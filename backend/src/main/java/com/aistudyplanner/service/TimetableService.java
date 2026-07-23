@@ -1,0 +1,335 @@
+package com.aistudyplanner.service;
+
+import com.aistudyplanner.exception.ResourceNotFoundException;
+import com.aistudyplanner.model.dto.request.SlotRequest;
+import com.aistudyplanner.model.dto.request.TimetableRequest;
+import com.aistudyplanner.model.dto.response.SlotResponse;
+import com.aistudyplanner.model.dto.response.TimetableResponse;
+import com.aistudyplanner.model.entity.Exam;
+import com.aistudyplanner.model.entity.Student;
+import com.aistudyplanner.model.entity.Subject;
+import com.aistudyplanner.model.entity.Timetable;
+import com.aistudyplanner.model.entity.TimetableSlot;
+import com.aistudyplanner.repository.ExamRepository;
+import com.aistudyplanner.repository.MarksRepository;
+import com.aistudyplanner.repository.StudentRepository;
+import com.aistudyplanner.repository.SubjectRepository;
+import com.aistudyplanner.repository.TimetableRepository;
+import com.aistudyplanner.repository.TimetableSlotRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class TimetableService {
+
+    private final TimetableRepository timetableRepository;
+    private final TimetableSlotRepository timetableSlotRepository;
+    private final SubjectRepository subjectRepository;
+    private final MarksRepository marksRepository;
+    private final ExamRepository examRepository;
+    private final StudentRepository studentRepository;
+    private final GroqService groqService;
+
+    @Transactional
+    public TimetableResponse generateAiTimetable(UUID studentId, TimetableRequest request) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        double availableHours = student.getAvailableHoursPerDay().doubleValue();
+        List<Subject> subjects = subjectRepository.findAllByStudentId(studentId, org.springframework.data.domain.PageRequest.of(0, 100));
+        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects);
+        
+        // Deactivate all other timetables
+        deactivateExistingTimetables(studentId);
+        
+        // Create new timetable
+        Timetable timetable = createNewTimetable(student);
+        
+        // Generate slots
+        List<TimetableSlot> slots = generateTimetableSlots(timetable, subjects, subjectWeights, availableHours);
+        timetableSlotRepository.saveAll(slots);
+        
+        return getTimetable(studentId);
+    }
+
+    /**
+     * Calculate weight for each subject based on performance and difficulty
+     */
+    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects) {
+        Map<UUID, Double> subjectAverages = new HashMap<>();
+        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(studentId);
+        for (Object[] row : avgData) {
+            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
+        }
+
+        LocalDate next30Days = LocalDate.now().plusDays(com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS);
+        List<Exam> upcomingExams = examRepository.findAllByStudentIdOrderByExamDateAsc(studentId, org.springframework.data.domain.PageRequest.of(0, 100)).stream()
+                .filter(e -> e.getExamDate() != null && !e.getExamDate().isAfter(next30Days) && !e.getExamDate().isBefore(LocalDate.now()))
+                .collect(Collectors.toList());
+
+        Map<UUID, Double> subjectWeights = new HashMap<>();
+        for (Subject subject : subjects) {
+            double weight = calculateIndividualWeight(subject, subjectAverages, upcomingExams);
+            subjectWeights.put(subject.getId(), weight);
+        }
+        return subjectWeights;
+    }
+
+    /**
+     * Calculate weight for a single subject
+     */
+    private double calculateIndividualWeight(Subject subject, Map<UUID, Double> subjectAverages, List<Exam> upcomingExams) {
+        double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
+        double diffLevel = subject.getDifficultyLevel() != null ? subject.getDifficultyLevel() : com.aistudyplanner.util.Constants.DEFAULT_SUBJECT_DIFFICULTY;
+        double weight = (100 - avg) + (diffLevel * 10);
+        
+        long minDaysToExam = com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS + 1;
+        for (Exam exam : upcomingExams) {
+            if (exam.getSubject().getId().equals(subject.getId())) {
+                long days = ChronoUnit.DAYS.between(LocalDate.now(), exam.getExamDate());
+                if (days < minDaysToExam) minDaysToExam = days;
+            }
+        }
+
+        if (minDaysToExam <= 3) {
+            weight += 50;
+        } else if (minDaysToExam <= 7) {
+            weight += 30;
+        }
+        return weight;
+    }
+
+    /**
+     * Deactivate all other timetables for the student
+     */
+    private void deactivateExistingTimetables(UUID studentId) {
+        List<Timetable> existing = timetableRepository.findAllByStudentId(studentId);
+        for (Timetable t : existing) {
+            t.setIsActive(false);
+            timetableRepository.save(t);
+        }
+    }
+
+    /**
+     * Create a new active timetable for the student
+     */
+    private Timetable createNewTimetable(Student student) {
+        Timetable timetable = Timetable.builder()
+                .student(student)
+                .isAiGenerated(true)
+                .isActive(true)
+                .build();
+        return timetableRepository.save(timetable);
+    }
+
+    /**
+     * Generate all timetable slots for the week
+     */
+    private List<TimetableSlot> generateTimetableSlots(Timetable timetable, List<Subject> subjects, 
+                                                        Map<UUID, Double> subjectWeights, double availableHours) {
+        List<TimetableSlot> slotsToSave = new ArrayList<>();
+        double totalWeight = subjectWeights.values().stream().mapToDouble(w -> w != null ? w : 0.0).sum();
+        double totalDailyMinutes = availableHours * 60;
+
+        Map<UUID, Integer> allocatedMinutesMap = allocateStudyTime(subjects, subjectWeights, totalWeight, totalDailyMinutes);
+        
+        for (int dayIndex = 0; dayIndex < com.aistudyplanner.util.Constants.DAYS_PER_WEEK; dayIndex++) {
+            slotsToSave.addAll(generateDaySlots(timetable, subjects, allocatedMinutesMap, dayIndex));
+        }
+        
+        return slotsToSave;
+    }
+
+    /**
+     * Allocate daily study time across subjects
+     */
+    private Map<UUID, Integer> allocateStudyTime(List<Subject> subjects, Map<UUID, Double> subjectWeights, 
+                                                  double totalWeight, double totalDailyMinutes) {
+        Map<UUID, Integer> allocatedMinutesMap = new HashMap<>();
+        
+        for (Subject subject : subjects) {
+            double weight = subjectWeights.get(subject.getId());
+            double allocated = (weight / totalWeight) * totalDailyMinutes;
+            int minutes = Math.max(com.aistudyplanner.util.Constants.MIN_SLOT_DURATION_MINUTES, (int) allocated);
+            minutes = Math.round(minutes / (float) com.aistudyplanner.util.Constants.SLOT_DURATION_ROUNDING_MINUTES) * com.aistudyplanner.util.Constants.SLOT_DURATION_ROUNDING_MINUTES;
+            if (minutes == 0) minutes = com.aistudyplanner.util.Constants.SLOT_DURATION_ROUNDING_MINUTES;
+            allocatedMinutesMap.put(subject.getId(), minutes);
+        }
+        return allocatedMinutesMap;
+    }
+
+    /**
+     * Generate slots for a specific day of the week
+     */
+    private List<TimetableSlot> generateDaySlots(Timetable timetable, List<Subject> subjects, 
+                                                  Map<UUID, Integer> allocatedMinutesMap, int dayIndex) {
+        List<TimetableSlot> daySlots = new ArrayList<>();
+        LocalTime currentTime = LocalTime.of(18, 0);
+        boolean isSunday = (dayIndex == 6);
+        double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
+
+        Map<UUID, Double> subjectAverages = new HashMap<>();
+        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
+        for (Object[] row : avgData) {
+            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
+        }
+
+        for (Subject subject : subjects) {
+            int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
+            if (subjectMinutes <= 0) continue;
+
+            double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
+            String topicSuggestion = groqService.generateTopicSuggestion(subject.getSubjectName(), avg, subjectMinutes, com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS);
+
+            TimetableSlot slot = TimetableSlot.builder()
+                    .timetable(timetable)
+                    .subject(subject)
+                    .dayOfWeek(dayIndex)
+                    .startTime(currentTime)
+                    .endTime(currentTime.plusMinutes(subjectMinutes))
+                    .topic(topicSuggestion)
+                    .isCompleted(false)
+                    .build();
+
+            daySlots.add(slot);
+            currentTime = currentTime.plusMinutes(subjectMinutes + com.aistudyplanner.util.Constants.BUFFER_BETWEEN_SLOTS_MINUTES);
+        }
+        return daySlots;
+    }
+
+    @Transactional(readOnly = true)
+    public TimetableResponse getTimetable(UUID studentId) {
+        Timetable timetable = timetableRepository.findByStudentIdAndIsActiveTrue(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("No active timetable found"));
+
+        // Use JOIN FETCH to avoid N+1 query problem
+        List<TimetableSlot> slots = timetableSlotRepository.findAllByTimetableIdWithSubjectFetch(timetable.getId());
+        List<SlotResponse> slotResponses = slots.stream().map(this::toSlotResponse).collect(Collectors.toList());
+
+        return TimetableResponse.builder()
+                .id(timetable.getId())
+                .isAiGenerated(timetable.getIsAiGenerated())
+                .isActive(timetable.getIsActive())
+                .slots(slotResponses)
+                .createdAt(timetable.getCreatedAt())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TimetableResponse> getAllTimetables(UUID studentId) {
+        // Use JOIN FETCH to load all timetables with slots in single query
+        List<Timetable> timetables = timetableRepository.findAllByStudentIdWithSlots(studentId);
+        
+        return timetables.stream().map(t -> {
+            List<SlotResponse> slots = t.getSlots().stream()
+                    .map(this::toSlotResponse)
+                    .collect(Collectors.toList());
+            
+            return TimetableResponse.builder()
+                    .id(t.getId())
+                    .isAiGenerated(t.getIsAiGenerated())
+                    .isActive(t.getIsActive())
+                    .slots(slots)
+                    .createdAt(t.getCreatedAt())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public SlotResponse updateSlot(UUID studentId, UUID slotId, SlotRequest request) {
+        TimetableSlot slot = timetableSlotRepository.findById(slotId)
+                .orElseThrow(() -> new ResourceNotFoundException("Slot not found"));
+
+        if (!slot.getTimetable().getStudent().getId().equals(studentId)) {
+            throw new IllegalArgumentException("Slot does not belong to student");
+        }
+
+        if (request.getSubjectId() != null) {
+            Subject subject = subjectRepository.findById(request.getSubjectId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+            slot.setSubject(subject);
+        }
+        
+        if (request.getDayOfWeek() != null) slot.setDayOfWeek(request.getDayOfWeek());
+        if (request.getStartTime() != null) slot.setStartTime(request.getStartTime());
+        if (request.getEndTime() != null) slot.setEndTime(request.getEndTime());
+        if (request.getTopic() != null) slot.setTopic(request.getTopic());
+
+        slot = timetableSlotRepository.save(slot);
+        return toSlotResponse(slot);
+    }
+
+    @Transactional
+    public SlotResponse markSlotComplete(UUID studentId, UUID slotId) {
+        TimetableSlot slot = timetableSlotRepository.findById(slotId)
+                .orElseThrow(() -> new ResourceNotFoundException("Slot not found"));
+
+        if (!slot.getTimetable().getStudent().getId().equals(studentId)) {
+            throw new IllegalArgumentException("Slot does not belong to student");
+        }
+
+        slot.setIsCompleted(!slot.getIsCompleted()); 
+        slot = timetableSlotRepository.save(slot);
+        return toSlotResponse(slot);
+    }
+
+    @Transactional
+    public void deleteTimetable(UUID studentId, UUID timetableId) {
+        Timetable timetable = timetableRepository.findById(timetableId)
+                .orElseThrow(() -> new ResourceNotFoundException("Timetable not found"));
+
+        if (!timetable.getStudent().getId().equals(studentId)) {
+            throw new IllegalArgumentException("Timetable does not belong to student");
+        }
+
+        timetableRepository.delete(timetable);
+    }
+
+    @Transactional
+    public TimetableResponse customCreateTimetable(UUID studentId, TimetableRequest request) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        List<Timetable> existing = timetableRepository.findAllByStudentId(studentId);
+        for (Timetable t : existing) {
+            t.setIsActive(false);
+            timetableRepository.save(t);
+        }
+
+        Timetable timetable = Timetable.builder()
+                .student(student)
+                .isAiGenerated(false)
+                .isActive(true)
+                .build();
+        timetable = timetableRepository.save(timetable);
+
+        return getTimetable(studentId);
+    }
+
+    private SlotResponse toSlotResponse(TimetableSlot slot) {
+        return SlotResponse.builder()
+                .id(slot.getId())
+                .subject(StudentMapper.toSubjectResponse(slot.getSubject()))
+                .dayOfWeek(slot.getDayOfWeek())
+                .startTime(slot.getStartTime())
+                .endTime(slot.getEndTime())
+                .topic(slot.getTopic())
+                .isCompleted(slot.getIsCompleted())
+                .notes(slot.getNotes())
+                .build();
+    }
+}

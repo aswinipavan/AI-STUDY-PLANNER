@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────
+#  ROOT .gitignore — AI Study Planner
+# ─────────────────────────────────────────────
+
+# ── Secrets / Environment Files ──────────────
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+!.env.local.example
+
+# Service account keys (Firebase, GCP, etc.)
+serviceAccountKey.json
+*serviceAccount*.json
+*.pem
+google-services.json
+
+# ── Backend (Spring Boot / Maven) ────────────
+backend/target/
+backend/logs/
+backend/*.log
+backend/full_test_output.txt
+backend/test_output.txt
+backend/maven.zip
+backend/maven/
+
+# ── Frontend (Next.js / Node) ─────────────────
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/coverage/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+frontend/.vercel/
+
+# ── IDE / Editor ─────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────
+*.log
+logs/
+
+# ── OS Files ─────────────────────────────────
+.DS_Store

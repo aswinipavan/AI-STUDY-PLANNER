@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "3d-web-experience": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/3d-web-experience/SKILL.md",
+      "computedHash": "87c4b32078381ee1e6df164ddd5c28dd67fc7552431a7415626e63b8cf74b11a"
+    },
+    "ai-engineer": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-engineer/SKILL.md",
+      "computedHash": "52fb6090bd4270629dca0c3b5d9dfbc38aa7c928c5fc9892d07fe0359c63130b"
+    },
+    "api-security-best-practices": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/api-security-best-practices/SKILL.md",
+      "computedHash": "c8c4fb0ccb11d3d22b59f72115c8c5da6db3f930dfb71a7b93e3b7889f0c44fe"
+    },
+    "clean-code": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/clean-code/SKILL.md",
+      "computedHash": "551e1ac1c416d9df11fce8bc613c3595794f1f5e634d20c5b3e257afded11ed7"
+    },
+    "firebase": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/firebase/SKILL.md",
+      "computedHash": "819f14081aceca8989f3389a95e3f6e1501a529efc444179852714db7c84e4a7"
+    },
+    "production-code-audit": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/production-code-audit/SKILL.md",
+      "computedHash": "e847a51ea79231a3d54311c31d2842be47ed6222be9b69c2d67b8dc438e85ede"
+    },
+    "senior-fullstack": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/senior-fullstack/SKILL.md",
+      "computedHash": "aeb5d559e500b2f3c0a827ba7921ae19e818e5faee7d7bb74b4e5e18ba4ad53b"
+    },
+    "ui-ux-designer": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ui-ux-designer/SKILL.md",
+      "computedHash": "fdccdfcc9b31cf185402e74d3d94b56709a6d4d2d92a4313d0fbafcca0a6d9a7"
+    }
+  }
+}

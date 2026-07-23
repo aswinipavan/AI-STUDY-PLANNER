@@ -1,0 +1,192 @@
+.container {
+  padding: 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--color-foreground);
+}
+
+.progressBlock {
+  background: var(--color-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.progressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.progressValue {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.progressTrack {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border-radius: 9999px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.progressFill {
+  background: var(--color-primary);
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gridBlock {
+  background: var(--color-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-x: auto;
+  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.1s;
+}
+
+.gridHeaders {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 0.75rem;
+}
+
+.dayHeader {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-foreground);
+  position: relative;
+}
+
+.dayHeaderActive {
+  color: var(--color-primary);
+}
+
+.todayDot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  margin: 4px auto 0;
+}
+
+.gridColumns {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 100px;
+}
+
+.slotCard {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  text-align: left;
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+}
+
+.slotCard:hover {
+  transform: translateY(-2px);
+}
+
+/* Status variants */
+.slotPending {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.05);
+  color: var(--color-foreground);
+}
+.slotPending:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.slotCompleted {
+  background: rgba(0, 229, 192, 0.1); /* Teal tinted */
+  border-color: rgba(0, 229, 192, 0.2);
+  color: var(--color-primary);
+}
+.slotCompleted:hover {
+  background: rgba(0, 229, 192, 0.15);
+}
+
+.slotSkipped {
+  background: transparent;
+  border-color: rgba(255,255,255,0.05);
+  color: var(--color-muted-foreground);
+  opacity: 0.7;
+}
+.slotSkipped:hover {
+  opacity: 1;
+}
+
+.slotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.slotSubject {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0;
+  truncate: true;
+}
+
+.slotIcon {
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  margin-left: 0.25rem;
+}
+
+.slotCard:hover .slotIcon {
+  opacity: 1;
+}
+
+.slotCompleted .slotIcon {
+  opacity: 1;
+}
+
+.slotTime {
+  font-size: 0.75rem;
+  font-family: var(--font-outfit), sans-serif;
+  opacity: 0.8;
+  margin: 0;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

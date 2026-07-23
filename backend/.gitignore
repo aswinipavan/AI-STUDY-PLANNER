@@ -1,0 +1,25 @@
+target/
+.env
+.env.local
+.env.*.local
+*.env
+
+# Service accounts
+serviceAccountKey.json
+*serviceAccount*.json
+
+# Compiled class file
+*.class
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Logs
+*.log
+/logs
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties

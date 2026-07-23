@@ -1,0 +1,130 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--color-foreground);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+
+.card {
+  background: var(--color-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 1.25rem;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.cardColorStrip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.subjectName {
+  font-family: var(--font-outfit), sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--color-foreground);
+  margin: 0;
+  padding-left: 0.5rem;
+  line-height: 1.2;
+}
+
+.actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.card:hover .actions {
+  opacity: 1;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.actionBtnEdit:hover { color: var(--color-foreground); background: rgba(255,255,255,0.05); }
+.actionBtnDelete:hover { color: #f87171; background: rgba(239, 68, 68, 0.1); }
+
+.cardFooter {
+  padding-left: 0.5rem;
+}
+
+.targetInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+}
+.skeletonHeader {
+  height: 2.25rem;
+  width: 10rem;
+  background: var(--color-muted);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.skeletonCard {
+  height: 100px;
+  background: var(--color-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

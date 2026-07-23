@@ -1,0 +1,21 @@
+.spinner {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fallback {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  filter: blur(60px);
+  opacity: 0.5;
+}
