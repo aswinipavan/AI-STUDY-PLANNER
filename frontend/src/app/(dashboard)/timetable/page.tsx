@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { AppButton } from '@/components/ui/AppButton';
 import { TimetableGridSkeleton } from '@/components/skeleton/TimetableGridSkeleton';
+import { useToast } from '@/components/ui/ToastProvider';
 import { CalendarDays, Zap, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TimetableSlot } from '@/types/api.types';
@@ -69,6 +70,7 @@ export default function TimetablePage() {
   const router = useRouter();
   const qc = useQueryClient();
   const [, startTransition] = useTransition();
+  const { toast } = useToast();
 
   const { data: timetable, isLoading, error, refetch } = useQuery({
     queryKey: QK.timetable,
@@ -88,8 +90,10 @@ export default function TimetablePage() {
         await timetableApi.updateSlotStatus(id, status);
         qc.invalidateQueries({ queryKey: QK.timetable });
       } catch (err) {
-        // BUG-006: Fix swallowed error in optimistic update
+        // BUG-006 Fixed: show visible error toast instead of swallowing silently
         console.error('[Timetable] Error updating slot status:', err);
+        toast.error('Could not update session status. Please try again.');
+        qc.invalidateQueries({ queryKey: QK.timetable }); // revert optimistic update
       }
     });
   };

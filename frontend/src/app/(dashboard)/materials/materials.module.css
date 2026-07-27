@@ -264,3 +264,82 @@
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ── AI Analysis UI ─────────────────────────────────── */
+
+.aiCategoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  color: #a78bfa;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.aiSummaryToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(0, 229, 192, 0.07);
+  border: 1px solid rgba(0, 229, 192, 0.2);
+  color: var(--color-primary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+.aiSummaryToggle:hover {
+  background: rgba(0, 229, 192, 0.14);
+}
+
+.aiSummaryPanel {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 6px;
+  text-align: left;
+  animation: fadeSlideUp 0.2s ease both;
+}
+
+.aiSummaryText {
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.aiPendingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-muted-foreground);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+

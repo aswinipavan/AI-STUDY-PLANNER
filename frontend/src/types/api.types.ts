@@ -53,6 +53,11 @@ export interface StudyMaterial {
   fileType: 'pdf' | 'image' | 'video' | 'doc'; 
   subjectId: string; 
   uploadedAt: string;
+  aiSummary?: string;
+  aiCategorizedSubject?: string;
+  fileName?: string;
+  fileSizeBytes?: number;
+  materialType?: string;
 }
 
 export interface ChatSession {

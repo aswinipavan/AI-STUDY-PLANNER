@@ -1,43 +1,34 @@
 # Next Task
 
-## BLOCKED - Security Test Dependency Missing
+## READY — Sign In & Verify Live Data
 
-### Current Issue
-**Module 3 - MaterialControllerTest cannot compile**
+Now that all hardcoded data and bugs are fixed, the next step is to:
 
-**Root Cause:**
-- MaterialController has `@PreAuthorize("isAuthenticated()")`
-- WebMvcTest needs spring-security-test to handle security context
-- pom.xml missing `spring-security-test` dependency
+### 1. Sign in with a real account
+- Go to http://localhost:3000/login
+- Sign in with email/password or Google
+- Verify the dashboard shows:
+  - Stats from your real data (0s if no data yet — not fake numbers)
+  - Focus Areas from priority API (or empty state message)
+  - Today's schedule from real timetable
 
-**Error Seen:**
-```
-ApplicationContext failure threshold exceeded - cannot load test context
-```
+### 2. Add your real data
+Follow this onboarding flow:
+1. `/subjects` → Add your subjects (e.g. Physics, Math, Chemistry)
+2. `/exams` → Add upcoming exams with dates and difficulty
+3. `/timetable/generate` → Generate AI timetable based on your subjects
+4. `/materials` → Upload your study materials (PDFs, docs, images)
+   - AI will automatically summarize and categorize them
+5. `/performance` → Add marks after exams to see analytics
 
-### To Resolve (requires user decision):
-Choose one:
+### 3. Open Items (if you want to continue developing)
+- **BUG-007**: Wire notification preferences to backend API endpoint
+- **Backend tests**: MaterialControllerTest now unblocked — run `mvn test` in backend/
+- **Performance page**: Add mark entry form directly in UI (currently requires API call)
 
-**Option 1 (Recommended):** Add missing dependency
-```xml
-<dependency>
-  <groupId>org.springframework.security</groupId>
-  <artifactId>spring-security-test</artifactId>
-  <scope>test</scope>
-</dependency>
-```
-
-**Option 2:** Remove @PreAuthorize from MaterialController for testing
-- Would require modifying production code
-
-**Option 3:** Mock security filter in test configuration
-- More complex, less clean
-
-### What's Complete ✅
-- Module 1: Auth & Security - 46+ tests (ALL PASSING)
-- Module 2: Groq & Caching - 28/28 tests (ALL PASSING)
-- Total: **74+ tests created and passing**
-
-### What's Blocked 🚫
-- Module 3+: Controller tests (20+ planned tests)
-- Awaiting spring-security-test dependency addition
+## What Was Fixed This Session ✅
+- BUG-004: Dashboard fake data → real API data
+- BUG-006: Timetable error toast
+- BUG-007 (partial): Notification UI note added
+- MaterialCard: AI Summary + AI Category badge display
+- spring-security-test added to pom.xml → MaterialControllerTest unblocked

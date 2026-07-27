@@ -29,7 +29,7 @@ export default function SettingsPage() {
   const { user, setUser, clearAuth } = useAuthStore();
   const router = useRouter();
 
-  // Mock settings for BUG-007
+  // Note: Notification preferences are local-only until BUG-007 backend endpoint is implemented
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(false);
 
@@ -151,7 +151,7 @@ export default function SettingsPage() {
             </div>
             <div>
               <h3 className={styles.cardTitle}>Notifications</h3>
-              <p className={styles.cardSubtitle}>Manage how we contact you</p>
+              <p className={styles.cardSubtitle}>Manage how we contact you · <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Preferences saved locally — backend sync coming soon</span></p>
             </div>
           </div>
           

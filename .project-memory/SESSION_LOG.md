@@ -111,3 +111,41 @@
   - Without dependency, Spring cannot instantiate test context
 - **Status:** BLOCKED - Requires adding spring-security-test dependency to pom.xml
 - **Next Action:** User to add dependency or modify controller for testing
+
+## 2026-07-23
+- **Task Started:** Push full-stack project to GitHub as monorepo
+- **Task Completed:** Project successfully pushed to https://github.com/aswinipavan/AI-STUDY-PLANNER
+- **Files Modified/Created:**
+  - Root `README.md` — Created comprehensive full-stack project documentation
+  - Root `.gitignore` — Created protecting .env, node_modules, build artifacts, IDE files
+  - `backend/.env.example` — **Sanitized**: replaced all real credentials with safe placeholders
+  - Removed `backend/.git` and `frontend/.git` nested repos to create unified monorepo
+- **Problems Found:**
+  - `backend/.env.example` contained real Supabase passwords, Groq API keys, Razorpay secrets — **CRITICAL: Credentials were sanitized before push**
+  - Both `backend/` and `frontend/` had their own `.git` folders (embedded repos)
+- **Solutions:**
+  - Sanitized `.env.example` with placeholder values
+  - Removed nested `.git` folders to merge into single root git repo (monorepo)
+  - Used `git add .` to stage all 347 files, excluding gitignored secrets
+- **Repository URL:** https://github.com/aswinipavan/AI-STUDY-PLANNER
+- **Commit:** `ccdcbd6 first commit - AI Study Planner full-stack project`
+- **Next Recommended Task:** ROTATE the exposed credentials immediately (Supabase DB password, Groq API key, Razorpay secret were previously in .env.example — revoke and regenerate all of them)
+
+## 2026-07-24
+- **Task Started:** Full QA audit of all frontend pages + fix hardcoded data issue.
+- **Task Completed:** 
+  - Audited all 13 pages of the frontend application.
+  - Identified BUG-004: Dashboard was showing hardcoded fake stats (14.5 hrs, 24 tasks, 3 exams) and fake AI Focus Areas (Physics/Thermodynamics, Maths/Calculus II, Chemistry/Organic) that were not real user data.
+  - Fixed BUG-004: `dashboard/page.tsx` now fetches real data via `useExams()`, `usePriority()`, and `timetableApi.getActive()`. Stats show actual timetable completion counts and real exam counts.
+  - Verified that all other pages correctly load data from API (no other hardcoded fakes found in data pages).
+  - Noted BUG-006 (optimistic update error swallowed) and BUG-007 (notification toggles not persisted).
+  - Added "backend sync coming soon" note to Settings > Notifications card to avoid confusing users.
+- **Files Modified:**
+  - `frontend/src/app/(dashboard)/dashboard/page.tsx` — Replaced all hardcoded stats and Focus Areas with real API hooks
+  - `frontend/src/app/(dashboard)/settings/page.tsx` — Fixed comment, added "coming soon" note to Notifications
+  - `.project-memory/BUG_TRACKER.md` — Added BUG-004 through BUG-007
+  - `.project-memory/TASKS.md` — Updated completed/pending tasks
+  - `.project-memory/UI_PROGRESS.md` — Full page audit scores filled in
+- **Problems Found:** Hardcoded fake data in dashboard; notification settings not persisted.
+- **Solutions:** Wired dashboard to real API hooks. Noted notification limitation in UI.
+- **Next Recommended Task:** Sign in with a real account and verify the dashboard shows correct data. Then implement notification preferences API endpoint (BUG-007).
