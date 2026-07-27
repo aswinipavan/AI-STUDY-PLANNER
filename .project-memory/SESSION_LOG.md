@@ -149,3 +149,26 @@
 - **Problems Found:** Hardcoded fake data in dashboard; notification settings not persisted.
 - **Solutions:** Wired dashboard to real API hooks. Noted notification limitation in UI.
 - **Next Recommended Task:** Sign in with a real account and verify the dashboard shows correct data. Then implement notification preferences API endpoint (BUG-007).
+
+## 2026-07-27
+- **Task Started:** Continue from previous session — commit pending changes, fix BUG-007, fix TypeScript errors
+- **Task Completed:**
+  - Committed 2 sessions worth of uncommitted changes to GitHub (BUG-004 fix, spring-security-test, UI improvements)
+  - BUG-007 FULLY FIXED: Implemented notification preferences persistence end-to-end
+  - BUG-008 FIXED: Sidebar.tsx TypeScript TS2451 variable collision (local `setMounted` vs store `setMounted`)
+- **Files Modified (Backend):**
+  - `Student.java` — Added `emailNotifications` and `pushNotifications` columns
+  - `NotificationPreferencesRequest.java` — New DTO (created)
+  - `StudentResponse.java` — Added notification fields to response DTO
+  - `StudentMapper.java` — Map new fields in toStudentResponse()
+  - `StudentService.java` — Added updateNotificationPreferences() transactional method
+  - `StudentController.java` — Added PUT /api/students/me/notifications endpoint
+- **Files Modified (Frontend):**
+  - `api.types.ts` — Added emailNotifications/pushNotifications to StudentProfile
+  - `auth.api.ts` — Added updateNotifications(), fixed ApiResponse unwrapping
+  - `settings/page.tsx` — Load prefs from user store, save via new API with success toast
+  - `Sidebar.tsx` — Fixed variable name collision
+- **Git Commits:** 1305c17 (previous session fixes), 2bc880e (BUG-007 + BUG-008)
+- **Problems Found:** Settings page had duplicate component code (write_to_file fixed it). Sidebar TS collision uncovered by tsc --noEmit.
+- **Solutions:** Proper Overwrite on settings page, renamed local state variable in Sidebar.
+- **Next Recommended Task:** Deploy frontend to Vercel. Trigger backend redeploy on Render to pick up new DB columns.

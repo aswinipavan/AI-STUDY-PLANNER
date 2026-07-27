@@ -14,19 +14,22 @@
 - [2026-07-24] Full QA audit of all frontend pages (13 pages checked).
 - [2026-07-24] BUG-004 Fixed: Removed hardcoded fake stats and fake Focus Areas from Dashboard. Now uses real API data (`useExams`, `usePriority`, `timetableApi.getActive`).
 
+- [2026-07-27] BUG-007 Fixed: Notification preferences API endpoint implemented. Backend: NotificationPreferencesRequest DTO, Student entity columns, StudentService method, PUT /api/students/me/notifications endpoint. Frontend: settings page wired to API with success toast.
+- [2026-07-27] BUG-008 Fixed: Sidebar.tsx TypeScript variable collision (setMounted from store vs local state).
+- [2026-07-27] Committed 2 sessions of work to GitHub (commits 1305c17 and 2bc880e).
+
 ## In Progress
-- BUG-007: Notification preferences (email/push toggles) are local state only — need backend API endpoint to persist.
+- (none)
 
 ## Blocked
-- BUG-007: Notification preferences backend endpoint not yet implemented.
-- MaterialControllerTest: Blocked on missing `spring-security-test` dependency.
+- BUG-006: Timetable error toast needs full optimistic update rollback.
 
 ## Pending
-- End-to-end testing of authenticated API routes from frontend.
-- Implement notification preferences persistence in backend.
-- Add `spring-security-test` to pom.xml and run MaterialControllerTest.
+- **Deploy frontend to Vercel** — push code then connect Vercel project.
+- **Redeploy backend to Render** — BUG-007 requires new columns in Supabase DB (Hibernate ddl-auto=update will auto-add them on restart).
+- Add `spring-security-test` already in pom.xml → Run MaterialControllerTest on local backend.
 
 ## Future Improvements
 - Add comprehensive JUnit/Mockito tests for backend services.
-- Wire up BUG-006: Show user-visible error toast when timetable slot update fails.
 - Performance page: Add marks entry form so users can record their own exam scores.
+- Playwright E2E automation tests.
