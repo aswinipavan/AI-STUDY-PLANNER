@@ -22,6 +22,8 @@ public class StudentMapper {
                 .studyStreak(student.getStudyStreak())
                 .availableHoursPerDay(student.getAvailableHoursPerDay())
                 .profilePictureUrl(student.getProfilePictureUrl())
+                .emailNotifications(student.getEmailNotifications())
+                .pushNotifications(student.getPushNotifications())
                 .build();
     }
 

@@ -29,9 +29,18 @@ export default function SettingsPage() {
   const { user, setUser, clearAuth } = useAuthStore();
   const router = useRouter();
 
-  // Note: Notification preferences are local-only until BUG-007 backend endpoint is implemented
-  const [emailNotifs, setEmailNotifs] = useState(true);
-  const [pushNotifs, setPushNotifs] = useState(false);
+  // BUG-007 FIXED: Notification preferences are now persisted in backend
+  const [emailNotifs, setEmailNotifs] = useState<boolean>(user?.emailNotifications ?? true);
+  const [pushNotifs, setPushNotifs] = useState<boolean>(user?.pushNotifications ?? false);
+  const [notifSaved, setNotifSaved] = useState(false);
+
+  // Sync notification prefs when user profile loads from store
+  useEffect(() => {
+    if (user) {
+      setEmailNotifs(user.emailNotifications ?? true);
+      setPushNotifs(user.pushNotifications ?? false);
+    }
+  }, [user]);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -49,6 +58,19 @@ export default function SettingsPage() {
       reset({ name: updated.name, grade: updated.grade ?? '' });
     },
   });
+
+  const { mutate: saveNotifications, isPending: isNotifPending } = useMutation({
+    mutationFn: authApi.updateNotifications,
+    onSuccess: (updated) => {
+      setUser(updated);
+      setNotifSaved(true);
+      setTimeout(() => setNotifSaved(false), 3000);
+    },
+  });
+
+  const handleSaveNotifications = () => {
+    saveNotifications({ emailNotifications: emailNotifs, pushNotifications: pushNotifs });
+  };
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -143,7 +165,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Notifications (Fix for BUG-007) */}
+        {/* Notifications — BUG-007 FIXED */}
         <div className={`${styles.card} ${styles.cardDelay2}`}>
           <div className={styles.cardHeader}>
             <div className={`${styles.iconWrap} ${styles.iconNotification}`}>
@@ -151,10 +173,16 @@ export default function SettingsPage() {
             </div>
             <div>
               <h3 className={styles.cardTitle}>Notifications</h3>
-              <p className={styles.cardSubtitle}>Manage how we contact you · <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Preferences saved locally — backend sync coming soon</span></p>
+              <p className={styles.cardSubtitle}>Manage how we contact you</p>
             </div>
           </div>
-          
+
+          {notifSaved && (
+            <div className={styles.successMsg}>
+              ✓ Notification preferences saved!
+            </div>
+          )}
+
           <div>
             <div className={styles.toggleRow}>
               <div className={styles.toggleInfo}>
@@ -162,7 +190,12 @@ export default function SettingsPage() {
                 <p className={styles.toggleDesc}>Receive weekly study summaries</p>
               </div>
               <label className={styles.switch}>
-                <input type="checkbox" checked={emailNotifs} onChange={(e) => setEmailNotifs(e.target.checked)} aria-label="Toggle email notifications" />
+                <input
+                  type="checkbox"
+                  checked={emailNotifs}
+                  onChange={(e) => setEmailNotifs(e.target.checked)}
+                  aria-label="Toggle email notifications"
+                />
                 <span className={styles.slider}></span>
               </label>
             </div>
@@ -172,9 +205,24 @@ export default function SettingsPage() {
                 <p className={styles.toggleDesc}>Get exam reminders on your device</p>
               </div>
               <label className={styles.switch}>
-                <input type="checkbox" checked={pushNotifs} onChange={(e) => setPushNotifs(e.target.checked)} aria-label="Toggle push notifications" />
+                <input
+                  type="checkbox"
+                  checked={pushNotifs}
+                  onChange={(e) => setPushNotifs(e.target.checked)}
+                  aria-label="Toggle push notifications"
+                />
                 <span className={styles.slider}></span>
               </label>
+            </div>
+            <div className="pt-4">
+              <AppButton
+                variant="outline"
+                onClick={handleSaveNotifications}
+                loading={isNotifPending}
+                className="w-full"
+              >
+                Save Notification Preferences
+              </AppButton>
             </div>
           </div>
         </div>

@@ -128,10 +128,10 @@ function UserProfileFooter() {
 export function Sidebar() {
   const pathname = usePathname();
   const { isSidebarOpen, isMounted, setSidebarOpen, setMounted } = useUIStore();
-  const [mounted, setMounted] = React.useState(false);
+  const [isLocalMounted, setIsLocalMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
+    setIsLocalMounted(true);
     setMounted();
   }, [setMounted]);
 

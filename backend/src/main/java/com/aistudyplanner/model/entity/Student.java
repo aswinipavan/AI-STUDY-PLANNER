@@ -55,6 +55,14 @@ public class Student {
     private Boolean isPremium = false;
 
     @Builder.Default
+    @Column(name = "email_notifications")
+    private Boolean emailNotifications = true;
+
+    @Builder.Default
+    @Column(name = "push_notifications")
+    private Boolean pushNotifications = false;
+
+    @Builder.Default
     @Column(name = "study_streak")
     private Integer studyStreak = 0;
 

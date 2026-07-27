@@ -1,5 +1,6 @@
 package com.aistudyplanner.controller;
 
+import com.aistudyplanner.model.dto.request.NotificationPreferencesRequest;
 import com.aistudyplanner.model.dto.request.SubjectRequest;
 import com.aistudyplanner.model.dto.request.UpdateProfileRequest;
 import com.aistudyplanner.model.dto.response.ApiResponse;
@@ -47,6 +48,16 @@ public class StudentController {
         log.info("Updating profile for student: {}", student.getId());
         StudentResponse response = studentService.updateProfile(student.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(response, "Profile updated successfully"));
+    }
+
+    @PutMapping("/me/notifications")
+    @Operation(summary = "Update notification preferences")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateNotifications(
+            @CurrentStudent Student student,
+            @Valid @RequestBody NotificationPreferencesRequest request) {
+        log.info("Updating notification preferences for student: {}", student.getId());
+        StudentResponse response = studentService.updateNotificationPreferences(student.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success(response, "Notification preferences updated"));
     }
 
     @GetMapping("/me/subjects")

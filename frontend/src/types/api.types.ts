@@ -7,6 +7,8 @@ export interface StudentProfile {
   grade?: string; 
   isPremium: boolean; 
   createdAt: string;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
 }
 
 export interface Subject {

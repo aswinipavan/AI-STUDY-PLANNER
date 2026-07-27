@@ -1,6 +1,7 @@
 package com.aistudyplanner.service;
 
 import com.aistudyplanner.exception.ResourceNotFoundException;
+import com.aistudyplanner.model.dto.request.NotificationPreferencesRequest;
 import com.aistudyplanner.model.dto.request.SubjectRequest;
 import com.aistudyplanner.model.dto.request.UpdateProfileRequest;
 import com.aistudyplanner.model.dto.response.StudentResponse;
@@ -42,6 +43,22 @@ public class StudentService {
         if (request.getSemester() != null) student.setSemester(request.getSemester());
         if (request.getDepartment() != null) student.setDepartment(request.getDepartment());
         if (request.getAvailableHoursPerDay() != null) student.setAvailableHoursPerDay(request.getAvailableHoursPerDay());
+
+        student = studentRepository.save(student);
+        return StudentMapper.toStudentResponse(student);
+    }
+
+    @Transactional
+    public StudentResponse updateNotificationPreferences(UUID studentId, NotificationPreferencesRequest request) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        if (request.getEmailNotifications() != null) {
+            student.setEmailNotifications(request.getEmailNotifications());
+        }
+        if (request.getPushNotifications() != null) {
+            student.setPushNotifications(request.getPushNotifications());
+        }
 
         student = studentRepository.save(student);
         return StudentMapper.toStudentResponse(student);

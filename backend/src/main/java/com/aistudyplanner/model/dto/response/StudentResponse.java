@@ -23,4 +23,6 @@ public class StudentResponse {
     private Integer studyStreak;
     private BigDecimal availableHoursPerDay;
     private String profilePictureUrl;
+    private Boolean emailNotifications;
+    private Boolean pushNotifications;
 }
