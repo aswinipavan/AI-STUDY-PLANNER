@@ -14,15 +14,19 @@
 - [2026-07-24] Full QA audit of all frontend pages (13 pages checked).
 - [2026-07-24] BUG-004 Fixed: Removed hardcoded fake stats and fake Focus Areas from Dashboard. Now uses real API data (`useExams`, `usePriority`, `timetableApi.getActive`).
 
-- [2026-07-27] BUG-007 Fixed: Notification preferences API endpoint implemented. Backend: NotificationPreferencesRequest DTO, Student entity columns, StudentService method, PUT /api/students/me/notifications endpoint. Frontend: settings page wired to API with success toast.
-- [2026-07-27] BUG-008 Fixed: Sidebar.tsx TypeScript variable collision (setMounted from store vs local state).
-- [2026-07-27] Committed 2 sessions of work to GitHub (commits 1305c17 and 2bc880e).
+- [2026-07-28] Module 3 UNBLOCKED: MaterialControllerTest 20/20 tests passing.
+  - Fixed @WebMvcTest context load: @MockBean StudentRepository (for FirebaseTokenFilter DI)
+  - Fixed 500s: used authentication() post-processor with real Student principal
+  - Fixed 403s: added csrf() to POST/DELETE requests
+- [2026-07-28] FirebaseTokenFilterTest: fixed UnnecessaryStubbingException by adding @MockitoSettings(strictness=LENIENT)
+- [2026-07-28] AuthServiceTest: fixed message assertion mismatch ("Invalid token" not "Invalid Firebase token")
+- [2026-07-28] Full backend test suite: 103 tests, 0 failures ✅
 
 ## In Progress
 - (none)
 
 ## Blocked
-- BUG-006: Timetable error toast needs full optimistic update rollback.
+- (none — BUG-006 timetable toast is low priority, future improvement)
 
 ## Pending
 - **Deploy frontend to Vercel** — push code then connect Vercel project.

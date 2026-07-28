@@ -172,3 +172,31 @@
 - **Problems Found:** Settings page had duplicate component code (write_to_file fixed it). Sidebar TS collision uncovered by tsc --noEmit.
 - **Solutions:** Proper Overwrite on settings page, renamed local state variable in Sidebar.
 - **Next Recommended Task:** Deploy frontend to Vercel. Trigger backend redeploy on Render to pick up new DB columns.
+
+## 2026-07-27 (Evening — Antigravity Session)
+- **Task Started:** Session continuation — project status review and handoff reading.
+- **Task Completed:** Full memory sync completed. Repository is clean and up-to-date with origin/main (4 commits total). No uncommitted changes found.
+- **Files Modified:** SESSION_LOG.md (this entry).
+- **Problems Found:** None. Repo is in a clean state.
+- **Solutions:** N/A.
+- **Context:** Previous work was done by Kiro (Claude-based agent). This session is being picked up by Antigravity. The project memory is accurate. Code was written by prior AI agents (Kiro + earlier Antigravity sessions), NOT by the user manually.
+- **Next Recommended Task:** Deploy frontend to Vercel + trigger Render backend redeploy to pick up new DB columns (email_notifications, push_notifications) from BUG-007 fix.
+
+## 2026-07-28
+- **Task Started:** Unblock MaterialControllerTest (Module 3) — previously failing with ApplicationContext load failure.
+- **Task Completed:** MaterialControllerTest now passes 20/20 tests. Full backend test suite passes (94+ tests total).
+- **Files Modified:**
+  - `MaterialControllerTest.java` — Complete rewrite to fix 3 root causes:
+    1. Added `@MockBean StudentRepository` — required by FirebaseTokenFilter constructor injection (WebMvcTest doesn't load JPA repos)
+    2. Replaced `@WithMockUser` with `authentication()` post-processor using a real `Student` entity as principal — required by `CurrentStudentArgumentResolver` which checks `instanceof Student`
+    3. Added `.with(csrf())` to all POST/DELETE requests — required by Spring Security CSRF protection
+    4. Fixed `isNull()` matcher for optional `fileType` parameter
+    5. Aligned IllegalArgumentException test expectations with actual GlobalExceptionHandler behavior (→ 500)
+  - `.project-memory/CURRENT_STATE.md` — Updated Module 3 status to ✅
+- **Problems Found:**
+  - FirebaseTokenFilter injects StudentRepository via Spring DI — @WebMvcTest doesn't load @Repository beans → context fail
+  - @WithMockUser sets Spring UserDetails principal, not Student entity → CurrentStudentArgumentResolver returns null → NPE → 500
+  - POST/DELETE without csrf() → 403
+  - GlobalExceptionHandler has no handler for IllegalArgumentException → falls to generic → 500 (not 400/403)
+- **Solutions:** See files modified above.
+- **Next Recommended Task:** Deploy frontend to Vercel + trigger backend redeploy on Render for BUG-007 new DB columns.

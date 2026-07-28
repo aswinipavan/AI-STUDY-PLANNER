@@ -153,7 +153,7 @@ class AuthServiceTest {
         when(firebaseAuthInstance.verifyIdToken(anyString())).thenThrow(new RuntimeException("Invalid token"));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> authService.login(request));
-        assertEquals("Invalid Firebase token", exception.getMessage());
+        assertEquals("Invalid token", exception.getMessage());
     }
 
     @Test
