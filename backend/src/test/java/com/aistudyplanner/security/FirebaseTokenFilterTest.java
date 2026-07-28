@@ -379,9 +379,11 @@ class FirebaseTokenFilterTest {
             // Act
             firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
-            // Assert
-            verify(filterChain, times(1)).doFilter(request, response);
+            // jwtTokenProvider should never be touched for any skip URL
             verifyNoInteractions(jwtTokenProvider);
         }
+
+        // filterChain.doFilter should have been called exactly once per path (3 paths total)
+        verify(filterChain, times(swaggerPaths.length)).doFilter(request, response);
     }
 }
