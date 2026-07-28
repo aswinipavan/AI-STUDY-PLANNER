@@ -28,7 +28,9 @@
   - MaterialControllerTest: 20/20 ✅
   - Key fix: @MockBean StudentRepository for FirebaseTokenFilter DI, authentication() post-processor with Student principal for CurrentStudentArgumentResolver, csrf() on mutating requests
 
-### TOTAL: 94+ tests passing ✅
+### TOTAL: 85 unit tests passing ✅
+- SecurityConfigTest + AuthControllerTest: Require Docker/Testcontainers (full DB). Pass when Docker available, skip in this env.
+- All pure unit + WebMvcTest + service tests: 85/85 ✅
 
 ## Deployment / Production Readiness
 - **Status:** Development phase. Not ready for production.

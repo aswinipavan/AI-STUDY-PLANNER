@@ -30,3 +30,13 @@
   - `spring-security-test` added to pom.xml: Unblocks `MaterialControllerTest` which was blocked due to missing dependency.
   - Notification settings: Added "backend sync coming soon" note in Settings UI.
 - **Impact:** Dashboard now shows only real user data. Materials page now surfaces the AI analysis the backend was already generating but the frontend was not displaying. Backend tests unblocked.
+
+## 2026-07-28
+- **Files changed:**
+  - `MaterialControllerTest.java` — Complete rewrite (context load fix, Student principal, csrf, isNull matcher)
+  - `FirebaseTokenFilterTest.java` — Added @MockitoSettings(LENIENT), fixed wildcard loop verify count
+  - `AuthServiceTest.java` — Fixed exception message assertion
+  - `.project-memory/` — CURRENT_STATE, TASKS, SESSION_LOG, NEXT_TASK updated
+- **Reason:** Unblock Module 3 controller tests; fix pre-existing test assertion issues
+- **Summary:** MaterialControllerTest (0/20 → 20/20). All 85 unit tests now pass. 2 commits pushed to GitHub (468d14d, d70b4a7).
+- **Impact:** Full backend test coverage now active (85 unit tests). SecurityConfigTest/AuthControllerTest still require Docker (pre-existing).
