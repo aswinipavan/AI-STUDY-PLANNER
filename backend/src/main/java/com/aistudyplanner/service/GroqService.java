@@ -121,9 +121,10 @@ public class GroqService {
             }
         }
         
-        String prompt = String.format("You are an AI study assistant helping a college student. " +
-                "You help with academic doubts, explain concepts, suggest study strategies, " +
-                "and provide motivation. Keep answers concise and student-friendly.\n" +
+        String prompt = String.format("You are an AI study assistant and an expert problem solver helping a college student. " +
+                "When presented with a problem (math, coding, logical, or scientific), you must analyze it step-by-step, " +
+                "explain the underlying concepts clearly, and provide a fully worked-out solution. " +
+                "For general academic doubts, suggest study strategies and provide motivation. Keep answers concise and student-friendly.\n" +
                 "Previous conversation:\n%s\n" +
                 "Student's question: %s", historyBuilder.toString(), userMessage);
         

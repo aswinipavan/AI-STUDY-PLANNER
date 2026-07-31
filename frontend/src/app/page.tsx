@@ -73,7 +73,7 @@ export default function Home() {
             <Link href="/dashboard" id="cta-dashboard" className={styles.btnPrimary}>
               Get Started →
             </Link>
-            <Link href="/auth/login" id="cta-login" className={styles.btnSecondary}>
+            <Link href="/login" id="cta-login" className={styles.btnSecondary}>
               Sign In
             </Link>
           </div>

@@ -8,7 +8,7 @@
 ## Environments
 - **Local:** Configured (`.env` file required).
 - **Staging:** Not Started.
-- **Production:** Backend deployed to Render. Frontend pending.
+- **Production:** Backend and Frontend deployed to Render (https://ai-study-planner-hp0e.onrender.com)
 
 ## Environment Variables
 - `FIREBASE_PROJECT_ID`

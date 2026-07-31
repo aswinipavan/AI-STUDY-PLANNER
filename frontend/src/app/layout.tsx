@@ -5,6 +5,7 @@ import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { OnboardingProvider } from "@/components/onboarding/OnboardingProvider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -28,7 +29,9 @@ export default function RootLayout({
           <AuthProvider>
             <OfflineBanner />
             <ToastProvider>
-              {children}
+              <OnboardingProvider>
+                {children}
+              </OnboardingProvider>
             </ToastProvider>
           </AuthProvider>
         </QueryProvider>

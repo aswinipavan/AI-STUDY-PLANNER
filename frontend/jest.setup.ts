@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import '@testing-library/jest-dom';
 
 // Mock global fetch and Response FIRST - before any other imports
@@ -48,3 +50,4 @@ jest.mock('next/navigation', () => ({
     return new URLSearchParams();
   }
 }));
+

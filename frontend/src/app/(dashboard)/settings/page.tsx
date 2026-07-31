@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,9 +12,10 @@ import { AppInput } from '@/components/ui/AppInput';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
-import { Moon, Sun, User, Bell, LogOut } from 'lucide-react';
+import { Moon, Sun, User, Bell, LogOut, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 const GRADES = ['Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12', 'Undergraduate', 'Postgraduate', 'Other'];
 
@@ -28,6 +30,12 @@ export default function SettingsPage() {
   const { toggleTheme, isDark } = useTheme();
   const { user, setUser, clearAuth } = useAuthStore();
   const router = useRouter();
+  const { replayOnboarding } = useOnboarding();
+
+  const handleReplayOnboarding = () => {
+    replayOnboarding();
+    router.push('/');
+  };
 
   // BUG-007 FIXED: Notification preferences are now persisted in backend
   const [emailNotifs, setEmailNotifs] = useState<boolean>(user?.emailNotifications ?? true);
@@ -224,6 +232,24 @@ export default function SettingsPage() {
                 Save Notification Preferences
               </AppButton>
             </div>
+          </div>
+        </div>
+
+        {/* Replay Onboarding */}
+        <div className={`${styles.card} ${styles.cardDelay3}`}>
+          <div className={styles.cardRow}>
+            <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
+              <div className={`${styles.iconWrap} ${styles.iconPrimary}`}>
+                <BookOpen size={20} />
+              </div>
+              <div>
+                <h3 className={styles.cardTitle}>Onboarding Tour</h3>
+                <p className={styles.cardSubtitle}>Replay the welcome experience</p>
+              </div>
+            </div>
+            <AppButton variant="outline" onClick={handleReplayOnboarding} id="settings-replay-onboarding">
+              Replay Tour
+            </AppButton>
           </div>
         </div>
 

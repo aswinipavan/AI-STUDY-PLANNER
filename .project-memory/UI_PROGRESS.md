@@ -12,6 +12,7 @@
 | `/timetable/generate` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | 5-step wizard. Warns if no subjects. |
 | `/performance` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Charts from real API data. Radial, Bar, Line, Scatter charts. |
 | `/chat` | 85% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | AI chat via Groq. |
-| `/settings` | 85% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Profile edit, theme toggle, notification toggles (local-only, noted). |
+| `/settings` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Profile edit, theme toggle, notifications, + Replay Onboarding. |
+| Onboarding (BookOnboarding) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 5-page 3D book-flip, particles, progress dots, skip, localStorage gate, keyboard nav. |
 | `/priority` | 80% | ✅ | ✅ | ✅ | ⭐⭐⭐ | From performance API. |
 | `/subscription` | 70% | ✅ | ✅ | ✅ | ⭐⭐⭐ | Razorpay integration. |

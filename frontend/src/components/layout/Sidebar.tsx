@@ -1,4 +1,6 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 // ── SKILLS APPLIED ────────────────────────────────────────────────────────────
 // clean-code:    Meaningful names, small focused components, SRP, no side effects

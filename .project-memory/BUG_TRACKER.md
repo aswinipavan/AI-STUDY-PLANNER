@@ -10,3 +10,6 @@
 | BUG-006 | Low | Optimistic update error swallowed silently in timetable slot toggle | `timetable/page.tsx` | Open — logged to console only | No |
 | BUG-007 | Medium | Notification toggles (email/push) are local state only — reset on refresh, not persisted to backend | `settings/page.tsx`, `auth.api.ts`, `StudentController.java`, `StudentService.java`, `Student.java` | **Fixed 2026-07-27** | No (needs live backend redeploy) |
 | BUG-008 | Low | Sidebar.tsx TypeScript error TS2451 — local `setMounted` collided with store `setMounted` | `Sidebar.tsx` | **Fixed 2026-07-27** | Yes |
+
+
+| RCA-001 | High | Backend CORS ALLOWED_ORIGINS points to itself instead of frontend | .env.example | Pending | No | No | |
