@@ -1,32 +1,33 @@
 # Next Task
 
 ## Current Module
-Production Deployment & UX Polish
+Production Deployment — Final CORS Fix
 
 ## Current Status
-Premium book-turn onboarding fully implemented, TypeScript-clean, and browser-verified. App is at 100% feature completeness.
+- ✅ Git push complete: `ddadbd3` on `main`
+- ✅ Secrets removed from history
+- ✅ Production build: 0 errors, 21 pages
+- ✅ **Vercel deployment LIVE:** https://ai-study-planner-jhh9.vercel.app
+- ⏳ Render CORS fix: **PENDING** — ALLOWED_ORIGINS must include Vercel URL
 
 ## Last Completed
-- Implemented premium 5-page book-flip onboarding experience.
-- Created 11 new files + modified 2 existing files.
-- Fixed Framer Motion v12 strict Variants type issues via shared `animationConfig.ts` with `as const` bezier tuples.
-- Build: ✅ 0 errors, 21 static pages.
-- Browser verification: ✅ All 5 pages, animations, navigation confirmed.
+- Vercel project- **Summary:** Force-pushed clean history to GitHub (`ddadbd3`). Deployed frontend to Vercel at https://ai-study-planner-jhh9.vercel.app. Set 11 environment variables (Firebase, backend URL, Razorpay). Root directory configured as `frontend`. Production build: 0 errors, 21 static pages.
 
 ## Next Action
-1. Push all code (including new onboarding files) to the central Git repository.
-2. Connect Vercel to the frontend directory and trigger a production deployment.
-3. On Render Dashboard: set `ALLOWED_ORIGINS` to the Vercel URL (CORS fix).
-4. Set Vercel env vars: `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_BACKEND_URL` to the backend's Render URL.
+1. **[HUMAN]** Go to https://dashboard.render.com → ai-study-planner service → Environment tab.
+2. **[HUMAN]** Update ALLOWED_ORIGINS to: `https://ai-study-planner-jhh9.vercel.app,http://localhost:3000`
+3. **[HUMAN]** Click Save Changes → Render auto-redeploys (~2 min).
+4. **[AI]** Verify live app E2E after CORS fix.
 
 ## After That
-- Verify the live deployed application E2E (auth flow, Supabase writes, Groq AI, onboarding on fresh browser).
+- Test live app: onboarding, login, dashboard, AI chat, materials upload.
+- Update NEXT_PUBLIC_APP_URL in Vercel settings to the real URL.
 
 ## Priority
-High (Deployment Finalization).
+High (CORS blocks all API calls from live app).
 
 ## Estimated Time
-30 Minutes.
+5 Minutes.
 
 ## Blockers
-Waiting for human action to execute Vercel setup and Render environment variable corrections (CORS).
+None — human can fix CORS directly on Render dashboard.

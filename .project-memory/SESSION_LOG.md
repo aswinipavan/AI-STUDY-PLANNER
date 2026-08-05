@@ -224,3 +224,19 @@
 - **Problems Found:** Framer Motion v12 strict `Variants` type rejects `ease: string` and `ease: number[]` (needs `readonly [n,n,n,n]` BezierDefinition). Multiple iterations of TS fixes required.
 - **Solutions:** Created shared `animationConfig.ts` with `as const` cubic-bezier tuples, exported typed `textVariants` with `Variants` type, imported across all pages. Moved inline float animations out of Variants objects to avoid type conflicts.
 - **Next Recommended Task:** Push to Git, deploy to Vercel, fix CORS on Render.
+
+## 2026-07-31
+- **Task Started:** Git push of all accumulated changes to GitHub.
+- **Task Completed:** All code pushed. Clean git history with secrets removed.
+- **Files Modified:** All 34 files from previous session committed. `backend/.env.example` sanitized.
+- **Problems Found:** 
+  1. Git push blocked by GitHub Push Protection — Groq API Key found in commit `16dceb5` (`backend/.env.example:15`). Also Supabase password, service role key, Razorpay secret present.
+  2. `git filter-branch` failed due to unstaged changes (needed `git stash` first).
+- **Solutions:**
+  1. Sanitized `backend/.env.example` — all real credentials replaced with descriptive `<placeholder>` values.
+  2. Used `git stash` → `git filter-branch --force --index-filter "git rm --cached --ignore-unmatch backend/.env.example"` to remove the file from commits `16dceb5` and `64c04fa`.
+  3. Restored sanitized file via `git stash pop` (resolved conflict by `git add`), committed as new commit `ddadbd3`.
+  4. Force-pushed (`git push --force origin main`). GitHub Push Protection no longer blocking.
+- **Production Build:** `npm run build` — ✅ 0 TypeScript errors, 0 compilation errors, 21 static pages generated.
+- **Next Recommended Task:** Human to connect Vercel (import `aswinipavan/AI-STUDY-PLANNER`, root dir = `frontend`) and set all Firebase + backend env vars. Then fix CORS on Render dashboard.
+

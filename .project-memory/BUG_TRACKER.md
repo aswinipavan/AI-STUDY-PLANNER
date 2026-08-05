@@ -12,4 +12,5 @@
 | BUG-008 | Low | Sidebar.tsx TypeScript error TS2451 — local `setMounted` collided with store `setMounted` | `Sidebar.tsx` | **Fixed 2026-07-27** | Yes |
 
 
+| BUG-009 | Low | `@types/jest` excluded from tsconfig — test files could not resolve jest globals (`describe`, `it`, `expect`, `jest`) | `tsconfig.json` | **Fixed 2026-08-03** | Yes |
 | RCA-001 | High | Backend CORS ALLOWED_ORIGINS points to itself instead of frontend | .env.example | Pending | No | No | |

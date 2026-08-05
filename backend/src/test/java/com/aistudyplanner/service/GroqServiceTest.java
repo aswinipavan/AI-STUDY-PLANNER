@@ -1,9 +1,7 @@
 package com.aistudyplanner.service;
 
-import com.aistudyplanner.exception.RateLimitException;
 import com.aistudyplanner.model.dto.response.ExamResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,10 +1,29 @@
 # Changelog
 
+## 2026-08-03 (session 2)
+- **Files changed:** `frontend/tsconfig.json`.
+- **Reason:** Fix IDE errors — jest globals (`describe`, `it`, `expect`, `jest.fn()`, `jest.Mock`) not resolved in test files.
+- **Summary:** Added `"types": ["jest", "node", "@testing-library/jest-dom"]` to `compilerOptions` and removed the blanket exclusion of `__tests__/**` and `*.test.ts/tsx` from `tsconfig.json`. This allows the TypeScript language server to apply jest type declarations to test files, resolving all 100+ reported errors across `timetable.test.tsx` and `hooks.test.ts`.
+- **Impact:** All test-file TypeScript errors in IDE are resolved. No runtime or build impact.
+
+## 2026-08-03 (session 1)
+- **Files changed:** `JwtTokenProviderTest.java`, `AuthServiceTest.java`, `GroqServiceTest.java`, `BookOnboarding.module.css`.
+- **Reason:** Fix all IDE lint warnings reported by the editor.
+- **Summary:** Removed 6 unused Java imports (`java.util.Date`, `ParameterizedTest`, `Arguments`, `MethodSource`, `Stream`, `RateLimitException`, `JsonNode`). Fixed CSS vendor prefix ordering for `backdrop-filter` and `backface-visibility` so `-webkit-` variants come before unprefixed ones.
+- **Impact:** 0 lint warnings remain in the reported files. No functional changes.
+
+## 2026-07-31
+- **Files changed:** `backend/.env.example` (SANITIZED — all real credentials replaced with placeholders).
+- **Reason:** GitHub Push Protection blocked push due to leaked Groq API Key + Supabase credentials in commit `16dceb5`. History rewritten with `git filter-branch` to remove secrets.
+- **Summary:** Force-pushed clean history to GitHub (`ddadbd3`). Deployed frontend to Vercel at https://ai-study-planner-jlh9.vercel.app. Set 11 environment variables (Firebase, backend URL, Razorpay). Root directory configured as `frontend`. Production build: 0 errors, 21 static pages.
+- **Impact:** App is now live on Vercel. CORS fix on Render pending (ALLOWED_ORIGINS must be updated to include Vercel URL before API calls will work from production).
+
 ## 2026-07-30
 - **Files changed:** `src/hooks/useOnboarding.ts` (NEW), `src/components/onboarding/animationConfig.ts` (NEW), `src/components/onboarding/BookOnboarding.tsx` (NEW), `src/components/onboarding/BookOnboarding.module.css` (NEW), `src/components/onboarding/OnboardingBackground.tsx` (NEW), `src/components/onboarding/OnboardingProvider.tsx` (NEW), `src/components/onboarding/pages/Page1Welcome.tsx`–`Page5Start.tsx` (NEW ×5), `src/app/layout.tsx` (MODIFIED), `src/app/(dashboard)/settings/page.tsx` (MODIFIED).
 - **Reason:** Implement premium first-visit onboarding experience as requested.
 - **Summary:** Created a full-screen book-page-turn onboarding with 5 illustrated pages, 3D CSS perspective + Framer Motion spring physics for the flip animation, animated particle background, warm paper aesthetic, localStorage first-visit gate, keyboard navigation, reduced-motion support, and a "Replay Tour" entry in Settings. Build passes 0 TypeScript errors. All 5 pages verified in browser.
 - **Impact:** New users see the onboarding on first visit; returning users go straight to the app. Existing authentication, routing, and business logic are completely untouched.
+
 
 ## 2026-07-22
 - **Files changed:** `pom.xml`, `.env`, `application.properties`, `GroqService.java`, `MaterialRepository.java`, `ChatHistoryRepository.java`, `MarksRepository.java`, `ExamRepository.java`, `FirebaseConfig.java`, `ManualTokenGenTest.java`.
