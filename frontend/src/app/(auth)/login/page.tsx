@@ -37,7 +37,11 @@ function friendlyError(code: string): string {
     case AuthErrorCodes.POPUP_CLOSED_BY_USER: return 'Sign-in window was closed. Please try again.';
     case AuthErrorCodes.POPUP_BLOCKED:        return 'Pop-up was blocked by browser. Please allow pop-ups.';
     case 'auth/invalid-credential':           return 'Invalid email or password.';
-    default: return 'Something went wrong. Please try again.';
+    case 'auth/unauthorized-domain':          return 'This domain is not authorised for sign-in. Please contact support.';
+    case 'auth/configuration-not-found':      return 'Firebase is not configured correctly. Please contact support.';
+    case 'auth/network-request-failed':       return 'Network error. Please check your connection and try again.';
+    case 'auth/internal-error':               return 'An internal error occurred. Please try again.';
+    default: return `Something went wrong (${code || 'unknown'}). Please try again.`;
   }
 }
 
