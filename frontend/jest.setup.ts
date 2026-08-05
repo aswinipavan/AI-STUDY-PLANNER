@@ -9,6 +9,7 @@ if (typeof global.fetch === 'undefined') {
 
 if (typeof global.Response === 'undefined') {
   (global as any).Response = class Response {
+    body: any;
     constructor(body: any) {
       this.body = body;
     }

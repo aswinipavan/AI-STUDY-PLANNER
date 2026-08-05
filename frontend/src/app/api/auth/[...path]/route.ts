@@ -24,7 +24,8 @@ async function handleProxy(request: NextRequest, context: { params: Promise<{ pa
       body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined,
     });
 
-    return new NextResponse(response.body, {
+    const body = await response.arrayBuffer();
+    return new NextResponse(body, {
       status: response.status,
       headers: {
         'Content-Type': response.headers.get('Content-Type') || 'application/json',
