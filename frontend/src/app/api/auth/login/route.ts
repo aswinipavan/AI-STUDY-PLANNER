@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firebaseToken }),
-        signal: AbortSignal.timeout(8000), // 8s max — Render cold start
+        signal: AbortSignal.timeout(30000), // 30s max — Render cold start can take 30-50s
       });
 
       if (backendRes.ok) {

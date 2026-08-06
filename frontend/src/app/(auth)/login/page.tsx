@@ -15,6 +15,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { StudentProfile } from '@/types/api.types';
 
+
 type Tab = 'signin' | 'register';
 
 const GoogleIcon = () => (
@@ -58,10 +59,23 @@ export default function LoginPage() {
   const [success, setSuccess]   = useState('');
   const [loading, setLoading]   = useState(false);
   const [showPwd, setShowPwd]   = useState(false);
+  const [backendStatus, setBackendStatus] = useState<'warming' | 'awake' | null>(null);
 
   // Clear errors when switching tabs
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setError(''); setSuccess(''); }, [tab]);
+
+  // Wake up the Render backend on page mount to avoid cold-start delays on login
+  useEffect(() => {
+    setBackendStatus('warming');
+    fetch('/api/wake')
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'awake') setBackendStatus('awake');
+        else setBackendStatus(null);
+      })
+      .catch(() => setBackendStatus(null));
+  }, []);
 
   // ── Shared: exchange Firebase token with backend proxy ────────────────────
   async function exchangeToken(idToken: string) {
@@ -143,6 +157,13 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
+      {/* Backend warm-up status — only show while warming */}
+      {backendStatus === 'warming' && (
+        <div style={{ position: 'fixed', top: 12, right: 16, fontSize: 12, color: '#aaa', background: 'rgba(0,0,0,0.5)', padding: '4px 10px', borderRadius: 999, zIndex: 999 }}>
+          ⚡ Connecting to server...
+        </div>
+      )}
+      
       {/* Subtle grid */}
       <div aria-hidden className={styles.backgroundGrid} />
 
