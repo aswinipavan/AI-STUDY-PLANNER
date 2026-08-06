@@ -44,12 +44,6 @@ export default function Home() {
 
         {/* Text content — left side */}
         <div className={styles.heroContent}>
-          {/* Badge */}
-          <div className={styles.badge}>
-            <span className={styles.badgeDot} />
-            Powered by Gemini AI
-          </div>
-
           {/* Headline */}
           <h1 className={styles.headline}>
             Study Smarter.{" "}

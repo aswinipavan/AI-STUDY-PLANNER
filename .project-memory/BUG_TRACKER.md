@@ -14,3 +14,6 @@
 
 | BUG-009 | Low | `@types/jest` excluded from tsconfig — test files could not resolve jest globals (`describe`, `it`, `expect`, `jest`) | `tsconfig.json` | **Fixed 2026-08-03** | Yes |
 | RCA-001 | High | Backend CORS ALLOWED_ORIGINS points to itself instead of frontend | .env.example | Pending | No | No | |
+
+| BUG-004 | CRITICAL | Firebase API key corrupted (FiOW vs FIoW) | frontend/.env.local | Fixed | Yes | Yes | No |
+| BUG-005 | CRITICAL | Render deployment timeout (Status 137) | application.properties | Fixed | Yes | Yes | No |

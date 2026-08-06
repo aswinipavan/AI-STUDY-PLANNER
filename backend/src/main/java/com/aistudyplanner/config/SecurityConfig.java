@@ -25,7 +25,6 @@ public class SecurityConfig {
     private final SecurityHeadersConfig securityHeadersConfig;
 
     @Bean
-    @SuppressWarnings("null")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)

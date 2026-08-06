@@ -177,7 +177,7 @@ export default function DashboardPage() {
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleBox}>
                 <h2>Quick Actions</h2>
-                <p>Accelerate your workflow with Gemini AI</p>
+                <p>Accelerate your workflow with AI</p>
               </div>
             </div>
             <div className={styles.actionGrid}>

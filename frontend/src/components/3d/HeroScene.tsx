@@ -7,9 +7,6 @@ import { ParticleField } from "./ParticleField";
 
 import styles from './HeroScene.module.css';
 
-// No longer used as a component — keep for future reference
-// function LoadingFallback() { ... }
-
 function NoWebGLFallback() {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
@@ -57,9 +54,11 @@ export function HeroScene() {
         }}
         style={{ background: "transparent" }}
       >
-        <ambientLight intensity={0.3} />
-        <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
-        <pointLight position={[-10, -5, -5]} intensity={0.8} color="#8b5cf6" />
+        {/* Enhanced lighting for better depth */}
+        <ambientLight intensity={0.4} />
+        <pointLight position={[10, 10, 10]} intensity={2} color="#ffffff" />
+        <pointLight position={[-10, -5, -5]} intensity={1.2} color="#8b5cf6" />
+        <pointLight position={[0, 0, 10]} intensity={0.8} color="#06b6d4" />
 
         <Suspense fallback={null}>
           <ParticleField count={particleCount} radius={10} />

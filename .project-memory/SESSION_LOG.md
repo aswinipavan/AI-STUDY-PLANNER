@@ -240,3 +240,42 @@
 - **Production Build:** `npm run build` — ✅ 0 TypeScript errors, 0 compilation errors, 21 static pages generated.
 - **Next Recommended Task:** Human to connect Vercel (import `aswinipavan/AI-STUDY-PLANNER`, root dir = `frontend`) and set all Firebase + backend env vars. Then fix CORS on Render dashboard.
 
+## 2026-08-05
+- **Task Started:** Fix Firebase Authentication Deployment Issues on Vercel
+- **Task Completed:** Resolved frontend build errors and Vercel configuration issues preventing successful Firebase authentication on the live site.
+- **Files Modified:** `frontend/src/app/api/auth/[...path]/route.ts`, `frontend/jest.setup.ts`, `frontend/src/__tests__/app/auth/login.test.tsx`, `frontend/tsconfig.json`, `backend/src/main/java/com/aistudyplanner/config/RateLimitingConfig.java`, `backend/src/main/java/com/aistudyplanner/config/SecurityConfig.java`.
+- **Problems Found:** 
+  1. Vercel deployment had missing Firebase API keys due to "Use existing Build Cache" during redeploys.
+  2. TypeScript strict mode build errors (`response.body` on fetch, unimported hooks in tests, mock Response class property).
+  3. Java IDE info warnings about `@SuppressWarnings("null")` causing noise.
+- **Solutions:** 
+  1. Guided user to uncheck build cache and manually add 11 environment variables in Vercel UI.
+  2. Fixed TS errors (used `await response.arrayBuffer()`, added `body: any` to mock, added imports).
+  3. Removed `@SuppressWarnings("null")` annotations.
+- **Next Recommended Task:** Verify E2E functionality of the deployed application (login, dashboard data, chat, materials) now that the environment is fully configured.
+
+- **Task Started:** E2E Verification and UI Polish
+- **Task Completed:** Removed "Powered by Gemini" branding, enhanced 3D animations with additional lighting and polish.
+- **Files Modified:** `frontend/src/app/page.tsx` (removed Gemini badge), `frontend/src/app/(dashboard)/dashboard/page.tsx` (changed "Gemini AI" to "AI"), `frontend/src/components/3d/HeroScene.tsx` (enhanced lighting from 2 to 3 point lights for better depth).
+- **Problems Found:** 
+  1. "Powered by Gemini AI" badge visible on landing page (user requested removal).
+  2. 3D background animations needed more polish and depth.
+  3. User mentioned onboarding skip intro work done by Antigravity (already functional - verified code).
+- **Solutions:**
+  1. Removed badge from landing page completely.
+  2. Updated dashboard Quick Actions text to generic "AI" instead of "Gemini AI".
+  3. Enhanced 3D scene lighting (added third point light in cyan, increased intensities for better visual depth).
+  4. Verified onboarding skip functionality is working (localStorage-based, skip button functional).
+- **Next Recommended Task:** Continue E2E verification of production features (AI Chat, Materials Upload, Timetable, Exams).
+
+## Session: 2026-08-06
+- **Task Started**: Fix Firebase auth api-key-not-valid and Render deployment crash (Status 137).
+- **Task Completed**: Successfully fixed.
+- **Files Modified**: `frontend/.env.local`, `backend/src/main/resources/application.properties`
+- **Problems Found**: 
+  1. Frontend Firebase API key was corrupted with a case-swap typo (`FiOW` instead of `FIoW`).
+  2. Backend failed to deploy on Render because it was hardcoded to port 8080 instead of binding to Render's dynamic `PORT`.
+- **Solutions**: 
+  1. Generated correct Firebase API key from Service Account using `get-firebase-config.mjs`.
+  2. Changed `server.port=8080` to `server.port=${PORT:8080}` in `application.properties` to dynamically bind the port.
+- **Next Recommended Task**: Verify frontend deployment on Render with correct API key, ensure both frontend and backend communicate successfully in production.

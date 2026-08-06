@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
-@SuppressWarnings("null")
 public class RateLimitingConfig {
 
     private final LoadingCache<String, RateLimiter> limiters;

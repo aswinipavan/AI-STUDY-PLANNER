@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase API Key Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1e293b;
+      color: #f1f5f9;
+    }
+    .log {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+    .success { background: #064e3b; border-left: 4px solid #10b981; }
+    .error { background: #7f1d1d; border-left: 4px solid #ef4444; }
+    .info { background: #1e3a5f; border-left: 4px solid #3b82f6; }
+  </style>
+</head>
+<body>
+  <h1>🔥 Firebase API Key Direct Test</h1>
+  <p>Testing Firebase initialization with the API key from .env.local</p>
+  <div id="output"></div>
+
+  <script type="module">
+    const output = document.getElementById('output');
+    
+    function log(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = message;
+      output.appendChild(div);
+    }
+
+    // Your Firebase config from .env.local
+    const firebaseConfig = {
+      apiKey: "AIzaSyAnt8FiOW8t_gt5ItsioRQhHpUJ2o8a-OY",
+      authDomain: "study-planner-ec1d2.firebaseapp.com",
+      projectId: "study-planner-ec1d2",
+      storageBucket: "study-planner-ec1d2.firebasestorage.app",
+      messagingSenderId: "217274229428",
+      appId: "1:217274229428:web:72d0fd169d064e2fe6ede1"
+    };
+
+    log('🔍 Testing Firebase Configuration...', 'info');
+    log(JSON.stringify(firebaseConfig, null, 2), 'info');
+
+    // Import Firebase
+    try {
+      log('📦 Importing Firebase SDK...', 'info');
+      
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+      const { getAuth, createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+      
+      log('✅ Firebase SDK loaded successfully', 'success');
+
+      // Initialize Firebase
+      log('🔥 Initializing Firebase app...', 'info');
+      const app = initializeApp(firebaseConfig);
+      log('✅ Firebase app initialized: ' + app.name, 'success');
+
+      // Get Auth instance
+      log('🔐 Getting Auth instance...', 'info');
+      const auth = getAuth(app);
+      log('✅ Auth instance created', 'success');
+
+      // Try to create a test user (will fail if email exists, but that's OK)
+      log('👤 Testing auth by creating test user...', 'info');
+      const testEmail = `test-${Date.now()}@example.com`;
+      const testPassword = 'test123456';
+      
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, testEmail, testPassword);
+        log('✅ SUCCESS! User created: ' + userCredential.user.email, 'success');
+        log('✅ API KEY IS VALID AND WORKING!', 'success');
+        log('🎉 Firebase is configured correctly!', 'success');
+      } catch (authError) {
+        if (authError.code === 'auth/email-already-in-use') {
+          log('✅ Auth is working (email already exists)', 'success');
+          log('✅ API KEY IS VALID!', 'success');
+        } else {
+          log('❌ AUTH ERROR: ' + authError.code, 'error');
+          log('❌ Message: ' + authError.message, 'error');
+          
+          if (authError.code === 'auth/api-key-not-valid') {
+            log('🔍 DIAGNOSIS: API key is invalid or restricted', 'error');
+            log('🔧 SOLUTION: Check Firebase Console → Project Settings → Web Apps', 'error');
+            log('🔧 Verify API key restrictions under APIs & Services in Google Cloud Console', 'error');
+          }
+        }
+      }
+
+    } catch (error) {
+      log('❌ FATAL ERROR: ' + error.message, 'error');
+      log('Stack: ' + error.stack, 'error');
+    }
+  </script>
+</body>
+</html>

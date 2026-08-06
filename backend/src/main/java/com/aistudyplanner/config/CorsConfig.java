@@ -21,15 +21,15 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         String allowedOriginsEnv = allowedOrigins;
         List<String> origins = Arrays.asList(allowedOriginsEnv.split(","));
-        
+
         // Security: Only allow * in non-production or reject it entirely
         if (origins.contains("*")) {
             if ("prod".equalsIgnoreCase(System.getenv("ENVIRONMENT"))) {
                 log.warn("WARNING: CORS wildcard (*) detected in production! Rejecting for security.");
-                configuration.setAllowedOrigins(List.of("https://your-production-frontend.com"));
+                configuration.setAllowedOrigins(List.of("https://ai-study-planner-jhh9.vercel.app/"));
             } else {
                 configuration.setAllowedOriginPatterns(List.of("*"));
                 log.warn("CORS wildcard (*) configured in non-production environment");
@@ -38,7 +38,7 @@ public class CorsConfig {
             configuration.setAllowedOrigins(origins);
             log.info("CORS configured for origins: {}", String.join(", ", origins));
         }
-        
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

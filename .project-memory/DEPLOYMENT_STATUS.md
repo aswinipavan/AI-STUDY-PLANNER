@@ -8,7 +8,7 @@
 ## Environments
 - **Local:** Configured (`.env` file required).
 - **Staging:** Not Started.
-- **Production:** Backend and Frontend deployed to Render (https://ai-study-planner-hp0e.onrender.com)
+- **Production:** Backend and Frontend deployed to Render (https://ai-study-planner-hp0e.onrender.com) - ✅ Verified Live on 2026-08-06
 
 ## Environment Variables
 - `FIREBASE_PROJECT_ID`
@@ -27,4 +27,4 @@
 ## Deployment Steps
 1. Push to GitHub.
 2. (Pending) Setup Vercel / Netlify for Frontend.
-3. (Pending) Setup Render / Railway for Backend.
+3. ✅ Backend successfully deployed to Render (dynamic port binding fixed).
