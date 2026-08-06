@@ -27,7 +27,9 @@ const GoogleIcon = () => (
   </svg>
 );
 
-function friendlyError(code: string): string {
+function friendlyError(err: unknown): string {
+  const code = (err as {code?: string})?.code || '';
+  const message = (err as {message?: string})?.message || '';
   switch (code) {
     case AuthErrorCodes.EMAIL_EXISTS:         return 'An account with this email already exists.';
     case AuthErrorCodes.INVALID_EMAIL:        return 'Please enter a valid email address.';
@@ -42,8 +44,10 @@ function friendlyError(code: string): string {
     case 'auth/configuration-not-found':      return 'Firebase is not configured correctly. Please contact support.';
     case 'auth/network-request-failed':       return 'Network error. Please check your connection and try again.';
     case 'auth/internal-error':               return 'An internal error occurred. Please try again.';
-    default: return `Something went wrong (${code || 'unknown'}). Please try again.`;
   }
+  if (message === 'backend-unavailable') return 'Server is starting up. Please wait 30 seconds and try again.';
+  if (message && !message.startsWith('Firebase')) return message;
+  return `Something went wrong (${code || message || 'unknown'}). Please try again.`;
 }
 
 export default function LoginPage() {
@@ -87,7 +91,13 @@ export default function LoginPage() {
     const data = await res.json();
     // Accept both 200 (backend success) and any response that has a user
     if (!res.ok && !data.user) {
-      throw new Error(data.error || 'Authentication failed');
+      if (res.status === 502 || res.status === 503 || res.status === 504) {
+        throw new Error('backend-unavailable');
+      }
+      // Use Firebase code if present, otherwise surface real error
+      const firebaseCode = (data as {code?: string}).code;
+      if (firebaseCode) throw Object.assign(new Error(firebaseCode), { code: firebaseCode });
+      throw new Error(data.error || `Server error (${res.status})`);
     }
     if (data.user) {
       setUserAction({
@@ -112,7 +122,7 @@ export default function LoginPage() {
       const token = await result.user.getIdToken();
       await exchangeToken(token);
     } catch (err: unknown) {
-      setError(friendlyError((err as { code?: string })?.code || ''));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -129,7 +139,7 @@ export default function LoginPage() {
       const token = await result.user.getIdToken();
       await exchangeToken(token);
     } catch (err: unknown) {
-      setError(friendlyError((err as { code?: string })?.code || ''));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -149,7 +159,7 @@ export default function LoginPage() {
       const token = await result.user.getIdToken(true);
       await exchangeToken(token);
     } catch (err: unknown) {
-      setError(friendlyError((err as { code?: string })?.code || ''));
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
