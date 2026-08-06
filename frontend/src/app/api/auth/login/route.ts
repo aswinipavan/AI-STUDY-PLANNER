@@ -48,9 +48,14 @@ export async function POST(req: NextRequest) {
       if (backendRes.ok) {
         const data = await backendRes.json();
 
-        // Set backend-issued tokens
-        if (data.accessToken) {
-          cookieStore.set('access_token', data.accessToken, {
+        // Backend returns ApiResponse<AuthResponse>:
+        // { success: true, data: { token: "...", student: {...}, isNewUser: false } }
+        const authData = data.data ?? data; // handle both wrapped and unwrapped responses
+
+        // Set the backend JWT token as an httpOnly cookie
+        const jwtToken = authData.token ?? authData.accessToken;
+        if (jwtToken) {
+          cookieStore.set('access_token', jwtToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -58,17 +63,9 @@ export async function POST(req: NextRequest) {
             maxAge: 60 * 60, // 1 hour
           });
         }
-        if (data.refreshToken) {
-          cookieStore.set('refresh_token', data.refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/',
-            maxAge: 60 * 60 * 24 * 30, // 30 days
-          });
-        }
 
-        user = data.user ?? null;
+        // student field from backend
+        user = authData.student ?? authData.user ?? null;
       }
     } catch (backendErr) {
       console.error('[auth/login] Backend unavailable:', backendErr);
