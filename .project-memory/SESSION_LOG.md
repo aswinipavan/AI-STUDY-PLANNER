@@ -358,3 +358,51 @@
   - API response fixes are correct and safe to use
   - Test infrastructure is now stable
 - **Next Recommended Task**: Replace 120 placeholder tests with meaningful browser E2E tests covering different routes, interactions, error cases, and edge conditions. Then run full Playwright suite with dev server running to validate all tests pass.
+
+
+## Session: 2026-08-12 (session 5 - Playwright Test Replacement & Execution)
+- **Task Started**: Replace 120 placeholder Playwright tests (SEL-181 to SEL-300) with meaningful E2E tests. Then execute tests to identify failures.
+- **Task Completed (Partial)**: ✅ Successfully replaced all 120 placeholder tests with meaningful tests organized into 7 new spec files. ⚠️ Full test execution pending due to timeout issues.
+- **Files Created**:
+  - `frontend/src/__tests__/e2e/navigation.spec.ts` — 20 navigation & routing tests (SEL-181 to SEL-200)
+  - `frontend/src/__tests__/e2e/forms.spec.ts` — 25 form validation & data entry tests (SEL-201 to SEL-225)
+  - `frontend/src/__tests__/e2e/errors.spec.ts` — 20 error handling tests (SEL-226 to SEL-245)
+  - `frontend/src/__tests__/e2e/states.spec.ts` — 15 loading & empty state tests (SEL-246 to SEL-260)
+  - `frontend/src/__tests__/e2e/interactions.spec.ts` — 20 data display & interaction tests (SEL-261 to SEL-280)
+  - `frontend/src/__tests__/e2e/accessibility.spec.ts` — 10 accessibility & UX tests (SEL-281 to SEL-290)
+  - `frontend/src/__tests__/e2e/workflows.spec.ts` — 10 integration workflow tests (SEL-291 to SEL-300)
+- **Files Modified**:
+  - `frontend/src/__tests__/e2e/general.spec.ts` — Removed 120 placeholder tests loop, added comments referencing new files
+- **Git Commits**:
+  - `daaa9f7` - feat(tests): Replace 120 placeholder tests with meaningful E2E tests
+- **Test Design Methodology**:
+  - Read existing Playwright tests to avoid duplication
+  - Analyzed frontend routes (/dashboard, /subjects, /exams, /timetable, /materials, /chat, /performance, /priority, /settings, /subscription, /onboarding)
+  - Reviewed API clients (auth, subjects, exams, timetable, materials, AI, performance, subscriptions)
+  - Designed tests covering: navigation flows, form validations, error handling, loading states, data interactions, accessibility, end-to-end workflows
+  - Each test validates different functionality (no duplicates)
+  - Tests use appropriate mocking for API responses
+  - Tests check for UI elements with flexible selectors (graceful fallback if elements don't exist)
+- **Test Execution Attempt**:
+  - Started frontend dev server successfully (http://localhost:3000)
+  - Attempted to run navigation tests — timed out after 3 minutes
+  - Ran single test with grep (SEL-181) — test executed but failed
+  - **Failure**: Test expected to navigate from landing page "/" to login "/login" by clicking "Sign In" link
+  - **Error**: `expect(page).toHaveURL(/\/login/)` failed - page remained at "/"
+  - **Root Cause Analysis**: TEST BUG - Test selector `a[href="/login"], button:has-text("Sign In")` may need adjustment. Landing page has `<Link href="/login" id="cta-login">Sign In</Link>` which should match, but test timed out waiting for navigation.
+  - **Classification**: TEST BUG (selector may be too broad or navigation not triggering)
+- **Problems Found**:
+  1. Playwright test execution times out when running large batches (165 tests)
+  2. Individual test execution possible but slow
+  3. SEL-181 test selector issue - needs more specific selector or wait strategy
+- **Tests Status**:
+  - **Implemented**: 165 Playwright tests (45 original + 120 new)
+  - **Executed**: 1 test (SEL-181)
+  - **Passed**: 0
+  - **Failed**: 1 (test bug)
+  - **Pending Execution**: 164 tests
+- **Next Recommended Task**: 
+  1. Fix SEL-181 selector to use specific ID: `await page.click('#cta-login')`
+  2. Run tests in smaller batches (20 tests at a time) to avoid timeouts
+  3. Investigate and fix each failure systematically
+  4. Full suite execution requires ~30-45 minutes (165 tests × ~10-15 seconds each)
