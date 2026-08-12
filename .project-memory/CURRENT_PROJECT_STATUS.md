@@ -18,9 +18,19 @@ This document outlines the compilation, testing, deployment, and production read
 - **Module 3 (Controllers - 20 tests):** All passing (MaterialController).
 - **Notes:** Full integration tests utilizing Docker Testcontainers (`SecurityConfigTest`, `ManualTokenGenTest`) are bypassed locally due to the host lacking Docker services, but they are fully written and compile.
 
-### Frontend Test Suite: 58/58 Passing (100% Green)
+### Frontend Test Suite: 58/58 Jest Tests Passing (100% Green)
 - Includes full unit and component test suites (Authentication, login pages, layout states, mock auth stores).
 - Login page tests verified green after importing real Next.js components and mocking warm-up fetches.
+- **Jest Configuration Fixed (2026-08-12):** Updated testPathIgnorePatterns to properly exclude Playwright tests from Jest execution.
+
+### Frontend E2E Tests: 45 Meaningful Playwright Tests (Status: Not Executed This Session)
+- **Total Playwright Test Files:** 12 spec files
+- **Total Test Count:** 165 Playwright tests
+  - **Meaningful Tests:** 45 (covering auth, dashboard, subjects, exams, timetable, materials, AI chat, analytics, settings, subscription, onboarding)
+  - **Placeholder Tests:** 120 (SEL-181 to SEL-300 in general.spec.ts - all perform identical action, need replacement)
+- **Execution Status:** Require running frontend dev server (`npm run dev`) to execute (standard E2E requirement)
+- **Previous Execution:** All tests failed with ERR_CONNECTION_REFUSED because server wasn't running
+- **Test Quality Issue Identified:** 120 placeholder tests violate meaningful test requirement
 
 ---
 

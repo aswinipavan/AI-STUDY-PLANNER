@@ -1,13 +1,27 @@
 # Next Task
 
-**Current Module**: Production Verification
-**Current Status**: Applied fixes for BUG-B (cross-domain auth proxy) and BUG-C (AI model name). Verified that BUG-A is a false positive due to Next.js 16 conventions. All local unit tests passing cleanly (100% green).
-**Last Completed**: Completed root-cause verification and applied the smallest correct fixes for the production issues.
+**Current Module**: Test Infrastructure Stabilization & Playwright Test Quality Improvement  
+**Current Status**: ✅ Fixed Jest configuration bug. ✅ Validated and committed API response wrapper fixes. ⚠️ Identified 120 placeholder Playwright tests that need replacement.  
+**Last Completed**: Comprehensive audit and stabilization of test infrastructure. Jest tests (58/58) passing cleanly. API response fixes validated against backend source code.
 
-**Next Action**: Deploy frontend changes to Vercel and backend changes to Render to verify the resolved cookies and model integrations in the live production staging environments.
-**After That**: Address any final polish or UI improvements.
-**Priority**: High
-**Estimated Time**: 30 minutes
+**Next Action (Priority 1):** Replace 120 placeholder Playwright tests (SEL-181 to SEL-300 in `general.spec.ts`) with meaningful E2E tests covering:
+- Different application routes with actual user workflows
+- Form submissions and data mutations
+- Error handling and edge cases  
+- Loading states and empty states
+- Accessibility checks
+- Responsive behavior validation
+- Network failure scenarios
+- Authentication boundary conditions
+
+**After That (Priority 2):** Run complete Playwright test suite with `npm run dev` running to validate all meaningful E2E tests pass end-to-end.
+
+**After That (Priority 3):** Complete remaining browser E2E tests to reach 300 total (currently have 45 meaningful + need 255 more).
+
+**After That (Priority 4):** Begin API Unit Tests category (300 tests planned).
+
+**Priority**: High (Test quality issue must be addressed before expanding test suite)  
+**Estimated Time**: 4-6 hours for placeholder replacement + validation  
 **Blockers**: None
 
 
