@@ -299,3 +299,30 @@
   4. Added `/api/auth/refresh` to permitAll in `SecurityConfig.java`.
   5. Updated `AuthService.java` to throw `FirebaseTokenException` when Firebase verification fails.
 - **Next Recommended Task**: Deploy frontend changes to Vercel and backend changes to Render to verify end-to-end user authentication flow in the live environment.
+
+## Session: 2026-08-12 (session 2)
+- **Task Started**: Complete project discovery, architectural audit, and product understanding.
+- **Task Completed**: Conducted a thorough codebase and architecture audit of the entire monorepo. Created 9 core project memory documents inside `.project-memory/` to map out the system overview, architecture, features, user journey, API routes, database ER schema, and AI prompts. Discovered 3 critical architectural vulnerabilities/bugs in production configuration.
+- **Files Modified (New Files Created)**: `.project-memory/PROJECT_OVERVIEW.md`, `.project-memory/PROJECT_ARCHITECTURE.md`, `.project-memory/FEATURE_INVENTORY.md`, `.project-memory/USER_JOURNEY.md`, `.project-memory/API_MAP.md`, `.project-memory/DATABASE_MAP.md`, `.project-memory/AI_SYSTEM.md`, `.project-memory/CURRENT_PROJECT_STATUS.md`, `.project-memory/PROJECT_MEMORY.md`
+- **Problems Found (Critical Audit Findings)**:
+  1. Next.js middleware is named `proxy.ts` in `frontend/src/` and is bypassed by Next.js, meaning all routes are unprotected.
+  2. Client-side Axios `apiClient` makes direct cross-domain requests to the Render backend, failing to send the Vercel-hosted `access_token` cookie. All API calls fail with 401 Unauthorized in production.
+  3. `GroqService` calls Google Gemini Developer API with an invalid model name `groq-1.5-flash`, causing 404/400 API failures at runtime.
+- **Solutions (Recommendations)**:
+  1. Rename `proxy.ts` to `middleware.ts` and locate it at the root of `src/` to activate route protection.
+  2. Route all browser API requests through Vercel's proxy (/api/auth/[...path]), or configure a JWT header-injection request interceptor using a client-side readable token.
+  3. Correct the Gemini model identifier in `GroqConfig.java` to `gemini-1.5-flash`.
+- **Next Recommended Task**: Fix the critical production-ready blockers identified in the technical audit and verify the live deployment end-to-end.
+
+## Session: 2026-08-12 (session 3)
+- **Task Started**: Root-cause verification and implementation of the smallest correct fixes for BUG-A, BUG-B, and BUG-C.
+- **Task Completed**: Applied verified production fixes. 
+  - BUG-A: Verified that Next.js 16.2.9 deprecates `middleware.ts` in favor of the `proxy.ts` convention (with `export function proxy`). Reverted the file path and function name to original settings; route protection remains functional.
+  - BUG-B: Created General API Proxy catch-all route at `frontend/src/app/api/[...path]/route.ts` and set client `baseURL` to `''` (same origin) in `apiClient.ts` to attach `httpOnly` access token cookies cross-site.
+  - BUG-C: Corrected Gemini model identifier to `gemini-1.5-flash` in `GroqConfig.java`.
+- **Files Modified**: `frontend/src/lib/apiClient.ts`, `frontend/src/app/api/[...path]/route.ts`, `backend/src/main/java/com/aistudyplanner/config/GroqConfig.java`, `.project-memory/CRITICAL_ISSUES_VERIFICATION.md`, `.project-memory/PROJECT_MEMORY.md`, `.project-memory/CURRENT_PROJECT_STATUS.md`.
+- **Problems Found**: None (Unit test suites passed cleanly with 58/58 frontend and 89/89 backend tests green).
+- **Solutions**: Resolved critical client credentials propagation and service endpoint naming discrepancies.
+- **Next Recommended Task**: Perform end-to-end testing in the live production staging environment.
+
+

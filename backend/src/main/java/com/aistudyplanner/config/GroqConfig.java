@@ -10,7 +10,7 @@ import java.time.Duration;
 @Configuration
 public class GroqConfig {
 
-    public static final String GROQ_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/groq-1.5-flash:generateContent";
+    public static final String GROQ_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
     @Bean
     public RestTemplate groqRestTemplate(RestTemplateBuilder builder) {

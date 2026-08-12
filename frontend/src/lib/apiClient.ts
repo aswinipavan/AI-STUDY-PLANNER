@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { normaliseError } from '@/utils/errorHandler';
-import { ENV } from '@/constants/config';
 
 export const apiClient = axios.create({
-  baseURL: ENV.BACKEND_URL,
+  baseURL: '', // Route through Next.js API proxy (same origin) to attach httpOnly auth cookie
   timeout: 15000, // axios timeout 15s — blueprint spec
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
