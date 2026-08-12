@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-12
+- **Files changed:** `frontend/src/__tests__/app/auth/login.test.tsx`, `backend/src/test/java/com/aistudyplanner/controller/AuthControllerTest.java`, `backend/src/main/java/com/aistudyplanner/config/SecurityConfig.java`, `backend/src/main/java/com/aistudyplanner/service/AuthService.java`
+- **Reason:** Fix all frontend and local backend unit/integration tests to be 100% green and fix authentication refresh & exception mapping.
+- **Summary:**
+  - Resolved 5 frontend login test failures in `login.test.tsx` by importing the real `LoginPage` component and mocking `fetch('/api/wake')`. All 58 frontend unit tests now pass.
+  - Resolved backend `@WebMvcTest` context failures in `AuthControllerTest.java` by importing `SecurityConfig`, `SecurityHeadersConfig`, and `FirebaseTokenFilter` along with declaring `@MockBean`s for `JwtTokenProvider` and `StudentRepository`.
+  - Added CSRF token mocking to `AuthControllerTest.java` requests.
+  - Fixed `SecurityConfig.java` to permit POST requests to `/api/auth/refresh` without pre-existing authentication.
+  - Remapped caught `FirebaseAuthException` in `AuthService.java` to throw `FirebaseTokenException` instead of `RuntimeException`, resulting in correct HTTP 401 Unauthorized errors instead of HTTP 500 Server Errors on token failure.
+  - Ran both test suites: 100% green passing tests (58 frontend tests, 89 backend tests).
+- **Impact:** Unified and verified testing pipeline local success. Improved session refresh security pathing and token exception response accuracy in production.
+
 ## 2026-08-03 (session 2)
 - **Files changed:** `frontend/tsconfig.json`.
 - **Reason:** Fix IDE errors — jest globals (`describe`, `it`, `expect`, `jest.fn()`, `jest.Mock`) not resolved in test files.

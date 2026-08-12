@@ -17,3 +17,5 @@
 
 | BUG-004 | CRITICAL | Firebase API key corrupted (FiOW vs FIoW) | frontend/.env.local | Fixed | Yes | Yes | No |
 | BUG-005 | CRITICAL | Render deployment timeout (Status 137) | application.properties | Fixed | Yes | Yes | No |
+| BUG-010 | Medium | AuthService throws RuntimeException on FirebaseAuthException, causing HTTP 500 instead of 401 | `AuthService.java` | Fixed | Yes |
+| BUG-011 | Medium | AuthControllerTest fails to boot or gets 403/401 due to missing SecurityConfig import and CSRF/auth | `AuthControllerTest.java`, `SecurityConfig.java` | Fixed | Yes |

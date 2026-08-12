@@ -4,7 +4,13 @@ import com.aistudyplanner.config.RateLimitingConfig;
 import com.aistudyplanner.model.dto.request.LoginRequest;
 import com.aistudyplanner.model.dto.response.AuthResponse;
 import com.aistudyplanner.service.AuthService;
+import com.aistudyplanner.security.JwtTokenProvider;
+import com.aistudyplanner.repository.StudentRepository;
+import com.aistudyplanner.config.SecurityConfig;
+import com.aistudyplanner.config.SecurityHeadersConfig;
+import com.aistudyplanner.security.FirebaseTokenFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,10 +23,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
+@Import({SecurityConfig.class, SecurityHeadersConfig.class, FirebaseTokenFilter.class})
 @DisplayName("Auth Controller Unit Tests")
 class AuthControllerTest {
 
@@ -35,6 +43,12 @@ class AuthControllerTest {
 
     @MockBean
     private RateLimitingConfig rateLimitingConfig;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private StudentRepository studentRepository;
 
     private LoginRequest validLoginRequest;
     private AuthResponse mockAuthResponse;
@@ -59,6 +73,7 @@ class AuthControllerTest {
         when(authService.login(any(LoginRequest.class))).thenReturn(mockAuthResponse);
 
         mockMvc.perform(post("/api/auth/login")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginRequest)))
                 .andExpect(status().isOk())
@@ -75,6 +90,7 @@ class AuthControllerTest {
         LoginRequest invalidRequest = LoginRequest.builder().firebaseToken("").build();
 
         mockMvc.perform(post("/api/auth/login")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -88,6 +104,7 @@ class AuthControllerTest {
         when(rateLimitingConfig.allowRequest(anyString())).thenReturn(false);
 
         mockMvc.perform(post("/api/auth/login")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginRequest)))
                 .andExpect(status().isTooManyRequests());
@@ -101,6 +118,7 @@ class AuthControllerTest {
         when(authService.refreshToken("valid.firebase.token")).thenReturn(mockAuthResponse);
 
         mockMvc.perform(post("/api/auth/refresh")
+                .with(csrf())
                 .header("Firebase-Token", "valid.firebase.token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))

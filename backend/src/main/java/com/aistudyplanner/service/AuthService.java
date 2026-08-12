@@ -5,6 +5,7 @@ import com.aistudyplanner.model.dto.response.AuthResponse;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.security.JwtTokenProvider;
+import com.aistudyplanner.exception.FirebaseTokenException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -59,7 +60,7 @@ public class AuthService {
 
         } catch (FirebaseAuthException e) {
             log.error("Firebase token verification failed", e);
-            throw new RuntimeException("Invalid Firebase token", e);
+            throw new FirebaseTokenException("Invalid Firebase token");
         }
     }
 
@@ -80,7 +81,7 @@ public class AuthService {
                     .build();
         } catch (FirebaseAuthException e) {
             log.error("Firebase token verification failed during refresh", e);
-            throw new RuntimeException("Invalid Firebase token", e);
+            throw new FirebaseTokenException("Invalid Firebase token");
         }
     }
 

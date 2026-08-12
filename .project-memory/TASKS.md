@@ -22,6 +22,13 @@
 - [2026-07-28] AuthServiceTest: fixed message assertion mismatch ("Invalid token" not "Invalid Firebase token")
 - [2026-07-28] Full backend test suite: 103 tests, 0 failures ✅
 - [2026-07-30] Conducted Complete Technical Audit. Generated 10 reports, fixed duplicate POM dependency, and cleared frontend linting errors.
+- [2026-08-12] Resolved all remaining test suite failures and security configurations:
+  - Fixed frontend unit tests in `login.test.tsx` by importing the real component rather than a broken mock, and mocked the `/api/wake` fetch route.
+  - Fixed backend `AuthControllerTest` context load by importing `SecurityConfig`/`SecurityHeadersConfig`/`FirebaseTokenFilter` and adding mock beans for `JwtTokenProvider`/`StudentRepository`.
+  - Added CSRF token post-processing to `AuthControllerTest` POST requests.
+  - Fixed `SecurityConfig.java` to permit public access to `/api/auth/refresh` so session refresh can happen without an existing JWT.
+  - Fixed `AuthService.java` exceptions to throw `FirebaseTokenException` instead of `RuntimeException` when Firebase validation fails, returning a 401 Unauthorized instead of a 500 Server Error.
+  - Ran both test suites: 100% passing (58/58 frontend green, 89/89 local backend green) ✅
 
 ## In Progress
 - (none)

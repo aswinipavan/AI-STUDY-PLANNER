@@ -35,127 +35,7 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(() => new URLSearchParams()),
 }));
 
-// Mock LoginPage component for testing
-const LoginPage = () => {
-  const [activeTab, setActiveTab] = React.useState('signin');
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
-  const [error, setError] = React.useState('');
-
-  return (
-    <div>
-      <div>
-        <button onClick={() => setActiveTab('signin')}>Sign In</button>
-        <button onClick={() => setActiveTab('register')}>Register</button>
-      </div>
-
-      {activeTab === 'signin' && (
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setError('');
-            if (!email || !password) {
-              setError('Please fill in all fields.');
-              return;
-            }
-            try {
-              const idToken = 'mock-token';
-              const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ firebaseToken: idToken }),
-              });
-              if (res.ok) {
-                window.location.href = '/dashboard';
-              }
-            } catch (err: any) {
-              setError(err.message || 'Sign in failed');
-            }
-          }}
-        >
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button type="submit">Sign In →</button>
-          {error && <div>{error}</div>}
-        </form>
-      )}
-
-      {activeTab === 'register' && (
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setError('');
-            if (!name || !email || !password || !confirmPassword) {
-              setError('Please fill in all fields.');
-              return;
-            }
-            if (password !== confirmPassword) {
-              setError('Passwords do not match.');
-              return;
-            }
-            if (password.length < 6) {
-              setError('Password must be at least 6 characters.');
-              return;
-            }
-            try {
-              const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ firebaseToken: 'mock-token' }),
-              });
-              if (res.ok) {
-                window.location.href = '/dashboard';
-              }
-            } catch (err: any) {
-              setError(err.message || 'Registration failed');
-            }
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Aswin Kumar"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Min. 6 characters"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Re-enter password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          <button type="submit">Create Account →</button>
-          {error && <div>{error}</div>}
-        </form>
-      )}
-
-      <button onClick={() => firebaseAuth.signInWithPopup}>
-        Continue with Google
-      </button>
-    </div>
-  );
-};
+import LoginPage from '@/app/(auth)/login/page';
 
 describe('LoginPage - Auth/Login Tests', () => {
   beforeEach(() => {
@@ -177,8 +57,15 @@ describe('LoginPage - Auth/Login Tests', () => {
       return selector ? selector(mockStore) : mockStore;
     });
 
-    // Reset fetch mock
+    // Reset fetch mock and set default implementation
     (global.fetch as jest.Mock).mockClear();
+    (global.fetch as jest.Mock).mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ status: 'awake', backend: 'UP' }),
+      })
+    );
   });
 
   // ─────────────────────────────────────────────────────────────────────────

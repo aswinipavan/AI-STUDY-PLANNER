@@ -279,3 +279,23 @@
   1. Generated correct Firebase API key from Service Account using `get-firebase-config.mjs`.
   2. Changed `server.port=8080` to `server.port=${PORT:8080}` in `application.properties` to dynamically bind the port.
 - **Next Recommended Task**: Verify frontend deployment on Render with correct API key, ensure both frontend and backend communicate successfully in production.
+
+## Session: 2026-08-12
+- **Task Started**: Verify test coverage and local pipeline, fix backend exception mapping, and resolve failing frontend and backend test suites.
+- **Task Completed**: All 58 frontend and 89 backend tests are fully passing (100% green). Fixed authentication exception mapping and permitted refresh token endpoint.
+- **Files Modified (Frontend)**: `frontend/src/__tests__/app/auth/login.test.tsx`
+- **Files Modified (Backend)**: `backend/src/test/java/com/aistudyplanner/controller/AuthControllerTest.java`, `backend/src/main/java/com/aistudyplanner/config/SecurityConfig.java`, `backend/src/main/java/com/aistudyplanner/service/AuthService.java`
+- **Problems Found**:
+  1. Frontend login tests had 5 failures due to a broken inline mock component `LoginPage` missing Firebase calls.
+  2. Backend `AuthControllerTest` failed to boot in WebMvcTest context due to missing `@MockBean`s for `JwtTokenProvider` and `StudentRepository` needed by `FirebaseTokenFilter`.
+  3. `AuthControllerTest` requests failed with 403 Forbidden because CSRF tokens were not mocked.
+  4. Once CSRF was mocked, requests failed with 401 Unauthorized because the custom `SecurityConfig` configuration class was not imported into WebMvcTest, defaulting to HTTP Basic auth.
+  5. The `/api/auth/refresh` endpoint was not permitted under `SecurityConfig`, rejecting public token refresh attempts.
+  6. Caught `FirebaseAuthException` in `AuthService` threw `RuntimeException`, returning an HTTP 500 error on Render rather than HTTP 401.
+- **Solutions**:
+  1. Imported real `LoginPage` component and mocked `fetch('/api/wake')` in frontend login tests.
+  2. Added `@Import({SecurityConfig.class, SecurityHeadersConfig.class, FirebaseTokenFilter.class})` and mocked dependencies in `AuthControllerTest.java`.
+  3. Added `.with(csrf())` to all `AuthControllerTest.java` mutating requests.
+  4. Added `/api/auth/refresh` to permitAll in `SecurityConfig.java`.
+  5. Updated `AuthService.java` to throw `FirebaseTokenException` when Firebase verification fails.
+- **Next Recommended Task**: Deploy frontend changes to Vercel and backend changes to Render to verify end-to-end user authentication flow in the live environment.
