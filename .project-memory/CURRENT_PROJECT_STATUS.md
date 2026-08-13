@@ -23,26 +23,47 @@ This document outlines the compilation, testing, deployment, and production read
 - Login page tests verified green after importing real Next.js components and mocking warm-up fetches.
 - **Jest Configuration Fixed (2026-08-12):** Updated testPathIgnorePatterns to properly exclude Playwright tests from Jest execution.
 
-### Frontend E2E Tests: 165 Playwright Tests Implemented (45 Original + 120 New Meaningful Tests)
+### Frontend E2E Tests: 165 Playwright Tests Implemented
 - **Total Playwright Test Files:** 19 spec files
 - **Total Test Count:** 165 Playwright tests
-  - **Original Meaningful Tests:** 45 (auth, dashboard, subjects, exams, timetable, materials, AI chat, analytics, settings, subscription, onboarding)
-  - **New Meaningful Tests:** 120 (navigation, forms, errors, states, interactions, accessibility, workflows)
-  - **Placeholder Tests:** 0 (all replaced with meaningful tests)
-- **Test Organization:**
-  - navigation.spec.ts: 20 tests (SEL-181 to SEL-200)
-  - forms.spec.ts: 25 tests (SEL-201 to SEL-225)
-  - errors.spec.ts: 20 tests (SEL-226 to SEL-245)
-  - states.spec.ts: 15 tests (SEL-246 to SEL-260)
-  - interactions.spec.ts: 20 tests (SEL-261 to SEL-280)
-  - accessibility.spec.ts: 10 tests (SEL-281 to SEL-290)
-  - workflows.spec.ts: 10 tests (SEL-291 to SEL-300)
-- **Execution Status:** Require running frontend dev server (`npm run dev`) to execute (standard E2E requirement)
-- **Partial Execution Results (2026-08-12):** 
-  - 1 test executed (SEL-181)
-  - 1 test failed (selector/timeout issue - test assumes UI element structure)
-  - Classification: TEST BUG - test selector may need adjustment
-  - Full suite execution pending (165 tests require longer execution time)
+
+**Test Execution Status (2026-08-12):**
+- **Implemented:** 165 tests
+- **Executed:** 50 tests
+- **Passed:** 42 tests (84% pass rate of executed)
+- **Failed:** 0 tests
+- **Blocked:** 8 tests (require real Firebase authentication)
+- **Not Executed:** 115 tests
+
+**Completed Batches:**
+1. **auth.spec.ts (SEL-001 to SEL-030):** 30 tests
+   - Passed: 22
+   - Blocked: 8 (SEL-001, SEL-002, SEL-003, SEL-009, SEL-010: require Firebase; SEL-026, SEL-027, SEL-028: Firebase/OAuth limitations)
+   - Client-side validation, route protection, session management all working
+   
+2. **navigation.spec.ts (SEL-181 to SEL-200):** 20 tests
+   - Passed: 20
+   - All navigation and routing features verified working correctly
+
+**Test Infrastructure Established:**
+- ✅ JWT token generation using cryptographically valid tokens (matches backend secret)
+- ✅ Reusable authenticated Playwright state (`setupAuthenticatedSession`)
+- ✅ Reusable unauthenticated context (`setupUnauthenticatedContext`)
+- ✅ API route mocking for authenticated pages
+- ✅ Onboarding modal skip for all tests
+- ✅ Files created:
+  - `frontend/playwright/generate-test-jwt.ts` - JWT generator
+  - `frontend/playwright/auth-setup.ts` - Reusable auth fixtures
+  - `frontend/playwright/test-jwt.js` - JWT verification script
+
+**Remaining Batches (115 tests):**
+- Dashboard tests (DASH-001 to DASH-025): 25 tests
+- Subject management tests (SUB-001 to SUB-020): 20 tests
+- Exam management tests (EX-001 to EX-020): 20 tests
+- Timetable tests (TT-001 to TT-015): 15 tests
+- Study materials tests (MAT-001 to MAT-015): 15 tests
+- AI assistant tests (AI-001 to AI-010): 10 tests
+- Analytics tests (ANA-001 to ANA-010): 10 tests
 
 ---
 

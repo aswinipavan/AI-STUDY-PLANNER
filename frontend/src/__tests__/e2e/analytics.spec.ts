@@ -4,6 +4,11 @@ import { test, expect } from '@playwright/test';
 test.describe('Analytics Charts Section', () => {
 
   test.beforeEach(async ({ page, context }) => {
+    // Skip onboarding for all tests
+    await context.addInitScript(() => {
+      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
+    });
+
     // Intercept auth checks
     await page.route('**/api/students/me', async (route) => {
       await route.fulfill({

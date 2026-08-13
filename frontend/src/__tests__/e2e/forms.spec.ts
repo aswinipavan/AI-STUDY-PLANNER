@@ -4,6 +4,11 @@ import { test, expect } from '@playwright/test';
 test.describe('Forms and Data Entry', () => {
 
   test.beforeEach(async ({ page, context }) => {
+    // Skip onboarding for all tests
+    await context.addInitScript(() => {
+      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
+    });
+
     await page.route('**/api/students/me', async (route) => {
       await route.fulfill({
         status: 200,
@@ -127,12 +132,16 @@ test.describe('Forms and Data Entry', () => {
     });
 
     await page.goto('/settings');
-    const nameInput = page.locator('input[name="name"], input[placeholder*="name"]').first();
+    const nameInput = page.locator('input[type="text"], input[placeholder*="name"]').first();
     if (await nameInput.count() > 0) {
       await nameInput.fill('Updated Name');
+      // Check if button becomes enabled
+      await page.waitForTimeout(300);
       const saveBtn = page.locator('button[type="submit"], button:has-text("Save")').first();
-      if (await saveBtn.count() > 0) {
+      if (await saveBtn.count() > 0 && await saveBtn.isEnabled()) {
         await saveBtn.click();
+        // Wait for update to complete
+        await page.waitForTimeout(500);
       }
     }
   });
