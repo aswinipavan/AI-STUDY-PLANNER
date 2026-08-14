@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { normaliseError } from '@/utils/errorHandler';
+import { auth } from '@/lib/firebase';
 
 export const apiClient = axios.create({
   baseURL: '', // Route through Next.js API proxy (same origin) to attach httpOnly auth cookie
@@ -24,7 +25,20 @@ apiClient.interceptors.response.use(
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          const refreshRes = await fetch('/api/auth/refresh', { method: 'POST' });
+          // Get current Firebase user's ID token
+          const currentUser = auth.currentUser;
+          if (!currentUser) {
+            throw new Error('No user authenticated');
+          }
+
+          const firebaseToken = await currentUser.getIdToken(true);
+
+          const refreshRes = await fetch('/api/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firebaseToken }),
+          });
+
           if (!refreshRes.ok) {
             throw new Error(`Refresh failed with status ${refreshRes.status}`);
           }
