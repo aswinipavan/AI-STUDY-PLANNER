@@ -5,6 +5,9 @@ import com.aistudyplanner.model.dto.response.SubjectResponse;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.model.entity.Subject;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 public class StudentMapper {
 
     public static StudentResponse toStudentResponse(Student student) {
@@ -29,12 +32,33 @@ public class StudentMapper {
 
     public static SubjectResponse toSubjectResponse(Subject subject) {
         if (subject == null) return null;
+        
+        // Calculate next exam date and days remaining
+        LocalDate nextExamDate = null;
+        Long daysUntilExam = null;
+        
+        if (subject.getExams() != null && !subject.getExams().isEmpty()) {
+            // Find the nearest upcoming exam for this subject
+            nextExamDate = subject.getExams().stream()
+                    .filter(exam -> exam.getExamDate() != null && !exam.getIsCompleted())
+                    .map(exam -> exam.getExamDate())
+                    .min(LocalDate::compareTo)
+                    .orElse(null);
+            
+            if (nextExamDate != null) {
+                daysUntilExam = ChronoUnit.DAYS.between(LocalDate.now(), nextExamDate);
+                if (daysUntilExam < 0) daysUntilExam = 0L;
+            }
+        }
+        
         return SubjectResponse.builder()
                 .id(subject.getId())
                 .subjectName(subject.getSubjectName())
                 .subjectCode(subject.getSubjectCode())
                 .credits(subject.getCredits())
                 .difficultyLevel(subject.getDifficultyLevel())
+                .nextExamDate(nextExamDate)
+                .daysUntilExam(daysUntilExam)
                 .build();
     }
 
