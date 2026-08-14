@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Auth Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    .test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    .result { margin-top: 10px; padding: 10px; border-radius: 3px; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    pre { background: #f5f5f5; padding: 10px; overflow-x: auto; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Firebase Authentication Test</h1>
+  <p><strong>Testing Domain:</strong> <span id="current-domain"></span></p>
+  <p><strong>Firebase Project:</strong> study-planner-ec1d2</p>
+  
+  <div class="test">
+    <h3>Configuration Check</h3>
+    <div id="config-result" class="result"></div>
+  </div>
+
+  <div class="test">
+    <h3>Test 1: Email/Password Register</h3>
+    <input type="email" id="reg-email" placeholder="test@example.com" value="test-user-12345@test.com">
+    <input type="password" id="reg-password" placeholder="password" value="test123456">
+    <button onclick="testRegister()">Test Register</button>
+    <div id="register-result" class="result"></div>
+  </div>
+
+  <div class="test">
+    <h3>Test 2: Email/Password Sign In</h3>
+    <input type="email" id="signin-email" placeholder="test@example.com" value="test-user-12345@test.com">
+    <input type="password" id="signin-password" placeholder="password" value="test123456">
+    <button onclick="testSignIn()">Test Sign In</button>
+    <div id="signin-result" class="result"></div>
+  </div>
+
+  <div class="test">
+    <h3>Test 3: Google Sign-In (Popup)</h3>
+    <button onclick="testGoogleSignIn()">Test Google Sign-In</button>
+    <div id="google-result" class="result"></div>
+  </div>
+
+  <script type="module">
+    // Firebase SDK
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword,
+      signInWithPopup,
+      GoogleAuthProvider 
+    } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAnt8FIoW8t_gt5ItsioRQhHpUJ2o8a-OY",
+      authDomain: "study-planner-ec1d2.firebaseapp.com",
+      projectId: "study-planner-ec1d2",
+      storageBucket: "study-planner-ec1d2.firebasestorage.app",
+      messagingSenderId: "217274229428",
+      appId: "1:217274229428:web:72d0fd169d064e2fe6ede1"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // Display current domain
+    document.getElementById('current-domain').textContent = window.location.hostname;
+
+    // Check configuration
+    const configResult = document.getElementById('config-result');
+    configResult.className = 'result success';
+    configResult.innerHTML = `
+      <strong>✅ Firebase SDK Loaded</strong><br>
+      <strong>Auth Domain:</strong> ${firebaseConfig.authDomain}<br>
+      <strong>Project ID:</strong> ${firebaseConfig.projectId}<br>
+      <strong>Current Host:</strong> ${window.location.hostname}<br>
+      <strong>Current URL:</strong> ${window.location.href}
+    `;
+
+    // Test Register
+    window.testRegister = async function() {
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+      const resultDiv = document.getElementById('register-result');
+      
+      resultDiv.innerHTML = '<em>Testing...</em>';
+      
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const token = await userCredential.user.getIdToken();
+        
+        resultDiv.className = 'result success';
+        resultDiv.innerHTML = `
+          <strong>✅ SUCCESS</strong><br>
+          <strong>User ID:</strong> ${userCredential.user.uid}<br>
+          <strong>Email:</strong> ${userCredential.user.email}<br>
+          <strong>Token Length:</strong> ${token.length} chars<br>
+          <pre>${JSON.stringify({ uid: userCredential.user.uid, email: userCredential.user.email }, null, 2)}</pre>
+        `;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+          <strong>❌ FAILED</strong><br>
+          <strong>Error Code:</strong> ${error.code || 'unknown'}<br>
+          <strong>Error Message:</strong> ${error.message || 'unknown'}<br>
+          <pre>${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}</pre>
+        `;
+      }
+    };
+
+    // Test Sign In
+    window.testSignIn = async function() {
+      const email = document.getElementById('signin-email').value;
+      const password = document.getElementById('signin-password').value;
+      const resultDiv = document.getElementById('signin-result');
+      
+      resultDiv.innerHTML = '<em>Testing...</em>';
+      
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const token = await userCredential.user.getIdToken();
+        
+        resultDiv.className = 'result success';
+        resultDiv.innerHTML = `
+          <strong>✅ SUCCESS</strong><br>
+          <strong>User ID:</strong> ${userCredential.user.uid}<br>
+          <strong>Email:</strong> ${userCredential.user.email}<br>
+          <strong>Token Length:</strong> ${token.length} chars<br>
+          <pre>${JSON.stringify({ uid: userCredential.user.uid, email: userCredential.user.email }, null, 2)}</pre>
+        `;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+          <strong>❌ FAILED</strong><br>
+          <strong>Error Code:</strong> ${error.code || 'unknown'}<br>
+          <strong>Error Message:</strong> ${error.message || 'unknown'}<br>
+          <pre>${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}</pre>
+        `;
+      }
+    };
+
+    // Test Google Sign-In
+    window.testGoogleSignIn = async function() {
+      const resultDiv = document.getElementById('google-result');
+      
+      resultDiv.innerHTML = '<em>Opening popup...</em>';
+      
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const token = await result.user.getIdToken();
+        
+        resultDiv.className = 'result success';
+        resultDiv.innerHTML = `
+          <strong>✅ SUCCESS</strong><br>
+          <strong>User ID:</strong> ${result.user.uid}<br>
+          <strong>Email:</strong> ${result.user.email}<br>
+          <strong>Display Name:</strong> ${result.user.displayName}<br>
+          <strong>Token Length:</strong> ${token.length} chars<br>
+          <pre>${JSON.stringify({ 
+            uid: result.user.uid, 
+            email: result.user.email,
+            displayName: result.user.displayName 
+          }, null, 2)}</pre>
+        `;
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+          <strong>❌ FAILED</strong><br>
+          <strong>Error Code:</strong> ${error.code || 'unknown'}<br>
+          <strong>Error Message:</strong> ${error.message || 'unknown'}<br>
+          <pre>${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}</pre>
+        `;
+      }
+    };
+  </script>
+</body>
+</html>
