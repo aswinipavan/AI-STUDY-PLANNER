@@ -36,6 +36,8 @@ interface GeneratePayload {
   style: 'intense' | 'balanced' | 'relaxed';
   startDate: string;
   durationDays: number;
+  useDeadlines?: boolean;
+  targetDeadlineDate?: string;
 }
 
 const DURATION_DAYS: Record<string, number> = {
@@ -55,6 +57,8 @@ export default function GenerateTimetablePage() {
   const [studyStyle, setStudyStyle] = useState('balanced');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [duration, setDuration] = useState('2 weeks');
+  const [useDeadlines, setUseDeadlines] = useState(true);
+  const [targetDeadlineDate, setTargetDeadlineDate] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   const { mutate: generate, isPending } = useMutation({
@@ -81,6 +85,8 @@ export default function GenerateTimetablePage() {
       style: studyStyle as 'intense' | 'balanced' | 'relaxed',
       startDate,
       durationDays: DURATION_DAYS[duration] ?? 14,
+      useDeadlines,
+      targetDeadlineDate: targetDeadlineDate || undefined,
     });
   };
 
@@ -224,6 +230,48 @@ export default function GenerateTimetablePage() {
                 ))}
               </div>
             </div>
+
+            <div className={styles.inputGroup} style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
+              <label className={styles.inputLabel}>Study Planning Mode</label>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                  <input
+                    type="radio"
+                    name="deadlineMode"
+                    checked={useDeadlines}
+                    onChange={() => setUseDeadlines(true)}
+                  />
+                  <span>Use exam deadlines (automatic prioritization)</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                  <input
+                    type="radio"
+                    name="deadlineMode"
+                    checked={!useDeadlines}
+                    onChange={() => setUseDeadlines(false)}
+                  />
+                  <span>Set a target deadline</span>
+                </label>
+              </div>
+              
+              {!useDeadlines && (
+                <div style={{ marginTop: '1rem' }}>
+                  <label style={{ fontSize: '0.875rem', display: 'block', marginBottom: '0.5rem' }}>Target exam date</label>
+                  <input
+                    type="date"
+                    value={targetDeadlineDate || ''}
+                    onChange={(e) => setTargetDeadlineDate(e.target.value)}
+                    min={startDate}
+                    className={styles.dateInput}
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-muted-foreground)', marginTop: '0.5rem' }}>
+                    {targetDeadlineDate 
+                      ? `${Math.max(0, Math.ceil((new Date(targetDeadlineDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)))} days available for study`
+                      : 'Choose a date to see available study time'}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -238,6 +286,7 @@ export default function GenerateTimetablePage() {
                 { label: 'Study Style', value: studyStyle.charAt(0).toUpperCase() + studyStyle.slice(1) },
                 { label: 'Start Date', value: new Date(startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) },
                 { label: 'Duration', value: duration },
+                { label: 'Planning Mode', value: useDeadlines ? 'Auto-prioritize by exam dates' : 'Target deadline: ' + (targetDeadlineDate ? new Date(targetDeadlineDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) : 'Not set') },
               ].map(({ label, value }) => (
                 <div key={label} className={styles.reviewRow}>
                   <span className={styles.reviewLabel}>{label}</span>

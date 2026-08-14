@@ -10,7 +10,7 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { SubjectModal } from '@/components/subjects/SubjectModal';
 import { ConfirmDialog } from '@/components/modals/ConfirmDialog';
 import { AppButton } from '@/components/ui/AppButton';
-import { BookOpen, Plus, Trash2, Pencil, Clock } from 'lucide-react';
+import { BookOpen, Plus, Trash2, Pencil, Clock, Calendar } from 'lucide-react';
 import { Subject } from '@/types/api.types';
 import styles from './subjects.module.css';
 
@@ -101,6 +101,12 @@ export default function SubjectsPage() {
                   <p className={styles.targetInfo}>
                     <Clock size={12} />
                     {subject.targetHours}h target
+                  </p>
+                )}
+                {subject.daysUntilExam !== undefined && subject.daysUntilExam !== null && (
+                  <p className={`${styles.targetInfo} ${subject.daysUntilExam <= 3 ? styles.urgentDeadline : subject.daysUntilExam <= 7 ? styles.warningDeadline : ''}`}>
+                    <Calendar size={12} />
+                    {subject.daysUntilExam === 0 ? 'Exam today!' : `Exam in ${subject.daysUntilExam} days`}
                   </p>
                 )}
               </div>

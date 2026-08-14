@@ -16,6 +16,7 @@ import { QK } from '@/constants/queryKeys';
 
 const examSchema = z.object({
   subjectId: z.string().min(1, 'Please select a subject'),
+  examName: z.string().min(1, 'Exam name is required').max(100, 'Max 100 characters'),
   examDate: z.string().min(1, 'Date is required'),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   notes: z.string().max(200, 'Max 200 characters').optional(),
@@ -44,6 +45,7 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
     resolver: zodResolver(examSchema),
     defaultValues: {
       subjectId: '',
+      examName: '',
       examDate: '',
       difficulty: 'medium',
       notes: '',
@@ -56,12 +58,13 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
     if (editExam) {
       reset({
         subjectId: editExam.subjectId,
+        examName: editExam.examName || '',
         examDate: editExam.examDate.split('T')[0],
         difficulty: editExam.difficulty,
         notes: editExam.notes || '',
       });
     } else {
-      reset({ subjectId: '', examDate: '', difficulty: 'medium', notes: '' });
+      reset({ subjectId: '', examName: '', examDate: '', difficulty: 'medium', notes: '' });
     }
   }, [editExam, reset]);
 
@@ -94,6 +97,13 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
           </select>
           {errors.subjectId && <p className="text-destructive text-xs mt-1">{errors.subjectId.message}</p>}
         </div>
+
+        <AppInput
+          label="Exam Name"
+          placeholder="e.g. Final Exam, Quiz 1..."
+          error={errors.examName?.message}
+          {...register('examName')}
+        />
 
         <AppInput
           label="Exam Date"

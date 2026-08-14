@@ -97,6 +97,19 @@
   gap: 0.35rem;
   font-size: 0.75rem;
   color: var(--color-muted-foreground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.targetInfo.urgentDeadline {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.targetInfo.warningDeadline {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
 }
 
 .skeletonList {

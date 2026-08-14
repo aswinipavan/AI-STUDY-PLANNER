@@ -4,20 +4,48 @@ import { Subject } from '@/types/api.types';
 export const subjectsApi = {
   getAll: async (): Promise<Subject[]> => {
     const response = await apiClient.get('/api/students/me/subjects');
-    return response.data;
+    const data = response.data.data ?? response.data;
+    return Array.isArray(data) ? data.map(mapSubjectFromBackend) : [];
   },
 
   create: async (data: Partial<Subject>): Promise<Subject> => {
-    const response = await apiClient.post('/api/students/me/subjects', data);
-    return response.data;
+    const response = await apiClient.post('/api/students/me/subjects', mapSubjectToBackend(data));
+    const result = response.data.data ?? response.data;
+    return mapSubjectFromBackend(result);
   },
 
   update: async (id: string, data: Partial<Subject>): Promise<Subject> => {
-    const response = await apiClient.put(`/api/students/me/subjects/${id}`, data);
-    return response.data;
+    const response = await apiClient.put(`/api/students/me/subjects/${id}`, mapSubjectToBackend(data));
+    const result = response.data.data ?? response.data;
+    return mapSubjectFromBackend(result);
   },
 
   remove: async (id: string): Promise<void> => {
     await apiClient.delete(`/api/students/me/subjects/${id}`);
   },
 };
+
+// Map backend SubjectResponse to frontend Subject type
+function mapSubjectFromBackend(backend: any): Subject {
+  return {
+    id: backend.id,
+    name: backend.subjectName || backend.name,
+    color: backend.color,
+    icon: backend.icon,
+    targetHours: backend.targetHours,
+    studentId: backend.studentId,
+    examDate: backend.nextExamDate, // Map backend's nextExamDate to frontend's examDate
+    daysUntilExam: backend.daysUntilExam,
+  };
+}
+
+// Map frontend Subject to backend SubjectRequest
+function mapSubjectToBackend(frontend: Partial<Subject>): Record<string, any> {
+  return {
+    subjectName: frontend.name,
+    subjectCode: frontend.color, // reusing color field for code if needed
+    credits: 3,
+    difficultyLevel: 3,
+    semester: null,
+  };
+}

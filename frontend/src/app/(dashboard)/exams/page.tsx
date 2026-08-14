@@ -84,7 +84,7 @@ export default function ExamsPage() {
                     <span className={styles.dateMonth}>{new Date(exam.examDate).toLocaleString('default', { month: 'short' })}</span>
                   </div>
                   <div className={styles.infoBlock}>
-                    <p className={styles.subjectName}>{exam.subject?.name ?? 'Exam'}</p>
+                    <p className={styles.subjectName}>{exam.examName || exam.subject?.name || 'Exam'}</p>
                     <div className={styles.metaTags}>
                       <span className={`${styles.difficultyTag} ${diffClass}`}>
                         {exam.difficulty}

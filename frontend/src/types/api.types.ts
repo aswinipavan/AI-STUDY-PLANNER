@@ -18,15 +18,23 @@ export interface Subject {
   icon?: string;
   targetHours?: number; 
   studentId: string;
+  examDate?: string; // Next exam date for this subject
+  daysUntilExam?: number; // Calculated remaining days
 }
 
 export interface Exam {
   id: string; 
   subjectId: string; 
   subject?: Subject; 
+  examName: string;
   examDate: string;
+  examType?: string;
+  durationHours?: number;
+  syllabusCovered?: string;
   difficulty: 'easy' | 'medium' | 'hard'; 
   notes?: string;
+  daysRemaining?: number;
+  isCompleted?: boolean;
 }
 
 export interface TimetableSlot {
@@ -117,4 +125,6 @@ export type GenerateTimetableDTO = {
   style: 'intense' | 'balanced' | 'relaxed'; 
   startDate: string; 
   durationDays: number;
+  useDeadlines?: boolean; // Use exam deadlines for prioritization
+  targetDeadlineDate?: string; // Optional: if all subjects share a deadline
 };
