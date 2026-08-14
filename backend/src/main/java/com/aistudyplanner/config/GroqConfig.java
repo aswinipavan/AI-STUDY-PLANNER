@@ -10,7 +10,8 @@ import java.time.Duration;
 @Configuration
 public class GroqConfig {
 
-    public static final String GROQ_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    // Actual Groq API endpoint (not Google Gemini)
+    public static final String GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     @Bean
     public RestTemplate groqRestTemplate(RestTemplateBuilder builder) {

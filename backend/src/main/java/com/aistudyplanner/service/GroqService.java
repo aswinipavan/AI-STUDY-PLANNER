@@ -54,33 +54,30 @@ public class GroqService {
         try {
             Map<String, Object> body = new HashMap<>();
             
-            Map<String, Object> part = new HashMap<>();
-            part.put("text", prompt);
+            // Groq uses OpenAI-compatible API format
+            body.put("model", "llama-3.3-70b-versatile");  // Groq's fastest model
             
-            Map<String, Object> content = new HashMap<>();
-            content.put("role", "user");
-            content.put("parts", List.of(part));
+            Map<String, Object> message = new HashMap<>();
+            message.put("role", "user");
+            message.put("content", prompt);
             
-            body.put("contents", List.of(content));
-            
-            Map<String, Object> generationConfig = new HashMap<>();
-            generationConfig.put("temperature", 0.7);
-            generationConfig.put("maxOutputTokens", 1000);
-            body.put("generationConfig", generationConfig);
+            body.put("messages", List.of(message));
+            body.put("temperature", 0.7);
+            body.put("max_tokens", 1000);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + apiKey);
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-            String url = GroqConfig.GROQ_API_URL + "?key=" + apiKey;
 
-            String responseStr = groqRestTemplate.postForObject(url, request, String.class);
+            String responseStr = groqRestTemplate.postForObject(GroqConfig.GROQ_API_URL, request, String.class);
             
             long duration = System.currentTimeMillis() - startTime;
             log.debug("Groq API call successful. Duration: {}ms", duration);
             
             JsonNode root = objectMapper.readTree(responseStr);
-            return root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
+            return root.path("choices").get(0).path("message").path("content").asText();
 
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
