@@ -1,6 +1,7 @@
 package com.aistudyplanner.service;
 
 import com.aistudyplanner.exception.ResourceNotFoundException;
+import com.aistudyplanner.model.dto.request.GenerateTimetableRequest;
 import com.aistudyplanner.model.dto.request.SlotRequest;
 import com.aistudyplanner.model.dto.request.TimetableRequest;
 import com.aistudyplanner.model.dto.response.SlotResponse;
@@ -45,11 +46,11 @@ public class TimetableService {
     private final GroqService groqService;
 
     @Transactional
-    public TimetableResponse generateAiTimetable(UUID studentId, TimetableRequest request) {
+    public TimetableResponse generateAiTimetable(UUID studentId, GenerateTimetableRequest request) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        double availableHours = student.getAvailableHoursPerDay().doubleValue();
+        double availableHours = request.getAvailableHoursPerDay().doubleValue();
         List<Subject> subjects = subjectRepository.findAllByStudentId(studentId, org.springframework.data.domain.PageRequest.of(0, 100));
         Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects);
         

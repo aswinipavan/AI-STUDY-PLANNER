@@ -1,5 +1,6 @@
 package com.aistudyplanner.controller;
 
+import com.aistudyplanner.model.dto.request.GenerateTimetableRequest;
 import com.aistudyplanner.model.dto.request.SlotRequest;
 import com.aistudyplanner.model.dto.request.TimetableRequest;
 import com.aistudyplanner.model.dto.response.ApiResponse;
@@ -35,7 +36,7 @@ public class TimetableController {
     @Operation(summary = "Generate AI Timetable")
     public ResponseEntity<ApiResponse<TimetableResponse>> generateAiTimetable(
             @CurrentStudent Student student,
-            @Valid @RequestBody TimetableRequest request) {
+            @Valid @RequestBody GenerateTimetableRequest request) {
         log.info("Generating AI timetable for student: {}", student.getId());
         TimetableResponse response = timetableService.generateAiTimetable(student.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Timetable generated successfully"));

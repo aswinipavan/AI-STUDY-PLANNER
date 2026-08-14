@@ -50,6 +50,12 @@ public class Exam {
     @Column(name = "syllabus_covered", columnDefinition = "TEXT")
     private String syllabusCovered;
 
+    @Column(name = "difficulty", length = 20)
+    private String difficulty;
+
+    @Column(name = "notes", columnDefinition = "TEXT")
+    private String notes;
+
     @Builder.Default
     @Column(name = "is_completed")
     private Boolean isCompleted = false;

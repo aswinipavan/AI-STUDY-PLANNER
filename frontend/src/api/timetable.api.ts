@@ -4,7 +4,7 @@ import { Timetable, TimetableSlot, GenerateTimetableDTO } from '@/types/api.type
 export const timetableApi = {
   generate: async (payload: GenerateTimetableDTO): Promise<Timetable> => {
     const response = await apiClient.post('/api/timetable/generate', payload);
-    return response.data;
+    return response.data.data ?? response.data;
   },
 
   addCustom: async (block: Partial<TimetableSlot>): Promise<Timetable> => {
@@ -14,7 +14,8 @@ export const timetableApi = {
 
   getActive: async (): Promise<Timetable> => {
     const response = await apiClient.get('/api/timetable/active');
-    return response.data;
+    // Backend returns ApiResponse wrapper: {success, message, data}
+    return response.data.data ?? response.data;
   },
 
   markSlotComplete: async (id: string): Promise<TimetableSlot> => {

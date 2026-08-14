@@ -30,4 +30,9 @@ public class ExamRequest {
     private BigDecimal durationHours;
 
     private String syllabusCovered;
+
+    @Pattern(regexp = "easy|medium|hard", message = "Difficulty must be one of: easy, medium, hard")
+    private String difficulty;
+
+    private String notes;
 }

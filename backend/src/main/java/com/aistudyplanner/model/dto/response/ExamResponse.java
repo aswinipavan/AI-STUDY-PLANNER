@@ -17,6 +17,8 @@ public class ExamResponse {
     private LocalDate examDate;
     private String examType;
     private String syllabusCovered;
+    private String difficulty;
+    private String notes;
     private long daysRemaining;
     private Boolean isCompleted;
 }

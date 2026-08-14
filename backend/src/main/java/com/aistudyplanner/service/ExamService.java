@@ -45,9 +45,13 @@ public class ExamService {
         Exam exam = Exam.builder()
                 .student(subject.getStudent())
                 .subject(subject)
+                .examName(request.getExamName())
                 .examDate(request.getExamDate())
                 .examType(request.getExamType())
+                .durationHours(request.getDurationHours())
                 .syllabusCovered(request.getSyllabusCovered())
+                .difficulty(request.getDifficulty())
+                .notes(request.getNotes())
                 .isCompleted(false)
                 .build();
 
@@ -79,8 +83,12 @@ public class ExamService {
         }
 
         if (request.getExamDate() != null) exam.setExamDate(request.getExamDate());
+        if (request.getExamName() != null) exam.setExamName(request.getExamName());
         if (request.getExamType() != null) exam.setExamType(request.getExamType());
+        if (request.getDurationHours() != null) exam.setDurationHours(request.getDurationHours());
         if (request.getSyllabusCovered() != null) exam.setSyllabusCovered(request.getSyllabusCovered());
+        if (request.getDifficulty() != null) exam.setDifficulty(request.getDifficulty());
+        if (request.getNotes() != null) exam.setNotes(request.getNotes());
 
         exam = examRepository.save(exam);
         return toExamResponse(exam);
@@ -155,9 +163,12 @@ public class ExamService {
         return ExamResponse.builder()
                 .id(exam.getId())
                 .subject(StudentMapper.toSubjectResponse(exam.getSubject()))
+                .examName(exam.getExamName())
                 .examDate(exam.getExamDate())
                 .examType(exam.getExamType())
                 .syllabusCovered(exam.getSyllabusCovered())
+                .difficulty(exam.getDifficulty())
+                .notes(exam.getNotes())
                 .isCompleted(exam.getIsCompleted())
                 .daysRemaining(daysRemaining)
                 .build();
