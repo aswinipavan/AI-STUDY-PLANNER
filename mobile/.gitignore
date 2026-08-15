@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Android build
+android/app/build/
+android/.gradle/
+android/local.properties
+
+# Firebase secrets — MUST NOT be committed
+android/app/google-services.json
+
+# Environment secrets
+.env
+.env.local
+.env.production
+
+# Metro bundler cache
+.metro-health-check*
+
+# TypeScript build info
+*.tsbuildinfo
+
+# iOS (not used for this Android-only app)
+ios/
+
+# Test artifacts
+coverage/

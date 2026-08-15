@@ -29,9 +29,18 @@
   - Fixed `SecurityConfig.java` to permit public access to `/api/auth/refresh` so session refresh can happen without an existing JWT.
   - Fixed `AuthService.java` exceptions to throw `FirebaseTokenException` instead of `RuntimeException` when Firebase validation fails, returning a 401 Unauthorized instead of a 500 Server Error.
   - Ran both test suites: 100% passing (58/58 frontend green, 89/89 local backend green) ✅
+- [2026-08-15] Web App Production Root-Cause Audit & Complete Repair:
+  - Fixed Timetable generation 500: Added Groq try-catch fallback, hoisted marks query, honored `subjectIds`.
+  - Fixed Exam creation 500: Added `IllegalArgumentException` `@ExceptionHandler` in `GlobalExceptionHandler.java` mapping to 400.
+  - Fixed Profile & Settings: Added missing fields (College, Academic Year, Department, Phone), fixed field name mapping (`fullName` vs `name`).
+  - Fixed Topbar Header Controls: Added `ThemeApplier` DOM bridge, exam notifications dropdown, profile/settings avatar menu.
+  - Fixed Chat History 500: Replaced raw entity serialization with `ChatMessageResponse` DTO, chronological sorting, and fixed `useChat.ts` hook.
+  - Fixed Material Upload: Added `supabase.anon-key` config + header authentication in `useMaterials.ts`.
+  - Verified: Backend `mvnw compile` BUILD SUCCESS (exit 0) & Next.js production `npm run build` (exit 0, 22 routes).
 
 ## In Progress
 - (none)
+
 
 ## Blocked
 - (none — BUG-006 timetable toast is low priority, future improvement)

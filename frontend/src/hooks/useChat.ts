@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatApi } from '@/api/chat.api';
 import { aiApi } from '@/api/ai.api';
 import { ChatMessage, ChatSession } from '@/types/api.types';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export interface ChatState {
@@ -40,11 +40,14 @@ export const useChat = (initialSessionId: string | null) => {
   // Sync initial history when loaded
   const { data: history } = useChatHistory(sessionId);
   
-  // We can update local messages state when history loads, 
-  // but to prevent loop, we only do it if local is empty and history exists
-  if (history && messages.length === 0 && history.length > 0) {
-    setMessages(history);
-  }
+  // FIXED: Moved from render body to useEffect to avoid state mutation during render.
+  // Previously this set state directly in render, causing React warnings and bugs.
+  useEffect(() => {
+    if (history && history.length > 0 && messages.length === 0) {
+      setMessages(history);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history]);
 
   const { mutateAsync: sendMessageMutation } = useMutation({
     mutationFn: chatApi.sendMessage,

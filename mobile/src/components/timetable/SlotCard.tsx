@@ -17,7 +17,7 @@ export function SlotCard({slot, onToggle, isToggling}: SlotCardProps) {
 
   return (
     <Card
-      style={[styles.card, slot.isCompleted && styles.completedCard]}>
+      style={[styles.card, slot.isCompleted ? styles.completedCard : undefined]}>
       <View style={styles.row}>
         {/* Completion toggle */}
         <TouchableOpacity

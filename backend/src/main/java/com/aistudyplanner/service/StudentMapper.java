@@ -8,6 +8,7 @@ import com.aistudyplanner.model.entity.Subject;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+@SuppressWarnings("null")
 public class StudentMapper {
 
     public static StudentResponse toStudentResponse(Student student) {

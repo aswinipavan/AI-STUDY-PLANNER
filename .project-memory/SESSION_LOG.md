@@ -540,3 +540,96 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
 3. Execute all remaining test batches
 4. Achieve 95%+ pass rate
 5. Move to API/Integration testing phase
+
+## 2026-08-14
+- **Task Started:** React Native Android app — pre-implementation architecture and API analysis.
+- **Task Completed:** Full analysis report produced. No code written yet (analysis only as requested).
+- **Files Modified:** `.project-memory/NEXT_TASK.md` updated; `.project-memory/SESSION_LOG.md` appended.
+- **Problems Found:**
+  - CORS config has trailing slash on hardcoded production origin (low severity, web-only).
+  - Several controllers use trailing-slash routes (`/api/marks/`, `/api/exams/`) — must use exact URL in mobile API client.
+  - JWT expiry value not documented in `.env.example`.
+  - No `/api/dashboard/summary` aggregate endpoint — mobile home screen will need 3-4 parallel calls.
+- **Solutions:** All documented in analysis report. No backend changes required for mobile Phase 1.
+- **Next Recommended Task:** Initialize `mobile/` React Native bare workflow project and build Phase 1 screens.
+
+## 2026-08-14 (Session 2)
+- **Task Started:** React Native Android app — Phase 1 full implementation.
+- **Task Completed:** Phase 1 COMPLETE. TypeScript: 0 errors. Frontend: unchanged (0 TS errors).
+- **Files Created (mobile/):**
+  - Foundation: `package.json`, `tsconfig.json`, `babel.config.js`, `metro.config.js`, `index.js`, `App.tsx`, `app.json`, `.env`, `.env.example`, `.gitignore`, `README.md`
+  - Types: `api.types.ts`, `auth.types.ts`, `student.types.ts`, `timetable.types.ts`, `exam.types.ts`
+  - Constants: `config.ts`, `queryKeys.ts`, `colors.ts`, `theme.ts`
+  - Auth: `firebaseAuth.ts`, `tokenStorage.ts`
+  - API: `apiClient.ts`, `auth.api.ts`, `student.api.ts`, `timetable.api.ts`, `exam.api.ts`
+  - Stores: `authStore.ts`
+  - Hooks: `useStudent.ts`, `useTimetable.ts`, `useExams.ts`
+  - Utils: `dateUtils.ts`, `errorHandler.ts`
+  - Components: `Button`, `Card`, `Input`, `LoadingSpinner`, `EmptyState`, `ErrorState`, `ScreenHeader`, `SubjectCard`, `SlotCard`, `DaySelector`, `ExamCard`
+  - Navigation: `RootNavigator.tsx`, `AuthStack.tsx`, `AppTabs.tsx`
+  - Screens: `SplashScreen`, `LoginScreen`, `DashboardScreen`, `SubjectsScreen`, `AddSubjectScreen`, `TimetableScreen`, `ExamsScreen`, `AddExamScreen`, `AiPlaceholderScreen`, `ProfileScreen`
+  - Android: `build.gradle`, `settings.gradle`, `app/build.gradle`, `AndroidManifest.xml`, `MainActivity.kt`, `MainApplication.kt`, `strings.xml`, `styles.xml`, `colors.xml`, `gradle.properties`
+- **Problems Found:** 15 TypeScript errors (implicit any, wrong RouteProp import, conditional style types) — all fixed.
+- **Solutions:** Fixed `StyleProp<ViewStyle>` in Card, corrected `RouteProp` from `@react-navigation/native`, added explicit types to filter/sort callbacks, used `Array.from` instead of Set spread.
+- **Backend URL corrected:** Old URL (`ai-study-planner-hp0e.onrender.com`) deprecated — confirmed `aistudyplannerbackend.onrender.com` from frontend `.env.local`.
+- **Next Recommended Task:** 1) Download `google-services.json` from Firebase Console and place at `mobile/android/app/google-services.json`. 2) Run `npx react-native run-android`. 3) Begin Phase 2 (AI Chat, Performance analytics).
+
+## 2026-08-14 (Session 3)
+- **Task Started:** React Native Android app — Full 12-Screen Implementation & Real API Integration.
+- **Task Completed:** All 12 screens fully functional and connected to real Spring Boot backend APIs. TypeScript: 0 errors. Backend: BUILD SUCCESS. Frontend: 0 TS errors.
+- **Screens Implemented & Verified:**
+  1. Splash (`SplashScreen.tsx`)
+  2. Login (`LoginScreen.tsx`)
+  3. Register (`RegisterScreen.tsx`)
+  4. Dashboard (`DashboardScreen.tsx`) — stat cards, streak, timetable preview, 6 quick actions
+  5. Subjects (`SubjectsScreen.tsx` & `AddSubjectScreen.tsx`)
+  6. Exams (`ExamsScreen.tsx` & `AddExamScreen.tsx`)
+  7. Timetable (`TimetableScreen.tsx`) — day selector, optimistic slot toggling, AI generation
+  8. AI Tutor (`AiChatScreen.tsx`) — Groq Llama-3, session history, daily motivation, prompt chips
+  9. Materials (`MaterialsScreen.tsx` & `UploadMaterialScreen.tsx`) — subject filtering, AI summary, upload metadata
+  10. Analytics (`AnalyticsScreen.tsx`) — performance mastery gauge, focus areas, AI performance analysis
+  11. Profile (`ProfileScreen.tsx`) — stats, inline profile edit, quick navigation links
+  12. Settings (`SettingsScreen.tsx`) — notification preference toggles, backend status, logout
+- **APIs Integrated:**
+  - Auth: `POST /api/auth/login`, `POST /api/auth/refresh`
+  - Student: `GET /api/students/me`, `PUT /api/students/me`, `PUT /api/students/me/notifications`, `GET /api/students/me/subjects`, `POST /api/students/me/subjects`, `PUT /api/students/me/subjects/{id}`, `DELETE /api/students/me/subjects/{id}`
+  - Exams: `GET /api/exams/`, `GET /api/exams/upcoming`, `POST /api/exams/`, `PUT /api/exams/{id}`, `DELETE /api/exams/{id}`, `PATCH /api/exams/{id}/complete`
+  - Timetable: `GET /api/timetable/active`, `POST /api/timetable/ai-generate`, `PATCH /api/timetable/slots/{id}/toggle`, `DELETE /api/timetable/{id}`
+  - AI Assistant: `POST /api/ai/chat`, `GET /api/ai/chat/history`, `DELETE /api/ai/chat/history`, `GET /api/ai/chat/session`, `GET /api/ai/motivation`, `POST /api/ai/analyze-performance`, `GET /api/ai/exam-prep-plan`
+  - Materials: `GET /api/materials/`, `GET /api/materials/subject/{id}`, `GET /api/materials/upload-url`, `POST /api/materials/`, `DELETE /api/materials/{id}`
+  - Performance: `GET /api/performance/report`, `GET /api/performance/history`, `GET /api/performance/priority`
+- **Validation Result:** `mobile/` tsc: 0 errors; `frontend/` tsc: 0 errors; `backend/` mvn compile: BUILD SUCCESS.
+
+## 2026-08-15 (Session 5)
+- **Task Started:** Complete Web Application Root-Cause Audit, Repair, and Verification.
+- **Task Completed:** All 6 identified issues fixed in source code and validated with full builds:
+  1. *Issue 1 (Timetable 500):* Wrapped Groq topic suggestions in try-catch with fallback; hoisted subject averages DB query outside day loop; filtered requested `subjectIds`.
+  2. *Issue 2 & 3 (Profile & Header Controls):* Added missing profile fields (College, Academic Year, Department, Phone); normalized `fullName` / `profilePictureUrl` mapping in `authStore` and `authApi`; created `ThemeApplier.tsx` DOM bridge mounted in layout; rebuilt `Topbar.tsx` with working theme toggle, upcoming exams notification dropdown, and profile/settings avatar menu.
+  3. *Issue 4 (AI Chat History):* Created `ChatMessageResponse` DTO preventing `LazyInitializationException` from student relationship; returned chronological messages; fixed `useChat.ts` render-time state update bug.
+  4. *Issue 5 (Material Upload):* Added `supabase.anon-key` config to backend `getStorageUploadUrl()` and added required `Authorization` / `apikey` headers in frontend `useMaterials.ts`.
+  5. *Issue 6 (Exam Creation 500):* Added `IllegalArgumentException` `@ExceptionHandler` in `GlobalExceptionHandler.java` mapping to HTTP 400 Bad Request.
+- **Files Modified:**
+  - `backend/src/main/java/com/aistudyplanner/exception/GlobalExceptionHandler.java`
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java`
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/ChatMessageResponse.java`
+  - `backend/src/main/java/com/aistudyplanner/service/AiAssistantService.java`
+  - `backend/src/main/java/com/aistudyplanner/controller/AiAssistantController.java`
+  - `backend/src/main/java/com/aistudyplanner/service/MaterialService.java`
+  - `backend/src/main/resources/application.properties`
+  - `frontend/src/types/api.types.ts`
+  - `frontend/src/stores/authStore.ts`
+  - `frontend/src/api/auth.api.ts`
+  - `frontend/src/app/(dashboard)/settings/page.tsx`
+  - `frontend/src/components/providers/ThemeApplier.tsx`
+  - `frontend/src/app/(dashboard)/layout.tsx`
+  - `frontend/src/components/layout/Topbar.tsx`
+  - `frontend/src/hooks/useMaterials.ts`
+  - `frontend/src/hooks/useChat.ts`
+- **Problems Found:** Unhandled runtime exceptions mapping to 500; disconnected theme store state from DOM; missing profile fields & DTO mismatch; missing Supabase Storage headers; missing DTO causing LazyInitializationException.
+- **Solutions:** Implemented try-catch fallbacks, added missing `@ExceptionHandler`, unified theme system with `ThemeApplier`, aligned DTO contracts, and added storage auth headers.
+- **Validation Results:**
+  - `backend/`: `.\mvnw.cmd clean compile` -> `BUILD SUCCESS` (exit code 0).
+  - `frontend/`: `npm run build` -> Next.js Turbopack 22/22 routes generated (exit code 0).
+- **Next Recommended Task:** Deploy frontend to Vercel and backend to Render, then perform production live smoke testing.
+
+

@@ -2,6 +2,7 @@ package com.aistudyplanner.service;
 
 import com.aistudyplanner.model.dto.request.ChatRequest;
 import com.aistudyplanner.model.dto.response.AiChatResponse;
+import com.aistudyplanner.model.dto.response.ChatMessageResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.repository.ChatHistoryRepository;
@@ -63,10 +64,25 @@ public class AiAssistantService {
                 .build();
     }
 
+    /**
+     * Get chat history as DTOs (not raw entities).
+     * CRITICAL FIX: Raw ChatHistory entity had lazy-loaded Student → LazyInitializationException → 500.
+     * Now maps to ChatMessageResponse DTOs within the transaction.
+     */
     @Transactional(readOnly = true)
-    public List<ChatHistory> getChatHistory(UUID studentId, String sessionId) {
-        // Limit to last 50 messages
-        return chatHistoryRepository.findTop50ByStudentIdAndSessionIdOrderByCreatedAtDesc(studentId, sessionId);
+    public List<ChatMessageResponse> getChatHistory(UUID studentId, String sessionId) {
+        // Fetch in DESC order, then reverse to chronological (ASC)
+        List<ChatHistory> history = chatHistoryRepository.findTop50ByStudentIdAndSessionIdOrderByCreatedAtDesc(studentId, sessionId);
+        java.util.Collections.reverse(history); // chronological order
+        return history.stream()
+                .map(ch -> ChatMessageResponse.builder()
+                        .id(ch.getId())
+                        .role(ch.getRole())
+                        .message(ch.getMessage())
+                        .sessionId(ch.getSessionId())
+                        .createdAt(ch.getCreatedAt())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional(readOnly = true)

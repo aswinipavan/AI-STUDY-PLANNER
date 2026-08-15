@@ -1,10 +1,14 @@
 import React from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
+import { ThemeApplier } from '@/components/providers/ThemeApplier';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* ThemeApplier bridges themeStore → DOM .dark class */}
+      <ThemeApplier />
+
       {/* Sidebar for Desktop & Mobile Overlay */}
       <Sidebar />
 

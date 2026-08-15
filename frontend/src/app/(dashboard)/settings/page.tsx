@@ -12,16 +12,24 @@ import { AppInput } from '@/components/ui/AppInput';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
-import { Moon, Sun, User, Bell, LogOut, BookOpen } from 'lucide-react';
+import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
 
-const GRADES = ['Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12', 'Undergraduate', 'Postgraduate', 'Other'];
+const SEMESTERS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Other'];
+const DEPARTMENTS = [
+  'Computer Science', 'Information Technology', 'Electronics', 'Electrical',
+  'Mechanical', 'Civil', 'Chemical', 'Biomedical', 'Mathematics', 'Physics',
+  'Commerce', 'Arts', 'Other'
+];
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required').max(80),
-  grade: z.string().optional(),
+  collegeName: z.string().max(200).optional(),
+  semester: z.string().optional(),
+  department: z.string().optional(),
+  phoneNumber: z.string().max(20).optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -37,12 +45,11 @@ export default function SettingsPage() {
     router.push('/');
   };
 
-  // BUG-007 FIXED: Notification preferences are now persisted in backend
+  // Notification preferences
   const [emailNotifs, setEmailNotifs] = useState<boolean>(user?.emailNotifications ?? true);
   const [pushNotifs, setPushNotifs] = useState<boolean>(user?.pushNotifications ?? false);
   const [notifSaved, setNotifSaved] = useState(false);
 
-  // Sync notification prefs when user profile loads from store
   useEffect(() => {
     if (user) {
       setEmailNotifs(user.emailNotifications ?? true);
@@ -52,18 +59,43 @@ export default function SettingsPage() {
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { name: user?.name ?? '', grade: user?.grade ?? '' },
+    defaultValues: {
+      name: user?.name || user?.fullName || '',
+      collegeName: user?.collegeName || '',
+      semester: user?.semester ? `${user.semester}` : '',
+      department: user?.department || '',
+      phoneNumber: user?.phoneNumber || '',
+    },
   });
 
   useEffect(() => {
-    if (user) reset({ name: user.name, grade: user.grade ?? '' });
+    if (user) {
+      reset({
+        name: user.name || user.fullName || '',
+        collegeName: user.collegeName || '',
+        semester: user.semester ? String(user.semester) : '',
+        department: user.department || '',
+        phoneNumber: user.phoneNumber || '',
+      });
+    }
   }, [user, reset]);
 
   const { mutate: saveProfile, isPending, isSuccess } = useMutation({
-    mutationFn: authApi.updateMe,
+    mutationFn: (data: ProfileFormData) => authApi.updateMe({
+      name: data.name,
+      collegeName: data.collegeName,
+      semester: data.semester ? Number(data.semester) : undefined,
+      department: data.department,
+    }),
     onSuccess: (updated) => {
       setUser(updated);
-      reset({ name: updated.name, grade: updated.grade ?? '' });
+      reset({
+        name: updated.name || updated.fullName || '',
+        collegeName: updated.collegeName || '',
+        semester: updated.semester ? String(updated.semester) : '',
+        department: updated.department || '',
+        phoneNumber: updated.phoneNumber || '',
+      });
     },
   });
 
@@ -123,17 +155,52 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* College Name */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Grade / Year</label>
-              <select
-                {...register('grade')}
-                className={styles.select}
-              >
-                <option value="">Select grade...</option>
-                {GRADES.map((g) => (
-                  <option key={g} value={g}>{g}</option>
+              <label className={styles.label}>
+                <Building2 size={14} className="inline mr-1" />College / Institution
+              </label>
+              <AppInput
+                placeholder="e.g. MIT, Stanford University..."
+                error={errors.collegeName?.message}
+                {...register('collegeName')}
+              />
+            </div>
+
+            {/* Semester / Year */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                <GraduationCap size={14} className="inline mr-1" />Academic Year / Semester
+              </label>
+              <select {...register('semester')} className={styles.select}>
+                <option value="">Select year...</option>
+                {SEMESTERS.map((s) => (
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Department */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Department / Stream</label>
+              <select {...register('department')} className={styles.select}>
+                <option value="">Select department...</option>
+                {DEPARTMENTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Phone */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                <Phone size={14} className="inline mr-1" />Phone Number (optional)
+              </label>
+              <AppInput
+                placeholder="+91 9876543210"
+                error={errors.phoneNumber?.message}
+                {...register('phoneNumber')}
+              />
             </div>
 
             {user?.isPremium && (
@@ -167,13 +234,13 @@ export default function SettingsPage() {
                 <p className={styles.cardSubtitle}>Toggle light / dark theme</p>
               </div>
             </div>
-            <AppButton variant="outline" onClick={toggleTheme}>
+            <AppButton variant="outline" onClick={toggleTheme} id="settings-theme-toggle">
               {isDark() ? 'Switch to Light' : 'Switch to Dark'}
             </AppButton>
           </div>
         </div>
 
-        {/* Notifications — BUG-007 FIXED */}
+        {/* Notifications */}
         <div className={`${styles.card} ${styles.cardDelay2}`}>
           <div className={styles.cardHeader}>
             <div className={`${styles.iconWrap} ${styles.iconNotification}`}>
@@ -265,7 +332,7 @@ export default function SettingsPage() {
                 <p className={styles.cardSubtitle}>Sign out of your account</p>
               </div>
             </div>
-            <AppButton variant="danger" onClick={handleLogout}>
+            <AppButton variant="danger" onClick={handleLogout} id="settings-logout">
               Log Out
             </AppButton>
           </div>

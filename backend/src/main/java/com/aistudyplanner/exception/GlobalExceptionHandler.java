@@ -52,6 +52,17 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("AI service temporarily unavailable", HttpStatus.SERVICE_UNAVAILABLE);
     }
 
+    /**
+     * CRITICAL FIX: IllegalArgumentException was previously unhandled, causing HTTP 500.
+     * Now correctly maps to HTTP 400 Bad Request.
+     * Fixes: exam creation date validation, subject ownership checks, timetable validation.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Bad request - illegal argument: {}", ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

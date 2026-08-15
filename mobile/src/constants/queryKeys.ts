@@ -24,8 +24,16 @@ export const QK = {
 
   // Performance
   PERFORMANCE_REPORT: ['performance', 'report'] as const,
+  PERFORMANCE_HISTORY: ['performance', 'history'] as const,
+  PERFORMANCE_PRIORITY: ['performance', 'priority'] as const,
+
+  // Materials
+  MATERIALS: ['materials'] as const,
+  MATERIALS_BY_SUBJECT: (subjectId: string) =>
+    ['materials', 'subject', subjectId] as const,
 
   // AI
   MOTIVATION: ['ai', 'motivation'] as const,
+  EXAM_PREP_PLAN: ['ai', 'exam-prep-plan'] as const,
   CHAT_HISTORY: (sessionId: string) => ['chat', 'history', sessionId] as const,
 } as const;

@@ -3,6 +3,7 @@ package com.aistudyplanner.controller;
 import com.aistudyplanner.model.dto.request.ChatRequest;
 import com.aistudyplanner.model.dto.response.AiChatResponse;
 import com.aistudyplanner.model.dto.response.ApiResponse;
+import com.aistudyplanner.model.dto.response.ChatMessageResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.security.CurrentStudent;
@@ -48,7 +49,7 @@ public class AiAssistantController {
 
     @GetMapping("/chat/history")
     @Operation(summary = "Get chat history by session ID with pagination")
-    public ResponseEntity<ApiResponse<List<ChatHistory>>> getChatHistory(
+    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> getChatHistory(
             @CurrentStudent Student student,
             @RequestParam String sessionId,
             @RequestParam(defaultValue = "0") int offset,
@@ -59,12 +60,12 @@ public class AiAssistantController {
             throw new IllegalArgumentException("Limit must be between 1 and 100");
         }
         
-        List<ChatHistory> history = aiAssistantService.getChatHistory(student.getId(), sessionId);
+        List<ChatMessageResponse> history = aiAssistantService.getChatHistory(student.getId(), sessionId);
         
         // Apply pagination
         int fromIndex = Math.min(offset, history.size());
         int toIndex = Math.min(offset + limit, history.size());
-        List<ChatHistory> paginatedHistory = history.subList(fromIndex, toIndex);
+        List<ChatMessageResponse> paginatedHistory = history.subList(fromIndex, toIndex);
         
         return ResponseEntity.ok(ApiResponse.success(paginatedHistory, "Chat history fetched successfully"));
     }

@@ -31,7 +31,18 @@ export const authApi = {
   },
 
   updateMe: async (data: Partial<StudentProfile>): Promise<StudentProfile> => {
-    const response = await apiClient.put<ApiResponse<StudentProfile>>('/api/students/me', data);
+    // Map frontend field names to backend field names
+    const payload: Record<string, unknown> = {
+      fullName: data.name || data.fullName, // backend expects 'fullName'
+      email: data.email,
+      collegeName: data.collegeName,
+      semester: data.semester,
+      department: data.department,
+      profilePictureUrl: data.profilePictureUrl || data.photoUrl,
+    };
+    // Remove undefined values to avoid overwriting with null
+    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+    const response = await apiClient.put<ApiResponse<StudentProfile>>('/api/students/me', payload);
     return response.data.data ?? response.data as unknown as StudentProfile;
   },
 

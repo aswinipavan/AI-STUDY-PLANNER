@@ -1,11 +1,20 @@
 export interface StudentProfile {
-  id: string; 
-  firebaseUid: string; 
-  name: string; 
+  id: string;
+  firebaseUid: string;
+  // Backend returns 'fullName'. Keep 'name' as optional alias for compatibility.
+  fullName?: string;
+  name?: string; // alias — populated from fullName on fetch
   email: string;
-  photoUrl?: string; 
-  grade?: string; 
-  isPremium: boolean; 
+  photoUrl?: string; // alias for profilePictureUrl
+  profilePictureUrl?: string;
+  collegeName?: string;
+  semester?: number;
+  department?: string;
+  phoneNumber?: string;
+  grade?: string; // kept for backward compat (maps to department in some contexts)
+  isPremium: boolean;
+  studyStreak?: number;
+  availableHoursPerDay?: number;
   createdAt: string;
   emailNotifications?: boolean;
   pushNotifications?: boolean;

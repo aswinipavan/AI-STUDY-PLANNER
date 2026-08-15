@@ -21,16 +21,33 @@ export const useUploadMaterial = () => {
   
   return useMutation({
     mutationFn: async ({ file, title, subjectId }: UploadPayload) => {
-      // 1. Get presigned URL
-      const { uploadUrl, fileUrl } = await materialsApi.getUploadUrl(file.name, file.type);
+      // 1. Get upload URL + auth key from backend
+      const uploadInfo = await materialsApi.getUploadUrl(file.name, file.type);
+      const { uploadUrl, fileUrl, anonKey } = uploadInfo as { uploadUrl: string; fileUrl: string; anonKey?: string };
       
-      // 2. Direct upload
+      if (!uploadUrl) {
+        throw new Error('Failed to get upload URL from server');
+      }
+
+      // 2. Direct upload to Supabase Storage with required auth headers
+      // FIXED: Supabase requires Authorization + apikey headers, otherwise returns 401
+      const uploadHeaders: Record<string, string> = {
+        'Content-Type': file.type,
+      };
+      if (anonKey) {
+        uploadHeaders['Authorization'] = `Bearer ${anonKey}`;
+        uploadHeaders['apikey'] = anonKey;
+      }
+
       const res = await fetch(uploadUrl, {
         method: 'PUT', 
         body: file,
-        headers: { 'Content-Type': file.type },
+        headers: uploadHeaders,
       });
-      if (!res.ok) throw new Error('Failed to upload file');
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        throw new Error(`Failed to upload file to storage (${res.status}): ${errText}`);
+      }
       
       // 3. Save metadata - backend expects MaterialUploadRequest format
       let materialType = 'TXT';
@@ -46,7 +63,7 @@ export const useUploadMaterial = () => {
           subjectId,
           fileName: file.name,
           materialType
-        } as unknown as Record<string, unknown>, // Using unknown since frontend StudyMaterial type doesn't match backend MaterialUploadRequest
+        } as unknown as Record<string, unknown>,
         fileUrl,
         file.type,
         file.size
@@ -55,6 +72,7 @@ export const useUploadMaterial = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: QK.materials }),
   });
 };
+
 
 export const useDeleteMaterial = () => {
   const qc = useQueryClient();

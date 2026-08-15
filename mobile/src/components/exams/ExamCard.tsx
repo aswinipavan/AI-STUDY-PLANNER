@@ -18,7 +18,7 @@ export function ExamCard({exam, onEdit, onDelete, onMarkComplete}: ExamCardProps
   const isCompleted = exam.isCompleted;
 
   return (
-    <Card style={[styles.card, isCompleted && styles.completedCard]}>
+    <Card style={[styles.card, isCompleted ? styles.completedCard : undefined]}>
       <View style={styles.row}>
         <View style={styles.content}>
           <Text style={styles.examName} numberOfLines={1}>

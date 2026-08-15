@@ -11,10 +11,27 @@ import {ExamsScreen} from '@/screens/exams/ExamsScreen';
 import {AddExamScreen} from '@/screens/exams/AddExamScreen';
 import {SubjectsScreen} from '@/screens/subjects/SubjectsScreen';
 import {AddSubjectScreen} from '@/screens/subjects/AddSubjectScreen';
-import {AiPlaceholderScreen} from '@/screens/ai/AiPlaceholderScreen';
+import {AiChatScreen} from '@/screens/ai/AiChatScreen';
+import {MaterialsScreen} from '@/screens/materials/MaterialsScreen';
+import {UploadMaterialScreen} from '@/screens/materials/UploadMaterialScreen';
+import {AnalyticsScreen} from '@/screens/analytics/AnalyticsScreen';
 import {ProfileScreen} from '@/screens/profile/ProfileScreen';
+import {SettingsScreen} from '@/screens/settings/SettingsScreen';
 
-// ── Param lists ───────────────────────────────────────────────────────────────
+// ── Param Lists ──────────────────────────────────────────────────────────────
+export type HomeStackParamList = {
+  Dashboard: undefined;
+  Subjects: undefined;
+  AddSubject: {subjectId?: string} | undefined;
+  Materials: undefined;
+  UploadMaterial: undefined;
+  Analytics: undefined;
+  Settings: undefined;
+  Timetable: undefined;
+  Exams: undefined;
+  AiChat: undefined;
+};
+
 export type ExamsStackParamList = {
   ExamsList: undefined;
   AddExam: {examId?: string} | undefined;
@@ -25,7 +42,34 @@ export type SubjectsStackParamList = {
   AddSubject: {subjectId?: string} | undefined;
 };
 
-// ── Exam stack ────────────────────────────────────────────────────────────────
+
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  Settings: undefined;
+  Subjects: undefined;
+  AddSubject: {subjectId?: string} | undefined;
+  Materials: undefined;
+  UploadMaterial: undefined;
+  Analytics: undefined;
+};
+
+// ── Home Stack ────────────────────────────────────────────────────────────────
+const HomeStack = createNativeStackNavigator<HomeStackParamList>();
+function HomeStackNavigator() {
+  return (
+    <HomeStack.Navigator screenOptions={{headerShown: false}}>
+      <HomeStack.Screen name="Dashboard" component={DashboardScreen} />
+      <HomeStack.Screen name="Subjects" component={SubjectsScreen} />
+      <HomeStack.Screen name="AddSubject" component={AddSubjectScreen} />
+      <HomeStack.Screen name="Materials" component={MaterialsScreen} />
+      <HomeStack.Screen name="UploadMaterial" component={UploadMaterialScreen} />
+      <HomeStack.Screen name="Analytics" component={AnalyticsScreen} />
+      <HomeStack.Screen name="Settings" component={SettingsScreen} />
+    </HomeStack.Navigator>
+  );
+}
+
+// ── Exams Stack ───────────────────────────────────────────────────────────────
 const ExamsStack = createNativeStackNavigator<ExamsStackParamList>();
 function ExamsStackNavigator() {
   return (
@@ -36,18 +80,23 @@ function ExamsStackNavigator() {
   );
 }
 
-// ── Subjects stack ────────────────────────────────────────────────────────────
-const SubjectsStack = createNativeStackNavigator<SubjectsStackParamList>();
-function SubjectsStackNavigator() {
+// ── Profile Stack ─────────────────────────────────────────────────────────────
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
+function ProfileStackNavigator() {
   return (
-    <SubjectsStack.Navigator screenOptions={{headerShown: false}}>
-      <SubjectsStack.Screen name="SubjectsList" component={SubjectsScreen} />
-      <SubjectsStack.Screen name="AddSubject" component={AddSubjectScreen} />
-    </SubjectsStack.Navigator>
+    <ProfileStack.Navigator screenOptions={{headerShown: false}}>
+      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+      <ProfileStack.Screen name="Settings" component={SettingsScreen} />
+      <ProfileStack.Screen name="Subjects" component={SubjectsScreen} />
+      <ProfileStack.Screen name="AddSubject" component={AddSubjectScreen} />
+      <ProfileStack.Screen name="Materials" component={MaterialsScreen} />
+      <ProfileStack.Screen name="UploadMaterial" component={UploadMaterialScreen} />
+      <ProfileStack.Screen name="Analytics" component={AnalyticsScreen} />
+    </ProfileStack.Navigator>
   );
 }
 
-// ── Tab icons ─────────────────────────────────────────────────────────────────
+// ── Tab Icons ─────────────────────────────────────────────────────────────────
 const TAB_ICONS: Record<string, {active: string; inactive: string}> = {
   Home: {active: '🏠', inactive: '🏡'},
   Timetable: {active: '📅', inactive: '📆'},
@@ -77,11 +126,11 @@ export function AppTabs() {
           );
         },
       })}>
-      <Tab.Screen name="Home" component={DashboardScreen} />
+      <Tab.Screen name="Home" component={HomeStackNavigator} />
       <Tab.Screen name="Timetable" component={TimetableScreen} />
       <Tab.Screen name="Exams" component={ExamsStackNavigator} />
-      <Tab.Screen name="AI" component={AiPlaceholderScreen} />
-      <Tab.Screen name="Profile" component={SubjectsStackNavigator} options={{title: 'Subjects'}} />
+      <Tab.Screen name="AI" component={AiChatScreen} options={{title: 'AI Tutor'}} />
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
 }

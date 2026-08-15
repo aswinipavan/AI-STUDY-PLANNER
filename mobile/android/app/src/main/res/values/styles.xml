@@ -1,0 +1,7 @@
+<resources>
+    <!-- Base application theme: dark background for status bar integration -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/bg_deep</item>
+    </style>
+</resources>

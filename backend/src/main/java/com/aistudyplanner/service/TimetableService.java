@@ -78,10 +78,24 @@ public class TimetableService {
         log.info("Generating timetable from {} to {} ({} days)", startDate, endDate, actualDurationDays);
 
         double availableHours = request.getAvailableHoursPerDay().doubleValue();
-        List<Subject> subjects = subjectRepository.findAllByStudentId(studentId, org.springframework.data.domain.PageRequest.of(0, 100));
+        List<Subject> allSubjects = subjectRepository.findAllByStudentId(studentId, org.springframework.data.domain.PageRequest.of(0, 100));
         
-        if (subjects.isEmpty()) {
+        if (allSubjects.isEmpty()) {
             throw new IllegalArgumentException("No subjects found. Please add subjects first.");
+        }
+        
+        // FIXED: Filter subjects by the requested subjectIds (was previously ignored)
+        List<Subject> subjects;
+        if (request.getSubjectIds() != null && !request.getSubjectIds().isEmpty()) {
+            final List<UUID> requestedIds = request.getSubjectIds();
+            subjects = allSubjects.stream()
+                    .filter(s -> requestedIds.contains(s.getId()))
+                    .collect(Collectors.toList());
+            if (subjects.isEmpty()) {
+                throw new IllegalArgumentException("None of the selected subjects were found for this student.");
+            }
+        } else {
+            subjects = allSubjects;
         }
         
         // Calculate subject weights with deadline awareness
@@ -192,7 +206,8 @@ public class TimetableService {
     }
 
     /**
-     * Generate all timetable slots for the week
+     * Generate all timetable slots for the week.
+     * FIXED: pre-fetch subject averages once (not per-day).
      */
     private List<TimetableSlot> generateTimetableSlots(Timetable timetable, List<Subject> subjects, 
                                                         Map<UUID, Double> subjectWeights, double availableHours) {
@@ -202,15 +217,23 @@ public class TimetableService {
 
         Map<UUID, Integer> allocatedMinutesMap = allocateStudyTime(subjects, subjectWeights, totalWeight, totalDailyMinutes);
         
+        // Pre-fetch subject averages ONCE instead of per-day
+        Map<UUID, Double> subjectAverages = new HashMap<>();
+        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
+        for (Object[] row : avgData) {
+            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
+        }
+        
         for (int dayIndex = 0; dayIndex < com.aistudyplanner.util.Constants.DAYS_PER_WEEK; dayIndex++) {
-            slotsToSave.addAll(generateDaySlots(timetable, subjects, allocatedMinutesMap, dayIndex));
+            slotsToSave.addAll(generateDaySlots(timetable, subjects, allocatedMinutesMap, dayIndex, subjectAverages));
         }
         
         return slotsToSave;
     }
     
     /**
-     * Generate timetable slots for actual duration (deadline-based planning)
+     * Generate timetable slots for actual duration (deadline-based planning).
+     * FIXED: pre-fetch subject averages once before the day loop.
      */
     private List<TimetableSlot> generateTimetableSlotsForDuration(
             Timetable timetable, 
@@ -226,6 +249,13 @@ public class TimetableService {
 
         Map<UUID, Integer> allocatedMinutesMap = allocateStudyTime(subjects, subjectWeights, totalWeight, totalDailyMinutes);
         
+        // FIXED: Pre-fetch subject averages ONCE (was re-queried for every single day)
+        Map<UUID, Double> subjectAverages = new HashMap<>();
+        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
+        for (Object[] row : avgData) {
+            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
+        }
+        
         // Generate slots for each day in the duration
         for (int dayOffset = 0; dayOffset < durationDays; dayOffset++) {
             LocalDate currentDate = startDate.plusDays(dayOffset);
@@ -233,7 +263,7 @@ public class TimetableService {
             // Database expects: 0=Sunday to 6=Saturday
             int dayOfWeek = (currentDate.getDayOfWeek().getValue() % 7); // SUNDAY=0, MONDAY=1, ..., SATURDAY=6
             
-            slotsToSave.addAll(generateDaySlotsForDate(timetable, subjects, allocatedMinutesMap, dayOffset, dayOfWeek));
+            slotsToSave.addAll(generateDaySlotsForDate(timetable, subjects, allocatedMinutesMap, dayOffset, dayOfWeek, subjectAverages));
         }
         
         log.info("Generated {} total slots across {} days", slotsToSave.size(), durationDays);
@@ -261,18 +291,17 @@ public class TimetableService {
     /**
      * Generate slots for a specific day of the week
      */
-    private List<TimetableSlot> generateDaySlots(Timetable timetable, List<Subject> subjects, 
-                                                  Map<UUID, Integer> allocatedMinutesMap, int dayIndex) {
+    /**
+     * Generate slots for a specific day of the week.
+     * FIXED: subject averages hoisted outside loop, Groq calls wrapped in try-catch.
+     */
+    private List<TimetableSlot> generateDaySlots(Timetable timetable, List<Subject> subjects,
+                                                  Map<UUID, Integer> allocatedMinutesMap, int dayIndex,
+                                                  Map<UUID, Double> subjectAverages) {
         List<TimetableSlot> daySlots = new ArrayList<>();
         LocalTime currentTime = LocalTime.of(18, 0);
         boolean isSunday = (dayIndex == 6);
         double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
-
-        Map<UUID, Double> subjectAverages = new HashMap<>();
-        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
-        for (Object[] row : avgData) {
-            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
-        }
 
         for (Subject subject : subjects) {
             int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
@@ -289,14 +318,19 @@ public class TimetableService {
                 subjectMinutes
             );
             
-            // Fallback to generic topic generation if no materials available
+            // Fallback to generic topic generation — FIXED: wrapped in try-catch
             if (topicSuggestion == null) {
-                topicSuggestion = groqService.generateTopicSuggestion(
-                    subject.getSubjectName(), 
-                    avg, 
-                    subjectMinutes, 
-                    com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
-                );
+                try {
+                    topicSuggestion = groqService.generateTopicSuggestion(
+                        subject.getSubjectName(), 
+                        avg, 
+                        subjectMinutes, 
+                        com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
+                    );
+                } catch (Exception e) {
+                    log.warn("Groq topic generation failed for {}, using fallback: {}", subject.getSubjectName(), e.getMessage());
+                    topicSuggestion = "Study: " + subject.getSubjectName();
+                }
             }
 
             TimetableSlot slot = TimetableSlot.builder()
@@ -360,18 +394,17 @@ public class TimetableService {
     /**
      * Generate slots for a specific date in deadline-based planning
      */
-    private List<TimetableSlot> generateDaySlotsForDate(Timetable timetable, List<Subject> subjects, 
-                                                        Map<UUID, Integer> allocatedMinutesMap, int dayOffset, int dayOfWeek) {
+    /**
+     * Generate slots for a specific date in deadline-based planning.
+     * FIXED: Groq calls wrapped in try-catch; subject averages passed in (not re-queried per day).
+     */
+    private List<TimetableSlot> generateDaySlotsForDate(Timetable timetable, List<Subject> subjects,
+                                                        Map<UUID, Integer> allocatedMinutesMap, int dayOffset, int dayOfWeek,
+                                                        Map<UUID, Double> subjectAverages) {
         List<TimetableSlot> daySlots = new ArrayList<>();
         LocalTime currentTime = LocalTime.of(18, 0);
         boolean isSunday = (dayOfWeek == 6);
         double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
-
-        Map<UUID, Double> subjectAverages = new HashMap<>();
-        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
-        for (Object[] row : avgData) {
-            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
-        }
 
         for (Subject subject : subjects) {
             int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
@@ -388,20 +421,25 @@ public class TimetableService {
                 subjectMinutes
             );
             
-            // Fallback to generic topic generation if no materials available
+            // Fallback to Groq topic — FIXED: wrapped in try-catch to prevent HTTP 500
             if (topicSuggestion == null) {
-                topicSuggestion = groqService.generateTopicSuggestion(
-                    subject.getSubjectName(), 
-                    avg, 
-                    subjectMinutes, 
-                    com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
-                );
+                try {
+                    topicSuggestion = groqService.generateTopicSuggestion(
+                        subject.getSubjectName(), 
+                        avg, 
+                        subjectMinutes, 
+                        com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
+                    );
+                } catch (Exception e) {
+                    log.warn("Groq topic generation failed for {}, using fallback: {}", subject.getSubjectName(), e.getMessage());
+                    topicSuggestion = "Study: " + subject.getSubjectName();
+                }
             }
 
             TimetableSlot slot = TimetableSlot.builder()
                     .timetable(timetable)
                     .subject(subject)
-                    .dayOfWeek(dayOfWeek)  // Use day of week (0-6), not day offset
+                    .dayOfWeek(dayOfWeek)
                     .startTime(currentTime)
                     .endTime(currentTime.plusMinutes(subjectMinutes))
                     .topic(topicSuggestion)

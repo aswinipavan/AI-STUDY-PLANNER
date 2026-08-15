@@ -19,3 +19,9 @@
 | BUG-005 | CRITICAL | Render deployment timeout (Status 137) | application.properties | Fixed | Yes | Yes | No |
 | BUG-010 | Medium | AuthService throws RuntimeException on FirebaseAuthException, causing HTTP 500 instead of 401 | `AuthService.java` | Fixed | Yes |
 | BUG-011 | Medium | AuthControllerTest fails to boot or gets 403/401 due to missing SecurityConfig import and CSRF/auth | `AuthControllerTest.java`, `SecurityConfig.java` | Fixed | Yes |
+| BUG-012 | High | Timetable generation HTTP 500 when Groq service fails; subjectIds ignored; marks DB query in loop | `TimetableService.java` | Fixed | Yes |
+| BUG-013 | High | Exam creation HTTP 500 on validation error due to missing IllegalArgumentException handler | `GlobalExceptionHandler.java` | Fixed | Yes |
+| BUG-014 | Medium | Profile update field name mismatch (`name` vs `fullName`) & missing fields in Settings | `settings/page.tsx`, `auth.api.ts`, `authStore.ts`, `api.types.ts` | Fixed | Yes |
+| BUG-015 | Medium | Topbar theme toggle not applying `.dark` class to DOM & missing avatar/bell menus | `ThemeApplier.tsx`, `layout.tsx`, `Topbar.tsx` | Fixed | Yes |
+| BUG-016 | High | Chat history endpoint LazyInitializationException HTTP 500 on Student relationship | `ChatMessageResponse.java`, `AiAssistantService.java`, `AiAssistantController.java` | Fixed | Yes |
+| BUG-017 | High | Material upload PUT failure to Supabase Storage due to missing authorization headers | `MaterialService.java`, `application.properties`, `useMaterials.ts` | Fixed | Yes |

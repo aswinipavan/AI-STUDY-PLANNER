@@ -30,6 +30,14 @@ public class MaterialService {
     @Value("${supabase.url}")
     private String supabaseUrl;
 
+    /**
+     * Supabase anon key — safe to expose to authenticated clients.
+     * Frontend includes this as Authorization and apikey headers in PUT upload requests.
+     * This is NOT the service role key.
+     */
+    @Value("${supabase.anon-key:}")
+    private String supabaseAnonKey;
+
     private final MaterialRepository materialRepository;
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
@@ -115,6 +123,11 @@ public class MaterialService {
         }
     }
 
+    /**
+     * Generate Supabase Storage upload URL.
+     * FIXED: Now includes anonKey so frontend can authenticate the PUT request.
+     * Without auth headers, Supabase rejects the upload with 401.
+     */
     public Map<String, String> getStorageUploadUrl(UUID studentId, String fileName, String fileType) {
         String filePath = "materials/" + studentId + "/" + System.currentTimeMillis() + "_" + fileName;
         String uploadUrl = supabaseUrl + "/storage/v1/object/materials/" + filePath;
@@ -124,6 +137,8 @@ public class MaterialService {
         response.put("uploadUrl", uploadUrl);
         response.put("filePath", filePath);
         response.put("fileUrl", fileUrl);
+        // Return anon key so frontend can set Authorization header (safe — not service role key)
+        response.put("anonKey", supabaseAnonKey != null ? supabaseAnonKey : "");
         return response;
     }
 
