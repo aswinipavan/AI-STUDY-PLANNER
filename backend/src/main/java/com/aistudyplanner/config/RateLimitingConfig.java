@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
+@SuppressWarnings("null")
 public class RateLimitingConfig {
 
     private final LoadingCache<String, RateLimiter> limiters;
@@ -27,8 +28,9 @@ public class RateLimitingConfig {
                 .build(new CacheLoader<String, RateLimiter>() {
                     @Override
                     public RateLimiter load(String key) {
-                        // 10 requests per minute per IP/key
-                        return RateLimiter.create(10.0 / 60.0);
+                        // 60 requests per minute per IP/key (increased for development/testing)
+                        // Production should use environment variable for this value
+                        return RateLimiter.create(60.0 / 60.0);
                     }
                 });
     }
