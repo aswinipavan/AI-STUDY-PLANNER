@@ -229,7 +229,9 @@ public class TimetableService {
         // Generate slots for each day in the duration
         for (int dayOffset = 0; dayOffset < durationDays; dayOffset++) {
             LocalDate currentDate = startDate.plusDays(dayOffset);
-            int dayOfWeek = currentDate.getDayOfWeek().getValue() % 7; // 0=Monday, 6=Sunday
+            // Java DayOfWeek: MONDAY=1 to SUNDAY=7
+            // Database expects: 0=Sunday to 6=Saturday
+            int dayOfWeek = (currentDate.getDayOfWeek().getValue() % 7); // SUNDAY=0, MONDAY=1, ..., SATURDAY=6
             
             slotsToSave.addAll(generateDaySlotsForDate(timetable, subjects, allocatedMinutesMap, dayOffset, dayOfWeek));
         }
@@ -399,7 +401,7 @@ public class TimetableService {
             TimetableSlot slot = TimetableSlot.builder()
                     .timetable(timetable)
                     .subject(subject)
-                    .dayOfWeek(dayOffset)  // Use actual day offset from start date, not weekday
+                    .dayOfWeek(dayOfWeek)  // Use day of week (0-6), not day offset
                     .startTime(currentTime)
                     .endTime(currentTime.plusMinutes(subjectMinutes))
                     .topic(topicSuggestion)
