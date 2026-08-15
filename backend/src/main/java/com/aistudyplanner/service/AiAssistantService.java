@@ -28,16 +28,22 @@ public class AiAssistantService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
 
+        // Auto-generate sessionId if not provided
+        String sessionId = request.getSessionId();
+        if (sessionId == null || sessionId.isBlank()) {
+            sessionId = generateNewSessionId();
+        }
+
         ChatHistory userMessage = ChatHistory.builder()
                 .student(student)
-                .sessionId(request.getSessionId())
+                .sessionId(sessionId)
                 .role("user")
                 .message(request.getMessage())
                 .build();
         chatHistoryRepository.save(userMessage);
 
         // Fetch only last 10 messages for context to avoid token limit issues
-        List<ChatHistory> history = chatHistoryRepository.findTop10ByStudentIdAndSessionIdOrderByCreatedAtDesc(studentId, request.getSessionId());
+        List<ChatHistory> history = chatHistoryRepository.findTop10ByStudentIdAndSessionIdOrderByCreatedAtDesc(studentId, sessionId);
         // Reverse to get chronological order
         java.util.Collections.reverse(history);
         
@@ -45,14 +51,14 @@ public class AiAssistantService {
 
         ChatHistory assistantMessage = ChatHistory.builder()
                 .student(student)
-                .sessionId(request.getSessionId())
+                .sessionId(sessionId)
                 .role("assistant")
                 .message(assistantReply)
                 .build();
         chatHistoryRepository.save(assistantMessage);
 
         return AiChatResponse.builder()
-                .sessionId(request.getSessionId())
+                .sessionId(sessionId)
                 .reply(assistantReply)
                 .build();
     }

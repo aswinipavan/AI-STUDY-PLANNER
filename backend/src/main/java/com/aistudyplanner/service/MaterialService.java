@@ -118,12 +118,12 @@ public class MaterialService {
     public Map<String, String> getStorageUploadUrl(UUID studentId, String fileName, String fileType) {
         String filePath = "materials/" + studentId + "/" + System.currentTimeMillis() + "_" + fileName;
         String uploadUrl = supabaseUrl + "/storage/v1/object/materials/" + filePath;
-        String publicUrl = supabaseUrl + "/storage/v1/object/public/materials/" + filePath;
+        String fileUrl = supabaseUrl + "/storage/v1/object/public/materials/" + filePath;
 
         Map<String, String> response = new HashMap<>();
         response.put("uploadUrl", uploadUrl);
         response.put("filePath", filePath);
-        response.put("publicUrl", publicUrl);
+        response.put("fileUrl", fileUrl);
         return response;
     }
 

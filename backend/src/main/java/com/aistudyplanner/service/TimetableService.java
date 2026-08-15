@@ -219,10 +219,14 @@ public class TimetableService {
 
         // Use JOIN FETCH to avoid N+1 query problem
         List<TimetableSlot> slots = timetableSlotRepository.findAllByTimetableIdWithSubjectFetch(timetable.getId());
-        List<SlotResponse> slotResponses = slots.stream().map(this::toSlotResponse).collect(Collectors.toList());
+        List<SlotResponse> slotResponses = slots.stream()
+                .map(slot -> toSlotResponse(slot, timetable.getWeekStartDate()))
+                .collect(Collectors.toList());
 
         return TimetableResponse.builder()
                 .id(timetable.getId())
+                .title(timetable.getTitle())
+                .weekStartDate(timetable.getWeekStartDate())
                 .isAiGenerated(timetable.getIsAiGenerated())
                 .isActive(timetable.getIsActive())
                 .slots(slotResponses)
@@ -237,11 +241,13 @@ public class TimetableService {
         
         return timetables.stream().map(t -> {
             List<SlotResponse> slots = t.getSlots().stream()
-                    .map(this::toSlotResponse)
+                    .map(slot -> toSlotResponse(slot, t.getWeekStartDate()))
                     .collect(Collectors.toList());
             
             return TimetableResponse.builder()
                     .id(t.getId())
+                    .title(t.getTitle())
+                    .weekStartDate(t.getWeekStartDate())
                     .isAiGenerated(t.getIsAiGenerated())
                     .isActive(t.getIsActive())
                     .slots(slots)
@@ -271,7 +277,7 @@ public class TimetableService {
         if (request.getTopic() != null) slot.setTopic(request.getTopic());
 
         slot = timetableSlotRepository.save(slot);
-        return toSlotResponse(slot);
+        return toSlotResponse(slot, slot.getTimetable().getWeekStartDate());
     }
 
     @Transactional
@@ -285,7 +291,7 @@ public class TimetableService {
 
         slot.setIsCompleted(!slot.getIsCompleted()); 
         slot = timetableSlotRepository.save(slot);
-        return toSlotResponse(slot);
+        return toSlotResponse(slot, slot.getTimetable().getWeekStartDate());
     }
 
     @Transactional
@@ -321,15 +327,29 @@ public class TimetableService {
         return getTimetable(studentId);
     }
 
-    private SlotResponse toSlotResponse(TimetableSlot slot) {
+    private SlotResponse toSlotResponse(TimetableSlot slot, LocalDate weekStartDate) {
+        // Calculate actual date: weekStartDate + dayOfWeek
+        LocalDate slotDate = null;
+        if (weekStartDate != null && slot.getDayOfWeek() != null) {
+            slotDate = weekStartDate.plusDays(slot.getDayOfWeek());
+        }
+        
+        // Map isCompleted to status string
+        String status = "pending";
+        if (slot.getIsCompleted() != null) {
+            status = slot.getIsCompleted() ? "completed" : "pending";
+        }
+        
         return SlotResponse.builder()
                 .id(slot.getId())
                 .subject(StudentMapper.toSubjectResponse(slot.getSubject()))
                 .dayOfWeek(slot.getDayOfWeek())
+                .date(slotDate)
                 .startTime(slot.getStartTime())
                 .endTime(slot.getEndTime())
                 .topic(slot.getTopic())
                 .isCompleted(slot.getIsCompleted())
+                .status(status)
                 .notes(slot.getNotes())
                 .build();
     }

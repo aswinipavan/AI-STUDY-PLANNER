@@ -47,9 +47,11 @@ export const Sidebar = () => {
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 text-center space-y-3">
           <div className="text-amber-500 font-semibold text-sm">Pro Features</div>
           <p className="text-xs text-muted-foreground">Unlock unlimited AI generations.</p>
-          <Button variant="outline" className="w-full border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600">
-            Upgrade Now
-          </Button>
+          <Link href="/subscription">
+            <Button variant="outline" className="w-full border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600">
+              Upgrade Now
+            </Button>
+          </Link>
         </div>
       </div>
     </aside>

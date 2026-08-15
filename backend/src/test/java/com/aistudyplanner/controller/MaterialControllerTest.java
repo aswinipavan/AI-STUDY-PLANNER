@@ -185,7 +185,7 @@ class MaterialControllerTest {
         Map<String, String> uploadInfo = new HashMap<>();
         uploadInfo.put("uploadUrl", "https://storage.example.com/upload");
         uploadInfo.put("filePath", "materials/" + studentId + "/file.pdf");
-        uploadInfo.put("publicUrl", "https://storage.example.com/public/materials/file.pdf");
+        uploadInfo.put("fileUrl", "https://storage.example.com/public/materials/file.pdf");
 
         when(materialService.getStorageUploadUrl(any(UUID.class), anyString(), anyString()))
                 .thenReturn(uploadInfo);
@@ -197,7 +197,7 @@ class MaterialControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.uploadUrl", containsString("storage.example.com")))
                 .andExpect(jsonPath("$.data.filePath", containsString("materials")))
-                .andExpect(jsonPath("$.data.publicUrl", notNullValue()));
+                .andExpect(jsonPath("$.data.fileUrl", notNullValue()));
 
         verify(materialService, times(1))
                 .getStorageUploadUrl(eq(studentId), anyString(), anyString());
@@ -209,7 +209,7 @@ class MaterialControllerTest {
         Map<String, String> uploadInfo = new HashMap<>();
         uploadInfo.put("uploadUrl", "https://storage.example.com/upload");
         uploadInfo.put("filePath", "materials/" + studentId + "/file.pdf");
-        uploadInfo.put("publicUrl", "https://storage.example.com/public/materials/file.pdf");
+        uploadInfo.put("fileUrl", "https://storage.example.com/public/materials/file.pdf");
 
         // fileType is null when not provided (required = false); use isNull() not anyString()
         when(materialService.getStorageUploadUrl(any(UUID.class), anyString(), isNull()))

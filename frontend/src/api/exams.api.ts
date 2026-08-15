@@ -10,6 +10,8 @@ export const examsApi = {
       examType: data.examType,
       durationHours: data.durationHours,
       syllabusCovered: data.syllabusCovered,
+      difficulty: data.difficulty,
+      notes: data.notes,
     });
     return response.data.data ?? response.data;
   },
@@ -28,6 +30,8 @@ export const examsApi = {
       examType: data.examType,
       durationHours: data.durationHours,
       syllabusCovered: data.syllabusCovered,
+      difficulty: data.difficulty,
+      notes: data.notes,
     });
     return response.data.data ?? response.data;
   },
