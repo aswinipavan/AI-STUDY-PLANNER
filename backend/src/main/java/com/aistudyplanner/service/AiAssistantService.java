@@ -69,6 +69,42 @@ public class AiAssistantService {
         return chatHistoryRepository.findTop50ByStudentIdAndSessionIdOrderByCreatedAtDesc(studentId, sessionId);
     }
 
+    @Transactional(readOnly = true)
+    public List<com.aistudyplanner.model.dto.response.ChatSessionResponse> getChatSessions(UUID studentId) {
+        // Get distinct sessions with first and last message per session
+        List<String> sessionIds = chatHistoryRepository.findDistinctSessionIdsByStudentId(studentId);
+        
+        return sessionIds.stream().map(sessionId -> {
+            List<ChatHistory> messages = chatHistoryRepository.findTop50ByStudentIdAndSessionIdOrderByCreatedAtDesc(studentId, sessionId);
+            if (messages.isEmpty()) {
+                return null;
+            }
+            
+            // Messages are in DESC order, so first element is most recent
+            ChatHistory lastMessage = messages.get(0);
+            ChatHistory firstMessage = messages.get(messages.size() - 1);
+            
+            String title = firstMessage.getMessage();
+            if (title.length() > 50) {
+                title = title.substring(0, 50) + "...";
+            }
+            
+            String lastMsg = lastMessage.getMessage();
+            if (lastMsg.length() > 100) {
+                lastMsg = lastMsg.substring(0, 100) + "...";
+            }
+            
+            return com.aistudyplanner.model.dto.response.ChatSessionResponse.builder()
+                    .sessionId(sessionId)
+                    .title(title)
+                    .createdAt(firstMessage.getCreatedAt())
+                    .lastMessage(lastMsg)
+                    .lastMessageAt(lastMessage.getCreatedAt())
+                    .build();
+        }).filter(java.util.Objects::nonNull)
+          .collect(java.util.stream.Collectors.toList());
+    }
+
     @Transactional
     public void clearChatHistory(UUID studentId, String sessionId) {
         List<ChatHistory> history = chatHistoryRepository.findByStudentIdAndSessionIdOrderByCreatedAtAsc(studentId, sessionId);

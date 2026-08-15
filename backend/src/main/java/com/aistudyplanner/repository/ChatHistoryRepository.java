@@ -2,6 +2,7 @@ package com.aistudyplanner.repository;
 
 import com.aistudyplanner.model.entity.ChatHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
@@ -29,5 +30,13 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, UUID> 
 
     // For cleanup: find all messages older than 30 days
     List<ChatHistory> findAllByCreatedAtBefore(OffsetDateTime date);
+
+    // Get distinct sessionIds for a student with metadata
+    @Query("SELECT DISTINCT ch.sessionId FROM ChatHistory ch WHERE ch.student.id = :studentId ORDER BY MAX(ch.createdAt) DESC")
+    List<String> findDistinctSessionIdsByStudentId(UUID studentId);
+
+    // Get first message of each session for metadata
+    @Query("SELECT ch FROM ChatHistory ch WHERE ch.student.id = :studentId AND ch.id IN (SELECT MIN(ch2.id) FROM ChatHistory ch2 WHERE ch2.student.id = :studentId GROUP BY ch2.sessionId) ORDER BY ch.createdAt DESC")
+    List<ChatHistory> findFirstMessagePerSession(UUID studentId);
 }
 

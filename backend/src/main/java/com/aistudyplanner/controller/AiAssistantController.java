@@ -86,6 +86,15 @@ public class AiAssistantController {
         return ResponseEntity.ok(ApiResponse.success(sessionId, "Session ID generated successfully"));
     }
 
+    @GetMapping("/chat/sessions")
+    @Operation(summary = "Get all chat sessions for the current student")
+    public ResponseEntity<ApiResponse<List<com.aistudyplanner.model.dto.response.ChatSessionResponse>>> getChatSessions(
+            @CurrentStudent Student student) {
+        log.info("Fetching chat sessions for student: {}", student.getId());
+        List<com.aistudyplanner.model.dto.response.ChatSessionResponse> sessions = aiAssistantService.getChatSessions(student.getId());
+        return ResponseEntity.ok(ApiResponse.success(sessions, "Chat sessions fetched successfully"));
+    }
+
     @PostMapping("/analyze-performance")
     @Operation(summary = "Analyze student performance")
     public ResponseEntity<ApiResponse<String>> analyzePerformance(@CurrentStudent Student student) {

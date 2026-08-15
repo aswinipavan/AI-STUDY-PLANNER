@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatApi } from '@/api/chat.api';
+import { aiApi } from '@/api/ai.api';
 import { ChatMessage, ChatSession } from '@/types/api.types';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,12 +13,10 @@ export interface ChatState {
 }
 
 export const useChatSessions = () => {
-  // Note: Backend doesn't have /sessions endpoint yet
-  // Return empty array until implemented
   return useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
-    queryFn: async () => [],
-    initialData: [],
+    queryFn: aiApi.getSessions,
+    staleTime: 30 * 1000, // 30 seconds
   });
 };
 
