@@ -18,4 +18,5 @@ public class UpdateProfileRequest {
     private Integer semester;
     private String department;
     private BigDecimal availableHoursPerDay;
+    private String profilePictureUrl;
 }

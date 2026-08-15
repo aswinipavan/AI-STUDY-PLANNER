@@ -30,6 +30,7 @@ export default function SubscriptionPage() {
   const { data: status } = useQuery({
     queryKey: QK.subscription,
     queryFn: subscriptionsApi.getStatus,
+    retry: false, // Don't retry if user has no subscription yet
   });
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {

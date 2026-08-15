@@ -119,8 +119,17 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public SubscriptionResponse getSubscriptionStatus(UUID studentId) {
-        Subscription subscription = subscriptionRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("No subscription found"));
+        Optional<Subscription> subscriptionOpt = subscriptionRepository.findByStudentId(studentId);
+        
+        if (subscriptionOpt.isEmpty()) {
+            // User has never subscribed - return FREE status
+            return SubscriptionResponse.builder()
+                    .planType(PlanType.FREE)
+                    .status(PaymentStatus.CREATED) // or null
+                    .build();
+        }
+        
+        Subscription subscription = subscriptionOpt.get();
         return toSubscriptionResponse(subscription);
     }
 

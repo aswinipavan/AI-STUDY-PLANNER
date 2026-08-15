@@ -7,12 +7,14 @@ import com.aistudyplanner.model.dto.request.TimetableRequest;
 import com.aistudyplanner.model.dto.response.SlotResponse;
 import com.aistudyplanner.model.dto.response.TimetableResponse;
 import com.aistudyplanner.model.entity.Exam;
+import com.aistudyplanner.model.entity.Material;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.model.entity.Subject;
 import com.aistudyplanner.model.entity.Timetable;
 import com.aistudyplanner.model.entity.TimetableSlot;
 import com.aistudyplanner.repository.ExamRepository;
 import com.aistudyplanner.repository.MarksRepository;
+import com.aistudyplanner.repository.MaterialRepository;
 import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.repository.SubjectRepository;
 import com.aistudyplanner.repository.TimetableRepository;
@@ -43,6 +45,7 @@ public class TimetableService {
     private final MarksRepository marksRepository;
     private final ExamRepository examRepository;
     private final StudentRepository studentRepository;
+    private final MaterialRepository materialRepository;
     private final GroqService groqService;
 
     @Transactional
@@ -50,19 +53,58 @@ public class TimetableService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
+        // Calculate actual study period
+        LocalDate startDate = request.getStartDate();
+        LocalDate endDate;
+        int actualDurationDays;
+        
+        if (request.getUseDeadlines() != null && request.getUseDeadlines() && request.getTargetDeadlineDate() != null) {
+            // Use specific target deadline
+            endDate = request.getTargetDeadlineDate();
+            actualDurationDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
+            if (actualDurationDays < 1) {
+                throw new IllegalArgumentException("Target deadline must be after start date");
+            }
+        } else if (request.getDurationDays() != null) {
+            // Use duration from request
+            actualDurationDays = request.getDurationDays();
+            endDate = startDate.plusDays(actualDurationDays);
+        } else {
+            // Default to 14 days
+            actualDurationDays = 14;
+            endDate = startDate.plusDays(actualDurationDays);
+        }
+        
+        log.info("Generating timetable from {} to {} ({} days)", startDate, endDate, actualDurationDays);
+
         double availableHours = request.getAvailableHoursPerDay().doubleValue();
         List<Subject> subjects = subjectRepository.findAllByStudentId(studentId, org.springframework.data.domain.PageRequest.of(0, 100));
-        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects);
+        
+        if (subjects.isEmpty()) {
+            throw new IllegalArgumentException("No subjects found. Please add subjects first.");
+        }
+        
+        // Calculate subject weights with deadline awareness
+        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects, request.getUseDeadlines());
         
         // Deactivate all other timetables
         deactivateExistingTimetables(studentId);
         
-        // Create new timetable
-        Timetable timetable = createNewTimetable(student);
+        // Create new timetable with start date
+        Timetable timetable = createNewTimetable(student, startDate, actualDurationDays);
         
-        // Generate slots
-        List<TimetableSlot> slots = generateTimetableSlots(timetable, subjects, subjectWeights, availableHours);
+        // Generate slots for actual duration
+        List<TimetableSlot> slots = generateTimetableSlotsForDuration(
+            timetable, 
+            subjects, 
+            subjectWeights, 
+            availableHours, 
+            startDate, 
+            actualDurationDays
+        );
         timetableSlotRepository.saveAll(slots);
+        
+        log.info("Generated {} slots for {} days", slots.size(), actualDurationDays);
         
         return getTimetable(studentId);
     }
@@ -70,22 +112,28 @@ public class TimetableService {
     /**
      * Calculate weight for each subject based on performance and difficulty
      */
-    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects) {
+    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects, Boolean useDeadlines) {
         Map<UUID, Double> subjectAverages = new HashMap<>();
         List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(studentId);
         for (Object[] row : avgData) {
             subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
         }
 
-        LocalDate next30Days = LocalDate.now().plusDays(com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS);
-        List<Exam> upcomingExams = examRepository.findAllByStudentIdOrderByExamDateAsc(studentId, org.springframework.data.domain.PageRequest.of(0, 100)).stream()
-                .filter(e -> e.getExamDate() != null && !e.getExamDate().isAfter(next30Days) && !e.getExamDate().isBefore(LocalDate.now()))
-                .collect(Collectors.toList());
+        // Fetch upcoming exams if deadline mode is enabled
+        List<Exam> upcomingExams = new ArrayList<>();
+        if (useDeadlines != null && useDeadlines) {
+            LocalDate next30Days = LocalDate.now().plusDays(com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS);
+            upcomingExams = examRepository.findAllByStudentIdOrderByExamDateAsc(studentId, org.springframework.data.domain.PageRequest.of(0, 100)).stream()
+                    .filter(e -> e.getExamDate() != null && !e.getExamDate().isAfter(next30Days) && !e.getExamDate().isBefore(LocalDate.now()))
+                    .collect(Collectors.toList());
+            log.info("Found {} upcoming exams for deadline-based prioritization", upcomingExams.size());
+        }
 
         Map<UUID, Double> subjectWeights = new HashMap<>();
         for (Subject subject : subjects) {
             double weight = calculateIndividualWeight(subject, subjectAverages, upcomingExams);
             subjectWeights.put(subject.getId(), weight);
+            log.debug("Subject {} weight: {}", subject.getSubjectName(), weight);
         }
         return subjectWeights;
     }
@@ -128,9 +176,15 @@ public class TimetableService {
     /**
      * Create a new active timetable for the student
      */
-    private Timetable createNewTimetable(Student student) {
+    private Timetable createNewTimetable(Student student, LocalDate weekStartDate, int durationDays) {
+        String title = String.format("Study Plan: %s to %s", 
+            weekStartDate.toString(), 
+            weekStartDate.plusDays(durationDays).toString());
+            
         Timetable timetable = Timetable.builder()
                 .student(student)
+                .weekStartDate(weekStartDate)
+                .title(title)
                 .isAiGenerated(true)
                 .isActive(true)
                 .build();
@@ -152,6 +206,35 @@ public class TimetableService {
             slotsToSave.addAll(generateDaySlots(timetable, subjects, allocatedMinutesMap, dayIndex));
         }
         
+        return slotsToSave;
+    }
+    
+    /**
+     * Generate timetable slots for actual duration (deadline-based planning)
+     */
+    private List<TimetableSlot> generateTimetableSlotsForDuration(
+            Timetable timetable, 
+            List<Subject> subjects, 
+            Map<UUID, Double> subjectWeights, 
+            double availableHours,
+            LocalDate startDate,
+            int durationDays) {
+        
+        List<TimetableSlot> slotsToSave = new ArrayList<>();
+        double totalWeight = subjectWeights.values().stream().mapToDouble(w -> w != null ? w : 0.0).sum();
+        double totalDailyMinutes = availableHours * 60;
+
+        Map<UUID, Integer> allocatedMinutesMap = allocateStudyTime(subjects, subjectWeights, totalWeight, totalDailyMinutes);
+        
+        // Generate slots for each day in the duration
+        for (int dayOffset = 0; dayOffset < durationDays; dayOffset++) {
+            LocalDate currentDate = startDate.plusDays(dayOffset);
+            int dayOfWeek = currentDate.getDayOfWeek().getValue() % 7; // 0=Monday, 6=Sunday
+            
+            slotsToSave.addAll(generateDaySlotsForDate(timetable, subjects, allocatedMinutesMap, dayOffset, dayOfWeek));
+        }
+        
+        log.info("Generated {} total slots across {} days", slotsToSave.size(), durationDays);
         return slotsToSave;
     }
 
@@ -194,12 +277,129 @@ public class TimetableService {
             if (subjectMinutes <= 0) continue;
 
             double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
-            String topicSuggestion = groqService.generateTopicSuggestion(subject.getSubjectName(), avg, subjectMinutes, com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS);
+            
+            // Try to get topic from uploaded materials first
+            String topicSuggestion = getTopicFromMaterials(
+                timetable.getStudent().getId(), 
+                subject.getId(), 
+                subject.getSubjectName(), 
+                avg, 
+                subjectMinutes
+            );
+            
+            // Fallback to generic topic generation if no materials available
+            if (topicSuggestion == null) {
+                topicSuggestion = groqService.generateTopicSuggestion(
+                    subject.getSubjectName(), 
+                    avg, 
+                    subjectMinutes, 
+                    com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
+                );
+            }
 
             TimetableSlot slot = TimetableSlot.builder()
                     .timetable(timetable)
                     .subject(subject)
                     .dayOfWeek(dayIndex)
+                    .startTime(currentTime)
+                    .endTime(currentTime.plusMinutes(subjectMinutes))
+                    .topic(topicSuggestion)
+                    .isCompleted(false)
+                    .build();
+
+            daySlots.add(slot);
+            currentTime = currentTime.plusMinutes(subjectMinutes + com.aistudyplanner.util.Constants.BUFFER_BETWEEN_SLOTS_MINUTES);
+        }
+        return daySlots;
+    }
+    
+    /**
+     * Extract topics from uploaded materials for a subject
+     * Returns null if no materials available, otherwise returns a material-based topic
+     */
+    private String getTopicFromMaterials(UUID studentId, UUID subjectId, String subjectName, double avgPercentage, int durationMinutes) {
+        List<Material> materials = materialRepository.findAllByStudentIdAndSubjectId(studentId, subjectId);
+        
+        if (materials.isEmpty()) {
+            log.debug("No materials found for subject {}. Using generic topic generation.", subjectName);
+            return null;
+        }
+        
+        // Collect all material summaries
+        StringBuilder materialContent = new StringBuilder();
+        for (Material material : materials) {
+            if (material.getAiSummary() != null && !material.getAiSummary().trim().isEmpty()) {
+                materialContent.append("Material: ").append(material.getTitle()).append("\n");
+                materialContent.append(material.getAiSummary()).append("\n\n");
+            }
+        }
+        
+        if (materialContent.length() == 0) {
+            log.debug("No material summaries available for subject {}. Using generic topic generation.", subjectName);
+            return null;
+        }
+        
+        // Use Groq to extract a specific topic from the material
+        try {
+            String topic = groqService.extractTopicFromMaterials(
+                subjectName, 
+                avgPercentage, 
+                durationMinutes, 
+                materialContent.toString()
+            );
+            log.info("Generated material-based topic for {}: {}", subjectName, topic);
+            return topic;
+        } catch (Exception e) {
+            log.error("Failed to extract topic from materials for subject {}: {}", subjectName, e.getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Generate slots for a specific date in deadline-based planning
+     */
+    private List<TimetableSlot> generateDaySlotsForDate(Timetable timetable, List<Subject> subjects, 
+                                                        Map<UUID, Integer> allocatedMinutesMap, int dayOffset, int dayOfWeek) {
+        List<TimetableSlot> daySlots = new ArrayList<>();
+        LocalTime currentTime = LocalTime.of(18, 0);
+        boolean isSunday = (dayOfWeek == 6);
+        double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
+
+        Map<UUID, Double> subjectAverages = new HashMap<>();
+        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
+        for (Object[] row : avgData) {
+            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
+        }
+
+        for (Subject subject : subjects) {
+            int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
+            if (subjectMinutes <= 0) continue;
+
+            double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
+            
+            // Try to get topic from uploaded materials first
+            String topicSuggestion = getTopicFromMaterials(
+                timetable.getStudent().getId(), 
+                subject.getId(), 
+                subject.getSubjectName(), 
+                avg, 
+                subjectMinutes
+            );
+            
+            // Fallback to generic topic generation if no materials available
+            if (topicSuggestion == null) {
+                topicSuggestion = groqService.generateTopicSuggestion(
+                    subject.getSubjectName(), 
+                    avg, 
+                    subjectMinutes, 
+                    com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
+                );
+            }
+
+            TimetableSlot slot = TimetableSlot.builder()
+                    .timetable(timetable)
+                    .subject(subject)
+                    .dayOfWeek(dayOffset)  // Use actual day offset from start date, not weekday
                     .startTime(currentTime)
                     .endTime(currentTime.plusMinutes(subjectMinutes))
                     .topic(topicSuggestion)
@@ -319,6 +519,7 @@ public class TimetableService {
 
         Timetable timetable = Timetable.builder()
                 .student(student)
+                .weekStartDate(LocalDate.now())  // Set to current week start for custom timetables
                 .isAiGenerated(false)
                 .isActive(true)
                 .build();

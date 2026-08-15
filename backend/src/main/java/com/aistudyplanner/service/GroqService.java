@@ -152,6 +152,18 @@ public class GroqService {
                 "File: %s. Preview: %s", fileName, textPreview);
         return callGroq(prompt).trim();
     }
+    
+    public String extractTopicFromMaterials(String subjectName, double avgPercentage, int durationMinutes, String materialSummaries) {
+        if (materialSummaries.length() > 3000) {
+            materialSummaries = materialSummaries.substring(0, 3000) + "...";
+        }
+        String prompt = String.format(
+            "Based on these uploaded study materials for %s, suggest ONE specific topic/chapter for a %d minute study session. " +
+            "Student's average: %.2f%%. Pick topics from the materials below. Be concise (max 10 words).\n\n%s",
+            subjectName, durationMinutes, avgPercentage, materialSummaries
+        );
+        return callGroq(prompt).trim();
+    }
 
     public String generateExamPlan(String studentName, List<ExamResponse> exams, Map<String, Double> subjectAverages) {
         String prompt = String.format("Create a day-by-day exam preparation plan for %s.\n" +

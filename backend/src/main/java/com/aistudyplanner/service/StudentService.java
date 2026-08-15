@@ -43,6 +43,7 @@ public class StudentService {
         if (request.getSemester() != null) student.setSemester(request.getSemester());
         if (request.getDepartment() != null) student.setDepartment(request.getDepartment());
         if (request.getAvailableHoursPerDay() != null) student.setAvailableHoursPerDay(request.getAvailableHoursPerDay());
+        if (request.getProfilePictureUrl() != null) student.setProfilePictureUrl(request.getProfilePictureUrl());
 
         student = studentRepository.save(student);
         return StudentMapper.toStudentResponse(student);

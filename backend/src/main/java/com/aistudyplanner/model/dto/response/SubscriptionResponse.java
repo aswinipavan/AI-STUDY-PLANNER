@@ -2,6 +2,7 @@ package com.aistudyplanner.model.dto.response;
 
 import com.aistudyplanner.model.PaymentStatus;
 import com.aistudyplanner.model.PlanType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.OffsetDateTime;
@@ -17,4 +18,13 @@ public class SubscriptionResponse {
     private PaymentStatus status;
     private OffsetDateTime startedAt;
     private OffsetDateTime expiresAt;
+    
+    @JsonProperty("isPremium")
+    public boolean isPremium() {
+        return planType != null 
+                && planType != PlanType.FREE 
+                && status == PaymentStatus.PAID
+                && expiresAt != null 
+                && expiresAt.isAfter(OffsetDateTime.now());
+    }
 }
