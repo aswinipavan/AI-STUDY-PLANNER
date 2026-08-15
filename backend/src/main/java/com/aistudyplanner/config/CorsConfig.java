@@ -28,8 +28,12 @@ public class CorsConfig {
         // Security: Only allow * in non-production or reject it entirely
         if (origins.contains("*")) {
             if ("prod".equalsIgnoreCase(System.getenv("ENVIRONMENT"))) {
-                log.warn("WARNING: CORS wildcard (*) detected in production! Rejecting for security.");
-                configuration.setAllowedOrigins(List.of("https://ai-study-planner-jhh9.vercel.app/"));
+                log.warn("WARNING: CORS wildcard (*) detected in production! Using explicit Vercel domains.");
+                configuration.setAllowedOriginPatterns(List.of(
+                    "https://ai-study-planner-*.vercel.app",
+                    "https://*.vercel.app"
+                ));
+                log.info("CORS configured for Vercel domain patterns");
             } else {
                 configuration.setAllowedOriginPatterns(List.of("*"));
                 log.warn("CORS wildcard (*) configured in non-production environment");

@@ -36,17 +36,23 @@ export async function POST(req: NextRequest) {
 
     // ── Try to exchange the token with the backend ──────────────────────────
     let user: Record<string, unknown> | null = null;
+    const backendUrl = ENV.BACKEND_URL;
+
+    console.log('[auth/login] Backend URL:', backendUrl);
 
     try {
-      const backendRes = await fetch(`${ENV.BACKEND_URL}/api/auth/login`, {
+      const backendRes = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firebaseToken }),
         signal: AbortSignal.timeout(30000), // 30s max — Render cold start can take 30-50s
       });
 
+      console.log('[auth/login] Backend response status:', backendRes.status);
+
       if (backendRes.ok) {
         const data = await backendRes.json();
+        console.log('[auth/login] Backend response data keys:', Object.keys(data));
 
         // Backend returns ApiResponse<AuthResponse>:
         // { success: true, data: { token: "...", student: {...}, isNewUser: false } }
@@ -62,10 +68,26 @@ export async function POST(req: NextRequest) {
             path: '/',
             maxAge: 60 * 60, // 1 hour
           });
+          console.log('[auth/login] JWT token cookie set');
         }
 
         // student field from backend
         user = authData.student ?? authData.user ?? null;
+        console.log('[auth/login] User extracted:', user ? 'YES' : 'NO');
+      } else {
+        // Backend returned non-ok status - log the error
+        const errorText = await backendRes.text();
+        console.error('[auth/login] Backend returned error:', backendRes.status, errorText);
+        
+        // Return the backend error to help diagnose
+        return NextResponse.json(
+          { 
+            error: 'Backend authentication failed', 
+            backendStatus: backendRes.status,
+            backendError: errorText.substring(0, 200) // Limit error text
+          },
+          { status: backendRes.status }
+        );
       }
     } catch (backendErr) {
       console.error('[auth/login] Backend unavailable:', backendErr);
@@ -76,8 +98,9 @@ export async function POST(req: NextRequest) {
     }
 
     if (!user) {
+      console.error('[auth/login] User is null after backend call - this should not happen');
       return NextResponse.json(
-        { error: 'Authentication failed.' },
+        { error: 'Authentication failed - user data not received from backend.' },
         { status: 401 }
       );
     }
