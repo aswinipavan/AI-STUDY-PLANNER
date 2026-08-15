@@ -9,7 +9,9 @@ export const materialsApi = {
         fileType: fileType,
       },
     });
-    return response.data;
+    // Backend returns ApiResponse<Map<String, String>>
+    // Extract the actual data from the wrapper
+    return response.data.data || response.data;
   },
 
   save: async (
@@ -29,17 +31,20 @@ export const materialsApi = {
         },
       }
     );
-    return response.data;
+    // Backend returns ApiResponse<MaterialResponse>
+    return response.data.data || response.data;
   },
 
   getAll: async (): Promise<StudyMaterial[]> => {
     const response = await apiClient.get('/api/materials/');
-    return response.data;
+    // Backend returns ApiResponse<List<MaterialResponse>>
+    return response.data.data || response.data;
   },
 
   getBySubject: async (id: string): Promise<StudyMaterial[]> => {
     const response = await apiClient.get(`/api/materials/subject/${id}`);
-    return response.data;
+    // Backend returns ApiResponse<List<MaterialResponse>>
+    return response.data.data || response.data;
   },
 
   remove: async (id: string): Promise<void> => {

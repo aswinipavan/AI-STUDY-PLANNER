@@ -9,7 +9,7 @@ export const timetableApi = {
 
   addCustom: async (block: Partial<TimetableSlot>): Promise<Timetable> => {
     const response = await apiClient.post('/api/timetable/custom', block);
-    return response.data;
+    return response.data.data ?? response.data;
   },
 
   getActive: async (): Promise<Timetable> => {
@@ -20,7 +20,7 @@ export const timetableApi = {
 
   markSlotComplete: async (id: string): Promise<TimetableSlot> => {
     const response = await apiClient.patch(`/api/timetable/slots/${id}/complete`);
-    return response.data;
+    return response.data.data ?? response.data;
   },
 
   // Wrapper for frontend 3-state status - maps to backend's boolean isCompleted
@@ -30,6 +30,6 @@ export const timetableApi = {
     // If setting to 'pending' or 'skipped' and currently complete, toggle
     // Otherwise, this is a no-op on backend (frontend optimistic update handles UI)
     const response = await apiClient.patch(`/api/timetable/slots/${id}/complete`);
-    return response.data;
+    return response.data.data ?? response.data;
   },
 };
