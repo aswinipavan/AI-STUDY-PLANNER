@@ -164,6 +164,19 @@
   truncate: true;
 }
 
+.slotTopic {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--color-foreground);
+  opacity: 0.85;
+  margin: 0.2rem 0 0.3rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 .slotIcon {
   opacity: 0;
   transition: opacity 0.2s;

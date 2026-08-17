@@ -59,6 +59,11 @@ function SlotCard({ slot, onToggle }: { slot: TimetableSlot; onToggle: (id: stri
             : <Clock size={14} />}
         </span>
       </div>
+      {slot.topic && (
+        <p className={styles.slotTopic} title={slot.topic}>
+          {slot.topic}
+        </p>
+      )}
       <p className={styles.slotTime}>
         {new Date(`1970-01-01T${slot.startTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
       </p>
@@ -143,10 +148,16 @@ export default function TimetablePage() {
             </div>
 
             <div className={styles.gridColumns}>
-              {DAYS.map(day => {
-                const daySlots = optimisticSlots.filter(s =>
-                  new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === day
-                );
+              {DAYS.map((day, dayIndex) => {
+                const daySlots = optimisticSlots.filter(s => {
+                  if (s.date) {
+                    return new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === day;
+                  }
+                  if (s.dayOfWeek !== undefined && s.dayOfWeek !== null) {
+                    return s.dayOfWeek === dayIndex;
+                  }
+                  return false;
+                });
                 return (
                   <div key={day} className={styles.dayColumn}>
                     {daySlots.map(slot => (

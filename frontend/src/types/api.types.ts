@@ -48,13 +48,15 @@ export interface Exam {
 
 export interface TimetableSlot {
   id: string; 
-  subjectId: string; 
+  subjectId?: string; 
   subject?: Subject;
   startTime: string; 
   endTime: string; 
-  date: string;
+  date?: string;
+  dayOfWeek?: number;
+  topic?: string;
   status: 'pending' | 'completed' | 'skipped'; 
-  timetableId: string;
+  timetableId?: string;
 }
 
 export interface Timetable {
