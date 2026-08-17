@@ -22,5 +22,13 @@ public class MaterialResponse {
     private Long fileSizeBytes;
     private String aiSummary;
     private String aiCategorizedSubject;
+    private com.aistudyplanner.model.ProcessingStatus processingStatus;
+    private String extractedTopics;
+    private String extractedChapters;
+    private String extractedKeywords;
+    private String overallDifficulty;
+    private Integer difficultyScore;
+    private String difficultyReason;
+    private String errorMessage;
     private OffsetDateTime uploadedAt;
 }

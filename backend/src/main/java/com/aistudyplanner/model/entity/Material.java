@@ -55,6 +55,31 @@ public class Material {
     @Column(name = "ai_categorized_subject", length = 100)
     private String aiCategorizedSubject;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "processing_status", length = 30)
+    private com.aistudyplanner.model.ProcessingStatus processingStatus;
+
+    @Column(name = "extracted_topics", columnDefinition = "TEXT")
+    private String extractedTopics;
+
+    @Column(name = "extracted_chapters", columnDefinition = "TEXT")
+    private String extractedChapters;
+
+    @Column(name = "extracted_keywords", columnDefinition = "TEXT")
+    private String extractedKeywords;
+
+    @Column(name = "overall_difficulty", length = 20)
+    private String overallDifficulty;
+
+    @Column(name = "difficulty_score")
+    private Integer difficultyScore;
+
+    @Column(name = "difficulty_reason", columnDefinition = "TEXT")
+    private String difficultyReason;
+
+    @Column(name = "error_message", columnDefinition = "TEXT")
+    private String errorMessage;
+
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
 
@@ -62,6 +87,9 @@ public class Material {
     public void prePersist() {
         if (createdAt == null) {
             createdAt = OffsetDateTime.now();
+        }
+        if (processingStatus == null) {
+            processingStatus = com.aistudyplanner.model.ProcessingStatus.PENDING;
         }
     }
 }

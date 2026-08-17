@@ -198,7 +198,41 @@ test.describe('Final Independent Verification Suite', () => {
     await expect(generateHeader).toBeVisible();
   });
 
-  test('Req 11 & 19: Materials Page, Upload Zone, and Subject Filters', async ({ page }) => {
+  test('Req 11 & 19: Materials Page, Upload Zone, NLP Document Intelligence, and Subject Filters', async ({ page }) => {
+    // Mock materials with document intelligence data
+    await page.route('**/api/materials/', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: [
+              {
+                id: 'mat-101',
+                title: 'Data Structures & Algorithms Lecture Notes',
+                fileUrl: 'https://example.com/dsa.pdf',
+                fileType: 'pdf',
+                fileSizeBytes: 2450000,
+                processingStatus: 'COMPLETED',
+                overallDifficulty: 'HARD',
+                difficultyScore: 85,
+                difficultyReason: 'High algorithmic complexity with graph traversal and dynamic programming.',
+                aiCategorizedSubject: 'Computer Science',
+                extractedTopics: [
+                  { name: 'Binary Search Trees & AVL Balancing', chapter: 'Chapter 3', relevanceScore: 0.95 }
+                ],
+                extractedKeywords: ['BST', 'AVL Tree', 'Traversal', 'Recursion'],
+                aiSummary: 'Comprehensive overview of balanced search trees and algorithms.',
+                uploadedAt: new Date().toISOString(),
+              }
+            ]
+          })
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
     await page.goto('/materials', { waitUntil: 'domcontentloaded' });
 
     // Verify upload zone
@@ -208,6 +242,23 @@ test.describe('Final Independent Verification Suite', () => {
     // Verify subject folder selector
     const subjectSelect = page.locator('select').first();
     await expect(subjectSelect).toBeVisible();
+
+    // Verify NLP Processed badge
+    const nlpBadge = page.locator('text=NLP Processed');
+    await expect(nlpBadge).toBeVisible();
+
+    // Verify Difficulty badge
+    const diffBadge = page.locator('text=HARD • 85/100');
+    await expect(diffBadge).toBeVisible();
+
+    // Click Topics toggle to expand
+    const topicsBtn = page.locator('button', { hasText: /Topics/i }).first();
+    if (await topicsBtn.isVisible()) {
+      await topicsBtn.click();
+      await page.waitForTimeout(300);
+      const topicItem = page.locator('text=Binary Search Trees & AVL Balancing');
+      await expect(topicItem).toBeVisible();
+    }
   });
 
   test('Req 17 & 18: Subscription Page and Pricing Tiers', async ({ page }) => {

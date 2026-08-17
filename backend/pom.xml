@@ -132,6 +132,13 @@
             <version>32.1.3-jre</version>
         </dependency>
 
+        <!-- Apache PDFBox for pure-Java PDF text extraction -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
         <!-- Dotenv -->
         <dependency>
             <groupId>me.paulschwarz</groupId>

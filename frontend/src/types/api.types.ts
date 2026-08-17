@@ -65,6 +65,22 @@ export interface Timetable {
   isActive: boolean;
 }
 
+export interface MaterialTopic {
+  name: string;
+  chapter?: string;
+  keywords?: string[];
+  relevanceScore?: number;
+  estimatedMinutes?: number;
+}
+
+export interface MaterialChapter {
+  title: string;
+  chapterNumber?: string;
+  subtopics?: string[];
+  contentSnippet?: string;
+  confidence?: number;
+}
+
 export interface StudyMaterial {
   id: string; 
   title: string; 
@@ -77,6 +93,14 @@ export interface StudyMaterial {
   fileName?: string;
   fileSizeBytes?: number;
   materialType?: string;
+  processingStatus?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  extractedTopics?: string | MaterialTopic[];
+  extractedChapters?: string | MaterialChapter[];
+  extractedKeywords?: string | string[];
+  overallDifficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  difficultyScore?: number;
+  difficultyReason?: string;
+  errorMessage?: string;
 }
 
 export interface ChatSession {

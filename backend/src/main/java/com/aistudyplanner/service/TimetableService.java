@@ -19,6 +19,7 @@ import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.repository.SubjectRepository;
 import com.aistudyplanner.repository.TimetableRepository;
 import com.aistudyplanner.repository.TimetableSlotRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class TimetableService {
     private final StudentRepository studentRepository;
     private final MaterialRepository materialRepository;
     private final GroqService groqService;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public TimetableResponse generateAiTimetable(UUID studentId, GenerateTimetableRequest request) {
@@ -303,35 +306,21 @@ public class TimetableService {
         boolean isSunday = (dayIndex == 6);
         double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
 
+        Map<UUID, List<String>> subjectTopicPools = new HashMap<>();
         for (Subject subject : subjects) {
             int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
             if (subjectMinutes <= 0) continue;
 
             double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
-            
-            // Try to get topic from uploaded materials first
-            String topicSuggestion = getTopicFromMaterials(
-                timetable.getStudent().getId(), 
-                subject.getId(), 
-                subject.getSubjectName(), 
-                avg, 
-                subjectMinutes
+            String topicSuggestion = getTopicFromMaterialsOrFallback(
+                    timetable.getStudent().getId(),
+                    subject,
+                    avg,
+                    subjectMinutes,
+                    dayIndex,
+                    subjectTopicPools,
+                    null
             );
-            
-            // Fallback to generic topic generation — FIXED: wrapped in try-catch
-            if (topicSuggestion == null) {
-                try {
-                    topicSuggestion = groqService.generateTopicSuggestion(
-                        subject.getSubjectName(), 
-                        avg, 
-                        subjectMinutes, 
-                        com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
-                    );
-                } catch (Exception e) {
-                    log.warn("Groq topic generation failed for {}, using fallback: {}", subject.getSubjectName(), e.getMessage());
-                    topicSuggestion = "Study: " + subject.getSubjectName();
-                }
-            }
 
             TimetableSlot slot = TimetableSlot.builder()
                     .timetable(timetable)
@@ -348,55 +337,95 @@ public class TimetableService {
         }
         return daySlots;
     }
-    
+
     /**
-     * Extract topics from uploaded materials for a subject
-     * Returns null if no materials available, otherwise returns a material-based topic
+     * Extract structured topics from uploaded materials for a subject, prioritized by student performance and exam urgency.
      */
-    private String getTopicFromMaterials(UUID studentId, UUID subjectId, String subjectName, double avgPercentage, int durationMinutes) {
+    private List<String> getPrioritizedTopicsForSubject(UUID studentId, UUID subjectId, double avgPercentage, List<Exam> upcomingExams) {
         List<Material> materials = materialRepository.findAllByStudentIdAndSubjectId(studentId, subjectId);
-        
-        if (materials.isEmpty()) {
-            log.debug("No materials found for subject {}. Using generic topic generation.", subjectName);
-            return null;
-        }
-        
-        // Collect all material summaries
-        StringBuilder materialContent = new StringBuilder();
+        if (materials.isEmpty()) return Collections.emptyList();
+
+        List<Map<String, Object>> allTopics = new ArrayList<>();
+        boolean isNearExam = upcomingExams != null && upcomingExams.stream()
+                .anyMatch(e -> e.getSubject() != null && e.getSubject().getId().equals(subjectId)
+                        && e.getExamDate() != null && ChronoUnit.DAYS.between(LocalDate.now(), e.getExamDate()) <= 7);
+
         for (Material material : materials) {
-            if (material.getAiSummary() != null && !material.getAiSummary().trim().isEmpty()) {
-                materialContent.append("Material: ").append(material.getTitle()).append("\n");
-                materialContent.append(material.getAiSummary()).append("\n\n");
+            String topicsJson = material.getExtractedTopics();
+            if (topicsJson != null && !topicsJson.isBlank() && !topicsJson.equals("[]")) {
+                try {
+                    List<Map<String, Object>> parsed = objectMapper.readValue(topicsJson, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+                    allTopics.addAll(parsed);
+                } catch (Exception e) {
+                    log.debug("Could not parse extractedTopics JSON for material {}: {}", material.getId(), e.getMessage());
+                }
             }
         }
-        
-        if (materialContent.length() == 0) {
-            log.debug("No material summaries available for subject {}. Using generic topic generation.", subjectName);
-            return null;
+
+        if (allTopics.isEmpty()) {
+            return Collections.emptyList();
         }
-        
-        // Use Groq to extract a specific topic from the material
+
+        // If student is weak (<60%) or exam is near, sort higher relevance / difficult topics first
+        if (avgPercentage < 60.0 || isNearExam) {
+            allTopics.sort((a, b) -> {
+                double relA = a.get("relevanceScore") instanceof Number ? ((Number) a.get("relevanceScore")).doubleValue() : 0.5;
+                double relB = b.get("relevanceScore") instanceof Number ? ((Number) b.get("relevanceScore")).doubleValue() : 0.5;
+                return Double.compare(relB, relA);
+            });
+        }
+
+        List<String> formattedTopics = new ArrayList<>();
+        for (Map<String, Object> t : allTopics) {
+            String name = (String) t.get("name");
+            String chapter = (String) t.get("chapter");
+            if (name != null && !name.isBlank()) {
+                String prefix = (avgPercentage < 50.0) ? "Focus: " : (isNearExam ? "Exam Prep: " : "Study: ");
+                if (chapter != null && !chapter.isBlank() && !chapter.equalsIgnoreCase(name) && !chapter.equalsIgnoreCase("General")) {
+                    formattedTopics.add(prefix + chapter + " - " + name);
+                } else {
+                    formattedTopics.add(prefix + name);
+                }
+            }
+        }
+
+        return formattedTopics;
+    }
+
+    /**
+     * Extract a specific topic from materials or fallback to Groq / deterministic generation
+     */
+    private String getTopicFromMaterialsOrFallback(UUID studentId, Subject subject, double avgPercentage,
+                                                  int durationMinutes, int slotIndex,
+                                                  Map<UUID, List<String>> subjectTopicPools,
+                                                  List<Exam> upcomingExams) {
+        // 1. Try to get progressive topic from extracted material topic pool
+        List<String> topicPool = subjectTopicPools.computeIfAbsent(
+                subject.getId(),
+                id -> getPrioritizedTopicsForSubject(studentId, id, avgPercentage, upcomingExams)
+        );
+
+        if (!topicPool.isEmpty()) {
+            int index = slotIndex % topicPool.size();
+            return topicPool.get(index);
+        }
+
+        // 2. Try Groq topic generation
         try {
-            String topic = groqService.extractTopicFromMaterials(
-                subjectName, 
-                avgPercentage, 
-                durationMinutes, 
-                materialContent.toString()
+            return groqService.generateTopicSuggestion(
+                    subject.getSubjectName(),
+                    avgPercentage,
+                    durationMinutes,
+                    com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
             );
-            log.info("Generated material-based topic for {}: {}", subjectName, topic);
-            return topic;
         } catch (Exception e) {
-            log.error("Failed to extract topic from materials for subject {}: {}", subjectName, e.getMessage());
-            return null;
+            log.warn("Groq topic generation failed for {}, using deterministic fallback: {}", subject.getSubjectName(), e.getMessage());
+            return "Study: " + subject.getSubjectName() + " (Session " + (slotIndex + 1) + ")";
         }
     }
-    
-    /**
-     * Generate slots for a specific date in deadline-based planning
-     */
+
     /**
      * Generate slots for a specific date in deadline-based planning.
-     * FIXED: Groq calls wrapped in try-catch; subject averages passed in (not re-queried per day).
      */
     private List<TimetableSlot> generateDaySlotsForDate(Timetable timetable, List<Subject> subjects,
                                                         Map<UUID, Integer> allocatedMinutesMap, int dayOffset, int dayOfWeek,
@@ -405,36 +434,22 @@ public class TimetableService {
         LocalTime currentTime = LocalTime.of(18, 0);
         boolean isSunday = (dayOfWeek == 6);
         double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
+        Map<UUID, List<String>> subjectTopicPools = new HashMap<>();
 
         for (Subject subject : subjects) {
             int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
             if (subjectMinutes <= 0) continue;
 
             double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
-            
-            // Try to get topic from uploaded materials first
-            String topicSuggestion = getTopicFromMaterials(
-                timetable.getStudent().getId(), 
-                subject.getId(), 
-                subject.getSubjectName(), 
-                avg, 
-                subjectMinutes
+            String topicSuggestion = getTopicFromMaterialsOrFallback(
+                    timetable.getStudent().getId(),
+                    subject,
+                    avg,
+                    subjectMinutes,
+                    dayOffset,
+                    subjectTopicPools,
+                    null
             );
-            
-            // Fallback to Groq topic — FIXED: wrapped in try-catch to prevent HTTP 500
-            if (topicSuggestion == null) {
-                try {
-                    topicSuggestion = groqService.generateTopicSuggestion(
-                        subject.getSubjectName(), 
-                        avg, 
-                        subjectMinutes, 
-                        com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
-                    );
-                } catch (Exception e) {
-                    log.warn("Groq topic generation failed for {}, using fallback: {}", subject.getSubjectName(), e.getMessage());
-                    topicSuggestion = "Study: " + subject.getSubjectName();
-                }
-            }
 
             TimetableSlot slot = TimetableSlot.builder()
                     .timetable(timetable)

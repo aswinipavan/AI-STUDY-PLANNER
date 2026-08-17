@@ -672,7 +672,56 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - `backend/`: `.\mvnw.cmd compile -q` -> `BUILD SUCCESS` (0 errors).
   - `frontend/`: `npm run build` -> 22/22 routes generated cleanly (0 errors).
   - Browser Verification: Landing, Login, Dashboard, Settings, Exams, Subjects, Materials, AI Tutor, and Subscription verified live in browser.
-- **Next Recommended Task:** Set `SUPABASE_ANON_KEY` in Render backend dashboard Environment Variables to enable live Supabase storage uploads in production deployment.
+
+---
+
+## Session: 2026-08-17 (NLP Academic Material Intelligence & Study Planner Integration)
+- **Task Started:** Implement robust NLP-based academic material intelligence pipeline connecting uploaded materials (PDFs, notes, chapters) to personalized study planner and timetable generation.
+- **Task Completed:**
+  1. *Pure-Java Text Extraction:*
+     - Added `org.apache.pdfbox:pdfbox:3.0.2` to `pom.xml` for zero-native, pure-Java PDF text extraction.
+  2. *Lightweight NLP Preprocessing:*
+     - Created `NlpTextPreprocessor.java` for normalization, sentence tokenization, stop-word filtering, and paragraph segmentation.
+  3. *Chapter & Section Detection:*
+     - Created `ChapterDetector.java` supporting `Chapter \d+`, `Unit [IVX]+`, `Module \d+`, and `\d+\.\d+` hierarchical patterns with confidence scoring.
+  4. *Topic & Keyword Extraction:*
+     - Created `TopicExtractor.java` combining chapter synthesis, TF-IDF term frequency scoring, and technical academic keyword extraction.
+  5. *Multi-Signal Difficulty & Complexity Analyzer:*
+     - Created `DifficultyAnalyzer.java` evaluating technical vocabulary density, sentence complexity, student subject marks, and exam proximity to output `EASY`/`MEDIUM`/`HARD`, 0-100 score, and transparent explanation.
+  6. *Document Intelligence Pipeline & Groq Fallback:*
+     - Created `DocumentIntelligenceService.java` orchestrating text extraction, preprocessing, chapter detection, topic extraction, complexity scoring, and optional Groq semantic enhancement with deterministic fallback.
+  7. *Database Schema & Entities:*
+     - Created Flyway migration `V2__add_material_nlp_columns.sql` and updated `Material.java`, `MaterialResponse.java`, `ProcessingStatus.java`.
+  8. *Timetable Integration:*
+     - Enhanced `TimetableService.java` to sequence extracted material topics, prioritizing complex topics for low marks subjects (<60%) or near exams (<=7 days).
+  9. *Frontend UI Upgrades:*
+     - Updated `types/api.types.ts`, `api/materials.api.ts`, `MaterialCard.tsx`, and `materials.module.css` with NLP status badges, difficulty indicators, and expandable chapter/topic/keyword intelligence panels.
+  10. *Verification & Tests:*
+      - Backend: `DocumentIntelligenceTest` (6/6 tests passed), `TimetableServiceNlpTest` (1/1 test passed).
+      - Frontend: `npm run build` (22/22 routes generated cleanly).
+      - E2E: Playwright test suite `comprehensive_audit.spec.ts` (10/10 test suites passed).
+- **Files Modified / Created:**
+  - `backend/pom.xml`
+  - `backend/src/main/resources/db/migration/V2__add_material_nlp_columns.sql`
+  - `backend/src/main/java/com/aistudyplanner/model/ProcessingStatus.java`
+  - `backend/src/main/java/com/aistudyplanner/model/entity/Material.java`
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/MaterialResponse.java`
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/NlpTextPreprocessor.java`
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/ChapterDetector.java`
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/TopicExtractor.java`
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/DifficultyAnalyzer.java`
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/DocumentIntelligenceService.java`
+  - `backend/src/main/java/com/aistudyplanner/service/MaterialService.java`
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java`
+  - `backend/src/main/java/com/aistudyplanner/controller/MaterialController.java`
+  - `backend/src/test/java/com/aistudyplanner/service/nlp/DocumentIntelligenceTest.java`
+  - `backend/src/test/java/com/aistudyplanner/service/TimetableServiceNlpTest.java`
+  - `frontend/src/types/api.types.ts`
+  - `frontend/src/api/materials.api.ts`
+  - `frontend/src/components/materials/MaterialCard.tsx`
+  - `frontend/src/app/(dashboard)/materials/materials.module.css`
+  - `frontend/src/__tests__/e2e/comprehensive_audit.spec.ts`
+- **Next Recommended Task:** Deploy updated Spring Boot backend (with V2 migration and PDFBox) and frontend to staging/production.
 
 
 

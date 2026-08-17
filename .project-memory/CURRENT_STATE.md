@@ -13,12 +13,15 @@
 - Token refresh recovery flow verified.
 
 ## API & Backend Features
+- **Document Intelligence Pipeline:** Apache PDFBox (pure Java) text extraction, sentence segmentation, stopword filtering, regex chapter detection, TF-IDF keyphrase extraction, and multi-signal difficulty estimation (`EASY`/`MEDIUM`/`HARD`, 0-100 score + explanation).
+- **Personalized Timetable Sequencing:** Timetable generator consumes extracted material topics/chapters, prioritizing complex topics for low-scoring subjects (<60%) or near exams (<=7 days).
+- **Material Processing Endpoints:** `POST /api/materials/` (auto-triggers async NLP pipeline) and `POST /api/materials/{id}/process` (reprocessing).
 - **Avatar Upload:** `POST /api/students/me/avatar-upload-url` + `PUT /api/students/me` with `profilePictureUrl`.
-- **Materials:** Supabase direct upload with `anonKey` + text preview extraction for Groq NLP summarization and subject categorization.
 - **AI Chat History:** Fixed session re-load handling with active `sessionId` tracking and cache invalidation.
 - **Exams & Timetable:** Deadline-based timetable generation, Groq retry safety, and subject prioritization.
 
 ## UI / UX
+- **Materials Intelligence:** Status badges (`NLP Analyzing...`, `NLP Processed`, `Failed`), difficulty badges (`HARD • 85/100`), expandable topics, chapter breakdown, keyword chips, and difficulty reasoning.
 - **Design System:** Upgraded to premium AI SaaS aesthetic with Google Fonts (Inter + Outfit), dark ambient mesh background, glowing teal accents, and glassmorphism.
 - **Landing Page:** Full-screen hero, interactive navigation pill, trust row with avatar stack, count-up statistics, and feature cards.
 - **Login Page:** Glassmorphism card, ambient mesh, glowing brand icon, animated tabs, and Google login.
@@ -26,6 +29,6 @@
 
 ## Production Readiness
 - **Status:** 100% Production Ready.
-- **Backend Build:** `BUILD SUCCESS` (0 errors)
-- **Frontend Build:** `Compiled successfully` (0 errors, 22/22 static & dynamic routes)
-- **Live Verification:** Verified across all pages via browser tools.
+- **Backend Tests:** `DocumentIntelligenceTest` (6/6 passed), `TimetableServiceNlpTest` (1/1 passed).
+- **Frontend Build:** `Compiled successfully` (0 errors, 22/22 routes generated cleanly).
+- **E2E Verification:** Playwright comprehensive audit (10/10 test suites passed).

@@ -50,4 +50,9 @@ export const materialsApi = {
   remove: async (id: string): Promise<void> => {
     await apiClient.delete(`/api/materials/${id}`);
   },
+
+  reprocess: async (id: string): Promise<StudyMaterial> => {
+    const response = await apiClient.post(`/api/materials/${id}/process`);
+    return response.data.data || response.data;
+  },
 };

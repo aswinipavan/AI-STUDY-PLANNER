@@ -72,6 +72,16 @@ public class MaterialController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Material metadata saved successfully"));
     }
 
+    @PostMapping("/{materialId}/process")
+    @Operation(summary = "Trigger re-processing of material with NLP pipeline")
+    public ResponseEntity<ApiResponse<MaterialResponse>> reprocessMaterial(
+            @CurrentStudent Student student,
+            @PathVariable UUID materialId) {
+        log.info("Triggering NLP re-processing for material: {} and student: {}", materialId, student.getId());
+        MaterialResponse response = materialService.reprocessMaterial(student.getId(), materialId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Material re-processing initiated successfully"));
+    }
+
     @DeleteMapping("/{materialId}")
     @Operation(summary = "Delete material metadata")
     public ResponseEntity<Void> deleteMaterial(

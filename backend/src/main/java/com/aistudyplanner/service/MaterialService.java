@@ -42,6 +42,7 @@ public class MaterialService {
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
     private final GroqService groqService;
+    private final com.aistudyplanner.service.nlp.DocumentIntelligenceService documentIntelligenceService;
 
     @Transactional
     public MaterialResponse saveMaterialMetadata(UUID studentId, MaterialUploadRequest request,
@@ -81,18 +82,31 @@ public class MaterialService {
                 .fileType(fileType)
                 .fileSizeBytes(fileSizeBytes)
                 .materialType(request.getMaterialType())
+                .processingStatus(com.aistudyplanner.model.ProcessingStatus.PENDING)
                 .build();
 
         material = materialRepository.save(material);
 
-        if (subject == null && request.getTextPreview() != null) {
-            processCategorizationAsync(material.getId(), request.getTitle(), request.getTextPreview());
+        // Trigger comprehensive document intelligence pipeline asynchronously
+        documentIntelligenceService.processMaterialAsync(material.getId(), request.getTextPreview());
+
+        return toMaterialResponse(material);
+    }
+
+    @Transactional
+    public MaterialResponse reprocessMaterial(UUID studentId, UUID materialId) {
+        Material material = materialRepository.findById(materialId)
+                .orElseThrow(() -> new ResourceNotFoundException("Material not found"));
+
+        if (!material.getStudent().getId().equals(studentId)) {
+            throw new IllegalArgumentException("Material does not belong to student");
         }
 
-        if (request.getTextPreview() != null && request.getTextPreview().length() > 50) {
-            processSummarizationAsync(material.getId(), request.getTextPreview());
-        }
+        material.setProcessingStatus(com.aistudyplanner.model.ProcessingStatus.PENDING);
+        material.setErrorMessage(null);
+        material = materialRepository.save(material);
 
+        documentIntelligenceService.processMaterialAsync(materialId, null);
         return toMaterialResponse(material);
     }
 
@@ -198,6 +212,14 @@ public class MaterialService {
                 .fileSizeBytes(material.getFileSizeBytes())
                 .aiSummary(material.getAiSummary())
                 .aiCategorizedSubject(material.getAiCategorizedSubject())
+                .processingStatus(material.getProcessingStatus())
+                .extractedTopics(material.getExtractedTopics())
+                .extractedChapters(material.getExtractedChapters())
+                .extractedKeywords(material.getExtractedKeywords())
+                .overallDifficulty(material.getOverallDifficulty())
+                .difficultyScore(material.getDifficultyScore())
+                .difficultyReason(material.getDifficultyReason())
+                .errorMessage(material.getErrorMessage())
                 .uploadedAt(material.getCreatedAt())
                 .build();
     }
