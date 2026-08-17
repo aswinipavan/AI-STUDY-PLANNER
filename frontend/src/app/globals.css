@@ -1,3 +1,11 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   AI Study Planner — Global Stylesheet
+   Premium AI SaaS Design System
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Google Fonts — Inter (body) + Outfit (display) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap');
+
 @import "tailwindcss";
 
 @theme inline {
@@ -23,68 +31,65 @@
   --radius: 0.5rem;
 }
 
+/* ── Light Mode ─────────────────────────────────────────────────────────── */
 :root {
-  /* "Illuminated Paper" Token System - Light Mode */
   --background: 210 40% 98%;
   --foreground: 222.2 84% 4.9%;
-
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
-
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-
-  --primary: 170 100% 45%; /* Cognitive Teal */
+  --primary: 170 100% 35%;
   --primary-foreground: 222.2 84% 4.9%;
-
   --secondary: 210 40% 96.1%;
   --secondary-foreground: 222.2 47.4% 11.2%;
-
   --muted: 210 40% 96.1%;
   --muted-foreground: 215.4 16.3% 46.9%;
-
   --accent: 210 40% 96.1%;
   --accent-foreground: 222.2 47.4% 11.2%;
-
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 170 100% 45%;
+  --ring: 170 100% 35%;
+
+  /* Premium design tokens */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --glow-teal: 0 0 20px rgba(0, 200, 180, 0.25), 0 0 60px rgba(0, 200, 180, 0.08);
+  --glow-blue: 0 0 20px rgba(59, 130, 246, 0.25), 0 0 60px rgba(59, 130, 246, 0.08);
+  --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-elevated: 0 20px 60px -10px rgba(0,0,0,0.15), 0 8px 24px -6px rgba(0,0,0,0.1);
 }
 
+/* ── Dark Mode ──────────────────────────────────────────────────────────── */
 .dark {
-  /* "Illuminated Paper" Token System - Dark Mode */
-  --background: 225 17% 5%; /* Vellum Noir #0A0B0E */
-  --foreground: 210 40% 98%; /* Bright Paper #F8FAFC */
-
-  --card: 220 15% 9%; /* Graphite Plate #13151A */
+  --background: 225 17% 5%;
+  --foreground: 210 40% 98%;
+  --card: 220 15% 9%;
   --card-foreground: 210 40% 98%;
-
   --popover: 220 15% 9%;
   --popover-foreground: 210 40% 98%;
-
-  --primary: 170 100% 45%; /* Cognitive Teal #00E5C0 */
+  --primary: 170 100% 40%;
   --primary-foreground: 225 17% 5%;
-
   --secondary: 217.2 32.6% 17.5%;
   --secondary-foreground: 210 40% 98%;
-
-  --muted: 220 15% 12%; 
-  --muted-foreground: 215 20.2% 65.1%; /* Muted Silver #94A3B8 */
-
+  --muted: 220 15% 12%;
+  --muted-foreground: 215 20.2% 65.1%;
   --accent: 217.2 32.6% 17.5%;
   --accent-foreground: 210 40% 98%;
-
-  --destructive: 0 62.8% 30.6%;
+  --destructive: 0 62.8% 45%;
   --destructive-foreground: 210 40% 98%;
-
-  --border: 220 15% 15%; /* Subtle 1px lines */
+  --border: 220 15% 15%;
   --input: 220 15% 15%;
-  --ring: 170 100% 45%;
+  --ring: 170 100% 40%;
+
+  --glow-teal: 0 0 20px rgba(0, 229, 192, 0.3), 0 0 80px rgba(0, 229, 192, 0.12);
+  --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
+  --shadow-elevated: 0 20px 60px -10px rgba(0,0,0,0.5), 0 8px 24px -6px rgba(0,0,0,0.3);
 }
 
+/* ── Base Reset ─────────────────────────────────────────────────────────── */
 * {
   border-color: hsl(var(--border));
   box-sizing: border-box;
@@ -93,13 +98,117 @@
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Accessibility: Reduced Motion ──────────────────────────────────────────
-   Disables all animations and transitions globally for users who prefer
-   reduced motion. Covers CSS module @keyframes, Tailwind animate-* utilities,
-   and inline transition properties across the entire application.
-   ────────────────────────────────────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}
+
+/* ── Premium Global Keyframe Animations ─────────────────────────────────── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 229, 192, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(0, 229, 192, 0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes meshFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(20px, -15px) scale(1.04); }
+  66%       { transform: translate(-15px, 10px) scale(0.97); }
+}
+
+/* ── Premium Utility Classes ─────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glow-teal {
+  box-shadow: var(--glow-teal);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #00e5c0 0%, #3b82f6 50%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-blue {
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.anim-fade-up {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-slide-down {
+  animation: slideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Accessibility: Reduced Motion ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

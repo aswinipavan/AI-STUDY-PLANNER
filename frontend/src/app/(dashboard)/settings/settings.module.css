@@ -182,7 +182,125 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+/* ── Animation ── */
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ── Avatar upload section ── */
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 229, 192, 0.35);
+  display: block;
+  transition: opacity 0.25s;
+}
+
+.avatarFallback {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00e5c0, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid rgba(0, 229, 192, 0.35);
+  transition: opacity 0.25s;
+}
+
+.avatarOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #fff;
+}
+
+.avatarWrapper:hover .avatarOverlay,
+.avatarWrapper:hover .avatarImg,
+.avatarWrapper:hover .avatarFallback {
+  opacity: 0.7;
+}
+
+.avatarWrapper:hover .avatarOverlay {
+  opacity: 1;
+}
+
+.avatarInfo {
+  flex: 1;
+}
+
+.avatarInfoTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem;
+}
+
+.avatarInfoSubtitle {
+  font-size: 0.78rem;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.avatarUploadProgress {
+  height: 3px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.08);
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.avatarUploadBar {
+  height: 100%;
+  background: linear-gradient(90deg, #00e5c0, #3b82f6);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.avatarError {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #f87171;
+}
+
+.cardHeaderFlush {
+  margin-bottom: 0;
+}
+
+/* Staggered card entrance */
+.cardDelay0 { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0ms; }
+.cardDelay1 { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 60ms; }
+.cardDelay2 { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 110ms; }
+.cardDelay3 { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 155ms; }
+
+.iconNotification { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+

@@ -50,4 +50,12 @@ export const authApi = {
     const response = await apiClient.put<ApiResponse<StudentProfile>>('/api/students/me/notifications', prefs);
     return response.data.data ?? response.data as unknown as StudentProfile;
   },
+
+  getAvatarUploadUrl: async (fileName: string, fileType: string): Promise<{ uploadUrl: string; fileUrl: string; anonKey: string }> => {
+    const params = new URLSearchParams({ fileName, fileType });
+    const response = await apiClient.post<ApiResponse<{ uploadUrl: string; fileUrl: string; anonKey: string }>>(
+      `/api/students/me/avatar-upload-url?${params.toString()}`
+    );
+    return response.data.data;
+  },
 };

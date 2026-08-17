@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-17 (Session 6)
+- **Files changed:**
+  - `backend/.env`, `backend/.env.example`, `backend/src/main/java/com/aistudyplanner/controller/StudentController.java`, `backend/src/main/java/com/aistudyplanner/service/MaterialService.java`
+  - `frontend/.env.example`, `frontend/next.config.ts`, `frontend/src/app/globals.css`, `frontend/src/app/page.tsx`, `frontend/src/app/page.module.css`, `frontend/src/app/(auth)/login/page.module.css`, `frontend/src/components/layout/Sidebar.tsx`, `frontend/src/components/layout/Sidebar.module.css`, `frontend/src/app/(dashboard)/dashboard/dashboard.module.css`, `frontend/src/app/(dashboard)/settings/page.tsx`, `frontend/src/app/(dashboard)/settings/settings.module.css`, `frontend/src/api/auth.api.ts`, `frontend/src/hooks/useChat.ts`, `frontend/src/hooks/useMaterials.ts`
+- **Reason:** Full production repair, UI redesign (AI-SaaS aesthetic), profile picture upload feature, and end-to-end verification.
+- **Summary:**
+  - Configured `SUPABASE_ANON_KEY` in backend `.env` for direct client uploads to Supabase storage.
+  - Implemented profile picture upload: backend `POST /api/students/me/avatar-upload-url` + frontend avatar camera overlay, progress indicator, and validation in `settings/page.tsx`.
+  - Upgraded UI design system across landing page, login page, dashboard, sidebar, and settings to a sleek AI-SaaS aesthetic with Google Fonts (Outfit + Inter), glassmorphism, animated mesh background, and trust indicators.
+  - Fixed chat history session switching in `useChat.ts`.
+  - Configured `next.config.ts` remotePatterns for Google & Supabase avatar images.
+  - Extracted text previews in `useMaterials.ts` to trigger Groq LLM summarization.
+  - All builds verified (Backend: `BUILD SUCCESS`, Frontend: `Compiled successfully` 22/22 routes).
+- **Impact:** Production-grade visual appeal, completed missing profile picture feature, and robust storage uploads.
+
 ## 2026-08-14 (session 3)
 - **Files changed:** `mobile/tsconfig.json`, `backend/src/main/java/com/aistudyplanner/config/RateLimitingConfig.java`, `backend/src/main/java/com/aistudyplanner/config/SecurityConfig.java`, `backend/src/main/java/com/aistudyplanner/service/StudentMapper.java`
 - **Reason:** Resolve IDE diagnostics in `mobile/tsconfig.json` (unresolved hammerjs/parent tsconfig) and backend Java null-safety warnings.

@@ -101,7 +101,7 @@ function UserProfileFooter() {
     <div className={styles.userProfile}>
       {/* Avatar */}
       {user?.photoUrl ? (
-        <Image src={user.photoUrl} alt={user.name || 'User'} width={40} height={40} className={styles.avatarImg} />
+        <Image src={user.photoUrl} alt={user.name || 'User'} width={40} height={40} className={styles.avatarImg} unoptimized />
       ) : (
         <div className={styles.avatarFallback}>
           {initials}

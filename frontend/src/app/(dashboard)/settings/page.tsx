@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,10 +12,12 @@ import { AppInput } from '@/components/ui/AppInput';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
-import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap } from 'lucide-react';
+import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import Image from 'next/image';
+
 
 const SEMESTERS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Other'];
 const DEPARTMENTS = [
@@ -39,10 +41,77 @@ export default function SettingsPage() {
   const { user, setUser, clearAuth } = useAuthStore();
   const router = useRouter();
   const { replayOnboarding } = useOnboarding();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Avatar upload state
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarProgress, setAvatarProgress] = useState(0);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   const handleReplayOnboarding = () => {
     replayOnboarding();
     router.push('/');
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!ALLOWED.includes(file.type)) {
+      setAvatarError('Only JPG, PNG, WEBP, or GIF images are allowed.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError('Image must be under 5MB.');
+      return;
+    }
+
+    setAvatarError(null);
+    setAvatarUploading(true);
+    setAvatarProgress(20);
+
+    try {
+      // 1. Get pre-signed upload URL from backend
+      const uploadInfo = await authApi.getAvatarUploadUrl(file.name, file.type);
+      setAvatarProgress(40);
+
+      // 2. Upload directly to Supabase Storage
+      const headers: Record<string, string> = { 'Content-Type': file.type };
+      if (uploadInfo.anonKey) {
+        headers['Authorization'] = `Bearer ${uploadInfo.anonKey}`;
+        headers['apikey'] = uploadInfo.anonKey;
+      }
+
+      const res = await fetch(uploadInfo.uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers,
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        throw new Error(`Upload failed (${res.status}): ${errText}`);
+      }
+      setAvatarProgress(75);
+
+      // 3. Update profile with new avatar URL
+      const updatedProfile = await authApi.updateMe({ profilePictureUrl: uploadInfo.fileUrl });
+      setUser(updatedProfile);
+      setAvatarProgress(100);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      setAvatarError(message);
+    } finally {
+      setAvatarUploading(false);
+      // Reset file input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setTimeout(() => setAvatarProgress(0), 1200);
+    }
   };
 
   // Notification preferences
@@ -144,6 +213,60 @@ export default function SettingsPage() {
               ✓ Profile saved successfully!
             </div>
           )}
+
+          {/* ── Avatar Upload ── */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            style={{ display: 'none' }}
+            onChange={handleAvatarChange}
+            aria-label="Upload profile picture"
+          />
+          <div className={styles.avatarSection}>
+            <div
+              className={styles.avatarWrapper}
+              onClick={handleAvatarClick}
+              role="button"
+              tabIndex={0}
+              aria-label="Change profile picture"
+              onKeyDown={(e) => e.key === 'Enter' && handleAvatarClick()}
+            >
+              {user?.photoUrl || user?.profilePictureUrl ? (
+                <Image
+                  src={(user.photoUrl || user.profilePictureUrl)!}
+                  alt="Profile"
+                  width={72}
+                  height={72}
+                  className={styles.avatarImg}
+                  unoptimized
+                />
+              ) : (
+                <div className={styles.avatarFallback}>
+                  {(user?.name || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className={styles.avatarOverlay}>
+                {avatarUploading ? (
+                  <span style={{ fontSize: '0.6rem', fontWeight: 700 }}>...</span>
+                ) : (
+                  <Camera size={20} />
+                )}
+              </div>
+            </div>
+            <div className={styles.avatarInfo}>
+              <p className={styles.avatarInfoTitle}>Profile Photo</p>
+              <p className={styles.avatarInfoSubtitle}>
+                {avatarUploading ? 'Uploading...' : 'Click avatar to change · JPG, PNG, WEBP · Max 5MB'}
+              </p>
+              {avatarProgress > 0 && (
+                <div className={styles.avatarUploadProgress}>
+                  <div className={styles.avatarUploadBar} style={{ width: `${avatarProgress}%` }} />
+                </div>
+              )}
+              {avatarError && <p className={styles.avatarError}>{avatarError}</p>}
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit((data) => saveProfile(data))} className="space-y-4">
             <div className={styles.formGroup}>

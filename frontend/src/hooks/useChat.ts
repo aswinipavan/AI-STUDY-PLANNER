@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatApi } from '@/api/chat.api';
 import { aiApi } from '@/api/ai.api';
 import { ChatMessage, ChatSession } from '@/types/api.types';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 export interface ChatState {
@@ -37,17 +37,32 @@ export const useChat = (initialSessionId: string | null) => {
   const [isThinking, setIsThinking] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId);
 
+  // Track last loaded sessionId to detect session changes
+  const loadedSessionRef = useRef<string | null>(null);
+
   // Sync initial history when loaded
   const { data: history } = useChatHistory(sessionId);
   
-  // FIXED: Moved from render body to useEffect to avoid state mutation during render.
-  // Previously this set state directly in render, causing React warnings and bugs.
+  // FIXED: Reset messages when sessionId changes so history always loads correctly.
+  // Previously messages.length === 0 guard prevented re-loading when navigating
+  // back to a session that had messages in state from a previous visit.
   useEffect(() => {
-    if (history && history.length > 0 && messages.length === 0) {
+    if (history && sessionId && loadedSessionRef.current !== sessionId) {
       setMessages(history);
+      loadedSessionRef.current = sessionId;
+    }
+  }, [history, sessionId]);
+
+  // Reset messages immediately when sessionId prop changes
+  useEffect(() => {
+    if (initialSessionId !== sessionId) {
+      setSessionId(initialSessionId);
+      setMessages([]);
+      loadedSessionRef.current = null;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history]);
+  }, [initialSessionId]);
+
 
   const { mutateAsync: sendMessageMutation } = useMutation({
     mutationFn: chatApi.sendMessage,

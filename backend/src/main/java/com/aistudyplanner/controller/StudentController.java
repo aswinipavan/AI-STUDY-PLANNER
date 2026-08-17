@@ -8,6 +8,7 @@ import com.aistudyplanner.model.dto.response.StudentResponse;
 import com.aistudyplanner.model.dto.response.SubjectResponse;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.security.CurrentStudent;
+import com.aistudyplanner.service.MaterialService;
 import com.aistudyplanner.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -31,6 +33,7 @@ import java.util.UUID;
 public class StudentController {
 
     private final StudentService studentService;
+    private final MaterialService materialService;
 
     @GetMapping("/me")
     @Operation(summary = "Get current student profile")
@@ -58,6 +61,22 @@ public class StudentController {
         log.info("Updating notification preferences for student: {}", student.getId());
         StudentResponse response = studentService.updateNotificationPreferences(student.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(response, "Notification preferences updated"));
+    }
+
+    /**
+     * Returns a Supabase pre-signed upload URL for profile avatar.
+     * Frontend uploads the image directly to Supabase Storage and then calls
+     * PUT /api/students/me with { profilePictureUrl } to persist the URL.
+     */
+    @PostMapping("/me/avatar-upload-url")
+    @Operation(summary = "Get avatar upload URL")
+    public ResponseEntity<ApiResponse<Map<String, String>>> getAvatarUploadUrl(
+            @CurrentStudent Student student,
+            @RequestParam String fileName,
+            @RequestParam String fileType) {
+        log.info("Generating avatar upload URL for student: {}", student.getId());
+        Map<String, String> uploadInfo = materialService.getAvatarUploadUrl(student.getId(), fileName, fileType);
+        return ResponseEntity.ok(ApiResponse.success(uploadInfo, "Avatar upload URL generated"));
     }
 
     @GetMapping("/me/subjects")

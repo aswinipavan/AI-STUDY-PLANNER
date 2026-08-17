@@ -49,7 +49,18 @@ export const useUploadMaterial = () => {
         throw new Error(`Failed to upload file to storage (${res.status}): ${errText}`);
       }
       
-      // 3. Save metadata - backend expects MaterialUploadRequest format
+      // 3. Extract text preview for text/markdown files for AI summarization
+      let textPreview: string | undefined = undefined;
+      if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.json')) {
+        try {
+          const text = await file.text();
+          textPreview = text.slice(0, 3000);
+        } catch {
+          // ignore preview extraction error
+        }
+      }
+
+      // 4. Save metadata - backend expects MaterialUploadRequest format
       let materialType = 'TXT';
       if (file.type.includes('pdf')) materialType = 'PDF';
       else if (file.type.includes('word') || file.type.includes('docx')) materialType = 'DOCX';
@@ -62,7 +73,8 @@ export const useUploadMaterial = () => {
           title, 
           subjectId,
           fileName: file.name,
-          materialType
+          materialType,
+          textPreview,
         } as unknown as Record<string, unknown>,
         fileUrl,
         file.type,

@@ -14,34 +14,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No Firebase token provided' }, { status: 401 });
     }
 
-    const res = await fetch(`${ENV.BACKEND_URL}/api/auth/refresh`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Firebase-Token': firebaseToken,
-      },
-    });
+    let jwtToken = null;
+    try {
+      const res = await fetch(`${ENV.BACKEND_URL}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Firebase-Token': firebaseToken,
+        },
+        signal: AbortSignal.timeout(10000),
+      });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      return NextResponse.json(data, { status: res.status });
+      if (res.ok) {
+        const data = await res.json();
+        jwtToken = data.data?.token ?? data.token ?? data.accessToken;
+      }
+    } catch (err) {
+      console.warn('[refresh] Backend refresh error, using Firebase token fallback:', err);
     }
     
-    // Backend returns { token, student, isNewUser }
-    const jwtToken = data.data?.token ?? data.token ?? data.accessToken;
-    
-    if (jwtToken) {
-      cookieStore.set('access_token', jwtToken, {
+    // Use either backend JWT token or fresh Firebase token
+    const tokenToSet = jwtToken || firebaseToken;
+    if (tokenToSet) {
+      cookieStore.set('access_token', tokenToSet, {
         httpOnly: true, 
         secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'strict', 
+        sameSite: 'lax', 
         path: '/',
-        maxAge: 60 * 60, // 1 hour
+        maxAge: 60 * 60 * 24, // 24 hours
       });
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
+
   } catch (error) {
     console.error('[API Proxy Error /refresh]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

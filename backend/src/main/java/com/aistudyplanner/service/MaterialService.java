@@ -142,6 +142,26 @@ public class MaterialService {
         return response;
     }
 
+    /**
+     * Generate a Supabase Storage upload URL for profile avatars.
+     * Files are stored in the 'avatars' bucket under the student's ID.
+     * After upload, the frontend should call PUT /api/students/me with { profilePictureUrl }.
+     */
+    public Map<String, String> getAvatarUploadUrl(UUID studentId, String fileName, String fileType) {
+        String ext = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf('.')) : "";
+        String filePath = studentId + "/avatar" + ext;
+        String uploadUrl = supabaseUrl + "/storage/v1/object/avatars/" + filePath;
+        String fileUrl = supabaseUrl + "/storage/v1/object/public/avatars/" + filePath;
+
+        Map<String, String> response = new HashMap<>();
+        response.put("uploadUrl", uploadUrl);
+        response.put("filePath", filePath);
+        response.put("fileUrl", fileUrl);
+        response.put("anonKey", supabaseAnonKey != null ? supabaseAnonKey : "");
+        return response;
+    }
+
+
     @Transactional(readOnly = true)
     public List<MaterialResponse> getMaterials(UUID studentId) {
         return materialRepository.findAllByStudentIdOrderByCreatedAtDesc(studentId).stream()
