@@ -439,8 +439,8 @@
   border-radius: 1.25rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   overflow: hidden;

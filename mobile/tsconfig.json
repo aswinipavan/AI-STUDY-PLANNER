@@ -17,6 +17,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "forceConsistentCasingInFileNames": true,
     "types": ["jest", "node"]
   },
   "include": ["src", "index.js", "App.tsx"],
