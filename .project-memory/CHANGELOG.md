@@ -2,9 +2,15 @@
 
 ## 2026-08-17 (Session 6)
 - **Files changed:**
-  - `backend/.env`, `backend/.env.example`, `backend/src/main/java/com/aistudyplanner/controller/StudentController.java`, `backend/src/main/java/com/aistudyplanner/service/MaterialService.java`
-  - `frontend/.env.example`, `frontend/next.config.ts`, `frontend/src/app/globals.css`, `frontend/src/app/page.tsx`, `frontend/src/app/page.module.css`, `frontend/src/app/(auth)/login/page.module.css`, `frontend/src/components/layout/Sidebar.tsx`, `frontend/src/components/layout/Sidebar.module.css`, `frontend/src/app/(dashboard)/dashboard/dashboard.module.css`, `frontend/src/app/(dashboard)/settings/page.tsx`, `frontend/src/app/(dashboard)/settings/settings.module.css`, `frontend/src/api/auth.api.ts`, `frontend/src/hooks/useChat.ts`, `frontend/src/hooks/useMaterials.ts`
-- **Reason:** Full production repair, UI redesign (AI-SaaS aesthetic), profile picture upload feature, and end-to-end verification.
+  - `frontend/src/lib/apiClient.ts`, `frontend/src/api/chat.api.ts`, `frontend/src/utils/errorHandler.ts`, `frontend/src/hooks/useChat.ts`
+  - `frontend/src/app/(auth)/login/page.module.css`, `frontend/src/app/globals.css`, `frontend/src/app/page.module.css`, `frontend/src/components/layout/Sidebar.module.css`, `mobile/tsconfig.json`
+- **Reason:** Resolve "Network error" in AI chat due to tight 15s timeout during LLM reasoning, improve error handling, and fix CSS vendor prefix ordering.
+- **Summary:**
+  - Increased Axios default timeout from 15s to 45s (and 60s on AI chat) to accommodate LLM reasoning and backend cold-starts.
+  - Added timeout detection in `normaliseError` and assistant error bubble rendering in `useChat.ts`.
+  - Ordered `-webkit-backdrop-filter` before `backdrop-filter` across all CSS modules.
+  - Enabled `"forceConsistentCasingInFileNames": true` in `mobile/tsconfig.json`.
+- **Impact:** AI chat handles long LLM responses gracefully without premature timeout cancellations; clean IDE diagnostics.
 - **Summary:**
   - Configured `SUPABASE_ANON_KEY` in backend `.env` for direct client uploads to Supabase storage.
   - Implemented profile picture upload: backend `POST /api/students/me/avatar-upload-url` + frontend avatar camera overlay, progress indicator, and validation in `settings/page.tsx`.
