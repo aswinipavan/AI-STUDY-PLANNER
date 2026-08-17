@@ -32,11 +32,11 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, UUID> 
     List<ChatHistory> findAllByCreatedAtBefore(OffsetDateTime date);
 
     // Get distinct sessionIds for a student with metadata
-    @Query("SELECT DISTINCT ch.sessionId FROM ChatHistory ch WHERE ch.student.id = :studentId ORDER BY MAX(ch.createdAt) DESC")
-    List<String> findDistinctSessionIdsByStudentId(UUID studentId);
+    @Query("SELECT ch.sessionId FROM ChatHistory ch WHERE ch.student.id = :studentId GROUP BY ch.sessionId ORDER BY MAX(ch.createdAt) DESC")
+    List<String> findDistinctSessionIdsByStudentId(@org.springframework.data.repository.query.Param("studentId") UUID studentId);
 
     // Get first message of each session for metadata
     @Query("SELECT ch FROM ChatHistory ch WHERE ch.student.id = :studentId AND ch.id IN (SELECT MIN(ch2.id) FROM ChatHistory ch2 WHERE ch2.student.id = :studentId GROUP BY ch2.sessionId) ORDER BY ch.createdAt DESC")
-    List<ChatHistory> findFirstMessagePerSession(UUID studentId);
+    List<ChatHistory> findFirstMessagePerSession(@org.springframework.data.repository.query.Param("studentId") UUID studentId);
 }
 
