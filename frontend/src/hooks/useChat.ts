@@ -108,10 +108,20 @@ export const useChat = (initialSessionId: string | null) => {
         message: currentInput.trim(), 
         sessionId: sessionId || undefined 
       });
-    } catch (err) {
-      // Handle error (e.g. show error bubble)
+    } catch (err: unknown) {
+      // Handle error gracefully with clear assistant feedback in chat
       setIsThinking(false);
-      console.error("Failed to send message", err);
+      const errMsg = err instanceof Error ? err.message : 'Unable to generate response. Please try again.';
+      setMessages(prev => [
+        ...prev,
+        {
+          id: String(Date.now()),
+          role: 'assistant',
+          content: `⚠️ ${errMsg}`,
+          sessionId: sessionId || 'temp',
+          timestamp: new Date().toISOString(),
+        },
+      ]);
     }
   }, [inputText, isThinking, sessionId, sendMessageMutation]);
 

@@ -18,7 +18,9 @@ export const chatApi = {
   },
 
   sendMessage: async (payload: { message: string; sessionId?: string }): Promise<{ message: ChatMessage; sessionId: string }> => {
-    const response = await apiClient.post(`/api/ai/chat`, payload);
+    const response = await apiClient.post(`/api/ai/chat`, payload, {
+      timeout: 60000, // 60s timeout for AI LLM reasoning
+    });
     // Backend returns ApiResponse<AiChatResponse>: { success: true, data: { reply: "...", sessionId: "...", timestamp: "..." } }
     const responseData = response.data?.data || response.data;
     

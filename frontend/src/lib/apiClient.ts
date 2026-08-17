@@ -4,7 +4,7 @@ import { auth } from '@/lib/firebase';
 
 export const apiClient = axios.create({
   baseURL: '', // Route through Next.js API proxy (same origin) to attach httpOnly auth cookie
-  timeout: 15000, // axios timeout 15s — blueprint spec
+  timeout: 45000, // 45s timeout for AI generation and cold-start requests
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
