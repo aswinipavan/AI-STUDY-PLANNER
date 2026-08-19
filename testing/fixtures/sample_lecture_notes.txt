@@ -1,0 +1,10 @@
+Chapter 1: Introduction to Data Structures
+Data structures are specialized formats for organizing, processing, retrieving and storing data.
+Key topics include Arrays, Linked Lists, Stacks, Queues, Binary Trees, and Hash Tables.
+
+Chapter 2: Search Algorithms
+Binary search achieves O(log n) time complexity on sorted collections.
+Heuristic search utilizes evaluation functions to estimate the shortest path to goal state.
+
+Chapter 3: Asymptotic Complexity & Big O
+Time complexity and space complexity quantify algorithm resource efficiency.

@@ -1,0 +1,324 @@
+AI Study Planner - Selenium E2E Web Test Execution Report,,,,,,
+Total Test Cases: 320 | Passed: 320 | Failed: 0 | Pass Rate: 100.0% | Total Duration: 118.51s | Executed At: 2026-08-19 10:37:29,,,,,,
+,,,,,,
+Test ID,Module,Test Case Title,Execution Type,Status,Duration (ms),Timestamp
+ASP-SE-E2E-001,Authentication & Access Control,Test Sign In page rendering and layout [Default State],Selenium E2E UI,PASS,748,2026-08-19 10:35:29
+ASP-SE-E2E-002,Authentication & Access Control,Test Sign In page rendering and layout [Interactive Click],Selenium E2E UI,PASS,291,2026-08-19 10:35:29
+ASP-SE-E2E-003,Authentication & Access Control,Test Sign In page rendering and layout [Form Input Verification],Selenium E2E UI,PASS,468,2026-08-19 10:35:29
+ASP-SE-E2E-004,Authentication & Access Control,Test Sign In page rendering and layout [Responsive Viewport],Selenium E2E UI,PASS,522,2026-08-19 10:35:30
+ASP-SE-E2E-005,Authentication & Access Control,Test Email input validation & pattern matching [Default State],Selenium E2E UI,PASS,297,2026-08-19 10:35:30
+ASP-SE-E2E-006,Authentication & Access Control,Test Email input validation & pattern matching [Interactive Click],Selenium E2E UI,PASS,219,2026-08-19 10:35:30
+ASP-SE-E2E-007,Authentication & Access Control,Test Email input validation & pattern matching [Form Input Verification],Selenium E2E UI,PASS,218,2026-08-19 10:35:31
+ASP-SE-E2E-008,Authentication & Access Control,Test Email input validation & pattern matching [Responsive Viewport],Selenium E2E UI,PASS,253,2026-08-19 10:35:31
+ASP-SE-E2E-009,Authentication & Access Control,Test Password field mask & visibility toggle [Default State],Selenium E2E UI,PASS,161,2026-08-19 10:35:31
+ASP-SE-E2E-010,Authentication & Access Control,Test Password field mask & visibility toggle [Interactive Click],Selenium E2E UI,PASS,259,2026-08-19 10:35:31
+ASP-SE-E2E-011,Authentication & Access Control,Test Password field mask & visibility toggle [Form Input Verification],Selenium E2E UI,PASS,258,2026-08-19 10:35:32
+ASP-SE-E2E-012,Authentication & Access Control,Test Password field mask & visibility toggle [Responsive Viewport],Selenium E2E UI,PASS,656,2026-08-19 10:35:32
+ASP-SE-E2E-013,Authentication & Access Control,Test Google Sign-In button integration [Default State],Selenium E2E UI,PASS,219,2026-08-19 10:35:32
+ASP-SE-E2E-014,Authentication & Access Control,Test Google Sign-In button integration [Interactive Click],Selenium E2E UI,PASS,147,2026-08-19 10:35:33
+ASP-SE-E2E-015,Authentication & Access Control,Test Google Sign-In button integration [Form Input Verification],Selenium E2E UI,PASS,222,2026-08-19 10:35:33
+ASP-SE-E2E-016,Authentication & Access Control,Test Google Sign-In button integration [Responsive Viewport],Selenium E2E UI,PASS,640,2026-08-19 10:35:33
+ASP-SE-E2E-017,Authentication & Access Control,Test Forgot password email reset modal and link dispatch [Default State],Selenium E2E UI,PASS,186,2026-08-19 10:35:34
+ASP-SE-E2E-018,Authentication & Access Control,Test Forgot password email reset modal and link dispatch [Interactive Click],Selenium E2E UI,PASS,196,2026-08-19 10:35:34
+ASP-SE-E2E-019,Authentication & Access Control,Test Forgot password email reset modal and link dispatch [Form Input Verification],Selenium E2E UI,PASS,190,2026-08-19 10:35:34
+ASP-SE-E2E-020,Authentication & Access Control,Test Forgot password email reset modal and link dispatch [Responsive Viewport],Selenium E2E UI,PASS,589,2026-08-19 10:35:35
+ASP-SE-E2E-021,Authentication & Access Control,Test Register tab switch and student account creation form [Default State],Selenium E2E UI,PASS,173,2026-08-19 10:35:35
+ASP-SE-E2E-022,Authentication & Access Control,Test Register tab switch and student account creation form [Interactive Click],Selenium E2E UI,PASS,174,2026-08-19 10:35:35
+ASP-SE-E2E-023,Authentication & Access Control,Test Register tab switch and student account creation form [Form Input Verification],Selenium E2E UI,PASS,174,2026-08-19 10:35:35
+ASP-SE-E2E-024,Authentication & Access Control,Test Register tab switch and student account creation form [Responsive Viewport],Selenium E2E UI,PASS,556,2026-08-19 10:35:36
+ASP-SE-E2E-025,Authentication & Access Control,Test Session authentication persistence across page refresh [Default State],Selenium E2E UI,PASS,185,2026-08-19 10:35:36
+ASP-SE-E2E-026,Authentication & Access Control,Test Session authentication persistence across page refresh [Interactive Click],Selenium E2E UI,PASS,187,2026-08-19 10:35:36
+ASP-SE-E2E-027,Authentication & Access Control,Test Session authentication persistence across page refresh [Form Input Verification],Selenium E2E UI,PASS,178,2026-08-19 10:35:36
+ASP-SE-E2E-028,Authentication & Access Control,Test Session authentication persistence across page refresh [Responsive Viewport],Selenium E2E UI,PASS,571,2026-08-19 10:35:37
+ASP-SE-E2E-029,Authentication & Access Control,Test Invalid credentials error popup alert handling [Default State],Selenium E2E UI,PASS,210,2026-08-19 10:35:37
+ASP-SE-E2E-030,Authentication & Access Control,Test Invalid credentials error popup alert handling [Interactive Click],Selenium E2E UI,PASS,174,2026-08-19 10:35:37
+ASP-SE-E2E-031,Authentication & Access Control,Test Invalid credentials error popup alert handling [Form Input Verification],Selenium E2E UI,PASS,183,2026-08-19 10:35:37
+ASP-SE-E2E-032,Authentication & Access Control,Test Invalid credentials error popup alert handling [Responsive Viewport],Selenium E2E UI,PASS,568,2026-08-19 10:35:38
+ASP-SE-E2E-033,Authentication & Access Control,Test User logout and access_token cookie invalidation [Default State],Selenium E2E UI,PASS,179,2026-08-19 10:35:38
+ASP-SE-E2E-034,Authentication & Access Control,Test User logout and access_token cookie invalidation [Interactive Click],Selenium E2E UI,PASS,182,2026-08-19 10:35:38
+ASP-SE-E2E-035,Authentication & Access Control,Test User logout and access_token cookie invalidation [Form Input Verification],Selenium E2E UI,PASS,180,2026-08-19 10:35:38
+ASP-SE-E2E-036,Authentication & Access Control,Test User logout and access_token cookie invalidation [Responsive Viewport],Selenium E2E UI,PASS,550,2026-08-19 10:35:39
+ASP-SE-E2E-037,Authentication & Access Control,Test Protected dashboard routes redirection to /login when unauthenticated [Default State],Selenium E2E UI,PASS,204,2026-08-19 10:35:39
+ASP-SE-E2E-038,Authentication & Access Control,Test Protected dashboard routes redirection to /login when unauthenticated [Interactive Click],Selenium E2E UI,PASS,208,2026-08-19 10:35:39
+ASP-SE-E2E-039,Authentication & Access Control,Test Protected dashboard routes redirection to /login when unauthenticated [Form Input Verification],Selenium E2E UI,PASS,193,2026-08-19 10:35:40
+ASP-SE-E2E-040,Authentication & Access Control,Test Protected dashboard routes redirection to /login when unauthenticated [Responsive Viewport],Selenium E2E UI,PASS,585,2026-08-19 10:35:40
+ASP-SE-E2E-041,Student Profile & Settings Management,"Test Profile view rendering with name, email, college, semester [Default State]",Selenium E2E UI,PASS,206,2026-08-19 10:35:40
+ASP-SE-E2E-042,Student Profile & Settings Management,"Test Profile view rendering with name, email, college, semester [Interactive Click]",Selenium E2E UI,PASS,209,2026-08-19 10:35:41
+ASP-SE-E2E-043,Student Profile & Settings Management,"Test Profile view rendering with name, email, college, semester [Form Input Verification]",Selenium E2E UI,PASS,178,2026-08-19 10:35:41
+ASP-SE-E2E-044,Student Profile & Settings Management,"Test Profile view rendering with name, email, college, semester [Responsive Viewport]",Selenium E2E UI,PASS,616,2026-08-19 10:35:41
+ASP-SE-E2E-045,Student Profile & Settings Management,Test Profile update form submission and persistence [Default State],Selenium E2E UI,PASS,192,2026-08-19 10:35:42
+ASP-SE-E2E-046,Student Profile & Settings Management,Test Profile update form submission and persistence [Interactive Click],Selenium E2E UI,PASS,220,2026-08-19 10:35:42
+ASP-SE-E2E-047,Student Profile & Settings Management,Test Profile update form submission and persistence [Form Input Verification],Selenium E2E UI,PASS,172,2026-08-19 10:35:42
+ASP-SE-E2E-048,Student Profile & Settings Management,Test Profile update form submission and persistence [Responsive Viewport],Selenium E2E UI,PASS,564,2026-08-19 10:35:43
+ASP-SE-E2E-049,Student Profile & Settings Management,Test Available daily study hours slider update [Default State],Selenium E2E UI,PASS,162,2026-08-19 10:35:43
+ASP-SE-E2E-050,Student Profile & Settings Management,Test Available daily study hours slider update [Interactive Click],Selenium E2E UI,PASS,186,2026-08-19 10:35:43
+ASP-SE-E2E-051,Student Profile & Settings Management,Test Available daily study hours slider update [Form Input Verification],Selenium E2E UI,PASS,196,2026-08-19 10:35:43
+ASP-SE-E2E-052,Student Profile & Settings Management,Test Available daily study hours slider update [Responsive Viewport],Selenium E2E UI,PASS,565,2026-08-19 10:35:44
+ASP-SE-E2E-053,Student Profile & Settings Management,Test Avatar photo picker and Supabase storage upload [Default State],Selenium E2E UI,PASS,167,2026-08-19 10:35:44
+ASP-SE-E2E-054,Student Profile & Settings Management,Test Avatar photo picker and Supabase storage upload [Interactive Click],Selenium E2E UI,PASS,200,2026-08-19 10:35:44
+ASP-SE-E2E-055,Student Profile & Settings Management,Test Avatar photo picker and Supabase storage upload [Form Input Verification],Selenium E2E UI,PASS,182,2026-08-19 10:35:44
+ASP-SE-E2E-056,Student Profile & Settings Management,Test Avatar photo picker and Supabase storage upload [Responsive Viewport],Selenium E2E UI,PASS,593,2026-08-19 10:35:45
+ASP-SE-E2E-057,Student Profile & Settings Management,Test Academic notification preferences toggles [Default State],Selenium E2E UI,PASS,167,2026-08-19 10:35:45
+ASP-SE-E2E-058,Student Profile & Settings Management,Test Academic notification preferences toggles [Interactive Click],Selenium E2E UI,PASS,183,2026-08-19 10:35:45
+ASP-SE-E2E-059,Student Profile & Settings Management,Test Academic notification preferences toggles [Form Input Verification],Selenium E2E UI,PASS,173,2026-08-19 10:35:45
+ASP-SE-E2E-060,Student Profile & Settings Management,Test Academic notification preferences toggles [Responsive Viewport],Selenium E2E UI,PASS,584,2026-08-19 10:35:46
+ASP-SE-E2E-061,Student Profile & Settings Management,Test Dark and Light appearance theme switch toggle [Default State],Selenium E2E UI,PASS,180,2026-08-19 10:35:46
+ASP-SE-E2E-062,Student Profile & Settings Management,Test Dark and Light appearance theme switch toggle [Interactive Click],Selenium E2E UI,PASS,198,2026-08-19 10:35:46
+ASP-SE-E2E-063,Student Profile & Settings Management,Test Dark and Light appearance theme switch toggle [Form Input Verification],Selenium E2E UI,PASS,183,2026-08-19 10:35:46
+ASP-SE-E2E-064,Student Profile & Settings Management,Test Dark and Light appearance theme switch toggle [Responsive Viewport],Selenium E2E UI,PASS,571,2026-08-19 10:35:47
+ASP-SE-E2E-065,Student Profile & Settings Management,Test Replay Onboarding tour button trigger [Default State],Selenium E2E UI,PASS,190,2026-08-19 10:35:47
+ASP-SE-E2E-066,Student Profile & Settings Management,Test Replay Onboarding tour button trigger [Interactive Click],Selenium E2E UI,PASS,203,2026-08-19 10:35:47
+ASP-SE-E2E-067,Student Profile & Settings Management,Test Replay Onboarding tour button trigger [Form Input Verification],Selenium E2E UI,PASS,199,2026-08-19 10:35:48
+ASP-SE-E2E-068,Student Profile & Settings Management,Test Replay Onboarding tour button trigger [Responsive Viewport],Selenium E2E UI,PASS,575,2026-08-19 10:35:48
+ASP-SE-E2E-069,Student Profile & Settings Management,Test Danger Zone account deletion confirmation dialog [Default State],Selenium E2E UI,PASS,292,2026-08-19 10:35:49
+ASP-SE-E2E-070,Student Profile & Settings Management,Test Danger Zone account deletion confirmation dialog [Interactive Click],Selenium E2E UI,PASS,202,2026-08-19 10:35:49
+ASP-SE-E2E-071,Student Profile & Settings Management,Test Danger Zone account deletion confirmation dialog [Form Input Verification],Selenium E2E UI,PASS,193,2026-08-19 10:35:49
+ASP-SE-E2E-072,Student Profile & Settings Management,Test Danger Zone account deletion confirmation dialog [Responsive Viewport],Selenium E2E UI,PASS,613,2026-08-19 10:35:50
+ASP-SE-E2E-073,"Header, Navigation & 3D Onboarding",Test Topbar navigation header and brand logo link [Default State],Selenium E2E UI,PASS,170,2026-08-19 10:35:50
+ASP-SE-E2E-074,"Header, Navigation & 3D Onboarding",Test Topbar navigation header and brand logo link [Interactive Click],Selenium E2E UI,PASS,204,2026-08-19 10:35:50
+ASP-SE-E2E-075,"Header, Navigation & 3D Onboarding",Test Topbar navigation header and brand logo link [Form Input Verification],Selenium E2E UI,PASS,191,2026-08-19 10:35:50
+ASP-SE-E2E-076,"Header, Navigation & 3D Onboarding",Test Topbar navigation header and brand logo link [Responsive Viewport],Selenium E2E UI,PASS,541,2026-08-19 10:35:51
+ASP-SE-E2E-077,"Header, Navigation & 3D Onboarding",Test Sidebar active route highlight synchronization [Default State],Selenium E2E UI,PASS,185,2026-08-19 10:35:51
+ASP-SE-E2E-078,"Header, Navigation & 3D Onboarding",Test Sidebar active route highlight synchronization [Interactive Click],Selenium E2E UI,PASS,177,2026-08-19 10:35:51
+ASP-SE-E2E-079,"Header, Navigation & 3D Onboarding",Test Sidebar active route highlight synchronization [Form Input Verification],Selenium E2E UI,PASS,226,2026-08-19 10:35:51
+ASP-SE-E2E-080,"Header, Navigation & 3D Onboarding",Test Sidebar active route highlight synchronization [Responsive Viewport],Selenium E2E UI,PASS,809,2026-08-19 10:35:52
+ASP-SE-E2E-081,"Header, Navigation & 3D Onboarding",Test Upcoming exams notifications bell dropdown popover [Default State],Selenium E2E UI,PASS,254,2026-08-19 10:35:52
+ASP-SE-E2E-082,"Header, Navigation & 3D Onboarding",Test Upcoming exams notifications bell dropdown popover [Interactive Click],Selenium E2E UI,PASS,227,2026-08-19 10:35:53
+ASP-SE-E2E-083,"Header, Navigation & 3D Onboarding",Test Upcoming exams notifications bell dropdown popover [Form Input Verification],Selenium E2E UI,PASS,173,2026-08-19 10:35:53
+ASP-SE-E2E-084,"Header, Navigation & 3D Onboarding",Test Upcoming exams notifications bell dropdown popover [Responsive Viewport],Selenium E2E UI,PASS,572,2026-08-19 10:35:53
+ASP-SE-E2E-085,"Header, Navigation & 3D Onboarding",Test Mobile hamburger drawer menu toggle and navigation [Default State],Selenium E2E UI,PASS,183,2026-08-19 10:35:53
+ASP-SE-E2E-086,"Header, Navigation & 3D Onboarding",Test Mobile hamburger drawer menu toggle and navigation [Interactive Click],Selenium E2E UI,PASS,183,2026-08-19 10:35:54
+ASP-SE-E2E-087,"Header, Navigation & 3D Onboarding",Test Mobile hamburger drawer menu toggle and navigation [Form Input Verification],Selenium E2E UI,PASS,255,2026-08-19 10:35:54
+ASP-SE-E2E-088,"Header, Navigation & 3D Onboarding",Test Mobile hamburger drawer menu toggle and navigation [Responsive Viewport],Selenium E2E UI,PASS,778,2026-08-19 10:35:55
+ASP-SE-E2E-089,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding 5-page flip animation [Default State],Selenium E2E UI,PASS,167,2026-08-19 10:35:55
+ASP-SE-E2E-090,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding 5-page flip animation [Interactive Click],Selenium E2E UI,PASS,126,2026-08-19 10:35:55
+ASP-SE-E2E-091,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding 5-page flip animation [Form Input Verification],Selenium E2E UI,PASS,139,2026-08-19 10:35:55
+ASP-SE-E2E-092,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding 5-page flip animation [Responsive Viewport],Selenium E2E UI,PASS,550,2026-08-19 10:35:56
+ASP-SE-E2E-093,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding progress dots synchronization [Default State],Selenium E2E UI,PASS,128,2026-08-19 10:35:56
+ASP-SE-E2E-094,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding progress dots synchronization [Interactive Click],Selenium E2E UI,PASS,130,2026-08-19 10:35:56
+ASP-SE-E2E-095,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding progress dots synchronization [Form Input Verification],Selenium E2E UI,PASS,136,2026-08-19 10:35:56
+ASP-SE-E2E-096,"Header, Navigation & 3D Onboarding",Test 3D Book Onboarding progress dots synchronization [Responsive Viewport],Selenium E2E UI,PASS,538,2026-08-19 10:35:57
+ASP-SE-E2E-097,"Header, Navigation & 3D Onboarding",Test Global Error Boundary fallback recovery [Default State],Selenium E2E UI,PASS,160,2026-08-19 10:35:57
+ASP-SE-E2E-098,"Header, Navigation & 3D Onboarding",Test Global Error Boundary fallback recovery [Interactive Click],Selenium E2E UI,PASS,174,2026-08-19 10:35:57
+ASP-SE-E2E-099,"Header, Navigation & 3D Onboarding",Test Global Error Boundary fallback recovery [Form Input Verification],Selenium E2E UI,PASS,182,2026-08-19 10:35:57
+ASP-SE-E2E-100,"Header, Navigation & 3D Onboarding",Test Global Error Boundary fallback recovery [Responsive Viewport],Selenium E2E UI,PASS,591,2026-08-19 10:35:58
+ASP-SE-E2E-101,Dashboard & Study Overview,Test Dashboard greeting matching current time and student name [Default State],Selenium E2E UI,PASS,176,2026-08-19 10:35:58
+ASP-SE-E2E-102,Dashboard & Study Overview,Test Dashboard greeting matching current time and student name [Interactive Click],Selenium E2E UI,PASS,202,2026-08-19 10:35:58
+ASP-SE-E2E-103,Dashboard & Study Overview,Test Dashboard greeting matching current time and student name [Form Input Verification],Selenium E2E UI,PASS,222,2026-08-19 10:35:58
+ASP-SE-E2E-104,Dashboard & Study Overview,Test Dashboard greeting matching current time and student name [Responsive Viewport],Selenium E2E UI,PASS,537,2026-08-19 10:35:59
+ASP-SE-E2E-105,Dashboard & Study Overview,Test Study streak flame badge pulse animation [Default State],Selenium E2E UI,PASS,185,2026-08-19 10:35:59
+ASP-SE-E2E-106,Dashboard & Study Overview,Test Study streak flame badge pulse animation [Interactive Click],Selenium E2E UI,PASS,176,2026-08-19 10:35:59
+ASP-SE-E2E-107,Dashboard & Study Overview,Test Study streak flame badge pulse animation [Form Input Verification],Selenium E2E UI,PASS,183,2026-08-19 10:35:59
+ASP-SE-E2E-108,Dashboard & Study Overview,Test Study streak flame badge pulse animation [Responsive Viewport],Selenium E2E UI,PASS,565,2026-08-19 10:36:00
+ASP-SE-E2E-109,Dashboard & Study Overview,Test Daily AI motivational quote card and cached tip [Default State],Selenium E2E UI,PASS,169,2026-08-19 10:36:00
+ASP-SE-E2E-110,Dashboard & Study Overview,Test Daily AI motivational quote card and cached tip [Interactive Click],Selenium E2E UI,PASS,158,2026-08-19 10:36:00
+ASP-SE-E2E-111,Dashboard & Study Overview,Test Daily AI motivational quote card and cached tip [Form Input Verification],Selenium E2E UI,PASS,181,2026-08-19 10:36:00
+ASP-SE-E2E-112,Dashboard & Study Overview,Test Daily AI motivational quote card and cached tip [Responsive Viewport],Selenium E2E UI,PASS,575,2026-08-19 10:36:01
+ASP-SE-E2E-113,Dashboard & Study Overview,Test Today's Schedule study timeline slots list [Default State],Selenium E2E UI,PASS,172,2026-08-19 10:36:01
+ASP-SE-E2E-114,Dashboard & Study Overview,Test Today's Schedule study timeline slots list [Interactive Click],Selenium E2E UI,PASS,192,2026-08-19 10:36:01
+ASP-SE-E2E-115,Dashboard & Study Overview,Test Today's Schedule study timeline slots list [Form Input Verification],Selenium E2E UI,PASS,171,2026-08-19 10:36:02
+ASP-SE-E2E-116,Dashboard & Study Overview,Test Today's Schedule study timeline slots list [Responsive Viewport],Selenium E2E UI,PASS,557,2026-08-19 10:36:02
+ASP-SE-E2E-117,Dashboard & Study Overview,"Test Quick Action AI cards (Generate Timetable, Chat, Upload) [Default State]",Selenium E2E UI,PASS,161,2026-08-19 10:36:02
+ASP-SE-E2E-118,Dashboard & Study Overview,"Test Quick Action AI cards (Generate Timetable, Chat, Upload) [Interactive Click]",Selenium E2E UI,PASS,192,2026-08-19 10:36:02
+ASP-SE-E2E-119,Dashboard & Study Overview,"Test Quick Action AI cards (Generate Timetable, Chat, Upload) [Form Input Verification]",Selenium E2E UI,PASS,180,2026-08-19 10:36:03
+ASP-SE-E2E-120,Dashboard & Study Overview,"Test Quick Action AI cards (Generate Timetable, Chat, Upload) [Responsive Viewport]",Selenium E2E UI,PASS,574,2026-08-19 10:36:03
+ASP-SE-E2E-121,Dashboard & Study Overview,Test Upcoming urgent exam countdown banner (<48h alert) [Default State],Selenium E2E UI,PASS,171,2026-08-19 10:36:03
+ASP-SE-E2E-122,Dashboard & Study Overview,Test Upcoming urgent exam countdown banner (<48h alert) [Interactive Click],Selenium E2E UI,PASS,180,2026-08-19 10:36:04
+ASP-SE-E2E-123,Dashboard & Study Overview,Test Upcoming urgent exam countdown banner (<48h alert) [Form Input Verification],Selenium E2E UI,PASS,197,2026-08-19 10:36:04
+ASP-SE-E2E-124,Dashboard & Study Overview,Test Upcoming urgent exam countdown banner (<48h alert) [Responsive Viewport],Selenium E2E UI,PASS,571,2026-08-19 10:36:04
+ASP-SE-E2E-125,Dashboard & Study Overview,Test Focus Areas academic readiness metrics card [Default State],Selenium E2E UI,PASS,206,2026-08-19 10:36:05
+ASP-SE-E2E-126,Dashboard & Study Overview,Test Focus Areas academic readiness metrics card [Interactive Click],Selenium E2E UI,PASS,182,2026-08-19 10:36:05
+ASP-SE-E2E-127,Dashboard & Study Overview,Test Focus Areas academic readiness metrics card [Form Input Verification],Selenium E2E UI,PASS,188,2026-08-19 10:36:05
+ASP-SE-E2E-128,Dashboard & Study Overview,Test Focus Areas academic readiness metrics card [Responsive Viewport],Selenium E2E UI,PASS,605,2026-08-19 10:36:06
+ASP-SE-E2E-129,Dashboard & Study Overview,Test Dashboard empty state when zero subjects exist [Default State],Selenium E2E UI,PASS,196,2026-08-19 10:36:06
+ASP-SE-E2E-130,Dashboard & Study Overview,Test Dashboard empty state when zero subjects exist [Interactive Click],Selenium E2E UI,PASS,186,2026-08-19 10:36:06
+ASP-SE-E2E-131,Dashboard & Study Overview,Test Dashboard empty state when zero subjects exist [Form Input Verification],Selenium E2E UI,PASS,163,2026-08-19 10:36:06
+ASP-SE-E2E-132,Dashboard & Study Overview,Test Dashboard empty state when zero subjects exist [Responsive Viewport],Selenium E2E UI,PASS,563,2026-08-19 10:36:07
+ASP-SE-E2E-133,Dashboard & Study Overview,Test Dashboard 2-column grid responsive stacking on mobile [Default State],Selenium E2E UI,PASS,185,2026-08-19 10:36:07
+ASP-SE-E2E-134,Dashboard & Study Overview,Test Dashboard 2-column grid responsive stacking on mobile [Interactive Click],Selenium E2E UI,PASS,201,2026-08-19 10:36:07
+ASP-SE-E2E-135,Dashboard & Study Overview,Test Dashboard 2-column grid responsive stacking on mobile [Form Input Verification],Selenium E2E UI,PASS,169,2026-08-19 10:36:07
+ASP-SE-E2E-136,Dashboard & Study Overview,Test Dashboard 2-column grid responsive stacking on mobile [Responsive Viewport],Selenium E2E UI,PASS,567,2026-08-19 10:36:08
+ASP-SE-E2E-137,Subjects & Academic Performance Data,Test Subjects library view rendering and subject cards grid [Default State],Selenium E2E UI,PASS,157,2026-08-19 10:36:08
+ASP-SE-E2E-138,Subjects & Academic Performance Data,Test Subjects library view rendering and subject cards grid [Interactive Click],Selenium E2E UI,PASS,173,2026-08-19 10:36:08
+ASP-SE-E2E-139,Subjects & Academic Performance Data,Test Subjects library view rendering and subject cards grid [Form Input Verification],Selenium E2E UI,PASS,182,2026-08-19 10:36:08
+ASP-SE-E2E-140,Subjects & Academic Performance Data,Test Subjects library view rendering and subject cards grid [Responsive Viewport],Selenium E2E UI,PASS,564,2026-08-19 10:36:09
+ASP-SE-E2E-141,Subjects & Academic Performance Data,"Test Add Subject modal form (Name, Code, Credits, Difficulty) [Default State]",Selenium E2E UI,PASS,161,2026-08-19 10:36:09
+ASP-SE-E2E-142,Subjects & Academic Performance Data,"Test Add Subject modal form (Name, Code, Credits, Difficulty) [Interactive Click]",Selenium E2E UI,PASS,161,2026-08-19 10:36:09
+ASP-SE-E2E-143,Subjects & Academic Performance Data,"Test Add Subject modal form (Name, Code, Credits, Difficulty) [Form Input Verification]",Selenium E2E UI,PASS,482,2026-08-19 10:36:10
+ASP-SE-E2E-144,Subjects & Academic Performance Data,"Test Add Subject modal form (Name, Code, Credits, Difficulty) [Responsive Viewport]",Selenium E2E UI,PASS,567,2026-08-19 10:36:10
+ASP-SE-E2E-145,Subjects & Academic Performance Data,Test Subject difficulty color badge rating thresholds (1-5) [Default State],Selenium E2E UI,PASS,173,2026-08-19 10:36:10
+ASP-SE-E2E-146,Subjects & Academic Performance Data,Test Subject difficulty color badge rating thresholds (1-5) [Interactive Click],Selenium E2E UI,PASS,191,2026-08-19 10:36:11
+ASP-SE-E2E-147,Subjects & Academic Performance Data,Test Subject difficulty color badge rating thresholds (1-5) [Form Input Verification],Selenium E2E UI,PASS,180,2026-08-19 10:36:11
+ASP-SE-E2E-148,Subjects & Academic Performance Data,Test Subject difficulty color badge rating thresholds (1-5) [Responsive Viewport],Selenium E2E UI,PASS,577,2026-08-19 10:36:11
+ASP-SE-E2E-149,Subjects & Academic Performance Data,Test Semester filter chip dropdown in subjects view [Default State],Selenium E2E UI,PASS,156,2026-08-19 10:36:12
+ASP-SE-E2E-150,Subjects & Academic Performance Data,Test Semester filter chip dropdown in subjects view [Interactive Click],Selenium E2E UI,PASS,141,2026-08-19 10:36:12
+ASP-SE-E2E-151,Subjects & Academic Performance Data,Test Semester filter chip dropdown in subjects view [Form Input Verification],Selenium E2E UI,PASS,168,2026-08-19 10:36:12
+ASP-SE-E2E-152,Subjects & Academic Performance Data,Test Semester filter chip dropdown in subjects view [Responsive Viewport],Selenium E2E UI,PASS,550,2026-08-19 10:36:12
+ASP-SE-E2E-153,Subjects & Academic Performance Data,Test Edit Subject modal and updating subject parameters [Default State],Selenium E2E UI,PASS,168,2026-08-19 10:36:13
+ASP-SE-E2E-154,Subjects & Academic Performance Data,Test Edit Subject modal and updating subject parameters [Interactive Click],Selenium E2E UI,PASS,153,2026-08-19 10:36:13
+ASP-SE-E2E-155,Subjects & Academic Performance Data,Test Edit Subject modal and updating subject parameters [Form Input Verification],Selenium E2E UI,PASS,168,2026-08-19 10:36:13
+ASP-SE-E2E-156,Subjects & Academic Performance Data,Test Edit Subject modal and updating subject parameters [Responsive Viewport],Selenium E2E UI,PASS,574,2026-08-19 10:36:13
+ASP-SE-E2E-157,Subjects & Academic Performance Data,Test Delete Subject confirmation dialog and cascade cleanup [Default State],Selenium E2E UI,PASS,191,2026-08-19 10:36:14
+ASP-SE-E2E-158,Subjects & Academic Performance Data,Test Delete Subject confirmation dialog and cascade cleanup [Interactive Click],Selenium E2E UI,PASS,161,2026-08-19 10:36:14
+ASP-SE-E2E-159,Subjects & Academic Performance Data,Test Delete Subject confirmation dialog and cascade cleanup [Form Input Verification],Selenium E2E UI,PASS,146,2026-08-19 10:36:14
+ASP-SE-E2E-160,Subjects & Academic Performance Data,Test Delete Subject confirmation dialog and cascade cleanup [Responsive Viewport],Selenium E2E UI,PASS,572,2026-08-19 10:36:15
+ASP-SE-E2E-161,Subjects & Academic Performance Data,Test Record test marks entry modal and auto-percentage [Default State],Selenium E2E UI,PASS,182,2026-08-19 10:36:15
+ASP-SE-E2E-162,Subjects & Academic Performance Data,Test Record test marks entry modal and auto-percentage [Interactive Click],Selenium E2E UI,PASS,168,2026-08-19 10:36:15
+ASP-SE-E2E-163,Subjects & Academic Performance Data,Test Record test marks entry modal and auto-percentage [Form Input Verification],Selenium E2E UI,PASS,168,2026-08-19 10:36:15
+ASP-SE-E2E-164,Subjects & Academic Performance Data,Test Record test marks entry modal and auto-percentage [Responsive Viewport],Selenium E2E UI,PASS,559,2026-08-19 10:36:16
+ASP-SE-E2E-165,Subjects & Academic Performance Data,Test Subject marks history display and exam scores list [Default State],Selenium E2E UI,PASS,153,2026-08-19 10:36:16
+ASP-SE-E2E-166,Subjects & Academic Performance Data,Test Subject marks history display and exam scores list [Interactive Click],Selenium E2E UI,PASS,187,2026-08-19 10:36:16
+ASP-SE-E2E-167,Subjects & Academic Performance Data,Test Subject marks history display and exam scores list [Form Input Verification],Selenium E2E UI,PASS,163,2026-08-19 10:36:16
+ASP-SE-E2E-168,Subjects & Academic Performance Data,Test Subject marks history display and exam scores list [Responsive Viewport],Selenium E2E UI,PASS,654,2026-08-19 10:36:17
+ASP-SE-E2E-169,Subjects & Academic Performance Data,Test Weak subject priority warning tag for average <60% [Default State],Selenium E2E UI,PASS,184,2026-08-19 10:36:17
+ASP-SE-E2E-170,Subjects & Academic Performance Data,Test Weak subject priority warning tag for average <60% [Interactive Click],Selenium E2E UI,PASS,555,2026-08-19 10:36:17
+ASP-SE-E2E-171,Subjects & Academic Performance Data,Test Weak subject priority warning tag for average <60% [Form Input Verification],Selenium E2E UI,PASS,241,2026-08-19 10:36:18
+ASP-SE-E2E-172,Subjects & Academic Performance Data,Test Weak subject priority warning tag for average <60% [Responsive Viewport],Selenium E2E UI,PASS,681,2026-08-19 10:36:18
+ASP-SE-E2E-173,Exams Management & Countdown,Test Exams page rendering and upcoming exam cards list [Default State],Selenium E2E UI,PASS,159,2026-08-19 10:36:19
+ASP-SE-E2E-174,Exams Management & Countdown,Test Exams page rendering and upcoming exam cards list [Interactive Click],Selenium E2E UI,PASS,163,2026-08-19 10:36:19
+ASP-SE-E2E-175,Exams Management & Countdown,Test Exams page rendering and upcoming exam cards list [Form Input Verification],Selenium E2E UI,PASS,173,2026-08-19 10:36:19
+ASP-SE-E2E-176,Exams Management & Countdown,Test Exams page rendering and upcoming exam cards list [Responsive Viewport],Selenium E2E UI,PASS,534,2026-08-19 10:36:19
+ASP-SE-E2E-177,Exams Management & Countdown,"Test Add Exam modal (Subject, Exam Name, Date, Type) [Default State]",Selenium E2E UI,PASS,183,2026-08-19 10:36:20
+ASP-SE-E2E-178,Exams Management & Countdown,"Test Add Exam modal (Subject, Exam Name, Date, Type) [Interactive Click]",Selenium E2E UI,PASS,171,2026-08-19 10:36:20
+ASP-SE-E2E-179,Exams Management & Countdown,"Test Add Exam modal (Subject, Exam Name, Date, Type) [Form Input Verification]",Selenium E2E UI,PASS,173,2026-08-19 10:36:20
+ASP-SE-E2E-180,Exams Management & Countdown,"Test Add Exam modal (Subject, Exam Name, Date, Type) [Responsive Viewport]",Selenium E2E UI,PASS,561,2026-08-19 10:36:21
+ASP-SE-E2E-181,Exams Management & Countdown,Test Exam countdown timer remaining days badge threshold [Default State],Selenium E2E UI,PASS,164,2026-08-19 10:36:21
+ASP-SE-E2E-182,Exams Management & Countdown,Test Exam countdown timer remaining days badge threshold [Interactive Click],Selenium E2E UI,PASS,157,2026-08-19 10:36:21
+ASP-SE-E2E-183,Exams Management & Countdown,Test Exam countdown timer remaining days badge threshold [Form Input Verification],Selenium E2E UI,PASS,151,2026-08-19 10:36:21
+ASP-SE-E2E-184,Exams Management & Countdown,Test Exam countdown timer remaining days badge threshold [Responsive Viewport],Selenium E2E UI,PASS,554,2026-08-19 10:36:22
+ASP-SE-E2E-185,Exams Management & Countdown,Test Syllabus coverage progress meter fill and topics [Default State],Selenium E2E UI,PASS,151,2026-08-19 10:36:22
+ASP-SE-E2E-186,Exams Management & Countdown,Test Syllabus coverage progress meter fill and topics [Interactive Click],Selenium E2E UI,PASS,171,2026-08-19 10:36:22
+ASP-SE-E2E-187,Exams Management & Countdown,Test Syllabus coverage progress meter fill and topics [Form Input Verification],Selenium E2E UI,PASS,196,2026-08-19 10:36:22
+ASP-SE-E2E-188,Exams Management & Countdown,Test Syllabus coverage progress meter fill and topics [Responsive Viewport],Selenium E2E UI,PASS,600,2026-08-19 10:36:23
+ASP-SE-E2E-189,Exams Management & Countdown,"Test Exam type filter tags (Quiz, Midterm, Final) [Default State]",Selenium E2E UI,PASS,162,2026-08-19 10:36:23
+ASP-SE-E2E-190,Exams Management & Countdown,"Test Exam type filter tags (Quiz, Midterm, Final) [Interactive Click]",Selenium E2E UI,PASS,174,2026-08-19 10:36:23
+ASP-SE-E2E-191,Exams Management & Countdown,"Test Exam type filter tags (Quiz, Midterm, Final) [Form Input Verification]",Selenium E2E UI,PASS,154,2026-08-19 10:36:23
+ASP-SE-E2E-192,Exams Management & Countdown,"Test Exam type filter tags (Quiz, Midterm, Final) [Responsive Viewport]",Selenium E2E UI,PASS,585,2026-08-19 10:36:24
+ASP-SE-E2E-193,Exams Management & Countdown,Test Edit Exam details and updating scheduled exam date [Default State],Selenium E2E UI,PASS,148,2026-08-19 10:36:24
+ASP-SE-E2E-194,Exams Management & Countdown,Test Edit Exam details and updating scheduled exam date [Interactive Click],Selenium E2E UI,PASS,159,2026-08-19 10:36:24
+ASP-SE-E2E-195,Exams Management & Countdown,Test Edit Exam details and updating scheduled exam date [Form Input Verification],Selenium E2E UI,PASS,164,2026-08-19 10:36:24
+ASP-SE-E2E-196,Exams Management & Countdown,Test Edit Exam details and updating scheduled exam date [Responsive Viewport],Selenium E2E UI,PASS,548,2026-08-19 10:36:25
+ASP-SE-E2E-197,Exams Management & Countdown,Test Delete Exam confirmation modal and list update [Default State],Selenium E2E UI,PASS,190,2026-08-19 10:36:25
+ASP-SE-E2E-198,Exams Management & Countdown,Test Delete Exam confirmation modal and list update [Interactive Click],Selenium E2E UI,PASS,181,2026-08-19 10:36:25
+ASP-SE-E2E-199,Exams Management & Countdown,Test Delete Exam confirmation modal and list update [Form Input Verification],Selenium E2E UI,PASS,176,2026-08-19 10:36:25
+ASP-SE-E2E-200,Exams Management & Countdown,Test Delete Exam confirmation modal and list update [Responsive Viewport],Selenium E2E UI,PASS,570,2026-08-19 10:36:26
+ASP-SE-E2E-201,Exams Management & Countdown,Test Exam date validation rejecting past dates [Default State],Selenium E2E UI,PASS,163,2026-08-19 10:36:26
+ASP-SE-E2E-202,Exams Management & Countdown,Test Exam date validation rejecting past dates [Interactive Click],Selenium E2E UI,PASS,156,2026-08-19 10:36:26
+ASP-SE-E2E-203,Exams Management & Countdown,Test Exam date validation rejecting past dates [Form Input Verification],Selenium E2E UI,PASS,174,2026-08-19 10:36:26
+ASP-SE-E2E-204,Exams Management & Countdown,Test Exam date validation rejecting past dates [Responsive Viewport],Selenium E2E UI,PASS,563,2026-08-19 10:36:27
+ASP-SE-E2E-205,AI Timetable & Study Planner,Test Weekly 7-day study timetable grid layout (Mon-Sun) [Default State],Selenium E2E UI,PASS,167,2026-08-19 10:36:27
+ASP-SE-E2E-206,AI Timetable & Study Planner,Test Weekly 7-day study timetable grid layout (Mon-Sun) [Interactive Click],Selenium E2E UI,PASS,183,2026-08-19 10:36:27
+ASP-SE-E2E-207,AI Timetable & Study Planner,Test Weekly 7-day study timetable grid layout (Mon-Sun) [Form Input Verification],Selenium E2E UI,PASS,158,2026-08-19 10:36:27
+ASP-SE-E2E-208,AI Timetable & Study Planner,Test Weekly 7-day study timetable grid layout (Mon-Sun) [Responsive Viewport],Selenium E2E UI,PASS,913,2026-08-19 10:36:28
+ASP-SE-E2E-209,AI Timetable & Study Planner,Test 5-Step AI Timetable Generator wizard invocation [Default State],Selenium E2E UI,PASS,214,2026-08-19 10:36:29
+ASP-SE-E2E-210,AI Timetable & Study Planner,Test 5-Step AI Timetable Generator wizard invocation [Interactive Click],Selenium E2E UI,PASS,161,2026-08-19 10:36:29
+ASP-SE-E2E-211,AI Timetable & Study Planner,Test 5-Step AI Timetable Generator wizard invocation [Form Input Verification],Selenium E2E UI,PASS,183,2026-08-19 10:36:29
+ASP-SE-E2E-212,AI Timetable & Study Planner,Test 5-Step AI Timetable Generator wizard invocation [Responsive Viewport],Selenium E2E UI,PASS,558,2026-08-19 10:36:29
+ASP-SE-E2E-213,AI Timetable & Study Planner,Test Daily study availability slider adjustment [Default State],Selenium E2E UI,PASS,161,2026-08-19 10:36:30
+ASP-SE-E2E-214,AI Timetable & Study Planner,Test Daily study availability slider adjustment [Interactive Click],Selenium E2E UI,PASS,164,2026-08-19 10:36:30
+ASP-SE-E2E-215,AI Timetable & Study Planner,Test Daily study availability slider adjustment [Form Input Verification],Selenium E2E UI,PASS,186,2026-08-19 10:36:30
+ASP-SE-E2E-216,AI Timetable & Study Planner,Test Daily study availability slider adjustment [Responsive Viewport],Selenium E2E UI,PASS,571,2026-08-19 10:36:31
+ASP-SE-E2E-217,AI Timetable & Study Planner,Test AI timetable generation loading state and Groq indicator [Default State],Selenium E2E UI,PASS,193,2026-08-19 10:36:31
+ASP-SE-E2E-218,AI Timetable & Study Planner,Test AI timetable generation loading state and Groq indicator [Interactive Click],Selenium E2E UI,PASS,183,2026-08-19 10:36:31
+ASP-SE-E2E-219,AI Timetable & Study Planner,Test AI timetable generation loading state and Groq indicator [Form Input Verification],Selenium E2E UI,PASS,199,2026-08-19 10:36:31
+ASP-SE-E2E-220,AI Timetable & Study Planner,Test AI timetable generation loading state and Groq indicator [Responsive Viewport],Selenium E2E UI,PASS,587,2026-08-19 10:36:32
+ASP-SE-E2E-221,AI Timetable & Study Planner,Test Weak-subject prioritization (+40% slots for <60%) [Default State],Selenium E2E UI,PASS,180,2026-08-19 10:36:32
+ASP-SE-E2E-222,AI Timetable & Study Planner,Test Weak-subject prioritization (+40% slots for <60%) [Interactive Click],Selenium E2E UI,PASS,154,2026-08-19 10:36:32
+ASP-SE-E2E-223,AI Timetable & Study Planner,Test Weak-subject prioritization (+40% slots for <60%) [Form Input Verification],Selenium E2E UI,PASS,180,2026-08-19 10:36:32
+ASP-SE-E2E-224,AI Timetable & Study Planner,Test Weak-subject prioritization (+40% slots for <60%) [Responsive Viewport],Selenium E2E UI,PASS,578,2026-08-19 10:36:33
+ASP-SE-E2E-225,AI Timetable & Study Planner,Test Exam deadline proximity prioritization (<=7 days) [Default State],Selenium E2E UI,PASS,171,2026-08-19 10:36:33
+ASP-SE-E2E-226,AI Timetable & Study Planner,Test Exam deadline proximity prioritization (<=7 days) [Interactive Click],Selenium E2E UI,PASS,169,2026-08-19 10:36:33
+ASP-SE-E2E-227,AI Timetable & Study Planner,Test Exam deadline proximity prioritization (<=7 days) [Form Input Verification],Selenium E2E UI,PASS,187,2026-08-19 10:36:33
+ASP-SE-E2E-228,AI Timetable & Study Planner,Test Exam deadline proximity prioritization (<=7 days) [Responsive Viewport],Selenium E2E UI,PASS,582,2026-08-19 10:36:34
+ASP-SE-E2E-229,AI Timetable & Study Planner,Test Study slot completion checkbox toggle and streak [Default State],Selenium E2E UI,PASS,172,2026-08-19 10:36:34
+ASP-SE-E2E-230,AI Timetable & Study Planner,Test Study slot completion checkbox toggle and streak [Interactive Click],Selenium E2E UI,PASS,208,2026-08-19 10:36:34
+ASP-SE-E2E-231,AI Timetable & Study Planner,Test Study slot completion checkbox toggle and streak [Form Input Verification],Selenium E2E UI,PASS,650,2026-08-19 10:36:35
+ASP-SE-E2E-232,AI Timetable & Study Planner,Test Study slot completion checkbox toggle and streak [Responsive Viewport],Selenium E2E UI,PASS,571,2026-08-19 10:36:36
+ASP-SE-E2E-233,AI Timetable & Study Planner,Test Add custom study slot modal and time range validation [Default State],Selenium E2E UI,PASS,164,2026-08-19 10:36:36
+ASP-SE-E2E-234,AI Timetable & Study Planner,Test Add custom study slot modal and time range validation [Interactive Click],Selenium E2E UI,PASS,182,2026-08-19 10:36:36
+ASP-SE-E2E-235,AI Timetable & Study Planner,Test Add custom study slot modal and time range validation [Form Input Verification],Selenium E2E UI,PASS,167,2026-08-19 10:36:36
+ASP-SE-E2E-236,AI Timetable & Study Planner,Test Add custom study slot modal and time range validation [Responsive Viewport],Selenium E2E UI,PASS,551,2026-08-19 10:36:37
+ASP-SE-E2E-237,AI Timetable & Study Planner,Test Delete custom study slot from active timetable [Default State],Selenium E2E UI,PASS,568,2026-08-19 10:36:37
+ASP-SE-E2E-238,AI Timetable & Study Planner,Test Delete custom study slot from active timetable [Interactive Click],Selenium E2E UI,PASS,201,2026-08-19 10:36:37
+ASP-SE-E2E-239,AI Timetable & Study Planner,Test Delete custom study slot from active timetable [Form Input Verification],Selenium E2E UI,PASS,229,2026-08-19 10:36:38
+ASP-SE-E2E-240,AI Timetable & Study Planner,Test Delete custom study slot from active timetable [Responsive Viewport],Selenium E2E UI,PASS,594,2026-08-19 10:36:38
+ASP-SE-E2E-241,AI Timetable & Study Planner,Test Export weekly timetable as downloadable PDF document [Default State],Selenium E2E UI,PASS,162,2026-08-19 10:36:38
+ASP-SE-E2E-242,AI Timetable & Study Planner,Test Export weekly timetable as downloadable PDF document [Interactive Click],Selenium E2E UI,PASS,176,2026-08-19 10:36:39
+ASP-SE-E2E-243,AI Timetable & Study Planner,Test Export weekly timetable as downloadable PDF document [Form Input Verification],Selenium E2E UI,PASS,187,2026-08-19 10:36:39
+ASP-SE-E2E-244,AI Timetable & Study Planner,Test Export weekly timetable as downloadable PDF document [Responsive Viewport],Selenium E2E UI,PASS,572,2026-08-19 10:36:39
+ASP-SE-E2E-245,Academic Materials & PDFBox NLP Intelligence,Test Study materials library page rendering and file list [Default State],Selenium E2E UI,PASS,181,2026-08-19 10:36:39
+ASP-SE-E2E-246,Academic Materials & PDFBox NLP Intelligence,Test Study materials library page rendering and file list [Interactive Click],Selenium E2E UI,PASS,206,2026-08-19 10:36:40
+ASP-SE-E2E-247,Academic Materials & PDFBox NLP Intelligence,Test Study materials library page rendering and file list [Form Input Verification],Selenium E2E UI,PASS,173,2026-08-19 10:36:40
+ASP-SE-E2E-248,Academic Materials & PDFBox NLP Intelligence,Test Study materials library page rendering and file list [Responsive Viewport],Selenium E2E UI,PASS,936,2026-08-19 10:36:41
+ASP-SE-E2E-249,Academic Materials & PDFBox NLP Intelligence,Test Drag-and-drop PDF upload dropzone and file selection [Default State],Selenium E2E UI,PASS,160,2026-08-19 10:36:41
+ASP-SE-E2E-250,Academic Materials & PDFBox NLP Intelligence,Test Drag-and-drop PDF upload dropzone and file selection [Interactive Click],Selenium E2E UI,PASS,611,2026-08-19 10:36:42
+ASP-SE-E2E-251,Academic Materials & PDFBox NLP Intelligence,Test Drag-and-drop PDF upload dropzone and file selection [Form Input Verification],Selenium E2E UI,PASS,181,2026-08-19 10:36:42
+ASP-SE-E2E-252,Academic Materials & PDFBox NLP Intelligence,Test Drag-and-drop PDF upload dropzone and file selection [Responsive Viewport],Selenium E2E UI,PASS,585,2026-08-19 10:36:42
+ASP-SE-E2E-253,Academic Materials & PDFBox NLP Intelligence,Test Apache PDFBox text extraction and status badge [Default State],Selenium E2E UI,PASS,173,2026-08-19 10:36:43
+ASP-SE-E2E-254,Academic Materials & PDFBox NLP Intelligence,Test Apache PDFBox text extraction and status badge [Interactive Click],Selenium E2E UI,PASS,501,2026-08-19 10:36:43
+ASP-SE-E2E-255,Academic Materials & PDFBox NLP Intelligence,Test Apache PDFBox text extraction and status badge [Form Input Verification],Selenium E2E UI,PASS,172,2026-08-19 10:36:43
+ASP-SE-E2E-256,Academic Materials & PDFBox NLP Intelligence,Test Apache PDFBox text extraction and status badge [Responsive Viewport],Selenium E2E UI,PASS,607,2026-08-19 10:36:44
+ASP-SE-E2E-257,Academic Materials & PDFBox NLP Intelligence,Test Extracted TF-IDF keyphrase chips display [Default State],Selenium E2E UI,PASS,499,2026-08-19 10:36:44
+ASP-SE-E2E-258,Academic Materials & PDFBox NLP Intelligence,Test Extracted TF-IDF keyphrase chips display [Interactive Click],Selenium E2E UI,PASS,173,2026-08-19 10:36:44
+ASP-SE-E2E-259,Academic Materials & PDFBox NLP Intelligence,Test Extracted TF-IDF keyphrase chips display [Form Input Verification],Selenium E2E UI,PASS,518,2026-08-19 10:36:45
+ASP-SE-E2E-260,Academic Materials & PDFBox NLP Intelligence,Test Extracted TF-IDF keyphrase chips display [Responsive Viewport],Selenium E2E UI,PASS,885,2026-08-19 10:36:46
+ASP-SE-E2E-261,Academic Materials & PDFBox NLP Intelligence,Test Chapter and section detection accordion expand/collapse [Default State],Selenium E2E UI,PASS,536,2026-08-19 10:36:46
+ASP-SE-E2E-262,Academic Materials & PDFBox NLP Intelligence,Test Chapter and section detection accordion expand/collapse [Interactive Click],Selenium E2E UI,PASS,563,2026-08-19 10:36:47
+ASP-SE-E2E-263,Academic Materials & PDFBox NLP Intelligence,Test Chapter and section detection accordion expand/collapse [Form Input Verification],Selenium E2E UI,PASS,525,2026-08-19 10:36:48
+ASP-SE-E2E-264,Academic Materials & PDFBox NLP Intelligence,Test Chapter and section detection accordion expand/collapse [Responsive Viewport],Selenium E2E UI,PASS,874,2026-08-19 10:36:48
+ASP-SE-E2E-265,Academic Materials & PDFBox NLP Intelligence,Test Document difficulty rating score (0-100) and reasoning [Default State],Selenium E2E UI,PASS,518,2026-08-19 10:36:49
+ASP-SE-E2E-266,Academic Materials & PDFBox NLP Intelligence,Test Document difficulty rating score (0-100) and reasoning [Interactive Click],Selenium E2E UI,PASS,982,2026-08-19 10:36:50
+ASP-SE-E2E-267,Academic Materials & PDFBox NLP Intelligence,Test Document difficulty rating score (0-100) and reasoning [Form Input Verification],Selenium E2E UI,PASS,535,2026-08-19 10:36:50
+ASP-SE-E2E-268,Academic Materials & PDFBox NLP Intelligence,Test Document difficulty rating score (0-100) and reasoning [Responsive Viewport],Selenium E2E UI,PASS,920,2026-08-19 10:36:51
+ASP-SE-E2E-269,Academic Materials & PDFBox NLP Intelligence,Test Reprocess material NLP pipeline trigger [Default State],Selenium E2E UI,PASS,549,2026-08-19 10:36:52
+ASP-SE-E2E-270,Academic Materials & PDFBox NLP Intelligence,Test Reprocess material NLP pipeline trigger [Interactive Click],Selenium E2E UI,PASS,647,2026-08-19 10:36:53
+ASP-SE-E2E-271,Academic Materials & PDFBox NLP Intelligence,Test Reprocess material NLP pipeline trigger [Form Input Verification],Selenium E2E UI,PASS,572,2026-08-19 10:36:53
+ASP-SE-E2E-272,Academic Materials & PDFBox NLP Intelligence,Test Reprocess material NLP pipeline trigger [Responsive Viewport],Selenium E2E UI,PASS,883,2026-08-19 10:36:54
+ASP-SE-E2E-273,Academic Materials & PDFBox NLP Intelligence,Test Delete study material and storage file cleanup [Default State],Selenium E2E UI,PASS,561,2026-08-19 10:36:55
+ASP-SE-E2E-274,Academic Materials & PDFBox NLP Intelligence,Test Delete study material and storage file cleanup [Interactive Click],Selenium E2E UI,PASS,696,2026-08-19 10:36:55
+ASP-SE-E2E-275,Academic Materials & PDFBox NLP Intelligence,Test Delete study material and storage file cleanup [Form Input Verification],Selenium E2E UI,PASS,536,2026-08-19 10:36:56
+ASP-SE-E2E-276,Academic Materials & PDFBox NLP Intelligence,Test Delete study material and storage file cleanup [Responsive Viewport],Selenium E2E UI,PASS,912,2026-08-19 10:36:57
+ASP-SE-E2E-277,Groq AI Coach & Chat Attachments,Test AI Chat interface rendering and message bubble styling [Default State],Selenium E2E UI,PASS,588,2026-08-19 10:36:57
+ASP-SE-E2E-278,Groq AI Coach & Chat Attachments,Test AI Chat interface rendering and message bubble styling [Interactive Click],Selenium E2E UI,PASS,514,2026-08-19 10:36:58
+ASP-SE-E2E-279,Groq AI Coach & Chat Attachments,Test AI Chat interface rendering and message bubble styling [Form Input Verification],Selenium E2E UI,PASS,566,2026-08-19 10:36:58
+ASP-SE-E2E-280,Groq AI Coach & Chat Attachments,Test AI Chat interface rendering and message bubble styling [Responsive Viewport],Selenium E2E UI,PASS,912,2026-08-19 10:36:59
+ASP-SE-E2E-281,Groq AI Coach & Chat Attachments,Test Send study query to Groq AI Coach and typing indicator [Default State],Selenium E2E UI,PASS,573,2026-08-19 10:37:00
+ASP-SE-E2E-282,Groq AI Coach & Chat Attachments,Test Send study query to Groq AI Coach and typing indicator [Interactive Click],Selenium E2E UI,PASS,529,2026-08-19 10:37:00
+ASP-SE-E2E-283,Groq AI Coach & Chat Attachments,Test Send study query to Groq AI Coach and typing indicator [Form Input Verification],Selenium E2E UI,PASS,605,2026-08-19 10:37:01
+ASP-SE-E2E-284,Groq AI Coach & Chat Attachments,Test Send study query to Groq AI Coach and typing indicator [Responsive Viewport],Selenium E2E UI,PASS,916,2026-08-19 10:37:02
+ASP-SE-E2E-285,Groq AI Coach & Chat Attachments,Test Markdown rendering and syntax-highlighted code container [Default State],Selenium E2E UI,PASS,509,2026-08-19 10:37:02
+ASP-SE-E2E-286,Groq AI Coach & Chat Attachments,Test Markdown rendering and syntax-highlighted code container [Interactive Click],Selenium E2E UI,PASS,587,2026-08-19 10:37:03
+ASP-SE-E2E-287,Groq AI Coach & Chat Attachments,Test Markdown rendering and syntax-highlighted code container [Form Input Verification],Selenium E2E UI,PASS,517,2026-08-19 10:37:04
+ASP-SE-E2E-288,Groq AI Coach & Chat Attachments,Test Markdown rendering and syntax-highlighted code container [Responsive Viewport],Selenium E2E UI,PASS,933,2026-08-19 10:37:04
+ASP-SE-E2E-289,Groq AI Coach & Chat Attachments,Test Copy code snippet to clipboard button interaction [Default State],Selenium E2E UI,PASS,666,2026-08-19 10:37:05
+ASP-SE-E2E-290,Groq AI Coach & Chat Attachments,Test Copy code snippet to clipboard button interaction [Interactive Click],Selenium E2E UI,PASS,626,2026-08-19 10:37:06
+ASP-SE-E2E-291,Groq AI Coach & Chat Attachments,Test Copy code snippet to clipboard button interaction [Form Input Verification],Selenium E2E UI,PASS,539,2026-08-19 10:37:06
+ASP-SE-E2E-292,Groq AI Coach & Chat Attachments,Test Copy code snippet to clipboard button interaction [Responsive Viewport],Selenium E2E UI,PASS,918,2026-08-19 10:37:07
+ASP-SE-E2E-293,Groq AI Coach & Chat Attachments,Test Chat paperclip attachment button and uploading study notes [Default State],Selenium E2E UI,PASS,599,2026-08-19 10:37:08
+ASP-SE-E2E-294,Groq AI Coach & Chat Attachments,Test Chat paperclip attachment button and uploading study notes [Interactive Click],Selenium E2E UI,PASS,500,2026-08-19 10:37:08
+ASP-SE-E2E-295,Groq AI Coach & Chat Attachments,Test Chat paperclip attachment button and uploading study notes [Form Input Verification],Selenium E2E UI,PASS,546,2026-08-19 10:37:09
+ASP-SE-E2E-296,Groq AI Coach & Chat Attachments,Test Chat paperclip attachment button and uploading study notes [Responsive Viewport],Selenium E2E UI,PASS,1048,2026-08-19 10:37:10
+ASP-SE-E2E-297,Groq AI Coach & Chat Attachments,Test Asking questions using uploaded material NLP context [Default State],Selenium E2E UI,PASS,527,2026-08-19 10:37:10
+ASP-SE-E2E-298,Groq AI Coach & Chat Attachments,Test Asking questions using uploaded material NLP context [Interactive Click],Selenium E2E UI,PASS,692,2026-08-19 10:37:11
+ASP-SE-E2E-299,Groq AI Coach & Chat Attachments,Test Asking questions using uploaded material NLP context [Form Input Verification],Selenium E2E UI,PASS,530,2026-08-19 10:37:12
+ASP-SE-E2E-300,Groq AI Coach & Chat Attachments,Test Asking questions using uploaded material NLP context [Responsive Viewport],Selenium E2E UI,PASS,909,2026-08-19 10:37:13
+ASP-SE-E2E-301,Groq AI Coach & Chat Attachments,Test Session history sidebar switching and persistence [Default State],Selenium E2E UI,PASS,506,2026-08-19 10:37:13
+ASP-SE-E2E-302,Groq AI Coach & Chat Attachments,Test Session history sidebar switching and persistence [Interactive Click],Selenium E2E UI,PASS,574,2026-08-19 10:37:14
+ASP-SE-E2E-303,Groq AI Coach & Chat Attachments,Test Session history sidebar switching and persistence [Form Input Verification],Selenium E2E UI,PASS,556,2026-08-19 10:37:14
+ASP-SE-E2E-304,Groq AI Coach & Chat Attachments,Test Session history sidebar switching and persistence [Responsive Viewport],Selenium E2E UI,PASS,922,2026-08-19 10:37:15
+ASP-SE-E2E-305,Academic Analytics & Subscriptions,Test Academic performance analytics and overall GPA radial gauge [Default State],Selenium E2E UI,PASS,531,2026-08-19 10:37:16
+ASP-SE-E2E-306,Academic Analytics & Subscriptions,Test Academic performance analytics and overall GPA radial gauge [Interactive Click],Selenium E2E UI,PASS,201,2026-08-19 10:37:16
+ASP-SE-E2E-307,Academic Analytics & Subscriptions,Test Academic performance analytics and overall GPA radial gauge [Form Input Verification],Selenium E2E UI,PASS,474,2026-08-19 10:37:16
+ASP-SE-E2E-308,Academic Analytics & Subscriptions,Test Academic performance analytics and overall GPA radial gauge [Responsive Viewport],Selenium E2E UI,PASS,969,2026-08-19 10:37:17
+ASP-SE-E2E-309,Academic Analytics & Subscriptions,Test Subject marks comparison bar chart and trend curves [Default State],Selenium E2E UI,PASS,549,2026-08-19 10:37:18
+ASP-SE-E2E-310,Academic Analytics & Subscriptions,Test Subject marks comparison bar chart and trend curves [Interactive Click],Selenium E2E UI,PASS,601,2026-08-19 10:37:18
+ASP-SE-E2E-311,Academic Analytics & Subscriptions,Test Subject marks comparison bar chart and trend curves [Form Input Verification],Selenium E2E UI,PASS,635,2026-08-19 10:37:19
+ASP-SE-E2E-312,Academic Analytics & Subscriptions,Test Subject marks comparison bar chart and trend curves [Responsive Viewport],Selenium E2E UI,PASS,979,2026-08-19 10:37:20
+ASP-SE-E2E-313,Academic Analytics & Subscriptions,Test Subscription plans comparison matrix (Free vs Pro vs Premium) [Default State],Selenium E2E UI,PASS,589,2026-08-19 10:37:21
+ASP-SE-E2E-314,Academic Analytics & Subscriptions,Test Subscription plans comparison matrix (Free vs Pro vs Premium) [Interactive Click],Selenium E2E UI,PASS,660,2026-08-19 10:37:21
+ASP-SE-E2E-315,Academic Analytics & Subscriptions,Test Subscription plans comparison matrix (Free vs Pro vs Premium) [Form Input Verification],Selenium E2E UI,PASS,612,2026-08-19 10:37:22
+ASP-SE-E2E-316,Academic Analytics & Subscriptions,Test Subscription plans comparison matrix (Free vs Pro vs Premium) [Responsive Viewport],Selenium E2E UI,PASS,1334,2026-08-19 10:37:23
+ASP-SE-E2E-317,Academic Analytics & Subscriptions,Test Razorpay checkout payment modal initialization [Default State],Selenium E2E UI,PASS,952,2026-08-19 10:37:24
+ASP-SE-E2E-318,Academic Analytics & Subscriptions,Test Razorpay checkout payment modal initialization [Interactive Click],Selenium E2E UI,PASS,647,2026-08-19 10:37:25
+ASP-SE-E2E-319,Academic Analytics & Subscriptions,Test Razorpay checkout payment modal initialization [Form Input Verification],Selenium E2E UI,PASS,604,2026-08-19 10:37:25
+ASP-SE-E2E-320,Academic Analytics & Subscriptions,Test Razorpay checkout payment modal initialization [Responsive Viewport],Selenium E2E UI,PASS,1050,2026-08-19 10:37:27
