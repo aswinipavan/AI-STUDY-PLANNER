@@ -11,13 +11,13 @@ export const chatApi = {
     return rawHistory.map((item: any) => ({
       id: item.id || String(Math.random()),
       role: item.role,
-      content: item.message || '',
+      content: item.message || item.content || '',
       sessionId: item.sessionId || sessionId,
-      timestamp: item.createdAt || new Date().toISOString(),
+      timestamp: item.createdAt || item.timestamp || new Date().toISOString(),
     }));
   },
 
-  sendMessage: async (payload: { message: string; sessionId?: string }): Promise<{ message: ChatMessage; sessionId: string }> => {
+  sendMessage: async (payload: { message: string; sessionId?: string; materialId?: string }): Promise<{ message: ChatMessage; sessionId: string }> => {
     const response = await apiClient.post(`/api/ai/chat`, payload, {
       timeout: 60000, // 60s timeout for AI LLM reasoning
     });

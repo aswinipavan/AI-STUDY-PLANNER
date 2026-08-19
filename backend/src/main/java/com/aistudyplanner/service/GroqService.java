@@ -77,7 +77,13 @@ public class GroqService {
             log.debug("Groq API call successful. Duration: {}ms", duration);
             
             JsonNode root = objectMapper.readTree(responseStr);
-            return root.path("choices").get(0).path("message").path("content").asText();
+            if (root.has("choices") && root.path("choices").size() > 0) {
+                return root.path("choices").get(0).path("message").path("content").asText();
+            }
+            if (root.has("candidates") && root.path("candidates").size() > 0) {
+                return root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
+            }
+            return "I'm currently unable to generate a response. Please try again later.";
 
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
@@ -99,6 +105,10 @@ public class GroqService {
     }
 
     public String chat(String userMessage, List<ChatHistory> history) {
+        return chat(userMessage, history, null);
+    }
+
+    public String chat(String userMessage, List<ChatHistory> history, String documentContext) {
         // Limit context window to avoid exceeding Groq token limits
         // Estimate: ~4 tokens per word, max 2000 tokens for context = ~500 words
         final int MAX_CONTEXT_WORDS = 500;
@@ -118,14 +128,31 @@ public class GroqService {
             }
         }
         
-        String prompt = String.format("You are an AI study assistant and an expert problem solver helping a college student. " +
-                "When presented with a problem (math, coding, logical, or scientific), you must analyze it step-by-step, " +
-                "explain the underlying concepts clearly, and provide a fully worked-out solution. " +
-                "For general academic doubts, suggest study strategies and provide motivation. Keep answers concise and student-friendly.\n" +
-                "Previous conversation:\n%s\n" +
-                "Student's question: %s", historyBuilder.toString(), userMessage);
+        StringBuilder promptBuilder = new StringBuilder();
+        promptBuilder.append("You are an AI study assistant and an expert academic problem solver helping a college student.\n");
+        promptBuilder.append("When presented with problems, concepts, or academic questions, analyze them step-by-step, explain underlying ideas clearly, and provide accurate, student-friendly explanations.\n\n");
         
-        return callGroq(prompt);
+        if (documentContext != null && !documentContext.isBlank()) {
+            promptBuilder.append("--- RELEVANT ACADEMIC MATERIAL / DOCUMENT CONTEXT ---\n");
+            promptBuilder.append(documentContext).append("\n");
+            promptBuilder.append("--- END DOCUMENT CONTEXT ---\n\n");
+            promptBuilder.append("Instruction: Use the academic material context above directly to answer the student's question accurately.\n\n");
+        }
+
+        if (historyBuilder.length() > 0) {
+            promptBuilder.append("Previous conversation:\n").append(historyBuilder).append("\n");
+        }
+
+        promptBuilder.append("Student's question: ").append(userMessage);
+        
+        String response = callGroq(promptBuilder.toString());
+        if (response == null || response.contains("unable to generate a response") || response.isBlank()) {
+            if (documentContext != null && !documentContext.isBlank()) {
+                return "Here is what I found from your uploaded material:\n\n" + documentContext + 
+                       "\n\n*(AI service is operating in deterministic offline mode)*";
+            }
+        }
+        return response;
     }
 
     public String generateTopicSuggestion(String subjectName, double avgPercentage, int durationMinutes, int daysToExam) {

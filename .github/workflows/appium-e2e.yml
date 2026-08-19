@@ -1,0 +1,60 @@
+name: Appium Mobile E2E Test Suite
+
+on:
+  push:
+    branches: [ main, master, production ]
+  pull_request:
+    branches: [ main, master, production ]
+  workflow_dispatch:
+
+jobs:
+  appium-mobile-e2e:
+    name: Run 260-Test Appium Mobile E2E Suite (Pixel 8 / API 34)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Appium 3.x & UiAutomator2 Driver
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Appium Python Client Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Appium-Python-Client selenium openpyxl requests
+
+      - name: Execute 260 Appium Mobile E2E Tests (4-State Pattern)
+        run: python testing/appium/appium_e2e_runner.py
+
+      - name: Upload Appium Mobile E2E Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appium-mobile-e2e-reports
+          path: |
+            testing/reports/AI_Study_Planner_Appium_E2E.xlsx
+            testing/reports/appium_e2e_results.csv
+            testing/reports/appium_e2e_report.html
+            testing/reports/appium_junit_results.xml
+            testing/reports/appium_e2e_summary.json
+          retention-days: 30

@@ -63,6 +63,14 @@ public class StudentController {
         return ResponseEntity.ok(ApiResponse.success(response, "Notification preferences updated"));
     }
 
+    @DeleteMapping("/me")
+    @Operation(summary = "Delete current student account and all associated data")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(@CurrentStudent Student student) {
+        log.info("Deleting account for student: {}", student.getId());
+        studentService.deleteAccount(student.getId());
+        return ResponseEntity.ok(ApiResponse.success(null, "Account deleted successfully"));
+    }
+
     /**
      * Returns a Supabase pre-signed upload URL for profile avatar.
      * Frontend uploads the image directly to Supabase Storage and then calls

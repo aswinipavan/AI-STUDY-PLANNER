@@ -48,5 +48,16 @@ Thumbs.db
 *.log
 logs/
 
+# ── Python / Testing Caches ──────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+test-results/
+frontend/test-results/
+frontend/playwright-report/
+
 # ── OS Files ─────────────────────────────────
 .DS_Store
+Thumbs.db
+

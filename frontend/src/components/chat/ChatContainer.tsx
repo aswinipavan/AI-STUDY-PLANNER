@@ -13,11 +13,27 @@ interface Props {
 }
 
 export default function ChatContainer({ initialSessionId }: Props) {
-  const { messages, inputText, setInputText, isThinking, sendMessage } = useChat(initialSessionId);
+  const {
+    messages,
+    inputText,
+    setInputText,
+    isThinking,
+    attachedMaterial,
+    setAttachedMaterial,
+    sendMessage,
+  } = useChat(initialSessionId);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    isNearBottomRef.current = distanceToBottom < 120;
+  };
 
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && isNearBottomRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isThinking]);
@@ -26,6 +42,7 @@ export default function ChatContainer({ initialSessionId }: Props) {
     <div className={styles.chatWrapper}>
       <div 
         ref={scrollRef}
+        onScroll={handleScroll}
         className={styles.scrollArea}
       >
         <div className={styles.messageList}>
@@ -55,7 +72,10 @@ export default function ChatContainer({ initialSessionId }: Props) {
         onChange={setInputText}
         onSend={sendMessage}
         isThinking={isThinking}
+        attachedMaterial={attachedMaterial}
+        onAttachMaterial={setAttachedMaterial}
       />
     </div>
   );
 }
+

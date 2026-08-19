@@ -126,4 +126,12 @@ public class StudentService {
         // This is safe because of CascadeType.ALL, orphanRemoval=true in Student entity
         subjectRepository.delete(subject);
     }
+
+    @Transactional
+    public void deleteAccount(UUID studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        studentRepository.delete(student);
+    }
 }
+

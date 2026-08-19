@@ -279,11 +279,11 @@ class MaterialControllerTest {
                         .param("fileSizeBytes", "60000000")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Should handle unsupported file type (service throws IllegalArgumentException → 500)")
+    @DisplayName("Should handle unsupported file type (service throws IllegalArgumentException → 400)")
     void testSaveMaterialInvalidFileType() throws Exception {
         MaterialUploadRequest request = MaterialUploadRequest.builder()
                 .title("Invalid Type")
@@ -295,7 +295,6 @@ class MaterialControllerTest {
                 any(UUID.class), any(MaterialUploadRequest.class), anyString(), anyString(), anyLong()))
                 .thenThrow(new IllegalArgumentException("File type not allowed"));
 
-        // GlobalExceptionHandler has no handler for IllegalArgumentException → generic → 500
         mockMvc.perform(post("/api/materials/")
                         .with(studentAuth)
                         .with(csrf())
@@ -304,7 +303,7 @@ class MaterialControllerTest {
                         .param("fileSizeBytes", "1000000")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -408,7 +407,7 @@ class MaterialControllerTest {
         mockMvc.perform(delete("/api/materials/" + materialId)
                         .with(studentAuth)
                         .with(csrf()))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     // ─── Response structure / data tests ─────────────────────────────────────

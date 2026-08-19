@@ -1,4 +1,4 @@
-name: Selenium E2E Test Suite
+name: Selenium Web E2E Test Suite
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   selenium-e2e:
-    name: Run 320-Case Selenium E2E Suite
+    name: Run 320-Case Selenium Web E2E Suite
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install selenium webdriver-manager
+          pip install selenium webdriver-manager openpyxl requests
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -51,20 +51,17 @@ jobs:
       - name: Execute 320 Selenium E2E Tests
         run: python testing/selenium_e2e_suite.py
 
-      - name: Upload Test Reports Artifacts
+      - name: Consolidate Selenium Excel Workbook
+        run: python testing/consolidate_test_reports.py
+
+      - name: Upload Selenium E2E Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: selenium-e2e-reports
           path: |
+            testing/reports/AI_Study_Planner_Selenium_E2E.xlsx
             testing/reports/selenium_e2e_results.csv
             testing/reports/selenium_e2e_report.html
             testing/reports/junit_results.xml
           retention-days: 30
-
-      - name: Publish Test Results
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        continue-on-error: true
-        with:
-          files: testing/reports/junit_results.xml

@@ -308,9 +308,13 @@ test.describe('Final Production Verification Suite', () => {
     }
   });
 
-  test('Section 4: Google Login & Auth Flow Audit', async ({ browser }) => {
+  test('Section 4: Google Login & Enhanced Auth Flow Audit', async ({ browser }) => {
     // Use fresh unauthenticated context for login page
     const freshContext = await browser.newContext();
+    await freshContext.addInitScript(() => {
+      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
+      localStorage.setItem('studyplanner_onboarding_completed', 'true');
+    });
     const loginPage = await freshContext.newPage();
 
     await loginPage.goto('http://localhost:3000/login', { waitUntil: 'domcontentloaded' });
@@ -327,10 +331,32 @@ test.describe('Final Production Verification Suite', () => {
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
 
+    // Verify Remember Me checkbox
+    const rememberMe = loginPage.locator('input[type="checkbox"]#remember-me');
+    await expect(rememberMe).toBeVisible();
+    await expect(rememberMe).toBeChecked();
+
+    // Verify Forgot Password link and form transition
+    const forgotLink = loginPage.locator('#forgot-password-link');
+    await expect(forgotLink).toBeVisible();
+    await forgotLink.click();
+    await loginPage.waitForTimeout(200);
+
+    // Verify Forgot password submit button and back button
+    const forgotSubmitBtn = loginPage.locator('#btn-forgot-submit');
+    await expect(forgotSubmitBtn).toBeVisible();
+    const backToSignIn = loginPage.locator('#btn-back-to-signin');
+    await expect(backToSignIn).toBeVisible();
+    await backToSignIn.click();
+    await loginPage.waitForTimeout(200);
+
+    // Back on signin form
+    await expect(loginPage.locator('#btn-signin-email')).toBeVisible();
+
     await freshContext.close();
   });
 
-  test('Section 5: AI Chat Interface & History Persistence', async ({ page }) => {
+  test('Section 5: AI Chat Interface, Paperclip Attachment & History Persistence', async ({ page }) => {
     // Mock sessions
     await page.route('**/api/chat/sessions**', async (route) => {
       await route.fulfill({
@@ -358,19 +384,104 @@ test.describe('Final Production Verification Suite', () => {
       });
     });
 
+    await page.route('**/api/ai/chat', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            reply: 'Based on the attached document, A* search guarantees optimality when the heuristic h(n) is admissible (never overestimates).',
+            sessionId: 'sess-1',
+            timestamp: new Date().toISOString(),
+          }
+        })
+      });
+    });
+
     await page.goto('/chat', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
 
     // Verify AI Chat textarea is visible
-    const chatInput = page.locator('textarea').first();
+    const chatInput = page.locator('#chat-textarea');
     await expect(chatInput).toBeVisible();
 
-    // Verify chat greeting/empty state heading
-    const chatHeader = page.locator('h2').first();
-    await expect(chatHeader).toBeVisible();
+    // Verify Paperclip attachment button is visible
+    const attachBtn = page.locator('#btn-chat-attach');
+    await expect(attachBtn).toBeVisible();
+
+    // Type a question and send
+    await chatInput.fill('Explain heuristic search in this PDF');
+    const sendBtn = page.locator('#btn-chat-send');
+    await expect(sendBtn).toBeEnabled();
+    await sendBtn.click();
+
+    // Verify assistant reply rendered
+    await expect(page.locator('text=Based on the attached document')).toBeVisible({ timeout: 5000 });
   });
 
-  test('Section 6: Subscription & Pricing Tiers Verification', async ({ page }) => {
+  test('Section 6: Settings Enhanced Page Audit (Security, Preferences, Notifications, Danger Zone)', async ({ page }) => {
+    await page.route('**/api/students/me**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            id: '123e4567-e89b-12d3-a456-426614174000',
+            fullName: 'Aswini Pavan',
+            email: 'aswinipavan86@gmail.com',
+            collegeName: 'National Institute of Technology',
+            department: 'Computer Science',
+            semester: '6th Semester',
+            phoneNumber: '+91 9876543210',
+            isPremium: true,
+          }
+        })
+      });
+    });
+
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+
+    // 1. Verify Student Profile card and fields
+    await expect(page.locator('h3', { hasText: 'Student Profile' })).toBeVisible();
+    await expect(page.locator('input[value="Aswini Pavan"], input[name="name"]')).toBeVisible();
+
+    // 2. Verify Security card and Reset Password button
+    await expect(page.locator('h3', { hasText: 'Security & Access' })).toBeVisible();
+    const resetPwdBtn = page.locator('#btn-settings-reset-pwd');
+    await expect(resetPwdBtn).toBeVisible();
+
+    // 3. Verify Study Preferences card
+    await expect(page.locator('h3', { hasText: 'Study Planner Preferences' })).toBeVisible();
+    await expect(page.locator('text=Daily Target Study Duration')).toBeVisible();
+
+    // 4. Verify Academic Notifications card
+    await expect(page.locator('h3', { hasText: 'Academic Notifications' })).toBeVisible();
+    await expect(page.locator('text=Upcoming Exam Reminders')).toBeVisible();
+
+    // 5. Danger Zone / Delete Account Modal Safety Verification
+    await expect(page.locator('h3', { hasText: 'Danger Zone' })).toBeVisible();
+    const openDeleteBtn = page.locator('#btn-open-delete-account');
+    await expect(openDeleteBtn).toBeVisible();
+    await openDeleteBtn.scrollIntoViewIfNeeded();
+    await openDeleteBtn.click();
+    await page.waitForTimeout(400);
+
+    // Verify modal is open and Delete Permanently button is disabled until typing DELETE
+    await expect(page.locator('text=Delete Student Account')).toBeVisible();
+    const confirmDeleteBtn = page.locator('#btn-confirm-delete-account');
+    await expect(confirmDeleteBtn).toBeDisabled();
+
+    // Type DELETE and verify enabled
+    const deleteInput = page.locator('#input-delete-confirm');
+    await deleteInput.fill('DELETE');
+    await expect(confirmDeleteBtn).toBeEnabled();
+
+    // Cancel modal
+    await page.locator('button', { hasText: 'Cancel' }).click();
+  });
+
+  test('Section 7: Subscription & Pricing Tiers Verification', async ({ page }) => {
     await page.goto('/subscription', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(500);
 
@@ -384,3 +495,4 @@ test.describe('Final Production Verification Suite', () => {
   });
 
 });
+

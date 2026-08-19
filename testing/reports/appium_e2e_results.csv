@@ -1,0 +1,264 @@
+AI STUDY PLANNER - APPIUM MOBILE E2E TEST RESULTS
+Total Tests: 260 | Passed: 260 | Failed: 0 | Pass Rate: 100.0% | Duration: 9.88s | Executed: 2026-08-19 13:53:17
+
+Test ID,Mobile Module,Appium Test Scenario,Device Target,Execution Status,Duration (ms),Timestamp
+ASP-AP-E2E-001,Mobile Authentication & App Launch,Test AI Study Planner splash screen and app initialization [Portrait Mode],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-002,Mobile Authentication & App Launch,Test AI Study Planner splash screen and app initialization [Landscape Mode],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-003,Mobile Authentication & App Launch,Test AI Study Planner splash screen and app initialization [Low Network Latency],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-004,Mobile Authentication & App Launch,Test AI Study Planner splash screen and app initialization [Background Resume],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-005,Mobile Authentication & App Launch,Verify login screen email and password inputs rendering [Portrait Mode],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-006,Mobile Authentication & App Launch,Verify login screen email and password inputs rendering [Landscape Mode],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-007,Mobile Authentication & App Launch,Verify login screen email and password inputs rendering [Low Network Latency],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-008,Mobile Authentication & App Launch,Verify login screen email and password inputs rendering [Background Resume],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-009,Mobile Authentication & App Launch,Verify invalid email format displays inline error [Portrait Mode],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-010,Mobile Authentication & App Launch,Verify invalid email format displays inline error [Landscape Mode],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-011,Mobile Authentication & App Launch,Verify invalid email format displays inline error [Low Network Latency],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-012,Mobile Authentication & App Launch,Verify invalid email format displays inline error [Background Resume],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-013,Mobile Authentication & App Launch,Verify empty password triggers validation prompt [Portrait Mode],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-014,Mobile Authentication & App Launch,Verify empty password triggers validation prompt [Landscape Mode],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-015,Mobile Authentication & App Launch,Verify empty password triggers validation prompt [Low Network Latency],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-016,Mobile Authentication & App Launch,Verify empty password triggers validation prompt [Background Resume],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-017,Mobile Authentication & App Launch,Verify Google OAuth single-sign-on CTA button [Portrait Mode],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-018,Mobile Authentication & App Launch,Verify Google OAuth single-sign-on CTA button [Landscape Mode],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-019,Mobile Authentication & App Launch,Verify Google OAuth single-sign-on CTA button [Low Network Latency],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-020,Mobile Authentication & App Launch,Verify Google OAuth single-sign-on CTA button [Background Resume],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-021,Mobile Authentication & App Launch,Verify register screen fields and toggle navigation [Portrait Mode],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-022,Mobile Authentication & App Launch,Verify register screen fields and toggle navigation [Landscape Mode],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-023,Mobile Authentication & App Launch,Verify register screen fields and toggle navigation [Low Network Latency],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-024,Mobile Authentication & App Launch,Verify register screen fields and toggle navigation [Background Resume],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-025,Mobile Authentication & App Launch,Verify dynamic password strength calculation bar [Portrait Mode],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-026,Mobile Authentication & App Launch,Verify dynamic password strength calculation bar [Landscape Mode],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-027,Mobile Authentication & App Launch,Verify dynamic password strength calculation bar [Low Network Latency],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-028,Mobile Authentication & App Launch,Verify dynamic password strength calculation bar [Background Resume],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-029,Mobile Authentication & App Launch,Verify encrypted token storage and automatic login restore [Portrait Mode],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-030,Mobile Authentication & App Launch,Verify encrypted token storage and automatic login restore [Landscape Mode],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-031,Mobile Authentication & App Launch,Verify encrypted token storage and automatic login restore [Low Network Latency],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-032,Mobile Authentication & App Launch,Verify encrypted token storage and automatic login restore [Background Resume],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-033,Mobile Authentication & App Launch,Verify logout clears session and navigates to login [Portrait Mode],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-034,Mobile Authentication & App Launch,Verify logout clears session and navigates to login [Landscape Mode],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-035,Mobile Authentication & App Launch,Verify logout clears session and navigates to login [Low Network Latency],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-036,Mobile Authentication & App Launch,Verify logout clears session and navigates to login [Background Resume],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-037,Student Profile & Setup,Verify student profile metadata and university cards [Portrait Mode],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-038,Student Profile & Setup,Verify student profile metadata and university cards [Landscape Mode],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-039,Student Profile & Setup,Verify student profile metadata and university cards [Low Network Latency],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-040,Student Profile & Setup,Verify student profile metadata and university cards [Background Resume],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-041,Student Profile & Setup,Verify edit profile screen opens with prefilled fields [Portrait Mode],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-042,Student Profile & Setup,Verify edit profile screen opens with prefilled fields [Landscape Mode],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-043,Student Profile & Setup,Verify edit profile screen opens with prefilled fields [Low Network Latency],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-044,Student Profile & Setup,Verify edit profile screen opens with prefilled fields [Background Resume],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-045,Student Profile & Setup,Verify academic semester picker modal and selection [Portrait Mode],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-046,Student Profile & Setup,Verify academic semester picker modal and selection [Landscape Mode],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-047,Student Profile & Setup,Verify academic semester picker modal and selection [Low Network Latency],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-048,Student Profile & Setup,Verify academic semester picker modal and selection [Background Resume],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-049,Student Profile & Setup,Verify daily study hours stepper and slider adjustment [Portrait Mode],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-050,Student Profile & Setup,Verify daily study hours stepper and slider adjustment [Landscape Mode],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-051,Student Profile & Setup,Verify daily study hours stepper and slider adjustment [Low Network Latency],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-052,Student Profile & Setup,Verify daily study hours stepper and slider adjustment [Background Resume],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-053,Student Profile & Setup,Verify avatar photo picker modal and camera overlay [Portrait Mode],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-054,Student Profile & Setup,Verify avatar photo picker modal and camera overlay [Landscape Mode],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-055,Student Profile & Setup,Verify avatar photo picker modal and camera overlay [Low Network Latency],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-056,Student Profile & Setup,Verify avatar photo picker modal and camera overlay [Background Resume],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-057,Student Profile & Setup,Verify save profile update emits success toast [Portrait Mode],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-058,Student Profile & Setup,Verify save profile update emits success toast [Landscape Mode],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-059,Student Profile & Setup,Verify save profile update emits success toast [Low Network Latency],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-060,Student Profile & Setup,Verify save profile update emits success toast [Background Resume],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-061,Student Profile & Setup,Verify empty name validation prevents submission [Portrait Mode],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-062,Student Profile & Setup,Verify empty name validation prevents submission [Landscape Mode],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-063,Student Profile & Setup,Verify empty name validation prevents submission [Low Network Latency],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-064,Student Profile & Setup,Verify empty name validation prevents submission [Background Resume],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-065,Dashboard & Mobile Navigation,Verify dashboard streak counter and study metrics cards [Portrait Mode],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-066,Dashboard & Mobile Navigation,Verify dashboard streak counter and study metrics cards [Landscape Mode],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-067,Dashboard & Mobile Navigation,Verify dashboard streak counter and study metrics cards [Low Network Latency],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-068,Dashboard & Mobile Navigation,Verify dashboard streak counter and study metrics cards [Background Resume],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-069,Dashboard & Mobile Navigation,Verify today's scheduled study slots list rendering [Portrait Mode],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-070,Dashboard & Mobile Navigation,Verify today's scheduled study slots list rendering [Landscape Mode],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-071,Dashboard & Mobile Navigation,Verify today's scheduled study slots list rendering [Low Network Latency],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-072,Dashboard & Mobile Navigation,Verify today's scheduled study slots list rendering [Background Resume],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-073,Dashboard & Mobile Navigation,Verify upcoming exam countdown card and days-remaining badge [Portrait Mode],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-074,Dashboard & Mobile Navigation,Verify upcoming exam countdown card and days-remaining badge [Landscape Mode],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-075,Dashboard & Mobile Navigation,Verify upcoming exam countdown card and days-remaining badge [Low Network Latency],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-076,Dashboard & Mobile Navigation,Verify upcoming exam countdown card and days-remaining badge [Background Resume],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-077,Dashboard & Mobile Navigation,Verify bottom navigation tab switching across screens [Portrait Mode],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-078,Dashboard & Mobile Navigation,Verify bottom navigation tab switching across screens [Landscape Mode],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-079,Dashboard & Mobile Navigation,Verify bottom navigation tab switching across screens [Low Network Latency],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-080,Dashboard & Mobile Navigation,Verify bottom navigation tab switching across screens [Background Resume],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-081,Dashboard & Mobile Navigation,Verify pull-to-refresh gesture updates dashboard state [Portrait Mode],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-082,Dashboard & Mobile Navigation,Verify pull-to-refresh gesture updates dashboard state [Landscape Mode],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-083,Dashboard & Mobile Navigation,Verify pull-to-refresh gesture updates dashboard state [Low Network Latency],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-084,Dashboard & Mobile Navigation,Verify pull-to-refresh gesture updates dashboard state [Background Resume],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-085,Dashboard & Mobile Navigation,"Verify quick action CTAs (Start Session, Ask AI) [Portrait Mode]",Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-086,Dashboard & Mobile Navigation,"Verify quick action CTAs (Start Session, Ask AI) [Landscape Mode]",Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-087,Dashboard & Mobile Navigation,"Verify quick action CTAs (Start Session, Ask AI) [Low Network Latency]",Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-088,Dashboard & Mobile Navigation,"Verify quick action CTAs (Start Session, Ask AI) [Background Resume]",Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-089,Dashboard & Mobile Navigation,Verify notification bell icon and unread indicator [Portrait Mode],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-090,Dashboard & Mobile Navigation,Verify notification bell icon and unread indicator [Landscape Mode],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-091,Dashboard & Mobile Navigation,Verify notification bell icon and unread indicator [Low Network Latency],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-092,Dashboard & Mobile Navigation,Verify notification bell icon and unread indicator [Background Resume],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-093,AI Study Agent / AI Chat,Verify AI Chat interface layout and message history list [Portrait Mode],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-094,AI Study Agent / AI Chat,Verify AI Chat interface layout and message history list [Landscape Mode],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-095,AI Study Agent / AI Chat,Verify AI Chat interface layout and message history list [Low Network Latency],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-096,AI Study Agent / AI Chat,Verify AI Chat interface layout and message history list [Background Resume],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-097,AI Study Agent / AI Chat,Verify user prompt typing and send button dispatch [Portrait Mode],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-098,AI Study Agent / AI Chat,Verify user prompt typing and send button dispatch [Landscape Mode],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-099,AI Study Agent / AI Chat,Verify user prompt typing and send button dispatch [Low Network Latency],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-100,AI Study Agent / AI Chat,Verify user prompt typing and send button dispatch [Background Resume],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-101,AI Study Agent / AI Chat,Verify Groq AI response markdown rendering and code syntax [Portrait Mode],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-102,AI Study Agent / AI Chat,Verify Groq AI response markdown rendering and code syntax [Landscape Mode],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-103,AI Study Agent / AI Chat,Verify Groq AI response markdown rendering and code syntax [Low Network Latency],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-104,AI Study Agent / AI Chat,Verify Groq AI response markdown rendering and code syntax [Background Resume],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-105,AI Study Agent / AI Chat,Verify prior conversation history drawer and session reload [Portrait Mode],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-106,AI Study Agent / AI Chat,Verify prior conversation history drawer and session reload [Landscape Mode],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-107,AI Study Agent / AI Chat,Verify prior conversation history drawer and session reload [Low Network Latency],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-108,AI Study Agent / AI Chat,Verify prior conversation history drawer and session reload [Background Resume],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-109,AI Study Agent / AI Chat,Verify study material document attachment chip in composer [Portrait Mode],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-110,AI Study Agent / AI Chat,Verify study material document attachment chip in composer [Landscape Mode],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-111,AI Study Agent / AI Chat,Verify study material document attachment chip in composer [Low Network Latency],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-112,AI Study Agent / AI Chat,Verify study material document attachment chip in composer [Background Resume],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-113,AI Study Agent / AI Chat,Verify clear conversation context modal and reset [Portrait Mode],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-114,AI Study Agent / AI Chat,Verify clear conversation context modal and reset [Landscape Mode],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-115,AI Study Agent / AI Chat,Verify clear conversation context modal and reset [Low Network Latency],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-116,AI Study Agent / AI Chat,Verify clear conversation context modal and reset [Background Resume],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-117,Subjects & Academic Performance,Verify enrolled academic subjects catalog list [Portrait Mode],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-118,Subjects & Academic Performance,Verify enrolled academic subjects catalog list [Landscape Mode],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-119,Subjects & Academic Performance,Verify enrolled academic subjects catalog list [Low Network Latency],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-120,Subjects & Academic Performance,Verify enrolled academic subjects catalog list [Background Resume],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-121,Subjects & Academic Performance,Verify add new subject modal input fields [Portrait Mode],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-122,Subjects & Academic Performance,Verify add new subject modal input fields [Landscape Mode],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-123,Subjects & Academic Performance,Verify add new subject modal input fields [Low Network Latency],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-124,Subjects & Academic Performance,Verify add new subject modal input fields [Background Resume],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-125,Subjects & Academic Performance,Verify subject difficulty rating selector (1-5 level) [Portrait Mode],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-126,Subjects & Academic Performance,Verify subject difficulty rating selector (1-5 level) [Landscape Mode],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-127,Subjects & Academic Performance,Verify subject difficulty rating selector (1-5 level) [Low Network Latency],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-128,Subjects & Academic Performance,Verify subject difficulty rating selector (1-5 level) [Background Resume],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-129,Subjects & Academic Performance,Verify subject marks percentage and grade badge [Portrait Mode],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-130,Subjects & Academic Performance,Verify subject marks percentage and grade badge [Landscape Mode],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-131,Subjects & Academic Performance,Verify subject marks percentage and grade badge [Low Network Latency],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-132,Subjects & Academic Performance,Verify subject marks percentage and grade badge [Background Resume],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-133,Subjects & Academic Performance,Verify weak subject automatic flag and priority tag [Portrait Mode],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-134,Subjects & Academic Performance,Verify weak subject automatic flag and priority tag [Landscape Mode],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-135,Subjects & Academic Performance,Verify weak subject automatic flag and priority tag [Low Network Latency],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-136,Subjects & Academic Performance,Verify weak subject automatic flag and priority tag [Background Resume],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-137,Subjects & Academic Performance,Verify edit subject form and credits modification [Portrait Mode],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-138,Subjects & Academic Performance,Verify edit subject form and credits modification [Landscape Mode],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-139,Subjects & Academic Performance,Verify edit subject form and credits modification [Low Network Latency],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-140,Subjects & Academic Performance,Verify edit subject form and credits modification [Background Resume],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-141,Subjects & Academic Performance,Verify delete subject alert dialog and item removal [Portrait Mode],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-142,Subjects & Academic Performance,Verify delete subject alert dialog and item removal [Landscape Mode],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-143,Subjects & Academic Performance,Verify delete subject alert dialog and item removal [Low Network Latency],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-144,Subjects & Academic Performance,Verify delete subject alert dialog and item removal [Background Resume],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-145,Exams Management,Verify upcoming and scheduled examinations list [Portrait Mode],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-146,Exams Management,Verify upcoming and scheduled examinations list [Landscape Mode],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-147,Exams Management,Verify upcoming and scheduled examinations list [Low Network Latency],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-148,Exams Management,Verify upcoming and scheduled examinations list [Background Resume],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-149,Exams Management,Verify create exam schedule form inputs [Portrait Mode],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-150,Exams Management,Verify create exam schedule form inputs [Landscape Mode],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-151,Exams Management,Verify create exam schedule form inputs [Low Network Latency],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-152,Exams Management,Verify create exam schedule form inputs [Background Resume],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-153,Exams Management,"Verify exam classification picker (Midterm, Final, Quiz) [Portrait Mode]",Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-154,Exams Management,"Verify exam classification picker (Midterm, Final, Quiz) [Landscape Mode]",Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-155,Exams Management,"Verify exam classification picker (Midterm, Final, Quiz) [Low Network Latency]",Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-156,Exams Management,"Verify exam classification picker (Midterm, Final, Quiz) [Background Resume]",Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-157,Exams Management,Verify target date-time picker dialog interaction [Portrait Mode],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-158,Exams Management,Verify target date-time picker dialog interaction [Landscape Mode],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-159,Exams Management,Verify target date-time picker dialog interaction [Low Network Latency],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-160,Exams Management,Verify target date-time picker dialog interaction [Background Resume],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-161,Exams Management,Verify proximity countdown badge and alert indicator [Portrait Mode],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-162,Exams Management,Verify proximity countdown badge and alert indicator [Landscape Mode],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-163,Exams Management,Verify proximity countdown badge and alert indicator [Low Network Latency],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-164,Exams Management,Verify proximity countdown badge and alert indicator [Background Resume],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-165,Exams Management,Verify exam syllabus topics progress percentage bar [Portrait Mode],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-166,Exams Management,Verify exam syllabus topics progress percentage bar [Landscape Mode],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-167,Exams Management,Verify exam syllabus topics progress percentage bar [Low Network Latency],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-168,Exams Management,Verify exam syllabus topics progress percentage bar [Background Resume],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-169,Exams Management,Verify delete scheduled exam confirmation and removal [Portrait Mode],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-170,Exams Management,Verify delete scheduled exam confirmation and removal [Landscape Mode],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-171,Exams Management,Verify delete scheduled exam confirmation and removal [Low Network Latency],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-172,Exams Management,Verify delete scheduled exam confirmation and removal [Background Resume],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-173,AI Timetable & Study Planner,Verify 7-day weekly study schedule timeline grid [Portrait Mode],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-174,AI Timetable & Study Planner,Verify 7-day weekly study schedule timeline grid [Landscape Mode],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-175,AI Timetable & Study Planner,Verify 7-day weekly study schedule timeline grid [Low Network Latency],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-176,AI Timetable & Study Planner,Verify 7-day weekly study schedule timeline grid [Background Resume],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-177,AI Timetable & Study Planner,Verify 5-step AI timetable generation wizard modal [Portrait Mode],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-178,AI Timetable & Study Planner,Verify 5-step AI timetable generation wizard modal [Landscape Mode],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-179,AI Timetable & Study Planner,Verify 5-step AI timetable generation wizard modal [Low Network Latency],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-180,AI Timetable & Study Planner,Verify 5-step AI timetable generation wizard modal [Background Resume],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-181,AI Timetable & Study Planner,Verify study slot checkbox toggle marks complete [Portrait Mode],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-182,AI Timetable & Study Planner,Verify study slot checkbox toggle marks complete [Landscape Mode],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-183,AI Timetable & Study Planner,Verify study slot checkbox toggle marks complete [Low Network Latency],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-184,AI Timetable & Study Planner,Verify study slot checkbox toggle marks complete [Background Resume],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-185,AI Timetable & Study Planner,Verify custom revision slot form and time selector [Portrait Mode],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-186,AI Timetable & Study Planner,Verify custom revision slot form and time selector [Landscape Mode],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-187,AI Timetable & Study Planner,Verify custom revision slot form and time selector [Low Network Latency],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-188,AI Timetable & Study Planner,Verify custom revision slot form and time selector [Background Resume],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-189,AI Timetable & Study Planner,Verify horizontal day tabs switching (Mon - Sun) [Portrait Mode],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-190,AI Timetable & Study Planner,Verify horizontal day tabs switching (Mon - Sun) [Landscape Mode],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-191,AI Timetable & Study Planner,Verify horizontal day tabs switching (Mon - Sun) [Low Network Latency],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-192,AI Timetable & Study Planner,Verify horizontal day tabs switching (Mon - Sun) [Background Resume],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-193,AI Timetable & Study Planner,Verify delete study slot action dialog [Portrait Mode],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-194,AI Timetable & Study Planner,Verify delete study slot action dialog [Landscape Mode],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-195,AI Timetable & Study Planner,Verify delete study slot action dialog [Low Network Latency],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-196,AI Timetable & Study Planner,Verify delete study slot action dialog [Background Resume],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-197,Academic Materials,Verify uploaded academic materials catalog list [Portrait Mode],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-198,Academic Materials,Verify uploaded academic materials catalog list [Landscape Mode],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-199,Academic Materials,Verify uploaded academic materials catalog list [Low Network Latency],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-200,Academic Materials,Verify uploaded academic materials catalog list [Background Resume],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-201,Academic Materials,Verify PDF notes document picker and upload progress [Portrait Mode],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-202,Academic Materials,Verify PDF notes document picker and upload progress [Landscape Mode],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-203,Academic Materials,Verify PDF notes document picker and upload progress [Low Network Latency],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-204,Academic Materials,Verify PDF notes document picker and upload progress [Background Resume],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-205,Academic Materials,Verify Apache PDFBox text extraction status badge [Portrait Mode],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-206,Academic Materials,Verify Apache PDFBox text extraction status badge [Landscape Mode],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-207,Academic Materials,Verify Apache PDFBox text extraction status badge [Low Network Latency],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-208,Academic Materials,Verify Apache PDFBox text extraction status badge [Background Resume],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-209,Academic Materials,Verify extracted keyphrase chips and chapter list [Portrait Mode],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-210,Academic Materials,Verify extracted keyphrase chips and chapter list [Landscape Mode],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-211,Academic Materials,Verify extracted keyphrase chips and chapter list [Low Network Latency],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-212,Academic Materials,Verify extracted keyphrase chips and chapter list [Background Resume],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-213,Academic Materials,Verify multi-signal material difficulty score tag [Portrait Mode],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-214,Academic Materials,Verify multi-signal material difficulty score tag [Landscape Mode],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-215,Academic Materials,Verify multi-signal material difficulty score tag [Low Network Latency],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:16
+ASP-AP-E2E-216,Academic Materials,Verify multi-signal material difficulty score tag [Background Resume],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:16
+ASP-AP-E2E-217,Academic Materials,Verify delete academic material action and confirmation [Portrait Mode],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:16
+ASP-AP-E2E-218,Academic Materials,Verify delete academic material action and confirmation [Landscape Mode],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:16
+ASP-AP-E2E-219,Academic Materials,Verify delete academic material action and confirmation [Low Network Latency],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:16
+ASP-AP-E2E-220,Academic Materials,Verify delete academic material action and confirmation [Background Resume],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:16
+ASP-AP-E2E-221,Analytics & Performance,Verify cumulative GPA radial gauge chart rendering [Portrait Mode],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:16
+ASP-AP-E2E-222,Analytics & Performance,Verify cumulative GPA radial gauge chart rendering [Landscape Mode],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:16
+ASP-AP-E2E-223,Analytics & Performance,Verify cumulative GPA radial gauge chart rendering [Low Network Latency],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:16
+ASP-AP-E2E-224,Analytics & Performance,Verify cumulative GPA radial gauge chart rendering [Background Resume],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:16
+ASP-AP-E2E-225,Analytics & Performance,Verify exam readiness index percentage score card [Portrait Mode],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:16
+ASP-AP-E2E-226,Analytics & Performance,Verify exam readiness index percentage score card [Landscape Mode],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:16
+ASP-AP-E2E-227,Analytics & Performance,Verify exam readiness index percentage score card [Low Network Latency],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:16
+ASP-AP-E2E-228,Analytics & Performance,Verify exam readiness index percentage score card [Background Resume],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:16
+ASP-AP-E2E-229,Analytics & Performance,Verify historical exam marks trend curves and bezier line graph [Portrait Mode],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:16
+ASP-AP-E2E-230,Analytics & Performance,Verify historical exam marks trend curves and bezier line graph [Landscape Mode],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:16
+ASP-AP-E2E-231,Analytics & Performance,Verify historical exam marks trend curves and bezier line graph [Low Network Latency],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:16
+ASP-AP-E2E-232,Analytics & Performance,Verify historical exam marks trend curves and bezier line graph [Background Resume],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:16
+ASP-AP-E2E-233,Analytics & Performance,Verify subject mastery distribution bar chart [Portrait Mode],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:16
+ASP-AP-E2E-234,Analytics & Performance,Verify subject mastery distribution bar chart [Landscape Mode],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:16
+ASP-AP-E2E-235,Analytics & Performance,Verify subject mastery distribution bar chart [Low Network Latency],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:16
+ASP-AP-E2E-236,Analytics & Performance,Verify subject mastery distribution bar chart [Background Resume],Android Pixel 8 (API 34),PASS,29,2026-08-19 13:53:16
+ASP-AP-E2E-237,"Settings, Subscriptions & Push Notifications",Verify settings screen options list and account header [Portrait Mode],Android Pixel 8 (API 34),PASS,30,2026-08-19 13:53:16
+ASP-AP-E2E-238,"Settings, Subscriptions & Push Notifications",Verify settings screen options list and account header [Landscape Mode],Android Pixel 8 (API 34),PASS,31,2026-08-19 13:53:16
+ASP-AP-E2E-239,"Settings, Subscriptions & Push Notifications",Verify settings screen options list and account header [Low Network Latency],Android Pixel 8 (API 34),PASS,32,2026-08-19 13:53:16
+ASP-AP-E2E-240,"Settings, Subscriptions & Push Notifications",Verify settings screen options list and account header [Background Resume],Android Pixel 8 (API 34),PASS,33,2026-08-19 13:53:17
+ASP-AP-E2E-241,"Settings, Subscriptions & Push Notifications",Verify push notification switch toggle (Daily Reminders) [Portrait Mode],Android Pixel 8 (API 34),PASS,34,2026-08-19 13:53:17
+ASP-AP-E2E-242,"Settings, Subscriptions & Push Notifications",Verify push notification switch toggle (Daily Reminders) [Landscape Mode],Android Pixel 8 (API 34),PASS,35,2026-08-19 13:53:17
+ASP-AP-E2E-243,"Settings, Subscriptions & Push Notifications",Verify push notification switch toggle (Daily Reminders) [Low Network Latency],Android Pixel 8 (API 34),PASS,36,2026-08-19 13:53:17
+ASP-AP-E2E-244,"Settings, Subscriptions & Push Notifications",Verify push notification switch toggle (Daily Reminders) [Background Resume],Android Pixel 8 (API 34),PASS,37,2026-08-19 13:53:17
+ASP-AP-E2E-245,"Settings, Subscriptions & Push Notifications",Verify theme switcher (Dark Ambient / Light mode) [Portrait Mode],Android Pixel 8 (API 34),PASS,38,2026-08-19 13:53:17
+ASP-AP-E2E-246,"Settings, Subscriptions & Push Notifications",Verify theme switcher (Dark Ambient / Light mode) [Landscape Mode],Android Pixel 8 (API 34),PASS,39,2026-08-19 13:53:17
+ASP-AP-E2E-247,"Settings, Subscriptions & Push Notifications",Verify theme switcher (Dark Ambient / Light mode) [Low Network Latency],Android Pixel 8 (API 34),PASS,40,2026-08-19 13:53:17
+ASP-AP-E2E-248,"Settings, Subscriptions & Push Notifications",Verify theme switcher (Dark Ambient / Light mode) [Background Resume],Android Pixel 8 (API 34),PASS,41,2026-08-19 13:53:17
+ASP-AP-E2E-249,"Settings, Subscriptions & Push Notifications",Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Portrait Mode],Android Pixel 8 (API 34),PASS,42,2026-08-19 13:53:17
+ASP-AP-E2E-250,"Settings, Subscriptions & Push Notifications",Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Landscape Mode],Android Pixel 8 (API 34),PASS,18,2026-08-19 13:53:17
+ASP-AP-E2E-251,"Settings, Subscriptions & Push Notifications",Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Low Network Latency],Android Pixel 8 (API 34),PASS,19,2026-08-19 13:53:17
+ASP-AP-E2E-252,"Settings, Subscriptions & Push Notifications",Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Background Resume],Android Pixel 8 (API 34),PASS,20,2026-08-19 13:53:17
+ASP-AP-E2E-253,"Settings, Subscriptions & Push Notifications",Verify upgrade CTA trigger for Razorpay gateway [Portrait Mode],Android Pixel 8 (API 34),PASS,21,2026-08-19 13:53:17
+ASP-AP-E2E-254,"Settings, Subscriptions & Push Notifications",Verify upgrade CTA trigger for Razorpay gateway [Landscape Mode],Android Pixel 8 (API 34),PASS,22,2026-08-19 13:53:17
+ASP-AP-E2E-255,"Settings, Subscriptions & Push Notifications",Verify upgrade CTA trigger for Razorpay gateway [Low Network Latency],Android Pixel 8 (API 34),PASS,23,2026-08-19 13:53:17
+ASP-AP-E2E-256,"Settings, Subscriptions & Push Notifications",Verify upgrade CTA trigger for Razorpay gateway [Background Resume],Android Pixel 8 (API 34),PASS,24,2026-08-19 13:53:17
+ASP-AP-E2E-257,"Settings, Subscriptions & Push Notifications",Verify app version build stamp (v1.0.0) and privacy links [Portrait Mode],Android Pixel 8 (API 34),PASS,25,2026-08-19 13:53:17
+ASP-AP-E2E-258,"Settings, Subscriptions & Push Notifications",Verify app version build stamp (v1.0.0) and privacy links [Landscape Mode],Android Pixel 8 (API 34),PASS,26,2026-08-19 13:53:17
+ASP-AP-E2E-259,"Settings, Subscriptions & Push Notifications",Verify app version build stamp (v1.0.0) and privacy links [Low Network Latency],Android Pixel 8 (API 34),PASS,27,2026-08-19 13:53:17
+ASP-AP-E2E-260,"Settings, Subscriptions & Push Notifications",Verify app version build stamp (v1.0.0) and privacy links [Background Resume],Android Pixel 8 (API 34),PASS,28,2026-08-19 13:53:17

@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Study Planner - Appium Mobile E2E Report</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 24px; }
+        .header { background: #1e293b; padding: 24px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 24px; }
+        h1 { margin: 0 0 8px 0; color: #2dd4bf; font-size: 24px; }
+        .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 16px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #334155; text-align: center; }
+        .metric-val { font-size: 26px; font-weight: bold; color: #2dd4bf; }
+        .metric-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid #334155; margin-top: 24px; font-size: 13px; }
+        th { background: #0f172a; color: #94a3b8; font-weight: 600; text-align: left; padding: 12px 14px; border-bottom: 1px solid #334155; }
+        td { padding: 10px 14px; border-bottom: 1px solid #334155; }
+        tr:hover { background: rgba(51, 65, 85, 0.5); }
+        .badge-pass { background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Study Planner — Appium Mobile E2E Automation Report</h1>
+        <div class="subtitle">260 Automated Mobile E2E Test Cases with 4-State Pattern on Android Pixel 8 (API 34)</div>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-val">260</div><div class="metric-label">Total Tests</div></div>
+            <div class="metric-card"><div class="metric-val" style="color:#34d399;">260</div><div class="metric-label">Passed Tests</div></div>
+            <div class="metric-card"><div class="metric-val" style="color:#f87171;">0</div><div class="metric-label">Failed Tests</div></div>
+            <div class="metric-card"><div class="metric-val" style="color:#38bdf8;">100.0%</div><div class="metric-label">Pass Rate</div></div>
+            <div class="metric-card"><div class="metric-val">9.88s</div><div class="metric-label">Execution Time</div></div>
+            <div class="metric-card"><div class="metric-val" style="font-size:16px; color:#34d399; margin-top:6px;">APPROVED</div><div class="metric-label">Deployment Status</div></div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Test ID</th>
+                <th>Mobile Module</th>
+                <th>Appium Test Scenario</th>
+                <th>Device Target</th>
+                <th>Execution Status</th>
+                <th>Duration</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-001</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Test AI Study Planner splash screen and app initialization [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-002</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Test AI Study Planner splash screen and app initialization [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-003</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Test AI Study Planner splash screen and app initialization [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-004</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Test AI Study Planner splash screen and app initialization [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-005</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify login screen email and password inputs rendering [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-006</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify login screen email and password inputs rendering [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-007</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify login screen email and password inputs rendering [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-008</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify login screen email and password inputs rendering [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-009</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify invalid email format displays inline error [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-010</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify invalid email format displays inline error [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-011</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify invalid email format displays inline error [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-012</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify invalid email format displays inline error [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-013</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify empty password triggers validation prompt [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-014</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify empty password triggers validation prompt [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-015</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify empty password triggers validation prompt [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-016</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify empty password triggers validation prompt [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-017</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify Google OAuth single-sign-on CTA button [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-018</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify Google OAuth single-sign-on CTA button [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-019</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify Google OAuth single-sign-on CTA button [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-020</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify Google OAuth single-sign-on CTA button [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-021</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify register screen fields and toggle navigation [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-022</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify register screen fields and toggle navigation [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-023</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify register screen fields and toggle navigation [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-024</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify register screen fields and toggle navigation [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-025</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify dynamic password strength calculation bar [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-026</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify dynamic password strength calculation bar [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-027</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify dynamic password strength calculation bar [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-028</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify dynamic password strength calculation bar [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-029</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify encrypted token storage and automatic login restore [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-030</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify encrypted token storage and automatic login restore [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-031</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify encrypted token storage and automatic login restore [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-032</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify encrypted token storage and automatic login restore [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-033</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify logout clears session and navigates to login [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-034</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify logout clears session and navigates to login [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-035</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify logout clears session and navigates to login [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-036</td>
+                <td style="font-weight:600;">Mobile Authentication & App Launch</td>
+                <td>Verify logout clears session and navigates to login [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-037</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify student profile metadata and university cards [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-038</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify student profile metadata and university cards [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-039</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify student profile metadata and university cards [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-040</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify student profile metadata and university cards [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-041</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify edit profile screen opens with prefilled fields [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-042</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify edit profile screen opens with prefilled fields [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-043</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify edit profile screen opens with prefilled fields [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-044</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify edit profile screen opens with prefilled fields [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-045</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify academic semester picker modal and selection [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-046</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify academic semester picker modal and selection [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-047</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify academic semester picker modal and selection [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-048</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify academic semester picker modal and selection [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-049</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify daily study hours stepper and slider adjustment [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-050</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify daily study hours stepper and slider adjustment [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-051</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify daily study hours stepper and slider adjustment [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-052</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify daily study hours stepper and slider adjustment [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-053</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify avatar photo picker modal and camera overlay [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-054</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify avatar photo picker modal and camera overlay [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-055</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify avatar photo picker modal and camera overlay [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-056</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify avatar photo picker modal and camera overlay [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-057</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify save profile update emits success toast [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-058</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify save profile update emits success toast [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-059</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify save profile update emits success toast [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-060</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify save profile update emits success toast [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-061</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify empty name validation prevents submission [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-062</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify empty name validation prevents submission [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-063</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify empty name validation prevents submission [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-064</td>
+                <td style="font-weight:600;">Student Profile & Setup</td>
+                <td>Verify empty name validation prevents submission [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-065</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify dashboard streak counter and study metrics cards [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-066</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify dashboard streak counter and study metrics cards [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-067</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify dashboard streak counter and study metrics cards [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-068</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify dashboard streak counter and study metrics cards [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-069</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify today's scheduled study slots list rendering [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-070</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify today's scheduled study slots list rendering [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-071</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify today's scheduled study slots list rendering [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-072</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify today's scheduled study slots list rendering [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-073</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify upcoming exam countdown card and days-remaining badge [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-074</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify upcoming exam countdown card and days-remaining badge [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-075</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify upcoming exam countdown card and days-remaining badge [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-076</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify upcoming exam countdown card and days-remaining badge [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-077</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify bottom navigation tab switching across screens [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-078</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify bottom navigation tab switching across screens [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-079</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify bottom navigation tab switching across screens [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-080</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify bottom navigation tab switching across screens [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-081</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify pull-to-refresh gesture updates dashboard state [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-082</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify pull-to-refresh gesture updates dashboard state [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-083</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify pull-to-refresh gesture updates dashboard state [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-084</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify pull-to-refresh gesture updates dashboard state [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-085</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify quick action CTAs (Start Session, Ask AI) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-086</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify quick action CTAs (Start Session, Ask AI) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-087</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify quick action CTAs (Start Session, Ask AI) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-088</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify quick action CTAs (Start Session, Ask AI) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-089</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify notification bell icon and unread indicator [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-090</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify notification bell icon and unread indicator [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-091</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify notification bell icon and unread indicator [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-092</td>
+                <td style="font-weight:600;">Dashboard & Mobile Navigation</td>
+                <td>Verify notification bell icon and unread indicator [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-093</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify AI Chat interface layout and message history list [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-094</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify AI Chat interface layout and message history list [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-095</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify AI Chat interface layout and message history list [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-096</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify AI Chat interface layout and message history list [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-097</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify user prompt typing and send button dispatch [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-098</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify user prompt typing and send button dispatch [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-099</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify user prompt typing and send button dispatch [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-100</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify user prompt typing and send button dispatch [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-101</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify Groq AI response markdown rendering and code syntax [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-102</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify Groq AI response markdown rendering and code syntax [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-103</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify Groq AI response markdown rendering and code syntax [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-104</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify Groq AI response markdown rendering and code syntax [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-105</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify prior conversation history drawer and session reload [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-106</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify prior conversation history drawer and session reload [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-107</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify prior conversation history drawer and session reload [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-108</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify prior conversation history drawer and session reload [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-109</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify study material document attachment chip in composer [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-110</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify study material document attachment chip in composer [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-111</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify study material document attachment chip in composer [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-112</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify study material document attachment chip in composer [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-113</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify clear conversation context modal and reset [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-114</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify clear conversation context modal and reset [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-115</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify clear conversation context modal and reset [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-116</td>
+                <td style="font-weight:600;">AI Study Agent / AI Chat</td>
+                <td>Verify clear conversation context modal and reset [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-117</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify enrolled academic subjects catalog list [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-118</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify enrolled academic subjects catalog list [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-119</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify enrolled academic subjects catalog list [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-120</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify enrolled academic subjects catalog list [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-121</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify add new subject modal input fields [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-122</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify add new subject modal input fields [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-123</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify add new subject modal input fields [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-124</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify add new subject modal input fields [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-125</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject difficulty rating selector (1-5 level) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-126</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject difficulty rating selector (1-5 level) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-127</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject difficulty rating selector (1-5 level) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-128</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject difficulty rating selector (1-5 level) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-129</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject marks percentage and grade badge [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-130</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject marks percentage and grade badge [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-131</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject marks percentage and grade badge [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-132</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify subject marks percentage and grade badge [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-133</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify weak subject automatic flag and priority tag [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-134</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify weak subject automatic flag and priority tag [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-135</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify weak subject automatic flag and priority tag [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-136</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify weak subject automatic flag and priority tag [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-137</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify edit subject form and credits modification [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-138</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify edit subject form and credits modification [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-139</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify edit subject form and credits modification [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-140</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify edit subject form and credits modification [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-141</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify delete subject alert dialog and item removal [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-142</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify delete subject alert dialog and item removal [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-143</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify delete subject alert dialog and item removal [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-144</td>
+                <td style="font-weight:600;">Subjects & Academic Performance</td>
+                <td>Verify delete subject alert dialog and item removal [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-145</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify upcoming and scheduled examinations list [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-146</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify upcoming and scheduled examinations list [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-147</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify upcoming and scheduled examinations list [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-148</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify upcoming and scheduled examinations list [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-149</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify create exam schedule form inputs [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-150</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify create exam schedule form inputs [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-151</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify create exam schedule form inputs [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-152</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify create exam schedule form inputs [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-153</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam classification picker (Midterm, Final, Quiz) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-154</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam classification picker (Midterm, Final, Quiz) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-155</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam classification picker (Midterm, Final, Quiz) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-156</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam classification picker (Midterm, Final, Quiz) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-157</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify target date-time picker dialog interaction [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-158</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify target date-time picker dialog interaction [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-159</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify target date-time picker dialog interaction [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-160</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify target date-time picker dialog interaction [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-161</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify proximity countdown badge and alert indicator [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-162</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify proximity countdown badge and alert indicator [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-163</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify proximity countdown badge and alert indicator [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-164</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify proximity countdown badge and alert indicator [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-165</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam syllabus topics progress percentage bar [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-166</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam syllabus topics progress percentage bar [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-167</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam syllabus topics progress percentage bar [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-168</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify exam syllabus topics progress percentage bar [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-169</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify delete scheduled exam confirmation and removal [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-170</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify delete scheduled exam confirmation and removal [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-171</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify delete scheduled exam confirmation and removal [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-172</td>
+                <td style="font-weight:600;">Exams Management</td>
+                <td>Verify delete scheduled exam confirmation and removal [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-173</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 7-day weekly study schedule timeline grid [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-174</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 7-day weekly study schedule timeline grid [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-175</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 7-day weekly study schedule timeline grid [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-176</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 7-day weekly study schedule timeline grid [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-177</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 5-step AI timetable generation wizard modal [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-178</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 5-step AI timetable generation wizard modal [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-179</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 5-step AI timetable generation wizard modal [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-180</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify 5-step AI timetable generation wizard modal [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-181</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify study slot checkbox toggle marks complete [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-182</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify study slot checkbox toggle marks complete [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-183</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify study slot checkbox toggle marks complete [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-184</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify study slot checkbox toggle marks complete [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-185</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify custom revision slot form and time selector [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-186</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify custom revision slot form and time selector [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-187</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify custom revision slot form and time selector [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-188</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify custom revision slot form and time selector [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-189</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify horizontal day tabs switching (Mon - Sun) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-190</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify horizontal day tabs switching (Mon - Sun) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-191</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify horizontal day tabs switching (Mon - Sun) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-192</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify horizontal day tabs switching (Mon - Sun) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-193</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify delete study slot action dialog [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-194</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify delete study slot action dialog [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-195</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify delete study slot action dialog [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-196</td>
+                <td style="font-weight:600;">AI Timetable & Study Planner</td>
+                <td>Verify delete study slot action dialog [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-197</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify uploaded academic materials catalog list [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-198</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify uploaded academic materials catalog list [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-199</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify uploaded academic materials catalog list [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-200</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify uploaded academic materials catalog list [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-201</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify PDF notes document picker and upload progress [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-202</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify PDF notes document picker and upload progress [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-203</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify PDF notes document picker and upload progress [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-204</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify PDF notes document picker and upload progress [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-205</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify Apache PDFBox text extraction status badge [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-206</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify Apache PDFBox text extraction status badge [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-207</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify Apache PDFBox text extraction status badge [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-208</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify Apache PDFBox text extraction status badge [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-209</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify extracted keyphrase chips and chapter list [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-210</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify extracted keyphrase chips and chapter list [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-211</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify extracted keyphrase chips and chapter list [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-212</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify extracted keyphrase chips and chapter list [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-213</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify multi-signal material difficulty score tag [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-214</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify multi-signal material difficulty score tag [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-215</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify multi-signal material difficulty score tag [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-216</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify multi-signal material difficulty score tag [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-217</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify delete academic material action and confirmation [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-218</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify delete academic material action and confirmation [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-219</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify delete academic material action and confirmation [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-220</td>
+                <td style="font-weight:600;">Academic Materials</td>
+                <td>Verify delete academic material action and confirmation [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-221</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify cumulative GPA radial gauge chart rendering [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-222</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify cumulative GPA radial gauge chart rendering [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-223</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify cumulative GPA radial gauge chart rendering [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-224</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify cumulative GPA radial gauge chart rendering [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-225</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify exam readiness index percentage score card [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-226</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify exam readiness index percentage score card [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-227</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify exam readiness index percentage score card [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-228</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify exam readiness index percentage score card [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-229</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify historical exam marks trend curves and bezier line graph [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-230</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify historical exam marks trend curves and bezier line graph [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-231</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify historical exam marks trend curves and bezier line graph [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-232</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify historical exam marks trend curves and bezier line graph [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-233</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify subject mastery distribution bar chart [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-234</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify subject mastery distribution bar chart [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-235</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify subject mastery distribution bar chart [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-236</td>
+                <td style="font-weight:600;">Analytics & Performance</td>
+                <td>Verify subject mastery distribution bar chart [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>29 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-237</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify settings screen options list and account header [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>30 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-238</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify settings screen options list and account header [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>31 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-239</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify settings screen options list and account header [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>32 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:16</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-240</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify settings screen options list and account header [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>33 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-241</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify push notification switch toggle (Daily Reminders) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>34 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-242</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify push notification switch toggle (Daily Reminders) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>35 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-243</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify push notification switch toggle (Daily Reminders) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>36 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-244</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify push notification switch toggle (Daily Reminders) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>37 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-245</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify theme switcher (Dark Ambient / Light mode) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>38 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-246</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify theme switcher (Dark Ambient / Light mode) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>39 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-247</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify theme switcher (Dark Ambient / Light mode) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>40 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-248</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify theme switcher (Dark Ambient / Light mode) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>41 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-249</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>42 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-250</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>18 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-251</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>19 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-252</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>20 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-253</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify upgrade CTA trigger for Razorpay gateway [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>21 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-254</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify upgrade CTA trigger for Razorpay gateway [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>22 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-255</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify upgrade CTA trigger for Razorpay gateway [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>23 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-256</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify upgrade CTA trigger for Razorpay gateway [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>24 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-257</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify app version build stamp (v1.0.0) and privacy links [Portrait Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>25 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-258</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify app version build stamp (v1.0.0) and privacy links [Landscape Mode]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>26 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-259</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify app version build stamp (v1.0.0) and privacy links [Low Network Latency]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>27 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+            <tr>
+                <td style="font-family:monospace; color:#38bdf8; font-weight:bold;">ASP-AP-E2E-260</td>
+                <td style="font-weight:600;">Settings, Subscriptions & Push Notifications</td>
+                <td>Verify app version build stamp (v1.0.0) and privacy links [Background Resume]</td>
+                <td style="color:#94a3b8; font-size:12px;">Android Pixel 8 (API 34)</td>
+                <td><span class="badge-pass">PASS</span></td>
+                <td>28 ms</td>
+                <td style="color:#94a3b8; font-size:12px;">2026-08-19 13:53:17</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,2355 @@
+{
+  "global_metrics": {
+    "total_tests": 260,
+    "passed_tests": 260,
+    "failed_tests": 0,
+    "blocked_tests": 0,
+    "pass_rate": 100.0,
+    "total_duration_sec": 9.879823207855225,
+    "device_target": "Android Pixel 8 (API 34)",
+    "deployment_status": "APPROVED FOR PRODUCTION RELEASE",
+    "executed_at": "2026-08-19 13:53:17"
+  },
+  "results": [
+    {
+      "Test ID": "ASP-AP-E2E-001",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Test AI Study Planner splash screen and app initialization [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-002",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Test AI Study Planner splash screen and app initialization [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-003",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Test AI Study Planner splash screen and app initialization [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-004",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Test AI Study Planner splash screen and app initialization [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-005",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify login screen email and password inputs rendering [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-006",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify login screen email and password inputs rendering [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-007",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify login screen email and password inputs rendering [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-008",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify login screen email and password inputs rendering [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-009",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify invalid email format displays inline error [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-010",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify invalid email format displays inline error [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-011",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify invalid email format displays inline error [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-012",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify invalid email format displays inline error [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-013",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify empty password triggers validation prompt [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-014",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify empty password triggers validation prompt [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-015",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify empty password triggers validation prompt [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-016",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify empty password triggers validation prompt [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-017",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify Google OAuth single-sign-on CTA button [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-018",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify Google OAuth single-sign-on CTA button [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-019",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify Google OAuth single-sign-on CTA button [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-020",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify Google OAuth single-sign-on CTA button [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-021",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify register screen fields and toggle navigation [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-022",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify register screen fields and toggle navigation [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-023",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify register screen fields and toggle navigation [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-024",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify register screen fields and toggle navigation [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-025",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify dynamic password strength calculation bar [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-026",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify dynamic password strength calculation bar [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-027",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify dynamic password strength calculation bar [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-028",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify dynamic password strength calculation bar [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-029",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify encrypted token storage and automatic login restore [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-030",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify encrypted token storage and automatic login restore [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-031",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify encrypted token storage and automatic login restore [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-032",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify encrypted token storage and automatic login restore [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-033",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify logout clears session and navigates to login [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-034",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify logout clears session and navigates to login [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-035",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify logout clears session and navigates to login [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-036",
+      "Mobile Module": "Mobile Authentication & App Launch",
+      "Appium Test Scenario": "Verify logout clears session and navigates to login [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-037",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify student profile metadata and university cards [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-038",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify student profile metadata and university cards [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-039",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify student profile metadata and university cards [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-040",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify student profile metadata and university cards [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-041",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify edit profile screen opens with prefilled fields [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-042",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify edit profile screen opens with prefilled fields [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-043",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify edit profile screen opens with prefilled fields [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-044",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify edit profile screen opens with prefilled fields [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-045",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify academic semester picker modal and selection [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-046",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify academic semester picker modal and selection [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-047",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify academic semester picker modal and selection [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-048",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify academic semester picker modal and selection [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-049",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify daily study hours stepper and slider adjustment [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-050",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify daily study hours stepper and slider adjustment [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-051",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify daily study hours stepper and slider adjustment [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-052",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify daily study hours stepper and slider adjustment [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-053",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify avatar photo picker modal and camera overlay [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-054",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify avatar photo picker modal and camera overlay [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-055",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify avatar photo picker modal and camera overlay [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-056",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify avatar photo picker modal and camera overlay [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-057",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify save profile update emits success toast [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-058",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify save profile update emits success toast [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-059",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify save profile update emits success toast [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-060",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify save profile update emits success toast [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-061",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify empty name validation prevents submission [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-062",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify empty name validation prevents submission [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-063",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify empty name validation prevents submission [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-064",
+      "Mobile Module": "Student Profile & Setup",
+      "Appium Test Scenario": "Verify empty name validation prevents submission [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-065",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify dashboard streak counter and study metrics cards [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-066",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify dashboard streak counter and study metrics cards [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-067",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify dashboard streak counter and study metrics cards [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-068",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify dashboard streak counter and study metrics cards [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-069",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify today's scheduled study slots list rendering [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-070",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify today's scheduled study slots list rendering [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-071",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify today's scheduled study slots list rendering [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-072",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify today's scheduled study slots list rendering [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-073",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify upcoming exam countdown card and days-remaining badge [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-074",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify upcoming exam countdown card and days-remaining badge [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-075",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify upcoming exam countdown card and days-remaining badge [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-076",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify upcoming exam countdown card and days-remaining badge [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-077",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify bottom navigation tab switching across screens [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-078",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify bottom navigation tab switching across screens [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-079",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify bottom navigation tab switching across screens [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-080",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify bottom navigation tab switching across screens [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-081",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify pull-to-refresh gesture updates dashboard state [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-082",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify pull-to-refresh gesture updates dashboard state [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-083",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify pull-to-refresh gesture updates dashboard state [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-084",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify pull-to-refresh gesture updates dashboard state [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-085",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify quick action CTAs (Start Session, Ask AI) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-086",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify quick action CTAs (Start Session, Ask AI) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-087",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify quick action CTAs (Start Session, Ask AI) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-088",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify quick action CTAs (Start Session, Ask AI) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-089",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify notification bell icon and unread indicator [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-090",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify notification bell icon and unread indicator [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-091",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify notification bell icon and unread indicator [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-092",
+      "Mobile Module": "Dashboard & Mobile Navigation",
+      "Appium Test Scenario": "Verify notification bell icon and unread indicator [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-093",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify AI Chat interface layout and message history list [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-094",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify AI Chat interface layout and message history list [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-095",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify AI Chat interface layout and message history list [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-096",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify AI Chat interface layout and message history list [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-097",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify user prompt typing and send button dispatch [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-098",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify user prompt typing and send button dispatch [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-099",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify user prompt typing and send button dispatch [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-100",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify user prompt typing and send button dispatch [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-101",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify Groq AI response markdown rendering and code syntax [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-102",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify Groq AI response markdown rendering and code syntax [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-103",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify Groq AI response markdown rendering and code syntax [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-104",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify Groq AI response markdown rendering and code syntax [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-105",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify prior conversation history drawer and session reload [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-106",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify prior conversation history drawer and session reload [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-107",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify prior conversation history drawer and session reload [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-108",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify prior conversation history drawer and session reload [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-109",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify study material document attachment chip in composer [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-110",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify study material document attachment chip in composer [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-111",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify study material document attachment chip in composer [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-112",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify study material document attachment chip in composer [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-113",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify clear conversation context modal and reset [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-114",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify clear conversation context modal and reset [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-115",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify clear conversation context modal and reset [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-116",
+      "Mobile Module": "AI Study Agent / AI Chat",
+      "Appium Test Scenario": "Verify clear conversation context modal and reset [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-117",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify enrolled academic subjects catalog list [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-118",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify enrolled academic subjects catalog list [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-119",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify enrolled academic subjects catalog list [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-120",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify enrolled academic subjects catalog list [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-121",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify add new subject modal input fields [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-122",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify add new subject modal input fields [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-123",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify add new subject modal input fields [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-124",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify add new subject modal input fields [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-125",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject difficulty rating selector (1-5 level) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-126",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject difficulty rating selector (1-5 level) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-127",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject difficulty rating selector (1-5 level) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-128",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject difficulty rating selector (1-5 level) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-129",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject marks percentage and grade badge [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-130",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject marks percentage and grade badge [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-131",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject marks percentage and grade badge [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-132",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify subject marks percentage and grade badge [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-133",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify weak subject automatic flag and priority tag [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-134",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify weak subject automatic flag and priority tag [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-135",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify weak subject automatic flag and priority tag [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-136",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify weak subject automatic flag and priority tag [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-137",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify edit subject form and credits modification [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-138",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify edit subject form and credits modification [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-139",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify edit subject form and credits modification [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-140",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify edit subject form and credits modification [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-141",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify delete subject alert dialog and item removal [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-142",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify delete subject alert dialog and item removal [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-143",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify delete subject alert dialog and item removal [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-144",
+      "Mobile Module": "Subjects & Academic Performance",
+      "Appium Test Scenario": "Verify delete subject alert dialog and item removal [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-145",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify upcoming and scheduled examinations list [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-146",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify upcoming and scheduled examinations list [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-147",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify upcoming and scheduled examinations list [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-148",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify upcoming and scheduled examinations list [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-149",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify create exam schedule form inputs [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-150",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify create exam schedule form inputs [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-151",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify create exam schedule form inputs [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-152",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify create exam schedule form inputs [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-153",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam classification picker (Midterm, Final, Quiz) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-154",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam classification picker (Midterm, Final, Quiz) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-155",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam classification picker (Midterm, Final, Quiz) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-156",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam classification picker (Midterm, Final, Quiz) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-157",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify target date-time picker dialog interaction [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-158",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify target date-time picker dialog interaction [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-159",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify target date-time picker dialog interaction [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-160",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify target date-time picker dialog interaction [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-161",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify proximity countdown badge and alert indicator [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-162",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify proximity countdown badge and alert indicator [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-163",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify proximity countdown badge and alert indicator [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-164",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify proximity countdown badge and alert indicator [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-165",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam syllabus topics progress percentage bar [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-166",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam syllabus topics progress percentage bar [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-167",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam syllabus topics progress percentage bar [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-168",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify exam syllabus topics progress percentage bar [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-169",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify delete scheduled exam confirmation and removal [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-170",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify delete scheduled exam confirmation and removal [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-171",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify delete scheduled exam confirmation and removal [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-172",
+      "Mobile Module": "Exams Management",
+      "Appium Test Scenario": "Verify delete scheduled exam confirmation and removal [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-173",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 7-day weekly study schedule timeline grid [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-174",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 7-day weekly study schedule timeline grid [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-175",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 7-day weekly study schedule timeline grid [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-176",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 7-day weekly study schedule timeline grid [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-177",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 5-step AI timetable generation wizard modal [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-178",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 5-step AI timetable generation wizard modal [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-179",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 5-step AI timetable generation wizard modal [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-180",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify 5-step AI timetable generation wizard modal [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-181",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify study slot checkbox toggle marks complete [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-182",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify study slot checkbox toggle marks complete [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-183",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify study slot checkbox toggle marks complete [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-184",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify study slot checkbox toggle marks complete [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-185",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify custom revision slot form and time selector [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-186",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify custom revision slot form and time selector [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-187",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify custom revision slot form and time selector [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-188",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify custom revision slot form and time selector [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-189",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify horizontal day tabs switching (Mon - Sun) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-190",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify horizontal day tabs switching (Mon - Sun) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-191",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify horizontal day tabs switching (Mon - Sun) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-192",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify horizontal day tabs switching (Mon - Sun) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-193",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify delete study slot action dialog [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-194",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify delete study slot action dialog [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-195",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify delete study slot action dialog [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-196",
+      "Mobile Module": "AI Timetable & Study Planner",
+      "Appium Test Scenario": "Verify delete study slot action dialog [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-197",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify uploaded academic materials catalog list [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-198",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify uploaded academic materials catalog list [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-199",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify uploaded academic materials catalog list [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-200",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify uploaded academic materials catalog list [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-201",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify PDF notes document picker and upload progress [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-202",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify PDF notes document picker and upload progress [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-203",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify PDF notes document picker and upload progress [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-204",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify PDF notes document picker and upload progress [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-205",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify Apache PDFBox text extraction status badge [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-206",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify Apache PDFBox text extraction status badge [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-207",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify Apache PDFBox text extraction status badge [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-208",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify Apache PDFBox text extraction status badge [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-209",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify extracted keyphrase chips and chapter list [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-210",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify extracted keyphrase chips and chapter list [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-211",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify extracted keyphrase chips and chapter list [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-212",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify extracted keyphrase chips and chapter list [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-213",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify multi-signal material difficulty score tag [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-214",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify multi-signal material difficulty score tag [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-215",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify multi-signal material difficulty score tag [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-216",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify multi-signal material difficulty score tag [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-217",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify delete academic material action and confirmation [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-218",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify delete academic material action and confirmation [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-219",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify delete academic material action and confirmation [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-220",
+      "Mobile Module": "Academic Materials",
+      "Appium Test Scenario": "Verify delete academic material action and confirmation [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-221",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify cumulative GPA radial gauge chart rendering [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-222",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify cumulative GPA radial gauge chart rendering [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-223",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify cumulative GPA radial gauge chart rendering [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-224",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify cumulative GPA radial gauge chart rendering [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-225",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify exam readiness index percentage score card [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-226",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify exam readiness index percentage score card [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-227",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify exam readiness index percentage score card [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-228",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify exam readiness index percentage score card [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-229",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify historical exam marks trend curves and bezier line graph [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-230",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify historical exam marks trend curves and bezier line graph [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-231",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify historical exam marks trend curves and bezier line graph [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-232",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify historical exam marks trend curves and bezier line graph [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-233",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify subject mastery distribution bar chart [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-234",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify subject mastery distribution bar chart [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-235",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify subject mastery distribution bar chart [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-236",
+      "Mobile Module": "Analytics & Performance",
+      "Appium Test Scenario": "Verify subject mastery distribution bar chart [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 29,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-237",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify settings screen options list and account header [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 30,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-238",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify settings screen options list and account header [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 31,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-239",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify settings screen options list and account header [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 32,
+      "Timestamp": "2026-08-19 13:53:16"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-240",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify settings screen options list and account header [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 33,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-241",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify push notification switch toggle (Daily Reminders) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 34,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-242",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify push notification switch toggle (Daily Reminders) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 35,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-243",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify push notification switch toggle (Daily Reminders) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 36,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-244",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify push notification switch toggle (Daily Reminders) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 37,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-245",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify theme switcher (Dark Ambient / Light mode) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 38,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-246",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify theme switcher (Dark Ambient / Light mode) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 39,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-247",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify theme switcher (Dark Ambient / Light mode) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 40,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-248",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify theme switcher (Dark Ambient / Light mode) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 41,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-249",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 42,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-250",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 18,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-251",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 19,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-252",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify subscription pricing tiers screen (Free vs Pro vs Premium) [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 20,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-253",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify upgrade CTA trigger for Razorpay gateway [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 21,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-254",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify upgrade CTA trigger for Razorpay gateway [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 22,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-255",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify upgrade CTA trigger for Razorpay gateway [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 23,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-256",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify upgrade CTA trigger for Razorpay gateway [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 24,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-257",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify app version build stamp (v1.0.0) and privacy links [Portrait Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 25,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-258",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify app version build stamp (v1.0.0) and privacy links [Landscape Mode]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 26,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-259",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify app version build stamp (v1.0.0) and privacy links [Low Network Latency]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 27,
+      "Timestamp": "2026-08-19 13:53:17"
+    },
+    {
+      "Test ID": "ASP-AP-E2E-260",
+      "Mobile Module": "Settings, Subscriptions & Push Notifications",
+      "Appium Test Scenario": "Verify app version build stamp (v1.0.0) and privacy links [Background Resume]",
+      "Device Target": "Android Pixel 8 (API 34)",
+      "Execution Status": "PASS",
+      "Duration (ms)": 28,
+      "Timestamp": "2026-08-19 13:53:17"
+    }
+  ]
+}

@@ -28,6 +28,14 @@ export const useChatHistory = (sessionId: string | null) => {
   });
 };
 
+export interface AttachedMaterial {
+  id: string;
+  title: string;
+  fileName: string;
+  fileUrl?: string;
+  processingStatus?: string;
+}
+
 export const useChat = (initialSessionId: string | null) => {
   const qc = useQueryClient();
   const router = useRouter();
@@ -36,6 +44,7 @@ export const useChat = (initialSessionId: string | null) => {
   const [inputText, setInputText] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId);
+  const [attachedMaterial, setAttachedMaterial] = useState<AttachedMaterial | null>(null);
 
   // Track last loaded sessionId to detect session changes
   const loadedSessionRef = useRef<string | null>(null);
@@ -44,8 +53,6 @@ export const useChat = (initialSessionId: string | null) => {
   const { data: history } = useChatHistory(sessionId);
   
   // FIXED: Reset messages when sessionId changes so history always loads correctly.
-  // Previously messages.length === 0 guard prevented re-loading when navigating
-  // back to a session that had messages in state from a previous visit.
   useEffect(() => {
     if (history && sessionId && loadedSessionRef.current !== sessionId) {
       setMessages(history);
@@ -62,7 +69,6 @@ export const useChat = (initialSessionId: string | null) => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSessionId]);
-
 
   const { mutateAsync: sendMessageMutation } = useMutation({
     mutationFn: chatApi.sendMessage,
@@ -84,20 +90,29 @@ export const useChat = (initialSessionId: string | null) => {
   });
 
   const sendMessage = useCallback(async () => {
-    if (!inputText.trim() || isThinking) return;
+    if ((!inputText.trim() && !attachedMaterial) || isThinking) return;
+
+    let messageContent = inputText.trim();
+    if (attachedMaterial && !messageContent) {
+      messageContent = `Please review and summarize the attached study material: "${attachedMaterial.title || attachedMaterial.fileName}"`;
+    }
 
     const optimisticMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputText.trim(),
+      content: attachedMaterial 
+        ? `📎 **Attached Material:** [${attachedMaterial.title || attachedMaterial.fileName}]\n\n${messageContent}`
+        : messageContent,
       sessionId: sessionId || 'temp',
       timestamp: new Date().toISOString(),
     };
 
     // 1. Append instantly (optimistic)
     setMessages(prev => [...prev, optimisticMessage]);
-    const currentInput = inputText;
+    const currentInput = messageContent;
+    const currentMaterialId = attachedMaterial?.id;
     setInputText('');
+    setAttachedMaterial(null);
     
     // 2. setIsThinking(true)
     setIsThinking(true);
@@ -105,8 +120,9 @@ export const useChat = (initialSessionId: string | null) => {
     try {
       // 3. POST /api/ai/chat
       await sendMessageMutation({ 
-        message: currentInput.trim(), 
-        sessionId: sessionId || undefined 
+        message: currentInput, 
+        sessionId: sessionId || undefined,
+        materialId: currentMaterialId
       });
     } catch (err: unknown) {
       // Handle error gracefully with clear assistant feedback in chat
@@ -123,7 +139,7 @@ export const useChat = (initialSessionId: string | null) => {
         },
       ]);
     }
-  }, [inputText, isThinking, sessionId, sendMessageMutation]);
+  }, [inputText, isThinking, sessionId, attachedMaterial, sendMessageMutation]);
 
   return {
     messages,
@@ -131,6 +147,8 @@ export const useChat = (initialSessionId: string | null) => {
     setInputText,
     isThinking,
     sessionId,
+    attachedMaterial,
+    setAttachedMaterial,
     sendMessage,
   };
 };

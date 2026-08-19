@@ -58,4 +58,9 @@ export const authApi = {
     );
     return response.data.data;
   },
+
+  deleteAccount: async (): Promise<void> => {
+    await apiClient.delete('/api/students/me');
+  },
 };
+

@@ -77,12 +77,82 @@
   align-items: flex-end;
 }
 
+.btnAttach {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.5rem;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btnAttach:hover:not(:disabled) {
+  color: var(--color-primary);
+  background: rgba(0, 229, 192, 0.1);
+}
+.btnAttach:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.attachedContainer {
+  max-width: 800px;
+  margin: 0 auto 0.5rem auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attachedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 229, 192, 0.1);
+  border: 1px solid rgba(0, 229, 192, 0.25);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.attachedPillRemove {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: opacity 0.2s;
+}
+.attachedPillRemove:hover {
+  opacity: 1;
+}
+
+.uploadProgressText {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .textarea {
   width: 100%;
   background: var(--color-card);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
-  padding: 1rem 3.5rem 1rem 1.25rem;
+  padding: 1rem 3.5rem 1rem 3.25rem;
   font-size: 0.875rem;
   color: var(--color-foreground);
   font-family: var(--font-inter), sans-serif;

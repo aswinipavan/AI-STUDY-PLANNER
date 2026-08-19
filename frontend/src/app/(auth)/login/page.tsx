@@ -6,6 +6,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   updateProfile,
   AuthErrorCodes,
 } from 'firebase/auth';
@@ -16,7 +17,7 @@ import styles from './page.module.css';
 import { StudentProfile } from '@/types/api.types';
 
 
-type Tab = 'signin' | 'register';
+type Tab = 'signin' | 'register' | 'forgot';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -59,6 +60,7 @@ export default function LoginPage() {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm]   = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError]       = useState('');
   const [success, setSuccess]   = useState('');
   const [loading, setLoading]   = useState(false);
@@ -166,6 +168,23 @@ export default function LoginPage() {
     }
   };
 
+  // ── Forgot Password ──────────────────────────────────────────────────────
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) { setError('Please enter your email address to reset password.'); return; }
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setSuccess(`Password reset instructions sent to ${email}. Check your inbox!`);
+    } catch (err: unknown) {
+      setError(friendlyError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       {/* Backend warm-up status — only show while warming */}
@@ -189,7 +208,9 @@ export default function LoginPage() {
             AI Study Planner
           </h1>
           <p className={styles.subtitle}>
-            {tab === 'signin' ? 'Welcome back! Sign in to continue.' : 'Create your free account today.'}
+            {tab === 'signin' && 'Welcome back! Sign in to continue.'}
+            {tab === 'register' && 'Create your free account today.'}
+            {tab === 'forgot' && 'Reset your password to regain access.'}
           </p>
         </div>
 
@@ -197,18 +218,20 @@ export default function LoginPage() {
         <div className={styles.card}>
 
           {/* Tabs */}
-          <div className={styles.tabs}>
-            {(['signin', 'register'] as Tab[]).map((t) => (
-              <button
-                key={t}
-                id={`tab-${t}`}
-                onClick={() => setTab(t)}
-                className={`${styles.tabBtn} ${tab === t ? styles.tabBtnActive : styles.tabBtnInactive}`}
-              >
-                {t === 'signin' ? 'Sign In' : 'Register'}
-              </button>
-            ))}
-          </div>
+          {tab !== 'forgot' && (
+            <div className={styles.tabs}>
+              {(['signin', 'register'] as Tab[]).map((t) => (
+                <button
+                  key={t}
+                  id={`tab-${t}`}
+                  onClick={() => setTab(t)}
+                  className={`${styles.tabBtn} ${tab === t ? styles.tabBtnActive : styles.tabBtnInactive}`}
+                >
+                  {t === 'signin' ? 'Sign In' : 'Register'}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Error / Success banners */}
           {error && (
@@ -236,6 +259,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
+                  required
                   className={styles.input}
                 />
               </div>
@@ -260,8 +284,31 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="current-password"
+                  required
                   className={styles.input}
                 />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--color-muted)' }}>
+                  <input
+                    type="checkbox"
+                    id="remember-me"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{ accentColor: '#00A896', cursor: 'pointer' }}
+                  />
+                  Remember me
+                </label>
+                <button
+                  type="button"
+                  id="forgot-password-link"
+                  onClick={() => setTab('forgot')}
+                  className={styles.linkBtn}
+                  style={{ fontSize: '0.8125rem' }}
+                >
+                  Forgot password?
+                </button>
               </div>
 
               <button
@@ -291,6 +338,7 @@ export default function LoginPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Aswin Kumar"
                   autoComplete="name"
+                  required
                   className={styles.input}
                 />
               </div>
@@ -306,6 +354,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
+                  required
                   className={styles.input}
                 />
               </div>
@@ -330,6 +379,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min. 6 characters"
                   autoComplete="new-password"
+                  required
                   className={styles.input}
                 />
               </div>
@@ -345,6 +395,7 @@ export default function LoginPage() {
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Re-enter password"
                   autoComplete="new-password"
+                  required
                   className={styles.input}
                 />
               </div>
@@ -362,40 +413,88 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Divider */}
-          <div className={styles.dividerContainer}>
-            <div className={styles.dividerLine} />
-            <span className={styles.dividerText}>or continue with</span>
-            <div className={styles.dividerLine} />
-          </div>
+          {/* ── FORGOT PASSWORD FORM ── */}
+          {tab === 'forgot' && (
+            <form onSubmit={handleForgotPassword} className={styles.form}>
+              <div>
+                <label className={styles.label}>
+                  Enter your account email
+                </label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                  className={styles.input}
+                />
+              </div>
 
-          {/* Google Button */}
-          <button
-            id="btn-google"
-            onClick={handleGoogle}
-            disabled={loading}
-            className={`${styles.googleBtn} ${loading ? styles.googleBtnLoading : styles.googleBtnActive}`}
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
+              <button
+                id="btn-forgot-submit"
+                type="submit"
+                disabled={loading}
+                className={`${styles.submitBtn} ${loading ? styles.submitBtnLoading : styles.submitBtnActive}`}
+              >
+                {loading ? (
+                  <><div className={styles.spinner} /> Sending reset link...</>
+                ) : 'Send Reset Link →'}
+              </button>
+
+              <button
+                type="button"
+                id="btn-back-to-signin"
+                onClick={() => setTab('signin')}
+                className={styles.linkBtn}
+                style={{ textAlign: 'center', marginTop: '0.5rem', width: '100%' }}
+              >
+                ← Back to Sign In
+              </button>
+            </form>
+          )}
+
+          {/* Divider */}
+          {tab !== 'forgot' && (
+            <>
+              <div className={styles.dividerContainer}>
+                <div className={styles.dividerLine} />
+                <span className={styles.dividerText}>or continue with</span>
+                <div className={styles.dividerLine} />
+              </div>
+
+              {/* Google Button */}
+              <button
+                id="btn-google"
+                onClick={handleGoogle}
+                disabled={loading}
+                className={`${styles.googleBtn} ${loading ? styles.googleBtnLoading : styles.googleBtnActive}`}
+              >
+                <GoogleIcon />
+                Continue with Google
+              </button>
+            </>
+          )}
 
           {/* Footer */}
-          <p className={styles.footerText}>
-            {tab === 'signin' ? (
-              <>Don&apos;t have an account?{' '}
-                <button onClick={() => setTab('register')} className={styles.linkBtn}>
-                  Register free
-                </button>
-              </>
-            ) : (
-              <>Already have an account?{' '}
-                <button onClick={() => setTab('signin')} className={styles.linkBtn}>
-                  Sign in
-                </button>
-              </>
-            )}
-          </p>
+          {tab !== 'forgot' && (
+            <p className={styles.footerText}>
+              {tab === 'signin' ? (
+                <>Don&apos;t have an account?{' '}
+                  <button onClick={() => setTab('register')} className={styles.linkBtn}>
+                    Register free
+                  </button>
+                </>
+              ) : (
+                <>Already have an account?{' '}
+                  <button onClick={() => setTab('signin')} className={styles.linkBtn}>
+                    Sign in
+                  </button>
+                </>
+              )}
+            </p>
+          )}
         </div>
 
         {/* Back to home */}

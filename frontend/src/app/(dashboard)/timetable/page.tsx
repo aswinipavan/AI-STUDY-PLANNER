@@ -104,8 +104,9 @@ export default function TimetablePage() {
   };
 
   const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' });
+  const todayIndex = (new Date().getDay() + 6) % 7;
   const todaySlots = optimisticSlots.filter(s =>
-    new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === todayKey
+    (s.date && new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === todayKey) || s.dayOfWeek === todayIndex
   );
 
   if (isLoading) return <div className="p-6"><TimetableGridSkeleton /></div>;

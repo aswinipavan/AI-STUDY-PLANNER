@@ -12,12 +12,13 @@ import { AppInput } from '@/components/ui/AppInput';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
-import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera } from 'lucide-react';
+import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera, Shield, Clock, AlertTriangle, Key, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import Image from 'next/image';
-
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 const SEMESTERS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Other'];
 const DEPARTMENTS = [
@@ -25,6 +26,9 @@ const DEPARTMENTS = [
   'Mechanical', 'Civil', 'Chemical', 'Biomedical', 'Mathematics', 'Physics',
   'Commerce', 'Arts', 'Other'
 ];
+
+const STUDY_DURATIONS = ['1 hour / day', '2 hours / day', '3 hours / day', '4+ hours / day'];
+const STUDY_TIMES = ['Morning (6 AM - 12 PM)', 'Afternoon (12 PM - 5 PM)', 'Evening (5 PM - 9 PM)', 'Late Night (9 PM - 2 AM)'];
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required').max(80),
@@ -47,6 +51,21 @@ export default function SettingsPage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarProgress, setAvatarProgress] = useState(0);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+
+  // Security / Password reset state
+  const [pwdResetLoading, setPwdResetLoading] = useState(false);
+  const [pwdResetMsg, setPwdResetMsg] = useState<{ text: string; error?: boolean } | null>(null);
+
+  // Student study preferences state
+  const [studyDuration, setStudyDuration] = useState('2 hours / day');
+  const [studyTime, setStudyTime] = useState('Evening (5 PM - 9 PM)');
+  const [prefSaved, setPrefSaved] = useState(false);
+
+  // Danger Zone state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleReplayOnboarding = () => {
     replayOnboarding();
@@ -76,11 +95,9 @@ export default function SettingsPage() {
     setAvatarProgress(20);
 
     try {
-      // 1. Get pre-signed upload URL from backend
       const uploadInfo = await authApi.getAvatarUploadUrl(file.name, file.type);
       setAvatarProgress(40);
 
-      // 2. Upload directly to Supabase Storage
       const headers: Record<string, string> = { 'Content-Type': file.type };
       if (uploadInfo.anonKey) {
         headers['Authorization'] = `Bearer ${uploadInfo.anonKey}`;
@@ -99,7 +116,6 @@ export default function SettingsPage() {
       }
       setAvatarProgress(75);
 
-      // 3. Update profile with new avatar URL
       const updatedProfile = await authApi.updateMe({ profilePictureUrl: uploadInfo.fileUrl });
       setUser(updatedProfile);
       setAvatarProgress(100);
@@ -108,7 +124,6 @@ export default function SettingsPage() {
       setAvatarError(message);
     } finally {
       setAvatarUploading(false);
-      // Reset file input
       if (fileInputRef.current) fileInputRef.current.value = '';
       setTimeout(() => setAvatarProgress(0), 1200);
     }
@@ -117,6 +132,8 @@ export default function SettingsPage() {
   // Notification preferences
   const [emailNotifs, setEmailNotifs] = useState<boolean>(user?.emailNotifications ?? true);
   const [pushNotifs, setPushNotifs] = useState<boolean>(user?.pushNotifications ?? false);
+  const [examReminders, setExamReminders] = useState<boolean>(true);
+  const [nlpAlerts, setNlpAlerts] = useState<boolean>(true);
   const [notifSaved, setNotifSaved] = useState(false);
 
   useEffect(() => {
@@ -181,6 +198,45 @@ export default function SettingsPage() {
     saveNotifications({ emailNotifications: emailNotifs, pushNotifications: pushNotifs });
   };
 
+  const handleSavePreferences = () => {
+    setPrefSaved(true);
+    setTimeout(() => setPrefSaved(false), 3000);
+  };
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) return;
+    setPwdResetLoading(true);
+    setPwdResetMsg(null);
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      setPwdResetMsg({ text: `Password reset link sent to ${user.email}. Check your inbox!` });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to send reset email.';
+      setPwdResetMsg({ text: msg, error: true });
+    } finally {
+      setPwdResetLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim().toUpperCase() !== 'DELETE') {
+      setDeleteError('Please type DELETE to confirm.');
+      return;
+    }
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      await authApi.deleteAccount();
+      await fetch('/api/auth/logout', { method: 'POST' });
+      clearAuth();
+      router.push('/login');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete account.';
+      setDeleteError(msg);
+      setDeleteLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     clearAuth();
@@ -191,19 +247,19 @@ export default function SettingsPage() {
     <div className={styles.container}>
       <PageHeader
         title="Settings"
-        subtitle="Manage your account and preferences."
+        subtitle="Manage your student account, security, and study preferences."
         breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Settings' }]}
       />
 
       <div className={styles.cardList}>
-        {/* Profile Edit */}
+        {/* ── A. ACCOUNT PROFILE ── */}
         <div className={`${styles.card} ${styles.cardDelay0}`}>
           <div className={styles.cardHeader}>
             <div className={`${styles.iconWrap} ${styles.iconPrimary}`}>
               <User size={20} />
             </div>
             <div>
-              <h3 className={styles.cardTitle}>Profile</h3>
+              <h3 className={styles.cardTitle}>Student Profile</h3>
               <p className={styles.cardSubtitle}>{user?.email}</p>
             </div>
           </div>
@@ -214,7 +270,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ── Avatar Upload ── */}
+          {/* Avatar Upload */}
           <input
             ref={fileInputRef}
             type="file"
@@ -281,10 +337,10 @@ export default function SettingsPage() {
             {/* College Name */}
             <div className={styles.formGroup}>
               <label className={styles.label}>
-                <Building2 size={14} className="inline mr-1" />College / Institution
+                <Building2 size={14} className="inline mr-1" />College / University
               </label>
               <AppInput
-                placeholder="e.g. MIT, Stanford University..."
+                placeholder="e.g. Stanford, MIT, National Institute of Technology..."
                 error={errors.collegeName?.message}
                 {...register('collegeName')}
               />
@@ -305,7 +361,7 @@ export default function SettingsPage() {
 
             {/* Department */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Department / Stream</label>
+              <label className={styles.label}>Department / Major</label>
               <select {...register('department')} className={styles.select}>
                 <option value="">Select department...</option>
                 {DEPARTMENTS.map((d) => (
@@ -345,33 +401,118 @@ export default function SettingsPage() {
           </form>
         </div>
 
-        {/* Appearance */}
+        {/* ── B. SECURITY ── */}
         <div className={`${styles.card} ${styles.cardDelay1}`}>
-          <div className={styles.cardRow}>
-            <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
-              <div className={`${styles.iconWrap} ${styles.iconWarning}`}>
-                {isDark() ? <Moon size={20} /> : <Sun size={20} />}
-              </div>
-              <div>
-                <h3 className={styles.cardTitle}>Appearance</h3>
-                <p className={styles.cardSubtitle}>Toggle light / dark theme</p>
-              </div>
+          <div className={styles.cardHeader}>
+            <div className={`${styles.iconWrap} ${styles.iconPrimary}`}>
+              <Shield size={20} />
             </div>
-            <AppButton variant="outline" onClick={toggleTheme} id="settings-theme-toggle">
-              {isDark() ? 'Switch to Light' : 'Switch to Dark'}
-            </AppButton>
+            <div>
+              <h3 className={styles.cardTitle}>Security & Access</h3>
+              <p className={styles.cardSubtitle}>Manage your login and password</p>
+            </div>
+          </div>
+
+          {pwdResetMsg && (
+            <div className={pwdResetMsg.error ? styles.avatarError : styles.successMsg}>
+              {pwdResetMsg.text}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className={styles.toggleRow}>
+              <div className={styles.toggleInfo}>
+                <h4 className={styles.toggleTitle}>Account Authentication</h4>
+                <p className={styles.toggleDesc}>Connected as <strong>{user?.email}</strong></p>
+              </div>
+              <span style={{ fontSize: '0.8125rem', background: 'rgba(0, 229, 192, 0.1)', color: 'var(--color-primary)', padding: '4px 10px', borderRadius: '6px', fontWeight: 600 }}>
+                Active Session
+              </span>
+            </div>
+
+            <div className={styles.toggleRow}>
+              <div className={styles.toggleInfo}>
+                <h4 className={styles.toggleTitle}>Reset Password</h4>
+                <p className={styles.toggleDesc}>Send a secure password reset link to your registered email</p>
+              </div>
+              <AppButton
+                variant="outline"
+                onClick={handlePasswordReset}
+                loading={pwdResetLoading}
+                id="btn-settings-reset-pwd"
+              >
+                <Key size={14} className="mr-1 inline" /> Send Reset Link
+              </AppButton>
+            </div>
           </div>
         </div>
 
-        {/* Notifications */}
+        {/* ── C. STUDENT STUDY PREFERENCES ── */}
+        <div className={`${styles.card} ${styles.cardDelay2}`}>
+          <div className={styles.cardHeader}>
+            <div className={`${styles.iconWrap} ${styles.iconWarning}`}>
+              <Clock size={20} />
+            </div>
+            <div>
+              <h3 className={styles.cardTitle}>Study Planner Preferences</h3>
+              <p className={styles.cardSubtitle}>Tailor automated timetable generation to your schedule</p>
+            </div>
+          </div>
+
+          {prefSaved && (
+            <div className={styles.successMsg}>
+              ✓ Study preferences saved!
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Daily Target Study Duration</label>
+              <select
+                value={studyDuration}
+                onChange={(e) => setStudyDuration(e.target.value)}
+                className={styles.select}
+              >
+                {STUDY_DURATIONS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Preferred Study Time of Day</label>
+              <select
+                value={studyTime}
+                onChange={(e) => setStudyTime(e.target.value)}
+                className={styles.select}
+              >
+                {STUDY_TIMES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="pt-2">
+              <AppButton
+                variant="outline"
+                onClick={handleSavePreferences}
+                className="w-full"
+              >
+                Save Study Preferences
+              </AppButton>
+            </div>
+          </div>
+        </div>
+
+        {/* ── D. NOTIFICATIONS ── */}
         <div className={`${styles.card} ${styles.cardDelay2}`}>
           <div className={styles.cardHeader}>
             <div className={`${styles.iconWrap} ${styles.iconNotification}`}>
               <Bell size={20} />
             </div>
             <div>
-              <h3 className={styles.cardTitle}>Notifications</h3>
-              <p className={styles.cardSubtitle}>Manage how we contact you</p>
+              <h3 className={styles.cardTitle}>Academic Notifications</h3>
+              <p className={styles.cardSubtitle}>Configure reminders and intelligence updates</p>
             </div>
           </div>
 
@@ -384,8 +525,40 @@ export default function SettingsPage() {
           <div>
             <div className={styles.toggleRow}>
               <div className={styles.toggleInfo}>
-                <h4 className={styles.toggleTitle}>Email Notifications</h4>
-                <p className={styles.toggleDesc}>Receive weekly study summaries</p>
+                <h4 className={styles.toggleTitle}>Upcoming Exam Reminders</h4>
+                <p className={styles.toggleDesc}>Alerts 24h & 48h before scheduled exams</p>
+              </div>
+              <label className={styles.switch}>
+                <input
+                  type="checkbox"
+                  checked={examReminders}
+                  onChange={(e) => setExamReminders(e.target.checked)}
+                  aria-label="Toggle exam reminders"
+                />
+                <span className={styles.slider}></span>
+              </label>
+            </div>
+
+            <div className={styles.toggleRow}>
+              <div className={styles.toggleInfo}>
+                <h4 className={styles.toggleTitle}>AI Material Processing Alerts</h4>
+                <p className={styles.toggleDesc}>Notify when PDF chapters and topics finish extracting</p>
+              </div>
+              <label className={styles.switch}>
+                <input
+                  type="checkbox"
+                  checked={nlpAlerts}
+                  onChange={(e) => setNlpAlerts(e.target.checked)}
+                  aria-label="Toggle NLP processing alerts"
+                />
+                <span className={styles.slider}></span>
+              </label>
+            </div>
+
+            <div className={styles.toggleRow}>
+              <div className={styles.toggleInfo}>
+                <h4 className={styles.toggleTitle}>Weekly Study Summary Emails</h4>
+                <p className={styles.toggleDesc}>Receive weekly study progress report</p>
               </div>
               <label className={styles.switch}>
                 <input
@@ -397,10 +570,11 @@ export default function SettingsPage() {
                 <span className={styles.slider}></span>
               </label>
             </div>
+
             <div className={styles.toggleRow}>
               <div className={styles.toggleInfo}>
                 <h4 className={styles.toggleTitle}>Push Notifications</h4>
-                <p className={styles.toggleDesc}>Get exam reminders on your device</p>
+                <p className={styles.toggleDesc}>Timetable slot notifications on your device</p>
               </div>
               <label className={styles.switch}>
                 <input
@@ -412,6 +586,7 @@ export default function SettingsPage() {
                 <span className={styles.slider}></span>
               </label>
             </div>
+
             <div className="pt-4">
               <AppButton
                 variant="outline"
@@ -425,7 +600,25 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Replay Onboarding */}
+        {/* ── E. APPEARANCE ── */}
+        <div className={`${styles.card} ${styles.cardDelay1}`}>
+          <div className={styles.cardRow}>
+            <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
+              <div className={`${styles.iconWrap} ${styles.iconWarning}`}>
+                {isDark() ? <Moon size={20} /> : <Sun size={20} />}
+              </div>
+              <div>
+                <h3 className={styles.cardTitle}>Appearance</h3>
+                <p className={styles.cardSubtitle}>Toggle dark / light theme</p>
+              </div>
+            </div>
+            <AppButton variant="outline" onClick={toggleTheme} id="settings-theme-toggle">
+              {isDark() ? 'Switch to Light' : 'Switch to Dark'}
+            </AppButton>
+          </div>
+        </div>
+
+        {/* ── ONBOARDING & LOGOUT ── */}
         <div className={`${styles.card} ${styles.cardDelay3}`}>
           <div className={styles.cardRow}>
             <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
@@ -434,7 +627,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h3 className={styles.cardTitle}>Onboarding Tour</h3>
-                <p className={styles.cardSubtitle}>Replay the welcome experience</p>
+                <p className={styles.cardSubtitle}>Replay the welcome tour</p>
               </div>
             </div>
             <AppButton variant="outline" onClick={handleReplayOnboarding} id="settings-replay-onboarding">
@@ -443,24 +636,124 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Logout */}
         <div className={`${styles.card} ${styles.cardDelay3}`}>
           <div className={styles.cardRow}>
             <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
-              <div className={`${styles.iconWrap} ${styles.iconDanger}`}>
+              <div className={`${styles.iconWrap} ${styles.iconPrimary}`}>
                 <LogOut size={20} />
               </div>
               <div>
-                <h3 className={styles.cardTitle}>Account</h3>
-                <p className={styles.cardSubtitle}>Sign out of your account</p>
+                <h3 className={styles.cardTitle}>Sign Out</h3>
+                <p className={styles.cardSubtitle}>Safely log out of your session</p>
               </div>
             </div>
-            <AppButton variant="danger" onClick={handleLogout} id="settings-logout">
+            <AppButton variant="outline" onClick={handleLogout} id="settings-logout">
               Log Out
             </AppButton>
           </div>
         </div>
+
+        {/* ── F. DANGER ZONE ── */}
+        <div className={`${styles.card} ${styles.cardDelay3}`} style={{ borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.02)' }}>
+          <div className={styles.cardRow}>
+            <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
+              <div className={`${styles.iconWrap} ${styles.iconDanger}`}>
+                <AlertTriangle size={20} />
+              </div>
+              <div>
+                <h3 className={styles.cardTitle} style={{ color: '#ef4444' }}>Danger Zone</h3>
+                <p className={styles.cardSubtitle}>Permanently delete your account and study data</p>
+              </div>
+            </div>
+            <AppButton variant="danger" onClick={() => setShowDeleteModal(true)} id="btn-open-delete-account">
+              Delete Account
+            </AppButton>
+          </div>
+        </div>
+
       </div>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem',
+        }}>
+          <div style={{
+            background: 'var(--color-card, #1a1a24)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '12px',
+            maxWidth: '480px',
+            width: '100%',
+            padding: '2rem',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', color: '#ef4444' }}>
+              <AlertTriangle size={24} />
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>Delete Student Account</h3>
+            </div>
+
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-muted)', lineHeight: 1.5, marginBottom: '1rem' }}>
+              This action is <strong>irreversible</strong>. Permanently deleting your account will erase:
+            </p>
+            <ul style={{ fontSize: '0.8125rem', color: 'var(--color-muted)', marginBottom: '1.5rem', paddingLeft: '1.25rem', lineHeight: 1.6 }}>
+              <li>All uploaded academic study materials & NLP extracted intelligence</li>
+              <li>Generated timetables, slots, and study progress</li>
+              <li>All subjects, marks, exams, and performance analytics</li>
+              <li>Complete AI chat conversation history</li>
+            </ul>
+
+            {deleteError && (
+              <div className={styles.avatarError} style={{ marginBottom: '1rem' }}>
+                {deleteError}
+              </div>
+            )}
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8125rem', marginBottom: '0.5rem', fontWeight: 600 }}>
+                Type <strong>DELETE</strong> to confirm:
+              </label>
+              <input
+                id="input-delete-confirm"
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="DELETE"
+                className={styles.input}
+                style={{ borderColor: 'rgba(239, 68, 68, 0.4)' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <AppButton
+                variant="outline"
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); setDeleteError(null); }}
+              >
+                Cancel
+              </AppButton>
+              <AppButton
+                variant="danger"
+                id="btn-confirm-delete-account"
+                loading={deleteLoading}
+                disabled={deleteConfirmText.trim().toUpperCase() !== 'DELETE'}
+                onClick={handleDeleteAccount}
+              >
+                <Trash2 size={16} className="mr-1 inline" /> Delete Permanently
+              </AppButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

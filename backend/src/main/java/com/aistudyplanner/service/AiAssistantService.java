@@ -23,6 +23,7 @@ public class AiAssistantService {
     private final ChatHistoryRepository chatHistoryRepository;
     private final GroqService groqService;
     private final StudentRepository studentRepository;
+    private final com.aistudyplanner.repository.MaterialRepository materialRepository;
 
     @Transactional
     public AiChatResponse chat(UUID studentId, ChatRequest request) {
@@ -48,7 +49,30 @@ public class AiAssistantService {
         // Reverse to get chronological order
         java.util.Collections.reverse(history);
         
-        String assistantReply = groqService.chat(request.getMessage(), history);
+        // Build document context if materialId provided or student has relevant materials
+        String documentContext = null;
+        if (request.getMaterialId() != null) {
+            var materialOpt = materialRepository.findByIdAndStudentId(request.getMaterialId(), studentId);
+            if (materialOpt.isPresent()) {
+                documentContext = buildDocumentContext(materialOpt.get());
+            }
+        } else {
+            var recentMaterials = materialRepository.findAllByStudentIdOrderByCreatedAtDesc(studentId);
+            if (!recentMaterials.isEmpty()) {
+                String lowerMsg = request.getMessage().toLowerCase();
+                for (var m : recentMaterials) {
+                    if (lowerMsg.contains("pdf") || lowerMsg.contains("material") || lowerMsg.contains("document")
+                            || lowerMsg.contains("unit") || lowerMsg.contains("chapter") || lowerMsg.contains("notes")
+                            || (m.getTitle() != null && lowerMsg.contains(m.getTitle().toLowerCase()))
+                            || (m.getFileName() != null && lowerMsg.contains(m.getFileName().toLowerCase()))) {
+                        documentContext = buildDocumentContext(m);
+                        break;
+                    }
+                }
+            }
+        }
+
+        String assistantReply = groqService.chat(request.getMessage(), history, documentContext);
 
         ChatHistory assistantMessage = ChatHistory.builder()
                 .student(student)
@@ -62,6 +86,39 @@ public class AiAssistantService {
                 .sessionId(sessionId)
                 .reply(assistantReply)
                 .build();
+    }
+
+    private String buildDocumentContext(com.aistudyplanner.model.entity.Material m) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Document: ").append(m.getTitle() != null ? m.getTitle() : m.getFileName()).append("\n");
+        if (m.getSubject() != null) {
+            sb.append("Subject: ").append(m.getSubject().getSubjectName()).append("\n");
+        }
+        if (m.getOverallDifficulty() != null) {
+            sb.append("Assessed Complexity: ").append(m.getOverallDifficulty());
+            if (m.getDifficultyScore() != null) {
+                sb.append(" (Score: ").append(m.getDifficultyScore()).append("/100)");
+            }
+            sb.append("\n");
+        }
+        if (m.getDifficultyReason() != null && !m.getDifficultyReason().isBlank()) {
+            sb.append("Complexity Insights: ").append(m.getDifficultyReason()).append("\n");
+        }
+        if (m.getExtractedChapters() != null && !m.getExtractedChapters().isBlank()) {
+            sb.append("Extracted Chapters & Units:\n").append(m.getExtractedChapters()).append("\n");
+        }
+        if (m.getExtractedTopics() != null && !m.getExtractedTopics().isBlank()) {
+            sb.append("Extracted Key Topics:\n").append(m.getExtractedTopics()).append("\n");
+        }
+        if (m.getExtractedKeywords() != null && !m.getExtractedKeywords().isBlank()) {
+            sb.append("Key Vocabulary/Keywords:\n").append(m.getExtractedKeywords()).append("\n");
+        }
+        if (m.getAiSummary() != null && !m.getAiSummary().isBlank()) {
+            String summary = m.getAiSummary();
+            if (summary.length() > 2000) summary = summary.substring(0, 2000) + "...";
+            sb.append("Document Summary:\n").append(summary).append("\n");
+        }
+        return sb.toString();
     }
 
     /**

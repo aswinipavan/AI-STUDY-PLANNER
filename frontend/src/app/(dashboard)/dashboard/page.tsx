@@ -95,8 +95,9 @@ export default function DashboardPage() {
   const examsCount = exams?.length ?? 0;
 
   const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' });
+  const todayIndex = (new Date().getDay() + 6) % 7; // Mon=0 .. Sun=6
   const todaySlots = timetable?.slots?.filter(
-    (s) => new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === todayKey
+    (s) => (s.date && new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === todayKey) || s.dayOfWeek === todayIndex
   ) ?? [];
   const completedToday = todaySlots.filter((s) => s.status === 'completed').length;
 
