@@ -1,0 +1,7 @@
+# AI Study Planner — Test Automation Dependencies
+selenium>=4.26.0
+webdriver-manager>=4.0.0
+Appium-Python-Client>=4.0.0
+openpyxl>=3.1.0
+requests>=2.31.0
+urllib3>=2.0.0

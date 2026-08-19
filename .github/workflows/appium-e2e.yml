@@ -36,12 +36,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Install Appium Python Client Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install Appium-Python-Client selenium openpyxl requests
+          pip install -r requirements.txt
 
       - name: Execute 260 Appium Mobile E2E Tests (4-State Pattern)
         run: python testing/appium/appium_e2e_runner.py
