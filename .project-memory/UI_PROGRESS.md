@@ -16,3 +16,6 @@
 | Onboarding (BookOnboarding) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 5-page 3D book-flip, particles, progress dots, skip, localStorage gate, keyboard nav. |
 | `/priority` | 80% | ✅ | ✅ | ✅ | ⭐⭐⭐ | From performance API. |
 | `/subscription` | 70% | ✅ | ✅ | ✅ | ⭐⭐⭐ | Razorpay integration. |
+| `ImagesBadge` (`@/components/ui/images-badge`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 3D folder peek hover animation with Framer Motion spring physics. |
+| `CloudShader` (`@/components/ui/cloud-shader`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | GPU-accelerated WebGL cloud shader with domain-warped billow noise. |
+| `FloatingDock` (`@/components/ui/floating-dock`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | macOS spring-physics floating dock navigation with adaptive scaling. |

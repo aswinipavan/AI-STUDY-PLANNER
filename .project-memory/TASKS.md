@@ -51,6 +51,9 @@
   - Phase 10: Database & Test Data Audit (`DATABASE_DATA_AUDIT.md`).
   - Phase 11: Comprehensive Test Suite (110/110 backend tests, 58/58 frontend tests, Next.js 23/23 routes build).
   - Phase 12: Production Audit & Documentation (`FINAL_PRODUCTION_AUDIT.md`).
+- [2026-08-20] Integrated `ImagesBadge` and `ImagesBadgeDemo` components into `@/components/ui/images-badge.tsx` and `@/components/images-badge-demo.tsx`. Created unit test suite (`images-badge.test.tsx`, 6/6 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
+- [2026-08-20] Integrated `CloudShader` WebGL component and `CloudShaderDemo` into `@/components/ui/cloud-shader.tsx` and `@/components/cloud-shader-demo.tsx`. Created unit test suite (`cloud-shader.test.tsx`, 4/4 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
+- [2026-08-20] Integrated `FloatingDock` spring-physics component and `FloatingDockDemo` into `@/components/ui/floating-dock.tsx` and `@/components/floating-dock-demo.tsx`. Created unit test suite (`floating-dock.test.tsx`, 3/3 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
 
 ## In Progress
 - (none)

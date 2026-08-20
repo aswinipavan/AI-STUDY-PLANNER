@@ -378,5 +378,35 @@
 - **Summary:** Authored 1,800 unique test cases covering all subsystems (Spring Boot 3.2.4, Next.js 16, Supabase, Firebase, Groq, Razorpay, PDFBox).
 - **Impact:** Complete quality gate coverage ready for production release governance.
 
+## [2026-08-20] ImagesBadge & Demo Component Integration
+- **Files changed:**
+  - `frontend/src/components/ui/images-badge.tsx` [NEW]: Interactive folder-peek badge with Framer Motion 3D transforms, customizable teaser/hover dimensions, spread, rotation, and link support.
+  - `frontend/src/components/images-badge-demo.tsx` [NEW]: Demo container rendering ImagesBadge with preview images.
+  - `frontend/src/__tests__/components/images-badge.test.tsx` [NEW]: Unit tests covering text/image rendering, link attributes, 3-image ceiling, and hover event handling.
+- **Reason:** Integrate the `ImagesBadge` and `ImagesBadgeDemo` components into the project's shadcn/ui and Tailwind v4 design system.
+- **Summary:** Verified shadcn/ui, Tailwind CSS v4, and TypeScript configuration. Created component files with full TypeScript types, tested with Jest (64/64 passing), and compiled via Next.js Turbopack build (23/23 routes generated cleanly).
+- **Impact:** Adds interactive visual badge primitive to the UI component library with 0 build errors and 100% test pass rate.
+
+## [2026-08-20] CloudShader WebGL Component Integration
+- **Files changed:**
+  - `frontend/src/components/ui/cloud-shader.tsx` [NEW]: GPU-accelerated WebGL cloud shader with domain-warped billow noise, self-shadowing, customizable speeds, cloud count, hex/RGB color parsing, and reduced motion responsiveness.
+  - `frontend/src/components/cloud-shader-demo.tsx` [NEW]: Demo showcase component rendering CloudShader.
+  - `frontend/src/__tests__/components/cloud-shader.test.tsx` [NEW]: Unit tests covering WebGL canvas mounting, children overlay rendering, prop validation, and unmounting cleanup.
+- **Reason:** Integrate the GPU-accelerated `CloudShader` visual effect into the AI Study Planner UI design system.
+- **Summary:** Added `CloudShader` and `CloudShaderDemo` following shadcn/ui and Tailwind v4 architecture. Tested with Jest (68/68 passing) and validated with Next.js Turbopack build (23/23 routes generated with 0 errors).
+- **Impact:** Delivers rich WebGL visual background capability for ambient scenes with 0 performance regressions and 100% test pass rate.
+
+## [2026-08-20] FloatingDock Navigation Component Integration
+- **Files changed:**
+  - `frontend/src/components/ui/floating-dock.tsx` [NEW]: macOS-inspired spring-physics floating dock navigation with distance-based scaling, tooltips, responsive mobile vertical expansion, and dark mode support.
+  - `frontend/src/components/floating-dock-demo.tsx` [NEW]: Demo container with Lucide icons tailored to AI Study Planner navigation.
+  - `frontend/src/__tests__/components/floating-dock.test.tsx` [NEW]: Unit tests covering item rendering, mobile drawer toggling, and demo mounting.
+- **Reason:** Integrate the `FloatingDock` adaptive navigation component into the project's shadcn/ui and Tailwind v4 architecture.
+- **Summary:** Built `FloatingDock` using Framer Motion and Lucide icons. Verified with Jest (71/71 tests passing) and Next.js Turbopack production build (23/23 routes generated with 0 errors).
+- **Impact:** Adds dynamic spring-physics navigation dock primitive to the component library.
+
+
+
+
 
 
