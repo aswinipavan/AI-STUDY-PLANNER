@@ -73,14 +73,34 @@ export default function LoginPage() {
 
   // Wake up the Render backend on page mount to avoid cold-start delays on login
   useEffect(() => {
-    setBackendStatus('warming');
-    fetch('/api/wake')
-      .then(r => r.json())
-      .then(data => {
-        if (data.status === 'awake') setBackendStatus('awake');
-        else setBackendStatus(null);
-      })
-      .catch(() => setBackendStatus(null));
+    let isMounted = true;
+    let timeoutId: NodeJS.Timeout;
+
+    const checkWakeStatus = async () => {
+      try {
+        setBackendStatus('warming');
+        const res = await fetch('/api/wake');
+        if (!isMounted) return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'awake') {
+            setBackendStatus('awake');
+            return;
+          }
+        }
+        // Retry every 6 seconds until backend is awake
+        timeoutId = setTimeout(checkWakeStatus, 6000);
+      } catch {
+        if (isMounted) setBackendStatus(null);
+      }
+    };
+
+    checkWakeStatus();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   // ── Shared: exchange Firebase token with backend proxy ────────────────────

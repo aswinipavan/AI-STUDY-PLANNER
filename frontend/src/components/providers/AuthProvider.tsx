@@ -50,12 +50,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setFirebaseUser(user);
 
       if (user) {
-        // Upsert user profile in Firestore on every login
-        await setUserProfile(user.uid, {
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        });
+        // Upsert user profile in Firestore if available (fail-safe)
+        try {
+          await setUserProfile(user.uid, {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          });
+        } catch (firestoreErr) {
+          console.warn('[AuthProvider] Firestore sync skipped or failed:', firestoreErr);
+        }
 
         // Sync to Zustand store — works whether backend or Firebase-only mode
         setUser({

@@ -1,12 +1,14 @@
 package com.aistudyplanner;
 
 import com.aistudyplanner.security.JwtTokenProvider;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.UUID;
 
+@Disabled("Manual token generation utility - run explicitly when needed")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ManualTokenGenTest {
 

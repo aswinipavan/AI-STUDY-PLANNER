@@ -25,3 +25,5 @@
 | BUG-015 | Medium | Topbar theme toggle not applying `.dark` class to DOM & missing avatar/bell menus | `ThemeApplier.tsx`, `layout.tsx`, `Topbar.tsx` | Fixed | Yes |
 | BUG-016 | High | Chat history endpoint LazyInitializationException HTTP 500 on Student relationship | `ChatMessageResponse.java`, `AiAssistantService.java`, `AiAssistantController.java` | Fixed | Yes |
 | BUG-017 | High | Material upload PUT failure to Supabase Storage due to missing authorization headers | `MaterialService.java`, `application.properties`, `useMaterials.ts` | Fixed | Yes |
+| BUG-018 | Medium | ManualTokenGenTest executed during automated Maven builds and failed due to test context configuration | `ManualTokenGenTest.java` | Fixed | Yes |
+| BUG-019 | Low | Login test empty form submission failed in JSDOM due to HTML5 required attribute preventing button click | `src/__tests__/app/auth/login.test.tsx` | Fixed | Yes |

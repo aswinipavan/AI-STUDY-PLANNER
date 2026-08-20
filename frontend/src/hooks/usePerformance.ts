@@ -17,15 +17,34 @@ export const usePriority = () => {
   });
 };
 
+export const useAcademicReadiness = () => {
+  return useQuery({
+    queryKey: QK.readiness,
+    queryFn: performanceApi.getReadiness,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useAiPerformanceAnalysis = () => {
+  return useQuery({
+    queryKey: QK.aiAnalysis,
+    queryFn: performanceApi.getAiAnalysis,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useAddMark = () => {
   const qc = useQueryClient();
   
   return useMutation({
     mutationFn: performanceApi.addMark,
-    // Invalidate both report and priority after new mark
+    // Invalidate report, priority, readiness, and analysis after new mark
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QK.performance });
       qc.invalidateQueries({ queryKey: QK.priority });
+      qc.invalidateQueries({ queryKey: QK.readiness });
+      qc.invalidateQueries({ queryKey: QK.aiAnalysis });
     },
   });
 };
+

@@ -186,6 +186,65 @@ export default function DashboardPage() {
             </div>
           </section>
 
+          {/* ── Gamification: Milestone Badges ── */}
+          <section aria-label="Milestone badges" className={styles.milestonesSection}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionTitleBox}>
+                <h2>Achievements & Milestone Badges</h2>
+                <p>Track your study dedication and unlock consistency rewards</p>
+              </div>
+            </div>
+            <div className={styles.badgesGrid}>
+              <div className={`${styles.badgeCard} ${studyHours >= 10 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+                <div className={styles.badgeIconBox}>⏳</div>
+                <div className={styles.badgeInfo}>
+                  <p className={styles.badgeTitle}>10h Explorer</p>
+                  <p className={styles.badgeCriteria}>{studyHours >= 10 ? 'Unlocked • Great Start!' : `${studyHours}/10 sessions`}</p>
+                </div>
+              </div>
+
+              <div className={`${styles.badgeCard} ${studyHours >= 50 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+                <div className={styles.badgeIconBox}>🎓</div>
+                <div className={styles.badgeInfo}>
+                  <p className={styles.badgeTitle}>50h Master</p>
+                  <p className={styles.badgeCriteria}>{studyHours >= 50 ? 'Unlocked • Elite Scholar' : `${studyHours}/50 sessions`}</p>
+                </div>
+              </div>
+
+              <div className={`${styles.badgeCard} ${(user?.studyStreak ?? 0) >= 7 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+                <div className={styles.badgeIconBox}>🔥</div>
+                <div className={styles.badgeInfo}>
+                  <p className={styles.badgeTitle}>7-Day Streak</p>
+                  <p className={styles.badgeCriteria}>{(user?.studyStreak ?? 0) >= 7 ? 'Unlocked • Unstoppable' : `${user?.studyStreak ?? 0}/7 days`}</p>
+                </div>
+              </div>
+
+              <div className={`${styles.badgeCard} ${(user?.studyStreak ?? 0) >= 30 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+                <div className={styles.badgeIconBox}>👑</div>
+                <div className={styles.badgeInfo}>
+                  <p className={styles.badgeTitle}>30-Day Legend</p>
+                  <p className={styles.badgeCriteria}>{(user?.studyStreak ?? 0) >= 30 ? 'Unlocked • Academic Titan' : `${user?.studyStreak ?? 0}/30 days`}</p>
+                </div>
+              </div>
+
+              <div className={`${styles.badgeCard} ${completedToday >= 3 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+                <div className={styles.badgeIconBox}>⚡</div>
+                <div className={styles.badgeInfo}>
+                  <p className={styles.badgeTitle}>Daily Finisher</p>
+                  <p className={styles.badgeCriteria}>{completedToday >= 3 ? 'Unlocked • 3+ Daily Tasks' : `${completedToday}/3 today`}</p>
+                </div>
+              </div>
+
+              <div className={`${styles.badgeCard} ${styles.badgeUnlocked}`}>
+                <div className={styles.badgeIconBox}>👥</div>
+                <div className={styles.badgeInfo}>
+                  <p className={styles.badgeTitle}>Collaborative Peer</p>
+                  <p className={styles.badgeCriteria}>Study Together Access Active</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
         </div>
 
         {/* ── Right Column: Contextual Side Panel ── */}
@@ -244,13 +303,15 @@ export default function DashboardPage() {
               {loadingPriority ? (
                 <p style={{ opacity: 0.5, fontSize: '0.85rem' }}>Loading recommendations...</p>
               ) : priorityList.length > 0 ? (
-                priorityList.map((item) => (
-                  <div key={item.subjectId} className={styles.recItem}>
+                priorityList.map((item, idx) => (
+                  <div key={item.id || idx} className={styles.recItem}>
                     <BookOpen size={16} />
                     <div>
                       <p className={styles.recItemTitle}>{item.subjectName ?? 'Subject'}</p>
                       <p className={styles.recItemTopic}>
-                        {item.averageScore != null ? `${item.averageScore}% avg · needs focus` : 'Add marks to see insights'}
+                        {item.averagePercentage != null
+                          ? `${Math.round(item.averagePercentage)}% avg · ${item.priorityLevel || 'HIGH'} priority`
+                          : `${item.priorityLevel || 'HIGH'} priority`}
                       </p>
                     </div>
                   </div>

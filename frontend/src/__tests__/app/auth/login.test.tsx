@@ -81,7 +81,7 @@ describe('LoginPage - Auth/Login Tests', () => {
 
       // Try to submit empty form
       const submitBtn = screen.getByRole('button', { name: /Sign In →/i });
-      fireEvent.click(submitBtn);
+      fireEvent.submit(submitBtn.closest('form')!);
 
       // Should show validation error
       await waitFor(() => {

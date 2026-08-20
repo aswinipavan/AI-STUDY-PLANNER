@@ -24,6 +24,9 @@ public class AiAssistantService {
     private final GroqService groqService;
     private final StudentRepository studentRepository;
     private final com.aistudyplanner.repository.MaterialRepository materialRepository;
+    private final com.aistudyplanner.repository.SubjectRepository subjectRepository;
+    private final com.aistudyplanner.repository.ExamRepository examRepository;
+    private final com.aistudyplanner.repository.MarksRepository marksRepository;
 
     @Transactional
     public AiChatResponse chat(UUID studentId, ChatRequest request) {
@@ -63,6 +66,8 @@ public class AiAssistantService {
                 for (var m : recentMaterials) {
                     if (lowerMsg.contains("pdf") || lowerMsg.contains("material") || lowerMsg.contains("document")
                             || lowerMsg.contains("unit") || lowerMsg.contains("chapter") || lowerMsg.contains("notes")
+                            || lowerMsg.contains("image") || lowerMsg.contains("photo") || lowerMsg.contains("diagram")
+                            || lowerMsg.contains("picture") || lowerMsg.contains("screenshot")
                             || (m.getTitle() != null && lowerMsg.contains(m.getTitle().toLowerCase()))
                             || (m.getFileName() != null && lowerMsg.contains(m.getFileName().toLowerCase()))) {
                         documentContext = buildDocumentContext(m);
@@ -72,7 +77,26 @@ public class AiAssistantService {
             }
         }
 
-        String assistantReply = groqService.chat(request.getMessage(), history, documentContext);
+        // Build combined context with connected student academic intelligence
+        StringBuilder combinedContext = new StringBuilder();
+        if (documentContext != null && !documentContext.isBlank()) {
+            combinedContext.append(documentContext).append("\n\n");
+        }
+
+        String lowerMsg = request.getMessage().toLowerCase();
+        boolean isStudyAdviceQuery = lowerMsg.contains("study") || lowerMsg.contains("schedule") 
+                || lowerMsg.contains("plan") || lowerMsg.contains("today") || lowerMsg.contains("weak") 
+                || lowerMsg.contains("exam") || lowerMsg.contains("prepare") || lowerMsg.contains("priority")
+                || lowerMsg.contains("recommend") || lowerMsg.contains("performance") || lowerMsg.contains("how should i")
+                || lowerMsg.contains("what should i");
+
+        if (isStudyAdviceQuery || documentContext == null) {
+            String academicContext = buildStudentAcademicContext(student);
+            combinedContext.append(academicContext);
+        }
+
+        String finalContext = combinedContext.length() > 0 ? combinedContext.toString() : null;
+        String assistantReply = groqService.chat(request.getMessage(), history, finalContext);
 
         ChatHistory assistantMessage = ChatHistory.builder()
                 .student(student)
@@ -94,6 +118,20 @@ public class AiAssistantService {
         if (m.getSubject() != null) {
             sb.append("Subject: ").append(m.getSubject().getSubjectName()).append("\n");
         }
+        
+        boolean isImage = m.getMaterialType() == com.aistudyplanner.model.MaterialType.IMAGE
+                || (m.getFileType() != null && m.getFileType().toLowerCase().contains("image"))
+                || (m.getFileName() != null && m.getFileName().toLowerCase().matches(".*\\.(jpg|jpeg|png|webp|gif)"));
+
+        if (isImage) {
+            sb.append("Type: Visual Study Material / Image\n");
+            if (m.getFileUrl() != null && !m.getFileUrl().isBlank()) {
+                sb.append("Image URL: ").append(m.getFileUrl()).append("\n");
+            }
+            sb.append("Context: The user has attached an image of study material, lecture notes, textbook diagram, or problem statement.\n");
+            sb.append("Instruction: Carefully explain and solve any academic problems, equations, diagrams, or concepts referenced from this visual material.\n");
+        }
+
         if (m.getOverallDifficulty() != null) {
             sb.append("Assessed Complexity: ").append(m.getOverallDifficulty());
             if (m.getDifficultyScore() != null) {
@@ -118,6 +156,76 @@ public class AiAssistantService {
             if (summary.length() > 2000) summary = summary.substring(0, 2000) + "...";
             sb.append("Document Summary:\n").append(summary).append("\n");
         }
+        return sb.toString();
+    }
+
+    private String buildStudentAcademicContext(Student student) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("--- STUDENT ACADEMIC PROFILE & LIVE STATUS ---\n");
+        sb.append("Student Name: ").append(student.getFullName() != null ? student.getFullName() : "Student").append("\n");
+        if (student.getDepartment() != null) {
+            sb.append("Department: ").append(student.getDepartment()).append("\n");
+        }
+        sb.append("Daily Available Study Hours: ").append(student.getAvailableHoursPerDay() != null ? student.getAvailableHoursPerDay() : "4.0").append(" hours\n");
+        sb.append("Current Study Streak: ").append(student.getStudyStreak() != null ? student.getStudyStreak() : 0).append(" days\n");
+
+        // Subjects & Marks
+        try {
+            List<com.aistudyplanner.model.entity.Subject> subjects = subjectRepository.findAllByStudentId(student.getId());
+            if (subjects != null && !subjects.isEmpty()) {
+                sb.append("Enrolled Subjects & Current Performance:\n");
+                List<Object[]> avgMarks = marksRepository.findAveragePercentageBySubject(student.getId());
+                java.util.Map<UUID, Double> avgMap = new java.util.HashMap<>();
+                if (avgMarks != null) {
+                    for (Object[] row : avgMarks) {
+                        if (row.length >= 2 && row[0] instanceof UUID && row[1] instanceof Number) {
+                            avgMap.put((UUID) row[0], ((Number) row[1]).doubleValue());
+                        }
+                    }
+                }
+
+                for (var sub : subjects) {
+                    Double avg = avgMap.get(sub.getId());
+                    sb.append("- ").append(sub.getSubjectName())
+                      .append(" (Difficulty: ").append(sub.getDifficultyLevel() != null ? sub.getDifficultyLevel() : 3).append("/5)");
+                    if (avg != null) {
+                        sb.append(": Average ").append(String.format("%.1f", avg)).append("%");
+                        if (avg < 60.0) {
+                            sb.append(" [WEAK AREA - High Priority]");
+                        } else if (avg >= 75.0) {
+                            sb.append(" [Strong Area]");
+                        }
+                    } else {
+                        sb.append(": No marks recorded yet");
+                    }
+                    sb.append("\n");
+                }
+            }
+        } catch (Exception e) {
+            // graceful fallback
+        }
+
+        // Upcoming Exams
+        try {
+            List<com.aistudyplanner.model.entity.Exam> upcomingExams = examRepository.findUpcomingExams(student.getId(), java.time.LocalDate.now());
+            if (upcomingExams != null && !upcomingExams.isEmpty()) {
+                sb.append("Upcoming Exams:\n");
+                for (var ex : upcomingExams) {
+                    long daysLeft = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), ex.getExamDate());
+                    sb.append("- ").append(ex.getExamName() != null ? ex.getExamName() : "Exam")
+                      .append(" (").append(ex.getSubject() != null ? ex.getSubject().getSubjectName() : "Subject").append(")")
+                      .append(": on ").append(ex.getExamDate()).append(" (in ").append(daysLeft).append(" days)");
+                    if (ex.getSyllabusCovered() != null && !ex.getSyllabusCovered().isBlank()) {
+                        sb.append(" - Syllabus: ").append(ex.getSyllabusCovered());
+                    }
+                    sb.append("\n");
+                }
+            }
+        } catch (Exception e) {
+            // graceful fallback
+        }
+
+        sb.append("--- END STUDENT ACADEMIC PROFILE ---\n");
         return sb.toString();
     }
 

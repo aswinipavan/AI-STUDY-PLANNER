@@ -16,7 +16,7 @@ import { useAuthStore } from '@/stores/authStore';
 import {
   LayoutDashboard, BookOpen, Calendar, FileText,
   MessageSquare, BarChart2, Settings, X, Crown,
-  Sparkles, GraduationCap, LucideIcon
+  Sparkles, GraduationCap, LucideIcon, Users, AlertTriangle
 } from 'lucide-react';
 
 import styles from './Sidebar.module.css';
@@ -26,25 +26,27 @@ const NAV_SECTIONS = [
   {
     label: 'Main',
     items: [
-      { name: 'Dashboard',    href: '/dashboard',   icon: LayoutDashboard, aiPowered: false },
-      { name: 'Subjects',     href: '/subjects',    icon: BookOpen,        aiPowered: false },
-      { name: 'Timetable',    href: '/timetable',   icon: Calendar,        aiPowered: true  },
-      { name: 'Exams',        href: '/exams',       icon: FileText,        aiPowered: false },
-      { name: 'Materials',    href: '/materials',   icon: FileText,        aiPowered: false },
+      { name: 'Dashboard',      href: '/dashboard',      icon: LayoutDashboard, aiPowered: false },
+      { name: 'Subjects',       href: '/subjects',       icon: BookOpen,        aiPowered: false },
+      { name: 'Timetable',      href: '/timetable',      icon: Calendar,        aiPowered: true  },
+      { name: 'Exams',          href: '/exams',          icon: FileText,        aiPowered: false },
+      { name: 'Materials',      href: '/materials',      icon: FileText,        aiPowered: false },
+      { name: 'Study Together', href: '/study-together', icon: Users,           aiPowered: true  },
     ],
   },
   {
     label: 'AI Features',
     items: [
       // ai-engineer: AI features get their own section for discoverability
-      { name: 'AI Tutor',     href: '/chat',        icon: MessageSquare,   aiPowered: true  },
-      { name: 'Performance',  href: '/performance', icon: BarChart2,       aiPowered: true  },
+      { name: 'AI Tutor',         href: '/chat',        icon: MessageSquare,   aiPowered: true  },
+      { name: 'Priority Ranking', href: '/priority',    icon: AlertTriangle,   aiPowered: true  },
+      { name: 'Performance',      href: '/performance', icon: BarChart2,       aiPowered: true  },
     ],
   },
   {
     label: 'Account',
     items: [
-      { name: 'Settings',     href: '/settings',    icon: Settings,        aiPowered: false },
+      { name: 'Settings',       href: '/settings',       icon: Settings,        aiPowered: false },
     ],
   },
 ];

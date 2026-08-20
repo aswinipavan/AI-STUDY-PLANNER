@@ -46,10 +46,26 @@ public class PerformanceController {
     }
 
     @GetMapping("/priority")
-    @Operation(summary = "Get subjects ordered by priority (weakest first)")
+    @Operation(summary = "Get subjects ordered by priority with explainable scoring")
     public ResponseEntity<ApiResponse<List<SubjectResponse>>> getPrioritySubjects(@CurrentStudent Student student) {
         log.info("Fetching priority subjects for student: {}", student.getId());
         List<SubjectResponse> responses = performanceService.getPrioritySubjects(student.getId());
         return ResponseEntity.ok(ApiResponse.success(responses, "Priority subjects fetched successfully"));
+    }
+
+    @GetMapping("/readiness")
+    @Operation(summary = "Get composite academic readiness metrics and AI explanation")
+    public ResponseEntity<ApiResponse<com.aistudyplanner.model.dto.response.AcademicReadinessResponse>> getAcademicReadiness(@CurrentStudent Student student) {
+        log.info("Fetching academic readiness for student: {}", student.getId());
+        var readiness = performanceService.getAcademicReadiness(student.getId());
+        return ResponseEntity.ok(ApiResponse.success(readiness, "Academic readiness metrics fetched successfully"));
+    }
+
+    @GetMapping("/ai-analysis")
+    @Operation(summary = "Get deep AI performance analysis and study recommendations")
+    public ResponseEntity<ApiResponse<com.aistudyplanner.model.dto.response.AiPerformanceAnalysisResponse>> getAiPerformanceAnalysis(@CurrentStudent Student student) {
+        log.info("Generating AI performance analysis for student: {}", student.getId());
+        var analysis = performanceService.getAiPerformanceAnalysis(student.getId());
+        return ResponseEntity.ok(ApiResponse.success(analysis, "AI performance analysis generated successfully"));
     }
 }

@@ -21,22 +21,25 @@ export default function PriorityWidget() {
         <p className="text-sm text-muted-foreground text-center py-4">All subjects are on track!</p>
       ) : (
         <div className="space-y-4">
-          {displayPriorities.map((item, index) => (
-            <div key={item.subjectId || index} className="flex flex-col">
-              <div className="flex justify-between items-end mb-1">
-                <span className="text-sm font-medium text-foreground">{item.subjectName}</span>
-                <span className="text-xs font-bold text-destructive flex items-center">
-                  {item.averageScore}% <TrendingDown className="w-3 h-3 ml-1" />
-                </span>
+          {displayPriorities.map((item, index) => {
+            const pct = Math.round(item.averagePercentage ?? (100 - item.priorityScore));
+            return (
+              <div key={item.id || index} className="flex flex-col">
+                <div className="flex justify-between items-end mb-1">
+                  <span className="text-sm font-medium text-foreground">{item.subjectName}</span>
+                  <span className="text-xs font-bold text-destructive flex items-center">
+                    {pct}% <TrendingDown className="w-3 h-3 ml-1" />
+                  </span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-destructive h-2 rounded-full" 
+                    style={{ width: `${pct}%` }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div 
-                  className="bg-destructive h-2 rounded-full" 
-                  style={{ width: `${item.averageScore}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -92,6 +92,49 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+.priorityScoreBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-family: var(--font-outfit), sans-serif;
+}
+.priorityHigh { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.priorityMed { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.priorityLow { background: rgba(0, 229, 192, 0.15); color: #00e5c0; border: 1px solid rgba(0, 229, 192, 0.3); }
+
+.reasonsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.reasonItem {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.studyTimeBadge {
+  font-size: 0.6875rem;
+  color: #00e5c0;
+  background: rgba(0, 229, 192, 0.08);
+  border: 1px solid rgba(0, 229, 192, 0.2);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+  width: fit-content;
+}
+
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -101,3 +144,4 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+

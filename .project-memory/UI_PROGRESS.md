@@ -11,7 +11,7 @@
 | `/timetable` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Slot toggle (pending/completed/skipped). Optimistic updates. |
 | `/timetable/generate` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | 5-step wizard. Warns if no subjects. |
 | `/performance` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Charts from real API data. Radial, Bar, Line, Scatter charts. |
-| `/chat` | 85% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | AI chat via Groq. |
+| `/chat` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | AI study coach via Groq with PDF/Image attachment upload, local thumbnail preview, NLP document intelligence, and session history. |
 | `/settings` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Profile edit, theme toggle, notifications, + Replay Onboarding. |
 | Onboarding (BookOnboarding) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 5-page 3D book-flip, particles, progress dots, skip, localStorage gate, keyboard nav. |
 | `/priority` | 80% | ✅ | ✅ | ✅ | ⭐⭐⭐ | From performance API. |

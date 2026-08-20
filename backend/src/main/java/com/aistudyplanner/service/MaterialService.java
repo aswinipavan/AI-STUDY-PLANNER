@@ -52,17 +52,9 @@ public class MaterialService {
             throw new IllegalArgumentException("File size exceeds maximum allowed size of 50MB");
         }
 
-        // Whitelist allowed file types
-        boolean isAllowedType = false;
-        for (String allowed : com.aistudyplanner.util.Constants.ALLOWED_FILE_TYPES) {
-            if (allowed.equalsIgnoreCase(fileType)) {
-                isAllowedType = true;
-                break;
-            }
-        }
-        
-        if (!isAllowedType) {
-            throw new IllegalArgumentException("File type not allowed. Allowed: PDF, DOCX, XLS, XLSX, TXT, ZIP");
+        // Whitelist allowed file types (flexible check for MIME types, extensions, or short names)
+        if (!isAllowedFileType(fileType)) {
+            throw new IllegalArgumentException("File type not allowed. Allowed: PDF, JPG, JPEG, PNG, WEBP, DOCX, XLS, XLSX, TXT, ZIP");
         }
 
         Student student = studentRepository.findById(studentId)
@@ -73,6 +65,21 @@ public class MaterialService {
             subject = subjectRepository.findById(request.getSubjectId()).orElse(null);
         }
 
+        // Resolve MaterialType if not explicitly provided
+        com.aistudyplanner.model.MaterialType resolvedType = request.getMaterialType();
+        if (resolvedType == null) {
+            String lower = fileType != null ? fileType.toLowerCase() : "";
+            if (lower.contains("pdf")) {
+                resolvedType = com.aistudyplanner.model.MaterialType.PDF;
+            } else if (lower.contains("image") || lower.contains("jpg") || lower.contains("jpeg") || lower.contains("png") || lower.contains("webp")) {
+                resolvedType = com.aistudyplanner.model.MaterialType.IMAGE;
+            } else if (lower.contains("doc") || lower.contains("word")) {
+                resolvedType = com.aistudyplanner.model.MaterialType.DOCX;
+            } else {
+                resolvedType = com.aistudyplanner.model.MaterialType.NOTES;
+            }
+        }
+
         Material material = Material.builder()
                 .student(student)
                 .subject(subject)
@@ -81,7 +88,7 @@ public class MaterialService {
                 .fileUrl(fileUrl)
                 .fileType(fileType)
                 .fileSizeBytes(fileSizeBytes)
-                .materialType(request.getMaterialType())
+                .materialType(resolvedType)
                 .processingStatus(com.aistudyplanner.model.ProcessingStatus.PENDING)
                 .build();
 
@@ -91,6 +98,22 @@ public class MaterialService {
         documentIntelligenceService.processMaterialAsync(material.getId(), request.getTextPreview());
 
         return toMaterialResponse(material);
+    }
+
+    public static boolean isAllowedFileType(String fileType) {
+        if (fileType == null || fileType.isBlank()) return false;
+        String cleanType = fileType.toLowerCase().trim();
+        for (String allowed : com.aistudyplanner.util.Constants.ALLOWED_FILE_TYPES) {
+            if (allowed.equalsIgnoreCase(cleanType)) {
+                return true;
+            }
+        }
+        return cleanType.equals("pdf") || cleanType.equals("jpg") || cleanType.equals("jpeg")
+                || cleanType.equals("png") || cleanType.equals("webp") || cleanType.equals("gif")
+                || cleanType.equals("txt") || cleanType.equals("doc") || cleanType.equals("docx")
+                || cleanType.equals("xls") || cleanType.equals("xlsx") || cleanType.equals("zip")
+                || cleanType.startsWith("image/") || cleanType.startsWith("text/")
+                || cleanType.contains("pdf") || cleanType.contains("word") || cleanType.contains("sheet");
     }
 
     @Transactional

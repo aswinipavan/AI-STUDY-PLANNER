@@ -69,6 +69,32 @@ public class DocumentIntelligenceService {
         materialRepository.save(material);
 
         try {
+            boolean isImage = material.getMaterialType() == com.aistudyplanner.model.MaterialType.IMAGE
+                    || (material.getFileType() != null && material.getFileType().toLowerCase().contains("image"))
+                    || (material.getFileName() != null && material.getFileName().toLowerCase().matches(".*\\.(jpg|jpeg|png|webp|gif)"));
+
+            if (isImage) {
+                log.info("Processing visual study material / image for material {}", materialId);
+                material.setProcessingStatus(ProcessingStatus.COMPLETED);
+                material.setOverallDifficulty("MEDIUM");
+                material.setDifficultyScore(50);
+                material.setDifficultyReason("Visual study material / lecture diagram or handwritten notes.");
+                
+                String title = material.getTitle() != null ? material.getTitle() : material.getFileName();
+                List<Map<String, String>> imageTopics = List.of(
+                        Map.of("name", title, "chapter", "Visual Study Notes")
+                );
+                material.setExtractedTopics(objectMapper.writeValueAsString(imageTopics));
+                material.setExtractedChapters(objectMapper.writeValueAsString(List.of("Visual Study Notes")));
+                material.setExtractedKeywords(objectMapper.writeValueAsString(List.of("diagram", "notes", "visual concept")));
+                if (material.getAiSummary() == null || material.getAiSummary().isBlank()) {
+                    material.setAiSummary("Visual academic asset: " + title + " (" + material.getFileName() + ")");
+                }
+                material.setErrorMessage(null);
+                materialRepository.save(material);
+                return;
+            }
+
             // 1. Extract text from file or preview
             String extractedText = extractDocumentText(material, fallbackPreview);
 

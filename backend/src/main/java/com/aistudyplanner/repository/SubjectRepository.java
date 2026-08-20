@@ -13,5 +13,7 @@ public interface SubjectRepository extends JpaRepository<Subject, UUID> {
 
     List<Subject> findAllByStudentId(UUID studentId, org.springframework.data.domain.Pageable pageable);
 
+    List<Subject> findAllByStudentId(UUID studentId);
+
     Optional<Subject> findByStudentIdAndSubjectNameIgnoreCase(UUID studentId, String subjectName);
 }

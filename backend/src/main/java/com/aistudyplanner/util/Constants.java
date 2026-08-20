@@ -34,6 +34,7 @@ public class Constants {
         "text/plain",
         "application/zip",
         "image/jpeg",
+        "image/jpg",
         "image/png",
         "image/gif",
         "image/webp"

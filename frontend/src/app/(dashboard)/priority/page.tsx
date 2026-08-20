@@ -8,6 +8,9 @@ import { ProgressRing } from '@/components/charts/ProgressRing';
 import { AlertTriangle } from 'lucide-react';
 import styles from './priority.module.css';
 
+import { SubjectPriority } from '@/types/api.types';
+import { Clock, CheckCircle, Info } from 'lucide-react';
+
 export default function PriorityPage() {
   const { data: priorities, isLoading, error, refetch } = usePriority();
 
@@ -15,7 +18,7 @@ export default function PriorityPage() {
     <div className={styles.container}>
       <PageHeader
         title="Subject Priority"
-        subtitle="Subjects ranked by urgency — focus on the top ones first."
+        subtitle="Explainable AI rankings — understand exactly why each subject is prioritized."
         breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Priority' }]}
       />
       <div className={styles.skeletonList}>
@@ -28,42 +31,64 @@ export default function PriorityPage() {
 
   if (error) return <div className="p-6"><ErrorState message="Could not load priority data." onRetry={refetch} /></div>;
 
-  const list = Array.isArray(priorities) ? priorities : [];
+  const list: SubjectPriority[] = Array.isArray(priorities) ? (priorities as unknown as SubjectPriority[]) : [];
 
   return (
     <div className={styles.container}>
       <PageHeader
         title="Subject Priority"
-        subtitle="Subjects ranked by urgency — focus on the top ones first."
+        subtitle="Explainable AI rankings — understand exactly why each subject is prioritized."
         breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Priority' }]}
       />
 
       <div className={styles.list}>
-        {list.map((item: { subjectId: string; subjectName?: string; priority: number; averageScore?: number }, idx: number) => {
-          const pct = Math.round(item.averageScore ?? 0);
+        {list.map((item, idx) => {
+          const pct = Math.round(item.averagePercentage ?? 0);
+          const score = item.priorityScore ?? Math.max(10, 100 - pct);
+          const level = item.priorityLevel || (score >= 70 ? 'HIGH' : score >= 40 ? 'MEDIUM' : 'LOW');
           
           let cardClass = styles.itemCard;
-          if (idx === 0) cardClass += ` ${styles.itemUrgent0}`;
-          else if (idx === 1) cardClass += ` ${styles.itemUrgent1}`;
+          if (level === 'HIGH') cardClass += ` ${styles.itemUrgent0}`;
+          else if (level === 'MEDIUM') cardClass += ` ${styles.itemUrgent1}`;
 
           let rankClass = styles.rankBadge;
           if (idx === 0) rankClass += ` ${styles.rank0}`;
           else if (idx === 1) rankClass += ` ${styles.rank1}`;
           else rankClass += ` ${styles.rankRest}`;
 
-          const ringColor = idx === 0 ? '#ef4444' : idx === 1 ? '#f59e0b' : '#00e5c0';
+          const ringColor = level === 'HIGH' ? '#ef4444' : level === 'MEDIUM' ? '#f59e0b' : '#00e5c0';
+          const badgeClass = level === 'HIGH' ? styles.priorityHigh : level === 'MEDIUM' ? styles.priorityMed : styles.priorityLow;
 
           return (
-            <div key={item.subjectId} className={cardClass} style={{ animationDelay: `${idx * 100}ms` }}>
+            <div key={item.id || idx} className={cardClass} style={{ animationDelay: `${idx * 100}ms` }}>
               <div className={styles.leftCol}>
                 <span className={rankClass}>#{idx + 1}</span>
-                <div>
-                  <h3 className={styles.subjectName}>{item.subjectName}</h3>
-                  {idx < 2 && (
-                    <p className={styles.alertMsg}>
-                      <AlertTriangle size={14} />
-                      Needs urgent attention
-                    </p>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <h3 className={styles.subjectName}>{item.subjectName}</h3>
+                    <span className={`${styles.priorityScoreBadge} ${badgeClass}`}>
+                      {level} PRIORITY • Score: {score}/100
+                    </span>
+                  </div>
+
+                  {/* Explainable Reasons */}
+                  {item.reasons && item.reasons.length > 0 && (
+                    <div className={styles.reasonsList}>
+                      {item.reasons.map((reason, rIdx) => (
+                        <span key={rIdx} className={styles.reasonItem}>
+                          <Info size={12} style={{ flexShrink: 0, color: ringColor }} />
+                          {reason}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Recommended Study Duration */}
+                  {item.recommendedStudyTime && (
+                    <div className={styles.studyTimeBadge}>
+                      <Clock size={11} />
+                      Recommended: {item.recommendedStudyTime} daily
+                    </div>
                   )}
                 </div>
               </div>
@@ -75,3 +100,4 @@ export default function PriorityPage() {
     </div>
   );
 }
+

@@ -19,4 +19,8 @@ public class SubjectResponse {
     private Double averagePercentage;
     private LocalDate nextExamDate; // Nearest upcoming exam for this subject
     private Long daysUntilExam; // Calculated remaining days
+    private Integer priorityScore; // 0 - 100
+    private String priorityLevel; // HIGH, MEDIUM, LOW
+    private java.util.List<String> reasons; // Explainable priority reasoning
+    private String recommendedStudyTime; // e.g. "2h 30m"
 }

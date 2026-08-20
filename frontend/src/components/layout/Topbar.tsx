@@ -10,12 +10,13 @@ import { QK } from '@/constants/queryKeys';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays } from 'lucide-react';
+import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles } from 'lucide-react';
+import { useNotifications } from '@/hooks/useNotifications';
 
 /**
  * Topbar — fixed for Issues 2, 3:
  * - Theme toggle now calls themeStore.setTheme(), which ThemeApplier bridges to the DOM
- * - Bell button shows upcoming exams dropdown
+ * - Bell button shows upcoming exams & smart academic notifications dropdown
  * - Avatar now has click dropdown: Settings + Logout
  */
 export function Topbar() {
@@ -29,7 +30,10 @@ export function Topbar() {
   const bellRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
 
-  // Fetch upcoming exams for notification badge
+  // Fetch smart academic notifications
+  const { data: notifications } = useNotifications();
+
+  // Fetch upcoming exams for notification fallback
   const { data: upcomingExams = [] } = useQuery({
     queryKey: QK.exams,
     queryFn: examsApi.getUpcoming,
@@ -95,45 +99,74 @@ export function Topbar() {
             aria-label="Notifications"
           >
             <Bell size={20} />
-            {urgentExams.length > 0 && (
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+            {notifications && notifications.length > 0 && (
+              <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-destructive animate-pulse" />
             )}
           </button>
 
           {showBell && (
-            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-background shadow-xl z-50 overflow-hidden">
-              <div className="px-4 py-3 border-b border-border">
-                <p className="text-sm font-semibold text-foreground">Upcoming Exams</p>
+            <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-border bg-background shadow-xl z-50 overflow-hidden">
+              <div className="px-4 py-3 border-b border-border flex justify-between items-center">
+                <p className="text-sm font-semibold text-foreground">Smart Notifications</p>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                  {notifications?.length || 0} alerts
+                </span>
               </div>
-              {upcomingExams.length === 0 ? (
+
+              {!notifications || notifications.length === 0 ? (
                 <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-                  No upcoming exams 🎉
+                  All caught up! No urgent alerts 🎉
                 </div>
               ) : (
-                <div className="max-h-64 overflow-y-auto">
-                  {upcomingExams.slice(0, 6).map(exam => {
-                    const days = daysUntil(exam.examDate);
+                <div className="max-h-80 overflow-y-auto divide-y divide-border/50">
+                  {notifications.slice(0, 8).map(notif => {
+                    const isHigh = notif.priority === 'HIGH';
+                    const iconColor = isHigh ? 'text-destructive' : 'text-primary';
+
                     return (
-                      <div key={exam.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors">
-                        <CalendarDays size={16} className={days <= 3 ? 'text-destructive' : 'text-primary'} />
+                      <Link
+                        key={notif.id}
+                        href={notif.actionUrl || '/dashboard'}
+                        onClick={() => setShowBell(false)}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-muted/70 transition-colors block"
+                      >
+                        <div className="mt-0.5">
+                          {notif.type === 'EXAM_ALERT' ? (
+                            <CalendarDays size={16} className={iconColor} />
+                          ) : notif.type === 'LOW_PERFORMANCE' ? (
+                            <AlertCircle size={16} className="text-amber-500" />
+                          ) : notif.type === 'STUDY_ROOM' ? (
+                            <Users size={16} className="text-cyan-400" />
+                          ) : (
+                            <Sparkles size={16} className="text-purple-400" />
+                          )}
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{exam.examName || 'Exam'}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {days === 0 ? 'Today!' : days === 1 ? 'Tomorrow' : `in ${days} days`}
+                          <p className="text-xs font-semibold text-foreground truncate">{notif.title}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">
+                            {notif.message}
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>
               )}
-              <div className="border-t border-border px-4 py-2">
+
+              <div className="border-t border-border px-4 py-2 bg-muted/20 flex justify-between">
                 <Link
                   href="/exams"
                   className="text-xs text-primary hover:underline"
                   onClick={() => setShowBell(false)}
                 >
-                  View all exams →
+                  Exams →
+                </Link>
+                <Link
+                  href="/study-together"
+                  className="text-xs text-primary hover:underline"
+                  onClick={() => setShowBell(false)}
+                >
+                  Study Rooms →
                 </Link>
               </div>
             </div>

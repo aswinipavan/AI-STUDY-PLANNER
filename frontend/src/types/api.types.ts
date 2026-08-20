@@ -151,6 +151,43 @@ export interface SubscriptionStatus {
   features: string[];
 }
 
+export interface SubjectPriority {
+  id: string;
+  subjectName: string;
+  subjectCode?: string;
+  credits?: number;
+  difficultyLevel?: number;
+  averagePercentage?: number;
+  nextExamDate?: string;
+  daysUntilExam?: number;
+  priorityScore: number;
+  priorityLevel: 'HIGH' | 'MEDIUM' | 'LOW';
+  reasons: string[];
+  recommendedStudyTime: string;
+}
+
+export interface AcademicReadiness {
+  overallReadiness: number;
+  subjectPerformanceScore: number;
+  examPreparationScore: number;
+  studyConsistencyScore: number;
+  materialCoverageScore: number;
+  aiExplanation: string;
+  primaryFocusSubject: string;
+}
+
+export interface AiPerformanceAnalysis {
+  currentPerformance: number;
+  performanceGrade: string;
+  weakAreas: string[];
+  strongAreas: string[];
+  performanceTrend: string;
+  examUrgency: string;
+  recommendedTopics: string[];
+  recommendedStudyDuration: string;
+  aiDetailedSummary: string;
+}
+
 // API DTOs
 export type CreateSubjectDTO = Pick<Subject, 'name' | 'color' | 'icon' | 'targetHours'>;
 export type CreateExamDTO = Pick<Exam, 'subjectId' | 'examDate' | 'difficulty' | 'notes'>;
@@ -163,3 +200,60 @@ export type GenerateTimetableDTO = {
   useDeadlines?: boolean; // Use exam deadlines for prioritization
   targetDeadlineDate?: string; // Optional: if all subjects share a deadline
 };
+
+export interface StudyRoomParticipant {
+  id: string;
+  studentId: string;
+  studentName: string;
+  avatarUrl?: string;
+  isOwner: boolean;
+  joinedAt: string;
+}
+
+export interface StudyRoomMessage {
+  id: string;
+  senderId?: string;
+  senderName: string;
+  message: string;
+  isAi: boolean;
+  createdAt: string;
+}
+
+export interface StudyRoom {
+  id: string;
+  roomCode: string;
+  ownerId: string;
+  ownerName: string;
+  subjectId?: string;
+  subjectName: string;
+  topic?: string;
+  durationMinutes: number;
+  maxParticipants: number;
+  currentParticipantsCount: number;
+  status: 'ACTIVE' | 'COMPLETED' | 'EXPIRED';
+  createdAt: string;
+  expiresAt: string;
+  secondsRemaining: number;
+  participants: StudyRoomParticipant[];
+  recentMessages?: StudyRoomMessage[];
+}
+
+export interface CreateStudyRoomDTO {
+  subjectId?: string;
+  subjectName?: string;
+  topic?: string;
+  durationMinutes?: number;
+  maxParticipants?: number;
+}
+
+export interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  actionUrl: string;
+  createdAt: string;
+  isRead: boolean;
+}
+

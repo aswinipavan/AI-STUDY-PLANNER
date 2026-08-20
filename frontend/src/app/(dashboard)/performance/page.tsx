@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { usePerformanceReport, usePriority } from '@/hooks/usePerformance';
+import React, { useState } from 'react';
+import { usePerformanceReport, usePriority, useAcademicReadiness, useAiPerformanceAnalysis } from '@/hooks/usePerformance';
 import { SubjectPerformance, Mark } from '@/types/api.types';
 import {
   RadialBarChart, RadialBar, ResponsiveContainer,
@@ -9,12 +9,20 @@ import {
   LineChart, Line,
   ScatterChart, Scatter, ZAxis,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, Lightbulb, Medal } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Lightbulb, Medal, Sparkles, Brain, CheckCircle2, AlertCircle } from 'lucide-react';
 import styles from './performance.module.css';
 
 export default function PerformancePage() {
   const { data: report, isLoading: loadingReport } = usePerformanceReport();
   const { data: priority, isLoading: loadingPriority } = usePriority();
+  const { data: readiness, isLoading: loadingReadiness } = useAcademicReadiness();
+  const { data: aiAnalysis, isLoading: loadingAiAnalysis, refetch: runAiAnalysis } = useAiPerformanceAnalysis();
+  const [showAnalysis, setShowAnalysis] = useState(false);
+
+  const handleAnalyzeClick = async () => {
+    setShowAnalysis(true);
+    await runAiAnalysis();
+  };
 
   const trendIcon = report?.trend === 'improving' ? (
     <TrendingUp size={20} color="#34d399" />
@@ -42,15 +50,137 @@ export default function PerformancePage() {
       <div className={styles.headerGroup}>
         <div>
           <h1 className={styles.pageTitle}>Performance Analytics</h1>
-          <p className={styles.pageSubtitle}>A detailed breakdown of your academic progress.</p>
+          <p className={styles.pageSubtitle}>A detailed breakdown of your academic progress and AI readiness.</p>
         </div>
-        {report && (
-          <div className={styles.trendBadge}>
-            {trendIcon}
-            <span>{report.trend}</span>
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleAnalyzeClick}
+            disabled={loadingAiAnalysis}
+            className={styles.btnAnalyze}
+            id="btn-analyze-performance"
+          >
+            <Sparkles size={16} />
+            {loadingAiAnalysis ? 'Analyzing...' : 'Analyze My Performance'}
+          </button>
+          {report && (
+            <div className={styles.trendBadge}>
+              {trendIcon}
+              <span>{report.trend}</span>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* ── PHASE 6: ACADEMIC READINESS CARD ── */}
+      {readiness && (
+        <div className={styles.readinessCard}>
+          <div className={styles.readinessHeader}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Brain size={22} color="#00e5c0" />
+                <h3 className={styles.cardTitle} style={{ fontSize: '1.25rem' }}>Academic Readiness Index</h3>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-muted-foreground)', margin: '0.25rem 0 0 0' }}>
+                Multi-factor composite preparedness score based on performance, upcoming exams, consistency, and syllabus coverage.
+              </p>
+            </div>
+            <div className={styles.readinessScoreBig}>
+              {readiness.overallReadiness}%
+            </div>
+          </div>
+
+          <div className={styles.readinessPillarsGrid}>
+            <div className={styles.pillarItem}>
+              <div className={styles.pillarLabelRow}>
+                <span>Subject Performance</span>
+                <span className={styles.pillarScore}>{readiness.subjectPerformanceScore}%</span>
+              </div>
+              <div className={styles.pillarBar}>
+                <div className={styles.pillarFill} style={{ width: `${readiness.subjectPerformanceScore}%`, background: '#00e5c0' }} />
+              </div>
+            </div>
+
+            <div className={styles.pillarItem}>
+              <div className={styles.pillarLabelRow}>
+                <span>Exam Preparation</span>
+                <span className={styles.pillarScore}>{readiness.examPreparationScore}%</span>
+              </div>
+              <div className={styles.pillarBar}>
+                <div className={styles.pillarFill} style={{ width: `${readiness.examPreparationScore}%`, background: '#38bdf8' }} />
+              </div>
+            </div>
+
+            <div className={styles.pillarItem}>
+              <div className={styles.pillarLabelRow}>
+                <span>Study Consistency</span>
+                <span className={styles.pillarScore}>{readiness.studyConsistencyScore}%</span>
+              </div>
+              <div className={styles.pillarBar}>
+                <div className={styles.pillarFill} style={{ width: `${readiness.studyConsistencyScore}%`, background: '#a855f7' }} />
+              </div>
+            </div>
+
+            <div className={styles.pillarItem}>
+              <div className={styles.pillarLabelRow}>
+                <span>Material Coverage</span>
+                <span className={styles.pillarScore}>{readiness.materialCoverageScore}%</span>
+              </div>
+              <div className={styles.pillarBar}>
+                <div className={styles.pillarFill} style={{ width: `${readiness.materialCoverageScore}%`, background: '#f59e0b' }} />
+              </div>
+            </div>
+          </div>
+
+          {readiness.aiExplanation && (
+            <div className={styles.aiExplanationBox}>
+              <Sparkles size={16} color="#00e5c0" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span>{readiness.aiExplanation}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── PHASE 4: AI PERFORMANCE ANALYSIS DIAGNOSTIC ── */}
+      {showAnalysis && aiAnalysis && (
+        <div className={styles.analysisCard}>
+          <div className={styles.cardTitleWrap}>
+            <Sparkles size={20} color="#a855f7" />
+            <h3 className={styles.cardTitle}>AI Performance Diagnostic & Action Plan</h3>
+          </div>
+
+          <p style={{ fontSize: '0.875rem', lineHeight: 1.6, margin: '0 0 1rem 0' }}>
+            {aiAnalysis.aiDetailedSummary}
+          </p>
+
+          <div className={styles.analysisDetailsGrid}>
+            <div className={styles.analysisBox}>
+              <div className={styles.analysisBoxTitle}>Current Grade</div>
+              <div className={styles.analysisBoxVal}>{aiAnalysis.performanceGrade} ({aiAnalysis.currentPerformance.toFixed(1)}%)</div>
+            </div>
+
+            <div className={styles.analysisBox}>
+              <div className={styles.analysisBoxTitle}>Exam Urgency</div>
+              <div className={styles.analysisBoxVal} style={{ fontSize: '0.8125rem' }}>{aiAnalysis.examUrgency}</div>
+            </div>
+
+            <div className={styles.analysisBox}>
+              <div className={styles.analysisBoxTitle}>Target Daily Study</div>
+              <div className={styles.analysisBoxVal} style={{ color: '#00e5c0' }}>{aiAnalysis.recommendedStudyDuration}</div>
+            </div>
+          </div>
+
+          {aiAnalysis.weakAreas && aiAnalysis.weakAreas.length > 0 && (
+            <div style={{ marginTop: '1rem', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f87171', textTransform: 'uppercase' }}>Focus Areas (Weakest Subjects)</span>
+              <ul style={{ margin: '0.35rem 0 0 1.25rem', padding: 0, fontSize: '0.8125rem', color: 'var(--color-foreground)' }}>
+                {aiAnalysis.weakAreas.map((w, idx) => (
+                  <li key={idx}>{w}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {loadingReport ? (
         <div className={styles.skeletonGrid}>
@@ -178,19 +308,21 @@ export default function PerformancePage() {
                   <h3 className={styles.cardTitle}>Subject Priority Ranking</h3>
                 </div>
                 <div className={styles.priorityList}>
-                  {(Array.isArray(priority) ? priority : []).map((item: { subjectId: string; subjectName?: string; priority: number; averageScore?: number }, idx: number) => {
+                  {(Array.isArray(priority) ? priority : []).map((item, idx) => {
                     let rankClass = styles.priorityRank;
                     if (idx === 0) rankClass += ` ${styles.rank1}`;
                     else if (idx === 1) rankClass += ` ${styles.rank2}`;
                     else rankClass += ` ${styles.rank3}`;
                     
                     return (
-                      <div key={item.subjectId} className={styles.priorityItem}>
+                      <div key={item.id || idx} className={styles.priorityItem}>
                         <div className={styles.priorityLeft}>
                           <span className={rankClass}>#{idx + 1}</span>
                           <span className={styles.priorityName}>{item.subjectName}</span>
                         </div>
-                        <span className={styles.priorityScore}>{item.averageScore}% avg</span>
+                        <span className={styles.priorityScore}>
+                          {item.averagePercentage != null ? `${Math.round(item.averagePercentage)}% avg` : `Score: ${item.priorityScore}`}
+                        </span>
                       </div>
                     );
                   })}

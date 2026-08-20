@@ -33,7 +33,10 @@ export interface AttachedMaterial {
   title: string;
   fileName: string;
   fileUrl?: string;
-  processingStatus?: string;
+  fileType?: string;
+  fileSizeBytes?: number;
+  thumbnailUrl?: string;
+  processingStatus?: 'SELECTED' | 'UPLOADING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | string;
 }
 
 export const useChat = (initialSessionId: string | null) => {
@@ -93,15 +96,23 @@ export const useChat = (initialSessionId: string | null) => {
     if ((!inputText.trim() && !attachedMaterial) || isThinking) return;
 
     let messageContent = inputText.trim();
+    const isImage = attachedMaterial?.fileType?.includes('image') || 
+                    attachedMaterial?.fileName?.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+
     if (attachedMaterial && !messageContent) {
-      messageContent = `Please review and summarize the attached study material: "${attachedMaterial.title || attachedMaterial.fileName}"`;
+      if (isImage) {
+        messageContent = `Please review and explain this study diagram/image: "${attachedMaterial.title || attachedMaterial.fileName}"`;
+      } else {
+        messageContent = `Please review and summarize the attached study material: "${attachedMaterial.title || attachedMaterial.fileName}"`;
+      }
     }
 
+    const attachBadge = isImage ? '📷 **Attached Image:**' : '📄 **Attached Document:**';
     const optimisticMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
       content: attachedMaterial 
-        ? `📎 **Attached Material:** [${attachedMaterial.title || attachedMaterial.fileName}]\n\n${messageContent}`
+        ? `${attachBadge} [${attachedMaterial.title || attachedMaterial.fileName}]\n\n${messageContent}`
         : messageContent,
       sessionId: sessionId || 'temp',
       timestamp: new Date().toISOString(),

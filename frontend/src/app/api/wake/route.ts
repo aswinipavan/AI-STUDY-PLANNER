@@ -10,17 +10,17 @@ export async function GET() {
   try {
     const res = await fetch(`${ENV.BACKEND_URL}/actuator/health`, {
       method: 'GET',
-      signal: AbortSignal.timeout(50000), // 50s — Render cold start can be slow
+      signal: AbortSignal.timeout(12000), // 12s — quick ping so UI stays responsive
       cache: 'no-store',
     });
 
     if (res.ok) {
       const data = await res.json();
-      return NextResponse.json({ status: 'awake', backend: data.status ?? 'UP' });
+      return NextResponse.json({ status: 'awake', backend: data.status ?? 'UP' }, { status: 200 });
     }
 
-    return NextResponse.json({ status: 'warming', message: 'Backend is starting up...' }, { status: 202 });
+    return NextResponse.json({ status: 'warming', message: 'Backend is starting up...' }, { status: 200 });
   } catch {
-    return NextResponse.json({ status: 'sleeping', message: 'Backend is cold, please wait a moment.' }, { status: 503 });
+    return NextResponse.json({ status: 'sleeping', message: 'Backend is cold, please wait a moment.' }, { status: 200 });
   }
 }
