@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: 'AI Chat', href: '/chat', icon: MessageSquare },
   { label: 'Materials', href: '/materials', icon: FileText },
   { label: 'Exams', href: '/exams', icon: GraduationCap },
-  { label: 'Analytics', href: '/analytics', icon: LineChart },
+  { label: 'Analytics', href: '/performance', icon: LineChart },
 ];
 
 export const Sidebar = () => {
