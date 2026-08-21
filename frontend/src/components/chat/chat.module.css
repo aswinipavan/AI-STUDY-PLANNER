@@ -293,6 +293,51 @@
 }
 .textarea:focus { border-color: var(--color-primary); }
 .textarea:disabled { opacity: 0.7; cursor: not-allowed; }
+.textareaAnimating { color: transparent !important; }
+
+.placeholderOverlay {
+  position: absolute;
+  top: 0;
+  left: 3.25rem;
+  right: 3.5rem;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.placeholderText {
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.vanishCanvas {
+  position: absolute;
+  pointer-events: none;
+  top: 8px;
+  left: 3.25rem;
+  right: 3.5rem;
+  transform: scale(0.5);
+  transform-origin: top left;
+  z-index: 10;
+}
+
+.canvasHidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.canvasVisible {
+  opacity: 1;
+  visibility: visible;
+}
+
 
 .btnSend {
   position: absolute;

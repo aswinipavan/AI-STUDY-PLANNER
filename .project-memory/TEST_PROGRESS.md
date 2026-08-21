@@ -39,8 +39,8 @@
 ---
 
 ## Frontend Automated Tests
-- **Status:** Passing (71/71 tests green across 9 suites) ✅
-- **Coverage:** ~ 84%
+- **Status:** Passing (77/77 tests green across 11 suites) ✅
+- **Coverage:** ~ 85%
 - **Build Verification:** Next.js 16.2.9 App Router (23/23 routes statically optimized with 0 errors)
 
 ---

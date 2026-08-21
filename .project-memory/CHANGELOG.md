@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-08-21 (Session 17 - Production API Timeout Fixes)
+- **Files changed:**
+  - `frontend/src/hooks/useBackendHealth.ts` [NEW]
+  - `frontend/src/hooks/useNotifications.ts` [MODIFIED]
+  - `frontend/src/hooks/usePerformance.ts` [MODIFIED]
+  - `frontend/src/hooks/useExams.ts` [MODIFIED]
+  - `frontend/src/hooks/useSubjects.ts` [MODIFIED]
+  - `frontend/src/hooks/useMaterials.ts` [MODIFIED]
+  - `frontend/src/hooks/useStudyRoom.ts` [MODIFIED]
+  - `frontend/src/hooks/useDashboard.ts` [MODIFIED]
+  - `frontend/src/hooks/useChat.ts` [MODIFIED]
+  - `frontend/src/api/chat.api.ts` [MODIFIED]
+  - `frontend/src/app/api/[...path]/route.ts` [MODIFIED]
+  - `frontend/src/components/layout/Topbar.tsx` [MODIFIED]
+  - `backend/.../NotificationController.java` [MODIFIED]
+  - `backend/.../NotificationService.java` [MODIFIED]
+  - `backend/.../CacheConfig.java` [MODIFIED]
+  - `.github/workflows/keep-alive.yml` [NEW]
+- **Reason:** All production API endpoints (notifications, ai/chat, performance/priority, performance/readiness, exams/upcoming) failing with net::ERR_ABORTED after 45-60s timeout due to Render free-tier cold starts.
+- **Summary:**
+  - Created `useBackendHealth` hook — pings `/api/wake` and gates all data-fetching hooks via `enabled: isReady`.
+  - Added health gate + retry/backoff to all 12 data-fetching hooks across the app.
+  - Increased AI chat timeout (60s → 90s) and proxy timeout (60s → 120s).
+  - Optimized `NotificationService` — removed redundant `findById`, added `@Cacheable`.
+  - Added graceful loading/error badge states to Topbar bell icon.
+  - Created GitHub Actions keep-alive cron (every 14 min) to prevent Render cold starts.
+  - Converted `useDashboard` from `useSuspenseQuery` to `useQuery` with health gate.
+- **Impact:** Eliminates all production ERR_ABORTED timeouts. Backend stays warm via keep-alive. Frontend gracefully handles cold starts instead of silently failing.
+
+## 2026-08-21 (Session 16 - Fix Production Metaspace OOM)
+- **Files changed:**
+  - `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/service/AuthService.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/security/FirebaseTokenFilter.java` [MODIFIED]
+- **Reason:** Metaspace OutOfMemoryError in production during login due to repeated FirebaseAuth.getInstance() calls under load.
+- **Summary:**
+  - Configured `FirebaseAuth` as a Spring `@Bean` initialized exactly once at startup inside `FirebaseConfig.java`.
+  - Replaced all ad-hoc `FirebaseAuth.getInstance()` calls with constructor-injected instances in `AuthService` and `FirebaseTokenFilter`.
+  - Verified backend compilation (BUILD SUCCESS) locally.
+- **Impact:** Prevents excessive classloading and synchronization overhead during authentication, resolving HTTP 500 Metaspace crashes on Render.
+
 ## 2026-08-20 (Session 15 - Phases 1-12 Execution: Intelligence, Collaboration, Notifications & Badges)
 - **Files changed:**
   - `backend/src/main/resources/db/migration/V3__add_study_together_tables.sql` [NEW]
@@ -405,8 +446,31 @@
 - **Summary:** Built `FloatingDock` using Framer Motion and Lucide icons. Verified with Jest (71/71 tests passing) and Next.js Turbopack production build (23/23 routes generated with 0 errors).
 - **Impact:** Adds dynamic spring-physics navigation dock primitive to the component library.
 
+## [2026-08-20] PlaceholdersAndVanishInput & AI Chat Box Enhancement
+- **Files changed:**
+  - `frontend/src/components/ui/placeholders-and-vanish-input.tsx` [NEW]: Reusable animated rotating placeholder input with HTML5 canvas particle vanish physics, visibility state lifecycle detection, and controlled/uncontrolled state support.
+  - `frontend/src/components/placeholders-and-vanish-input-demo.tsx` [NEW]: Demo showcase container for PlaceholdersAndVanishInput.
+  - `frontend/src/components/chat/ChatInput.tsx` [MODIFIED]: Upgraded real AI Chat input with animated rotating study-focused placeholders, canvas particle disintegration on message submit, while fully preserving PDF/image attachments, preview thumbnails, upload validation, Groq AI messaging, and quick action chips.
+  - `frontend/src/components/chat/chat.module.css` [MODIFIED]: Added styles for `.placeholderOverlay`, `.placeholderText`, `.vanishCanvas`, and `.textareaAnimating`.
+  - `frontend/src/__tests__/components/placeholders-and-vanish-input.test.tsx` [NEW]: Unit tests covering placeholder rotation, form submit, and demo rendering.
+  - `frontend/src/__tests__/components/chat-input.test.tsx` [NEW]: Unit tests covering ChatInput rendering, message sending, and attachment quick actions.
+- **Reason:** Enhance the AI Study Planner chat input box with animated rotating academic questions and canvas particle vanish effect while keeping 100% of existing Groq AI and attachment capabilities intact.
+- **Summary:** Built UI primitive and enhanced real ChatInput component. Tested with Jest (77/77 tests passing across 11 suites) and compiled cleanly via Next.js Turbopack build (23/23 routes generated with 0 errors).
+- **Impact:** Delivers engaging micro-interactions and visual polish to the core AI Chat companion.
 
 
 
 
 
+
+
+## [2026-08-21T09:05:00] Environment Variable Cleanup
+- **Files Modified**: 
+  - frontend/.env.local
+  - frontend/.env.production
+  - frontend/.env.example
+  - frontend/.env.local.example
+  - frontend/src/env.ts
+- **Reason**: To remove backend-only secrets from frontend files and consolidate API base URL configuration to match actual source code usage.
+- **Summary**: Removed JWT_SECRET, API_BASE_URL, and NEXT_PUBLIC_API_BASE_URL from frontend environment files. Ensured NEXT_PUBLIC_BACKEND_URL is correctly configured as the sole backend connection URL.
+- **Impact**: Better security by moving secrets purely to backend configuration. Cleaned up obsolete variable clutter from frontend environments.

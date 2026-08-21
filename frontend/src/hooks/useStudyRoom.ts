@@ -2,30 +2,35 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { studyRoomApi } from '@/api/studyRoom.api';
 import { QK } from '@/constants/queryKeys';
 import { CreateStudyRoomDTO } from '@/types/api.types';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 export const useActiveStudyRooms = () => {
+  const { isReady } = useBackendHealth();
   return useQuery({
     queryKey: QK.studyRooms,
     queryFn: studyRoomApi.getActiveRooms,
-    refetchInterval: 10000, // Poll active rooms every 10s
+    refetchInterval: isReady ? 10000 : false, // Only poll when backend is warm
+    enabled: isReady,
   });
 };
 
 export const useStudyRoom = (code: string) => {
+  const { isReady } = useBackendHealth();
   return useQuery({
     queryKey: QK.studyRoom(code),
     queryFn: () => studyRoomApi.getRoom(code),
-    enabled: Boolean(code),
-    refetchInterval: 5000, // Poll room details & timer every 5s
+    enabled: Boolean(code) && isReady,
+    refetchInterval: isReady ? 5000 : false, // Poll room details & timer every 5s
   });
 };
 
 export const useStudyRoomMessages = (code: string) => {
+  const { isReady } = useBackendHealth();
   return useQuery({
     queryKey: QK.studyRoomMessages(code),
     queryFn: () => studyRoomApi.getMessages(code),
-    enabled: Boolean(code),
-    refetchInterval: 3000, // Live chat polling every 3s
+    enabled: Boolean(code) && isReady,
+    refetchInterval: isReady ? 3000 : false, // Live chat polling every 3s
   });
 };
 

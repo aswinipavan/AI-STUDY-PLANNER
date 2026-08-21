@@ -1,6 +1,5 @@
 package com.aistudyplanner.service;
 
-import com.aistudyplanner.exception.ResourceNotFoundException;
 import com.aistudyplanner.model.dto.response.NotificationResponse;
 import com.aistudyplanner.model.entity.Exam;
 import com.aistudyplanner.model.entity.Student;
@@ -9,6 +8,7 @@ import com.aistudyplanner.model.entity.Subject;
 import com.aistudyplanner.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +22,15 @@ import java.util.*;
 @Slf4j
 public class NotificationService {
 
-    private final StudentRepository studentRepository;
     private final ExamRepository examRepository;
     private final MarksRepository marksRepository;
     private final SubjectRepository subjectRepository;
     private final StudyRoomRepository studyRoomRepository;
 
     @Transactional(readOnly = true)
-    public List<NotificationResponse> getPersonalizedNotifications(UUID studentId) {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
-
+    @Cacheable(value = "notifications", key = "#student.id", unless = "#result.isEmpty()")
+    public List<NotificationResponse> getPersonalizedNotifications(Student student) {
+        UUID studentId = student.getId();
         List<NotificationResponse> notifications = new ArrayList<>();
 
         // 1. Upcoming Exams (7 days, 3 days, 1 day)

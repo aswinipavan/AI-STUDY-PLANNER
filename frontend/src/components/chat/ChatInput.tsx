@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Paperclip, X, FileText, ImageIcon, FileCode, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
 import styles from './chat.module.css';
 import { useUploadMaterial } from '@/hooks/useMaterials';
@@ -26,6 +27,16 @@ function formatFileSize(bytes?: number): string {
 const ALLOWED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png', '.webp', '.doc', '.docx', '.txt'];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
+const STUDY_PLACEHOLDERS = [
+  "Ask anything... (Enter to send, Shift+Enter for new line)",
+  "Ask me to explain any concept or formula from your notes...",
+  "How should I structure my revision for upcoming exams?",
+  "Generate 5 practice multiple-choice questions for revision...",
+  "Summarize key formulas, theorems, and definitions...",
+  "Help me create a personalized study timetable...",
+  "Break down complex academic concepts step-by-step...",
+];
+
 const QUICK_ACTIONS = [
   { label: '✨ Summarize', prompt: 'Please provide a comprehensive, structured summary of this material with key takeaways and definitions.' },
   { label: '📝 Generate MCQs', prompt: 'Generate 5 high-yield multiple-choice questions (MCQs) with 4 options each, correct answers, and detailed explanations based on this material.' },
@@ -45,14 +56,50 @@ export default function ChatInput({
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const newDataRef = useRef<Array<{ x: number; y: number; r: number; color: string }>>([]);
+
   const [uploading, setUploading] = useState(false);
   const [uploadStatusText, setUploadStatusText] = useState<string>('');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const [localThumbnail, setLocalThumbnail] = useState<string | null>(null);
+  const [animating, setAnimating] = useState(false);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
 
   const { mutateAsync: uploadMaterialMutation } = useUploadMaterial();
 
+  // Placeholder rotation
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startPlaceholderAnimation = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCurrentPlaceholder((prev) => (prev + 1) % STUDY_PLACEHOLDERS.length);
+    }, 3500);
+  }, []);
+
+  const handleVisibilityChange = useCallback(() => {
+    if (document.visibilityState !== "visible" && intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    } else if (document.visibilityState === "visible") {
+      startPlaceholderAnimation();
+    }
+  }, [startPlaceholderAnimation]);
+
+  useEffect(() => {
+    startPlaceholderAnimation();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [startPlaceholderAnimation, handleVisibilityChange]);
+
+  // Adjust textarea height
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -62,10 +109,117 @@ export default function ChatInput({
     }
   }, [value]);
 
+  // Particle Vanish Effect
+  const drawVanishCanvas = useCallback(() => {
+    if (!textareaRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = 800;
+    canvas.height = 400;
+    ctx.clearRect(0, 0, 800, 400);
+
+    const computedStyles = getComputedStyle(textareaRef.current);
+    const fontSize = parseFloat(computedStyles.getPropertyValue("font-size")) || 14;
+    ctx.font = `${fontSize * 2}px ${computedStyles.fontFamily || "sans-serif"}`;
+    ctx.fillStyle = "#00e5c0";
+    ctx.fillText(value.slice(0, 80), 16, 40);
+
+    try {
+      const imageData = ctx.getImageData(0, 0, 800, 400);
+      const pixelData = imageData.data;
+      const newData: Array<{ x: number; y: number; r: number; color: string }> = [];
+
+      for (let t = 0; t < 400; t += 2) {
+        const i = 4 * t * 800;
+        for (let n = 0; n < 800; n += 2) {
+          const e = i + 4 * n;
+          if (
+            pixelData[e] !== 0 ||
+            pixelData[e + 1] !== 0 ||
+            pixelData[e + 2] !== 0
+          ) {
+            newData.push({
+              x: n,
+              y: t,
+              r: 1,
+              color: `rgba(${pixelData[e]}, ${pixelData[e + 1]}, ${pixelData[e + 2]}, ${pixelData[e + 3] / 255})`,
+            });
+          }
+        }
+      }
+      newDataRef.current = newData;
+    } catch {
+      newDataRef.current = [];
+    }
+  }, [value]);
+
+  useEffect(() => {
+    drawVanishCanvas();
+  }, [value, drawVanishCanvas]);
+
+  const triggerVanishAnimation = (startPos: number = 0) => {
+    const animateFrame = (pos: number = 0) => {
+      requestAnimationFrame(() => {
+        const newArr: Array<{ x: number; y: number; r: number; color: string }> = [];
+        for (let i = 0; i < newDataRef.current.length; i++) {
+          const current = newDataRef.current[i];
+          if (current.x < pos) {
+            newArr.push(current);
+          } else {
+            if (current.r <= 0) continue;
+            current.x += Math.random() > 0.5 ? 1 : -1;
+            current.y += Math.random() > 0.5 ? 1 : -1;
+            current.r -= 0.05 * Math.random();
+            newArr.push(current);
+          }
+        }
+        newDataRef.current = newArr;
+        const ctx = canvasRef.current?.getContext("2d");
+        if (ctx) {
+          ctx.clearRect(0, 0, 800, 400);
+          newDataRef.current.forEach((t) => {
+            const { x: n, y: i, r: s, color } = t;
+            if (n > pos && s > 0) {
+              ctx.beginPath();
+              ctx.rect(n, i, s, s);
+              ctx.fillStyle = color;
+              ctx.strokeStyle = color;
+              ctx.stroke();
+            }
+          });
+        }
+        if (newDataRef.current.length > 0) {
+          animateFrame(pos - 8);
+        } else {
+          setAnimating(false);
+        }
+      });
+    };
+    animateFrame(startPos);
+  };
+
+  const handleSend = () => {
+    if ((!value.trim() && !attachedMaterial) || isThinking || uploading) return;
+
+    if (value.trim() && newDataRef.current.length > 0) {
+      setAnimating(true);
+      const maxX = newDataRef.current.reduce(
+        (prev, current) => (current.x > prev ? current.x : prev),
+        0
+      );
+      triggerVanishAnimation(maxX);
+    }
+
+    onSend();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
       e.preventDefault();
-      onSend();
+      handleSend();
     }
   };
 
@@ -298,6 +452,12 @@ export default function ChatInput({
 
       {/* ── INPUT BAR ── */}
       <div className={styles.inputWrap}>
+        {/* Particle Canvas Vanish Layer */}
+        <canvas
+          ref={canvasRef}
+          className={`${styles.vanishCanvas} ${!animating ? styles.canvasHidden : styles.canvasVisible}`}
+        />
+
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -315,19 +475,35 @@ export default function ChatInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={
-            attachedMaterial
-              ? `Ask anything about "${attachedMaterial.title || attachedMaterial.fileName}"...`
-              : 'Ask anything... (Enter to send, Shift+Enter for new line)'
-          }
-          className={styles.textarea}
+          className={`${styles.textarea} ${animating ? styles.textareaAnimating : ''}`}
           rows={1}
           disabled={isThinking}
           id="chat-textarea"
+          aria-label="Chat input message"
         />
 
+        {/* Animated Rotating Placeholder */}
+        {!value && (
+          <div className={styles.placeholderOverlay}>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={attachedMaterial ? 'attached' : `placeholder-${currentPlaceholder}`}
+                initial={{ y: 6, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -6, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className={styles.placeholderText}
+              >
+                {attachedMaterial
+                  ? `Ask anything about "${attachedMaterial.title || attachedMaterial.fileName}"...`
+                  : STUDY_PLACEHOLDERS[currentPlaceholder]}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+        )}
+
         <button
-          onClick={onSend}
+          onClick={handleSend}
           disabled={(!value.trim() && !attachedMaterial) || isThinking || uploading}
           className={styles.btnSend}
           aria-label="Send message"
@@ -339,4 +515,3 @@ export default function ChatInput({
     </div>
   );
 }
-

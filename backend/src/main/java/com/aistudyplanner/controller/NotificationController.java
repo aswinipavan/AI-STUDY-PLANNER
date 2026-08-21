@@ -31,7 +31,7 @@ public class NotificationController {
     @Operation(summary = "Get personalized smart academic notifications")
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> getNotifications(@CurrentStudent Student student) {
         log.info("Fetching smart notifications for student: {}", student.getId());
-        List<NotificationResponse> notifications = notificationService.getPersonalizedNotifications(student.getId());
+        List<NotificationResponse> notifications = notificationService.getPersonalizedNotifications(student);
         return ResponseEntity.ok(ApiResponse.success(notifications, "Notifications fetched successfully"));
     }
 }

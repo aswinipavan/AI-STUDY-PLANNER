@@ -23,10 +23,11 @@ public class AuthService {
 
     private final StudentRepository studentRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final FirebaseAuth firebaseAuth;
 
     public AuthResponse login(LoginRequest request) {
         try {
-            FirebaseToken firebaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getFirebaseToken());
+            FirebaseToken firebaseToken = firebaseAuth.verifyIdToken(request.getFirebaseToken());
             String uid = firebaseToken.getUid();
             
             // Extract phone number if available
@@ -66,7 +67,7 @@ public class AuthService {
 
     public AuthResponse refreshToken(String firebaseTokenStr) {
         try {
-            FirebaseToken firebaseToken = FirebaseAuth.getInstance().verifyIdToken(firebaseTokenStr);
+            FirebaseToken firebaseToken = firebaseAuth.verifyIdToken(firebaseTokenStr);
             String uid = firebaseToken.getUid();
 
             Student student = studentRepository.findByFirebaseUid(uid)

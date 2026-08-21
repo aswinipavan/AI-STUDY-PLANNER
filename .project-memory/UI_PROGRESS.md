@@ -19,3 +19,5 @@
 | `ImagesBadge` (`@/components/ui/images-badge`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 3D folder peek hover animation with Framer Motion spring physics. |
 | `CloudShader` (`@/components/ui/cloud-shader`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | GPU-accelerated WebGL cloud shader with domain-warped billow noise. |
 | `FloatingDock` (`@/components/ui/floating-dock`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | macOS spring-physics floating dock navigation with adaptive scaling. |
+| `PlaceholdersAndVanishInput` (`@/components/ui/placeholders-and-vanish-input`) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | Animated rotating study placeholders and HTML5 canvas particle vanish effect. |
+| `/chat` (Upgraded with Vanish Effect) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | Full AI chat with rotating academic placeholders, canvas particle vanish, PDF/image upload, and quick action chips. |

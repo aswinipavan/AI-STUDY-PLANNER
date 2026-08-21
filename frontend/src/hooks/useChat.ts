@@ -4,6 +4,7 @@ import { aiApi } from '@/api/ai.api';
 import { ChatMessage, ChatSession } from '@/types/api.types';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 export interface ChatState {
   messages: ChatMessage[];
@@ -13,10 +14,12 @@ export interface ChatState {
 }
 
 export const useChatSessions = () => {
+  const { isReady } = useBackendHealth();
   return useQuery<ChatSession[]>({
     queryKey: ['chat-sessions'],
     queryFn: aiApi.getSessions,
     staleTime: 30 * 1000, // 30 seconds
+    enabled: isReady,
   });
 };
 

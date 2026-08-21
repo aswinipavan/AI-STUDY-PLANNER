@@ -2,12 +2,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subjectsApi } from '@/api/subjects.api';
 import { QK } from '@/constants/queryKeys';
 import { Subject } from '@/types/api.types';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 export const useSubjects = () => {
+  const { isReady } = useBackendHealth();
   return useQuery({ 
     queryKey: QK.subjects, 
     queryFn: subjectsApi.getAll,
-    staleTime: 5 * 60 * 1000 
+    staleTime: 5 * 60 * 1000,
+    enabled: isReady,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
 };
 

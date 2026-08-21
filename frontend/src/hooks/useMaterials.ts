@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsApi } from '@/api/materials.api';
 import { QK } from '@/constants/queryKeys';
 import { StudyMaterial } from '@/types/api.types';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 interface UploadPayload {
   file: File;
@@ -10,9 +11,13 @@ interface UploadPayload {
 }
 
 export const useMaterials = () => {
+  const { isReady } = useBackendHealth();
   return useQuery({
     queryKey: QK.materials,
     queryFn: materialsApi.getAll,
+    enabled: isReady,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
 };
 

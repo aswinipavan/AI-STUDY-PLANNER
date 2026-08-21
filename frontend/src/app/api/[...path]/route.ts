@@ -24,7 +24,7 @@ async function handleProxy(request: NextRequest, context: { params: Promise<{ pa
       method: request.method,
       headers,
       body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined,
-      signal: AbortSignal.timeout(60000), // 60s timeout for backend AI processing & cold starts
+      signal: AbortSignal.timeout(120000), // 120s — must outlive the longest client timeout (90s for AI chat)
     });
 
     const body = await response.arrayBuffer();

@@ -33,6 +33,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final StudentRepository studentRepository;
+    private final FirebaseAuth firebaseAuth;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private static final List<String> SKIP_URLS = Arrays.asList(
@@ -63,7 +64,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                     });
                 } else {
                     try {
-                        FirebaseToken firebaseToken = FirebaseAuth.getInstance().verifyIdToken(jwt);
+                        FirebaseToken firebaseToken = firebaseAuth.verifyIdToken(jwt);
                         String firebaseUid = firebaseToken.getUid();
                         
                         // CRITICAL FIX: Do NOT auto-create students from Firebase tokens

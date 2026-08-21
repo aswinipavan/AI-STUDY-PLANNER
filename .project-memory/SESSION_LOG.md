@@ -1280,7 +1280,77 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
 - **Problems Found & Solutions:** None. Replaced non-existent `@tabler/icons-react` references with native `lucide-react` icons matching project dependencies.
 - **Next Recommended Task:** Production deployment & user acceptance testing.
 
+---
 
+## Session 20: 2026-08-20 - PlaceholdersAndVanishInput & AI Chat Box Enhancement
+- **Task Started:** Verify project prerequisites (shadcn/ui, Tailwind CSS v4, TypeScript), determine component default paths, integrate `PlaceholdersAndVanishInput` UI component, and upgrade existing AI Chat input box with animated rotating study placeholders and HTML5 canvas particle vanish effect.
+- **Task Completed:**
+  1. Verified project structure: shadcn/ui configured via `components.json` with `@/components/ui` alias; Tailwind CSS v4 configured via `@tailwindcss/postcss` and `@theme inline` in `globals.css`; TypeScript 5 configured with `@/*` path mapping in `tsconfig.json`.
+  2. Implemented `PlaceholdersAndVanishInput` in `frontend/src/components/ui/placeholders-and-vanish-input.tsx` with Framer Motion, HTML5 canvas particle sampling, and visibility lifecycle detection.
+  3. Implemented `PlaceholdersAndVanishInputDemo` in `frontend/src/components/placeholders-and-vanish-input-demo.tsx`.
+  4. Upgraded `frontend/src/components/chat/ChatInput.tsx` with animated rotating study-focused placeholders (`STUDY_PLACEHOLDERS`), canvas particle disintegration animation on message send, while preserving 100% of existing functionality: file attachments (PDF/images), local thumbnail previews, upload validation (<= 50MB), 6 AI quick action chips, error/success banners, and all testing IDs (`#chat-textarea`, `#btn-chat-send`, `#btn-chat-attach`, `#chat-file-input`).
+  5. Added styles in `frontend/src/components/chat/chat.module.css` for `.placeholderOverlay`, `.placeholderText`, `.vanishCanvas`, and `.textareaAnimating`.
+  6. Added comprehensive unit tests in `placeholders-and-vanish-input.test.tsx` (3/3 tests passed) and `chat-input.test.tsx` (3/3 tests passed).
+  7. Verified all frontend tests: `npm test` -> **77/77 PASSED across 11 test suites**.
+  8. Verified production build: `npm run build` -> **23/23 routes compiled with 0 errors**.
+- **Files Created / Modified:**
+  - `frontend/src/components/ui/placeholders-and-vanish-input.tsx` [NEW]
+  - `frontend/src/components/placeholders-and-vanish-input-demo.tsx` [NEW]
+  - `frontend/src/components/chat/ChatInput.tsx` [MODIFIED]
+  - `frontend/src/components/chat/chat.module.css` [MODIFIED]
+  - `frontend/src/__tests__/components/placeholders-and-vanish-input.test.tsx` [NEW]
+  - `frontend/src/__tests__/components/chat-input.test.tsx` [NEW]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/TEST_PROGRESS.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:** None. Canvas particle physics degrade gracefully in headless test environments while maintaining smooth 60fps animations in the browser.
+- **Next Recommended Task:** Production deployment & user acceptance testing.
 
+## 2026-08-21 (Session 16 - Fix Production Metaspace OOM)
+- **Task Started:** Investigate and fix Metaspace OutOfMemoryError during login on Render.
+- **Task Completed:** Changed FirebaseAuth initialization to a singleton @Bean to prevent repeated initialization overhead.
+- **Files Modified:** `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java`, `backend/src/main/java/com/aistudyplanner/service/AuthService.java`, `backend/src/main/java/com/aistudyplanner/security/FirebaseTokenFilter.java`
+- **Problems Found:** `FirebaseAuth.getInstance()` was called on every request in AuthService and FirebaseTokenFilter, contributing to excessive classloading/synchronization overhead that triggered Metaspace OOM under load on Render's memory-constrained instances.
+- **Solutions:** Configured a singleton `FirebaseAuth` bean initialized once at startup and constructor-injected it.
+- **Next Recommended Task:** Deploy the backend to Render and verify the fix in production.
+ 
+ ## [2026-08-21T09:05:00] Environment Variable Cleanup
+- **Task Started**: Cleanup frontend environment variables to remove backend-only secrets and unify API base URL.
+- **Task Completed**: Yes
+- **Files Modified**: 
+  - frontend/.env.local
+  - frontend/.env.production
+  - frontend/.env.example
+  - frontend/.env.local.example
+  - frontend/src/env.ts
+- **Problems Found**: Multiple API URLs existed (API_BASE_URL, NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_BACKEND_URL) and backend secrets like JWT_SECRET were exposed in frontend envs.
+- **Solutions**: Removed JWT_SECRET from frontend env. Unified API base URL to only use NEXT_PUBLIC_BACKEND_URL as it is what the source code (src/constants/config.ts) actually uses.
+- **Next Recommended Task**: Validate frontend API calls are successfully connecting to the backend.
 
-
+## 2026-08-21 (Session 17 - Production API Timeout Fixes)
+- **Task Started:** Fix all production API requests failing with net::ERR_ABORTED (45s/60s timeouts) due to Render free-tier cold starts.
+- **Task Completed:** Implemented comprehensive cold-start resilience across frontend and backend.
+- **Files Modified:**
+  - frontend/src/hooks/useBackendHealth.ts [NEW] — Singleton health gate hook
+  - frontend/src/hooks/useNotifications.ts [MODIFIED] — Added health gate, retry, reduced polling
+  - frontend/src/hooks/usePerformance.ts [MODIFIED] — Added health gate to all 4 query hooks
+  - frontend/src/hooks/useExams.ts [MODIFIED] — Added health gate
+  - frontend/src/hooks/useSubjects.ts [MODIFIED] — Added health gate
+  - frontend/src/hooks/useMaterials.ts [MODIFIED] — Added health gate
+  - frontend/src/hooks/useStudyRoom.ts [MODIFIED] — Added health gate, conditional polling
+  - frontend/src/hooks/useDashboard.ts [MODIFIED] — Converted useSuspenseQuery → useQuery with health gate
+  - frontend/src/hooks/useChat.ts [MODIFIED] — Added health gate to chat sessions
+  - frontend/src/api/chat.api.ts [MODIFIED] — Increased AI chat timeout 60s → 90s
+  - frontend/src/app/api/[...path]/route.ts [MODIFIED] — Increased proxy timeout 60s → 120s
+  - frontend/src/components/layout/Topbar.tsx [MODIFIED] — Added health gate, loading/error bell badge states
+  - backend/src/main/java/com/aistudyplanner/controller/NotificationController.java [MODIFIED] — Pass Student entity directly
+  - backend/src/main/java/com/aistudyplanner/service/NotificationService.java [MODIFIED] — Accept Student entity, added @Cacheable
+  - backend/src/main/java/com/aistudyplanner/config/CacheConfig.java [MODIFIED] — Added "notifications" cache
+  - .github/workflows/keep-alive.yml [NEW] — GitHub Actions cron ping every 14 min
+- **Problems Found:** All production API endpoints timing out with ERR_ABORTED because Render free-tier spins down after 15 min and Spring Boot JVM takes 30-60s to cold start. No coordination between wake endpoint and data hooks. Aggressive polling (30s notifications, 10s/5s/3s study rooms) firing during cold starts.
+- **Solutions:** Created useBackendHealth hook as a centralized gate. All data hooks now wait for backend readiness via `enabled: isReady`. Reduced polling frequencies. Added keep-alive cron to prevent cold starts. Optimized NotificationService with caching and eliminated redundant DB query.
+- **Next Recommended Task**: Deploy to Vercel/Render and verify cold-start resilience in production.

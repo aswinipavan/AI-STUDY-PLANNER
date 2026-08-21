@@ -10,8 +10,9 @@ import { QK } from '@/constants/queryKeys';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles } from 'lucide-react';
+import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles, Loader2 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 /**
  * Topbar — fixed for Issues 2, 3:
@@ -30,14 +31,18 @@ export function Topbar() {
   const bellRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
 
-  // Fetch smart academic notifications
-  const { data: notifications } = useNotifications();
+  // Backend health gate — prevent API calls while Render is cold-starting
+  const { isReady, isWaking } = useBackendHealth();
 
-  // Fetch upcoming exams for notification fallback
+  // Fetch smart academic notifications (gated by backend health)
+  const { data: notifications, isLoading: notifLoading } = useNotifications();
+
+  // Fetch upcoming exams for notification fallback (also gated)
   const { data: upcomingExams = [] } = useQuery({
     queryKey: QK.exams,
     queryFn: examsApi.getUpcoming,
     staleTime: 5 * 60 * 1000,
+    enabled: isReady,
   });
 
   // Close dropdowns when clicking outside
@@ -99,9 +104,11 @@ export function Topbar() {
             aria-label="Notifications"
           >
             <Bell size={20} />
-            {notifications && notifications.length > 0 && (
+            {isWaking || notifLoading ? (
+              <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-muted-foreground/40 animate-pulse" />
+            ) : notifications && notifications.length > 0 ? (
               <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-destructive animate-pulse" />
-            )}
+            ) : null}
           </button>
 
           {showBell && (

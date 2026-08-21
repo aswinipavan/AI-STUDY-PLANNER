@@ -1,0 +1,29 @@
+name: Keep Backend Alive
+
+# Ping the Render backend every 14 minutes to prevent free-tier cold starts.
+# Render free tier spins down after ~15 min of inactivity; Spring Boot JVM
+# takes 30-60s to cold start, causing all frontend API calls to timeout.
+
+on:
+  schedule:
+    # Every 14 minutes — just under Render's 15-min inactivity threshold
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping Render backend health endpoint
+        run: |
+          echo "Pinging backend to prevent cold start..."
+          HTTP_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
+            https://ai-study-planner-hp0e.onrender.com/actuator/health \
+            --max-time 30 || echo "000")
+          echo "Response status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Backend is awake"
+          else
+            echo "⚠️ Backend returned $HTTP_STATUS (may be waking up)"
+          fi

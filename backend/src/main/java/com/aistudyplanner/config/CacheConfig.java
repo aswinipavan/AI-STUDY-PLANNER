@@ -16,7 +16,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         // Use Caffeine for bounded, efficient caching with automatic eviction
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("groq-tips");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("groq-tips", "notifications");
         
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(100)              // Max 100 cached entries

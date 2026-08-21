@@ -25,5 +25,6 @@
 | BUG-015 | Medium | Topbar theme toggle not applying `.dark` class to DOM & missing avatar/bell menus | `ThemeApplier.tsx`, `layout.tsx`, `Topbar.tsx` | Fixed | Yes |
 | BUG-016 | High | Chat history endpoint LazyInitializationException HTTP 500 on Student relationship | `ChatMessageResponse.java`, `AiAssistantService.java`, `AiAssistantController.java` | Fixed | Yes |
 | BUG-017 | High | Material upload PUT failure to Supabase Storage due to missing authorization headers | `MaterialService.java`, `application.properties`, `useMaterials.ts` | Fixed | Yes |
-| BUG-018 | Medium | ManualTokenGenTest executed during automated Maven builds and failed due to test context configuration | `ManualTokenGenTest.java` | Fixed | Yes |
 | BUG-019 | Low | Login test empty form submission failed in JSDOM due to HTML5 required attribute preventing button click | `src/__tests__/app/auth/login.test.tsx` | Fixed | Yes |
+| BUG-020 | High | Metaspace OutOfMemoryError in production under load due to repeated FirebaseAuth.getInstance() calls | `FirebaseConfig.java`, `AuthService.java`, `FirebaseTokenFilter.java` | Fixed | Yes |
+| BUG-021 | Critical | All production API endpoints (notifications, ai/chat, performance, exams) timeout with ERR_ABORTED after 45-60s due to Render free-tier cold starts | `useBackendHealth.ts`, all hooks, `keep-alive.yml`, `NotificationService.java` | Fixed | Yes |

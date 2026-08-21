@@ -54,6 +54,7 @@
 - [2026-08-20] Integrated `ImagesBadge` and `ImagesBadgeDemo` components into `@/components/ui/images-badge.tsx` and `@/components/images-badge-demo.tsx`. Created unit test suite (`images-badge.test.tsx`, 6/6 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
 - [2026-08-20] Integrated `CloudShader` WebGL component and `CloudShaderDemo` into `@/components/ui/cloud-shader.tsx` and `@/components/cloud-shader-demo.tsx`. Created unit test suite (`cloud-shader.test.tsx`, 4/4 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
 - [2026-08-20] Integrated `FloatingDock` spring-physics component and `FloatingDockDemo` into `@/components/ui/floating-dock.tsx` and `@/components/floating-dock-demo.tsx`. Created unit test suite (`floating-dock.test.tsx`, 3/3 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
+- [2026-08-20] Integrated `PlaceholdersAndVanishInput` component (`@/components/ui/placeholders-and-vanish-input.tsx`), created `PlaceholdersAndVanishInputDemo`, and upgraded `ChatInput.tsx` with animated rotating study placeholders and canvas particle vanish effect. Created unit test suites (`placeholders-and-vanish-input.test.tsx`, `chat-input.test.tsx`, 77/77 tests passing across 11 suites). Next.js 16 build passed with 0 errors (23/23 routes).
 
 ## In Progress
 - (none)

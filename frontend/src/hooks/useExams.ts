@@ -2,13 +2,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examsApi } from '@/api/exams.api';
 import { QK } from '@/constants/queryKeys';
 import { Exam } from '@/types/api.types';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
-export const useExams = () =>
-  useQuery({
+export const useExams = () => {
+  const { isReady } = useBackendHealth();
+  return useQuery({
     queryKey: QK.exams,
     queryFn: examsApi.getUpcoming,
     staleTime: 5 * 60 * 1000,
+    enabled: isReady,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
+};
 
 export const useCreateExam = () => {
   const qc = useQueryClient();
