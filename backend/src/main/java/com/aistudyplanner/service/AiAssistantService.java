@@ -156,6 +156,11 @@ public class AiAssistantService {
             if (summary.length() > 2000) summary = summary.substring(0, 2000) + "...";
             sb.append("Document Summary:\n").append(summary).append("\n");
         }
+        if (m.getExtractedText() != null && !m.getExtractedText().isBlank()) {
+            String excerpt = m.getExtractedText();
+            if (excerpt.length() > 6_000) excerpt = excerpt.substring(0, 6_000) + "...";
+            sb.append("Document Text Excerpt:\n").append(excerpt).append("\n");
+        }
         return sb.toString();
     }
 
@@ -217,6 +222,30 @@ public class AiAssistantService {
                       .append(": on ").append(ex.getExamDate()).append(" (in ").append(daysLeft).append(" days)");
                     if (ex.getSyllabusCovered() != null && !ex.getSyllabusCovered().isBlank()) {
                         sb.append(" - Syllabus: ").append(ex.getSyllabusCovered());
+                    }
+                    sb.append("\n");
+                }
+            }
+        } catch (Exception e) {
+            // graceful fallback
+        }
+
+        // Uploaded Study Materials & Syllabus Knowledge Base
+        try {
+            List<com.aistudyplanner.model.entity.Material> materials = materialRepository.findAllByStudentId(student.getId());
+            if (materials != null && !materials.isEmpty()) {
+                sb.append("Uploaded Study Materials & Knowledge Base:\n");
+                for (var mat : materials.stream().limit(5).toList()) {
+                    sb.append("- ").append(mat.getTitle() != null ? mat.getTitle() : mat.getFileName());
+                    if (mat.getSubject() != null) {
+                        sb.append(" (Subject: ").append(mat.getSubject().getSubjectName()).append(")");
+                    }
+                    if (mat.getOverallDifficulty() != null) {
+                        sb.append(" [Difficulty: ").append(mat.getOverallDifficulty()).append("]");
+                    }
+                    if (mat.getExtractedTopics() != null && !mat.getExtractedTopics().isBlank() && !mat.getExtractedTopics().equals("[]")) {
+                        String topics = mat.getExtractedTopics();
+                        sb.append(" - Key Topics: ").append(topics.length() > 150 ? topics.substring(0, 147) + "..." : topics);
                     }
                     sb.append("\n");
                 }

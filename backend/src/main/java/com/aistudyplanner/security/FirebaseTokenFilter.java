@@ -58,32 +58,33 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt)) {
                 if (jwtTokenProvider.validateToken(jwt)) {
                     UUID studentId = jwtTokenProvider.getStudentIdFromToken(jwt);
-                    
-                    studentRepository.findById(studentId).ifPresent(student -> {
-                        setAuthenticationContext(student, request);
-                    });
+                    Student student = studentRepository.findById(studentId).orElse(null);
+                    if (student == null) {
+                        sendUnauthorized(response, "Authentication session is no longer valid.");
+                        return;
+                    }
+                    setAuthenticationContext(student, request);
                 } else {
                     try {
                         FirebaseToken firebaseToken = firebaseAuth.verifyIdToken(jwt);
                         String firebaseUid = firebaseToken.getUid();
-                        
-                        // CRITICAL FIX: Do NOT auto-create students from Firebase tokens
-                        // Require explicit signup through AuthService.login() which handles new user creation properly
-                        Student student = studentRepository.findByFirebaseUid(firebaseUid)
-                                .orElse(null);
-                        
-                        if (student != null) {
-                            setAuthenticationContext(student, request);
-                        } else {
-                            log.warn("User not found for Firebase UID: {}. User must complete signup.", firebaseUid);
+                        Student student = studentRepository.findByFirebaseUid(firebaseUid).orElse(null);
+                        if (student == null) {
+                            sendUnauthorized(response, "No Study Planner account exists for this Firebase user. Please sign in again.");
+                            return;
                         }
+                        setAuthenticationContext(student, request);
                     } catch (FirebaseAuthException e) {
-                        log.error("Could not verify Firebase token", e);
+                        log.info("Rejected invalid Firebase token: {}", e.getMessage());
+                        sendUnauthorized(response, "Invalid or expired authentication token.");
+                        return;
                     }
                 }
             }
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);
+            sendUnauthorized(response, "Invalid or expired authentication token.");
+            return;
         }
 
         filterChain.doFilter(request, response);
@@ -102,5 +103,12 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private void sendUnauthorized(HttpServletResponse response, String message) throws IOException {
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"success\":false,\"message\":\"" + message.replace("\"", "\\\"") + "\"}");
     }
 }

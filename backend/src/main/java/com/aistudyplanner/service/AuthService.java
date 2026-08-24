@@ -6,6 +6,7 @@ import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.security.JwtTokenProvider;
 import com.aistudyplanner.exception.FirebaseTokenException;
+import com.aistudyplanner.exception.UnauthorizedException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -71,7 +72,7 @@ public class AuthService {
             String uid = firebaseToken.getUid();
 
             Student student = studentRepository.findByFirebaseUid(uid)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new UnauthorizedException("No Study Planner account exists for this Firebase user. Please sign in again."));
 
             String token = jwtTokenProvider.generateToken(student.getId(), uid);
 

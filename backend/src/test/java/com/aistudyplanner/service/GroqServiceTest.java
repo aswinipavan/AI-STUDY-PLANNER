@@ -2,6 +2,7 @@ package com.aistudyplanner.service;
 
 import com.aistudyplanner.model.dto.response.ExamResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
+import com.aistudyplanner.exception.GroqApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -70,7 +71,7 @@ class GroqServiceTest {
 
     // ============ Test 2: Analyze Marks API Failure ============
     @Test
-    @DisplayName("Should handle API failure and return fallback message")
+    @DisplayName("Should surface API failures instead of inventing an AI response")
     void testAnalyzeMarksAPIFailure() {
         // Arrange
         Map<String, Double> subjectAverages = new HashMap<>();
@@ -80,10 +81,8 @@ class GroqServiceTest {
                 .thenThrow(new RuntimeException("Connection failed"));
 
         // Act
-        String result = groqService.analyzeMarks(testStudentId, subjectAverages);
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
+        assertThatThrownBy(() -> groqService.analyzeMarks(testStudentId, subjectAverages))
+                .isInstanceOf(GroqApiException.class);
     }
 
     // ============ Test 3: Analyze Marks Empty Subjects ============
@@ -369,7 +368,7 @@ class GroqServiceTest {
 
     // ============ Test 15: Rate Limiting ============
     @Test
-    @DisplayName("Should enforce rate limiting by returning fallback message")
+    @DisplayName("Should surface provider failures instead of returning a fabricated result")
     void testRateLimitingEnforcement() {
         // Arrange - Mock the RestTemplate to trigger rate limit check internally
         // The service will call checkRateLimit() which throws RateLimitException
@@ -382,11 +381,8 @@ class GroqServiceTest {
         when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
                 .thenThrow(new RuntimeException("Rate limit"));
 
-        // Act
-        String result = groqService.analyzeMarks(testStudentId, marks);
-
-        // Assert - Service catches exceptions and returns fallback
-        assertThat(result).contains("unable to generate a response");
+        assertThatThrownBy(() -> groqService.analyzeMarks(testStudentId, marks))
+                .isInstanceOf(GroqApiException.class);
     }
 
     // ============ Test 16: Chat Failure ============
@@ -401,10 +397,8 @@ class GroqServiceTest {
                 .thenThrow(new RuntimeException("Service unavailable"));
 
         // Act
-        String result = groqService.chat(userMessage, history);
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
+        assertThatThrownBy(() -> groqService.chat(userMessage, history))
+                .isInstanceOf(GroqApiException.class);
     }
 
     // ============ Test 17: Summarize Failure ============
@@ -418,10 +412,8 @@ class GroqServiceTest {
                 .thenThrow(new RuntimeException("API error"));
 
         // Act
-        String result = groqService.summarizeMaterial(content);
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
+        assertThatThrownBy(() -> groqService.summarizeMaterial(content))
+                .isInstanceOf(GroqApiException.class);
     }
 
     // ============ Test 18: Categorize Failure ============
@@ -433,9 +425,7 @@ class GroqServiceTest {
                 .thenThrow(new RuntimeException("Categorization failed"));
 
         // Act
-        String result = groqService.categorizeMaterial("file.pdf", "content preview");
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
+        assertThatThrownBy(() -> groqService.categorizeMaterial("file.pdf", "content preview"))
+                .isInstanceOf(GroqApiException.class);
     }
 }

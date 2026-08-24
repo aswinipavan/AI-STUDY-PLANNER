@@ -1,6 +1,7 @@
 package com.aistudyplanner.service;
 
 import com.aistudyplanner.config.GroqConfig;
+import com.aistudyplanner.exception.GroqApiException;
 import com.aistudyplanner.exception.RateLimitException;
 import com.aistudyplanner.model.dto.response.ExamResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
@@ -35,6 +36,9 @@ public class GroqService {
     @Value("${groq.api-key}")
     private String apiKey;
 
+    @Value("${groq.model:openai/gpt-oss-20b}")
+    private String model;
+
     private final ConcurrentHashMap<Long, AtomicInteger> rateLimiter = new ConcurrentHashMap<>();
 
     private void checkRateLimit() {
@@ -49,13 +53,20 @@ public class GroqService {
     }
 
     private String callGroq(String prompt) {
+        return callGroq(prompt, true);
+    }
+
+    private String callGroq(String prompt, boolean allowRetry) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new GroqApiException("Groq is not configured on the backend.", null);
+        }
         checkRateLimit();
         long startTime = System.currentTimeMillis();
         try {
             Map<String, Object> body = new HashMap<>();
             
             // Groq uses OpenAI-compatible API format
-            body.put("model", "llama-3.3-70b-versatile");  // Groq's fastest model
+            body.put("model", model != null && !model.isBlank() ? model : "openai/gpt-oss-20b");
             
             Map<String, Object> message = new HashMap<>();
             message.put("role", "user");
@@ -72,25 +83,49 @@ public class GroqService {
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
             String responseStr = groqRestTemplate.postForObject(GroqConfig.GROQ_API_URL, request, String.class);
+            if (responseStr == null || responseStr.isBlank()) {
+                throw new GroqApiException("Groq returned an empty response.", null);
+            }
             
             long duration = System.currentTimeMillis() - startTime;
             log.debug("Groq API call successful. Duration: {}ms", duration);
             
             JsonNode root = objectMapper.readTree(responseStr);
             if (root.has("choices") && root.path("choices").size() > 0) {
-                return root.path("choices").get(0).path("message").path("content").asText();
+                String content = root.path("choices").get(0).path("message").path("content").asText();
+                if (!content.isBlank()) return cleanResponse(content);
             }
             if (root.has("candidates") && root.path("candidates").size() > 0) {
-                return root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
+                String content = root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
+                if (!content.isBlank()) return cleanResponse(content);
             }
-            return "I'm currently unable to generate a response. Please try again later.";
+            throw new GroqApiException("Groq returned a malformed response.", null);
 
+        } catch (org.springframework.web.client.HttpClientErrorException.TooManyRequests e) {
+            if (allowRetry) {
+                log.warn("Groq rate limit encountered. Waiting 2.5s and retrying once...");
+                try {
+                    Thread.sleep(2500);
+                    return callGroq(prompt, false);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            throw new RateLimitException("Groq API rate limit exceeded. Please try again shortly.");
+        } catch (GroqApiException | RateLimitException e) {
+            throw e;
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
-            log.error("Groq API call failed after {}ms. Prompt length: {}. Error: {}", 
-                duration, prompt.length(), e.getMessage(), e);
-            return "I'm currently unable to generate a response. Please try again later.";
+            log.warn("Groq API call failed after {}ms. Prompt length: {}. Error type: {}",
+                    duration, prompt.length(), e.getClass().getSimpleName());
+            throw new GroqApiException("Groq request failed.", e);
         }
+    }
+
+    private String cleanResponse(String content) {
+        if (content == null) return "";
+        String cleaned = content.replaceAll("(?s)<think>.*?</think>", "").trim();
+        return cleaned.isBlank() ? content.trim() : cleaned;
     }
 
     public String analyzeMarks(UUID studentId, Map<String, Double> subjectAverages) {
@@ -145,14 +180,7 @@ public class GroqService {
 
         promptBuilder.append("Student's question: ").append(userMessage);
         
-        String response = callGroq(promptBuilder.toString());
-        if (response == null || response.contains("unable to generate a response") || response.isBlank()) {
-            if (documentContext != null && !documentContext.isBlank()) {
-                return "Here is what I found from your uploaded material:\n\n" + documentContext + 
-                       "\n\n*(AI service is operating in deterministic offline mode)*";
-            }
-        }
-        return response;
+        return callGroq(promptBuilder.toString());
     }
 
     public String generateTopicSuggestion(String subjectName, double avgPercentage, int durationMinutes, int daysToExam) {

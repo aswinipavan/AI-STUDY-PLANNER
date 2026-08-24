@@ -7,11 +7,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Configuration
@@ -21,7 +20,7 @@ public class FirebaseConfig {
     private String projectId;
 
     @Value("${FIREBASE_SERVICE_ACCOUNT_JSON:}")
-    private String serviceAccountJsonBase64;
+    private String serviceAccountJson;
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
@@ -29,21 +28,28 @@ public class FirebaseConfig {
             return FirebaseApp.getInstance();
         }
 
-        InputStream credentialsStream;
-
-        if (serviceAccountJsonBase64 != null && !serviceAccountJsonBase64.isBlank()) {
-            byte[] decoded = Base64.getDecoder().decode(serviceAccountJsonBase64);
-            credentialsStream = new ByteArrayInputStream(decoded);
-        } else {
-            credentialsStream = new ClassPathResource("serviceAccountKey.json").getInputStream();
+        if (projectId == null || projectId.isBlank()) {
+            throw new IllegalStateException("Firebase is not configured: FIREBASE_PROJECT_ID is required.");
+        }
+        if (serviceAccountJson == null || serviceAccountJson.isBlank()) {
+            throw new IllegalStateException("Firebase is not configured: FIREBASE_SERVICE_ACCOUNT_JSON is required by the backend.");
         }
 
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(credentialsStream))
-                .setProjectId(projectId)
-                .build();
-
-        return FirebaseApp.initializeApp(options);
+        try {
+            String trimmed = serviceAccountJson.trim();
+            byte[] credentialBytes = trimmed.startsWith("{")
+                    ? trimmed.getBytes(StandardCharsets.UTF_8)
+                    : Base64.getDecoder().decode(trimmed);
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(credentialBytes)))
+                    .setProjectId(projectId)
+                    .build();
+            return FirebaseApp.initializeApp(options);
+        } catch (IllegalArgumentException | IOException ex) {
+            throw new IllegalStateException(
+                    "Firebase is not configured correctly: FIREBASE_SERVICE_ACCOUNT_JSON must contain valid service-account JSON or Base64-encoded JSON.",
+                    ex);
+        }
     }
 
     @Bean

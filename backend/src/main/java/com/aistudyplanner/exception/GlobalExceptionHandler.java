@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,6 +73,28 @@ public class GlobalExceptionHandler {
         }
         ApiResponse<Map<String, String>> response = ApiResponse.error(errors, "Validation failed");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * A required request header being absent is a client error (a malformed request), not a server
+     * fault. Without this it fell through to the generic handler below and surfaced as HTTP 500 — e.g.
+     * {@code POST /api/auth/refresh} with no {@code Firebase-Token} header. Map it to 400 instead.
+     */
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingRequestHeader(MissingRequestHeaderException ex) {
+        log.warn("Bad request - missing header: {}", ex.getHeaderName());
+        return buildErrorResponse("Required request header '" + ex.getHeaderName() + "' is missing.",
+                HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * A request that matches no controller mapping (e.g. an unknown path) must surface as a
+     * proper 404 rather than being swallowed by the generic handler below and reported as 500.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException ex) {
+        log.warn("No handler for resource: {}", ex.getResourcePath());
+        return buildErrorResponse("The requested resource was not found.", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
