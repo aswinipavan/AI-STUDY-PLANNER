@@ -4,7 +4,7 @@ import { createTestJwt } from '../../../playwright/generate-test-jwt';
 // Group: Data Display & Interactions (SEL-261 to SEL-280)
 test.describe('Data Display and Interactions', () => {
 
-  test.beforeEach(async ({ page, context }) => {
+  test.beforeEach(async ({ context }) => {
     // Skip onboarding for all tests
     await context.addInitScript(() => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');

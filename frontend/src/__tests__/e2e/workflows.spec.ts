@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 // Group: Integration Workflows (SEL-291 to SEL-300)
 test.describe('Integration Workflows', () => {

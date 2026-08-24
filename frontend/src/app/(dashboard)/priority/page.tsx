@@ -5,11 +5,9 @@ import { usePriority } from '@/hooks/usePerformance';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ErrorState } from '@/components/common/ErrorState';
 import { ProgressRing } from '@/components/charts/ProgressRing';
-import { AlertTriangle } from 'lucide-react';
-import styles from './priority.module.css';
-
 import { SubjectPriority } from '@/types/api.types';
-import { Clock, CheckCircle, Info } from 'lucide-react';
+import { Clock, Info } from 'lucide-react';
+import styles from './priority.module.css';
 
 export default function PriorityPage() {
   const { data: priorities, isLoading, error, refetch } = usePriority();

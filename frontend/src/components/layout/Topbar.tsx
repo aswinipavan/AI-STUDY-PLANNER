@@ -4,13 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
-import { useQuery } from '@tanstack/react-query';
-import { examsApi } from '@/api/exams.api';
-import { QK } from '@/constants/queryKeys';
-import Image from 'next/image';
+import AvatarImage from '@/components/common/AvatarImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles, Loader2 } from 'lucide-react';
+import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBackendHealth } from '@/hooks/useBackendHealth';
 
@@ -32,18 +29,10 @@ export function Topbar() {
   const avatarRef = useRef<HTMLDivElement>(null);
 
   // Backend health gate — prevent API calls while Render is cold-starting
-  const { isReady, isWaking } = useBackendHealth();
+  const { isWaking } = useBackendHealth();
 
   // Fetch smart academic notifications (gated by backend health)
   const { data: notifications, isLoading: notifLoading } = useNotifications();
-
-  // Fetch upcoming exams for notification fallback (also gated)
-  const { data: upcomingExams = [] } = useQuery({
-    queryKey: QK.exams,
-    queryFn: examsApi.getUpcoming,
-    staleTime: 5 * 60 * 1000,
-    enabled: isReady,
-  });
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -60,8 +49,6 @@ export function Topbar() {
   }, []);
 
   const isDark = theme === 'dark';
-  const daysUntil = (d: string) => Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
-  const urgentExams = upcomingExams.filter(e => daysUntil(e.examDate) <= 7);
 
   const handleLogout = async () => {
     setShowAvatar(false);
@@ -189,7 +176,13 @@ export function Topbar() {
             aria-label="Profile menu"
           >
             {user?.photoUrl ? (
-              <Image src={user.photoUrl} alt="Profile" fill className="object-cover" unoptimized />
+              <AvatarImage
+                src={user.photoUrl}
+                alt="Profile"
+                fill
+                className="object-cover"
+                fallback={<span className="text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>}
+              />
             ) : (
               <span className="text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
             )}

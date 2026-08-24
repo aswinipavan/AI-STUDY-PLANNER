@@ -6,7 +6,7 @@ interface LogEntry {
   time: string;
   level: 'info' | 'error' | 'warn';
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export function FirebaseDebugPanel() {
@@ -202,7 +202,7 @@ export function FirebaseDebugPanel() {
               <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                 {log.message}
               </div>
-              {log.data && (
+              {log.data ? (
                 <pre style={{ 
                   marginTop: '8px', 
                   padding: '8px', 
@@ -213,7 +213,7 @@ export function FirebaseDebugPanel() {
                 }}>
                   {JSON.stringify(log.data, null, 2)}
                 </pre>
-              )}
+              ) : null}
             </div>
           ))
         )}

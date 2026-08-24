@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { StudyMaterial } from '@/types/api.types';
 
 const VALID_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjNlNDU2Ny1lODliLTEyZDMtYTQ1Ni00MjY2MTQxNzQwMDAiLCJlbWFpbCI6ImFzd2luaXBhd2FuODZAZ21haWwuY29tIiwiaWF0IjoxNzgxNTEwOTUxLCJleHAiOjIwOTcwODY5NTF9.ZlQ1_JVTGyglYJuOm2w6BdWSCqEI749Xtsfad7QpvIY';
 
@@ -74,7 +75,7 @@ test.describe('Final Production Verification Suite', () => {
       });
     });
 
-    let uploadedMaterial: any = {
+    const uploadedMaterial: StudyMaterial = {
       id: 'mat-ai-901',
       title: 'AI & Search Algorithms Lecture Notes',
       fileUrl: 'https://mock-storage.supabase.co/storage/v1/object/public/materials/ai_lecture_notes.pdf',

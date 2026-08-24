@@ -25,11 +25,31 @@ export const subjectsApi = {
   },
 };
 
+interface BackendSubjectResponse {
+  id: string;
+  subjectName?: string;
+  name?: string;
+  color?: string;
+  icon?: string;
+  targetHours?: number;
+  studentId: string;
+  nextExamDate?: string;
+  daysUntilExam?: number;
+}
+
+interface BackendSubjectRequest {
+  subjectName?: string;
+  subjectCode?: string;
+  credits: number;
+  difficultyLevel: number;
+  semester: number | null;
+}
+
 // Map backend SubjectResponse to frontend Subject type
-function mapSubjectFromBackend(backend: any): Subject {
+function mapSubjectFromBackend(backend: BackendSubjectResponse): Subject {
   return {
     id: backend.id,
-    name: backend.subjectName || backend.name,
+    name: backend.subjectName || backend.name || '',
     color: backend.color,
     icon: backend.icon,
     targetHours: backend.targetHours,
@@ -40,7 +60,7 @@ function mapSubjectFromBackend(backend: any): Subject {
 }
 
 // Map frontend Subject to backend SubjectRequest
-function mapSubjectToBackend(frontend: Partial<Subject>): Record<string, any> {
+function mapSubjectToBackend(frontend: Partial<Subject>): BackendSubjectRequest {
   return {
     subjectName: frontend.name,
     subjectCode: frontend.color, // reusing color field for code if needed

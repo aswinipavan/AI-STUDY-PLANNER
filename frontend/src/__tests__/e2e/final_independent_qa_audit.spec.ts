@@ -297,7 +297,7 @@ test.describe('FINAL INDEPENDENT QA AUDIT SUITE', () => {
       { id: 'sess-ai-102', title: 'Minimax & Alpha-Beta Pruning', createdAt: new Date().toISOString() }
     ];
 
-    const sessionMessages: Record<string, any[]> = {
+    const sessionMessages: Record<string, Array<{ id: string; role: string; message: string; content: string; createdAt: string }>> = {
       'sess-ai-101': [
         { id: 'msg-1', role: 'user', message: 'Explain A* heuristic optimality', content: 'Explain A* heuristic optimality', createdAt: new Date().toISOString() },
         { id: 'msg-2', role: 'assistant', message: 'A* is guaranteed to find an optimal path if the heuristic function h(n) is admissible (never overestimates the true cost to goal).', content: 'A* is guaranteed to find an optimal path if the heuristic function h(n) is admissible (never overestimates the true cost to goal).', createdAt: new Date().toISOString() }
@@ -374,7 +374,7 @@ test.describe('FINAL INDEPENDENT QA AUDIT SUITE', () => {
   // 5. CHAT MATERIAL UPLOAD & ACADEMIC Q&A
   // ==========================================
   test('5. CHAT MATERIAL UPLOAD: Upload PDF in Chat, NLP Pipeline Extraction & Context-Aware Q&A', async ({ page }) => {
-    let uploadedMaterialId = 'mat-ai-nlp-777';
+    const uploadedMaterialId = 'mat-ai-nlp-777';
 
     await page.route('**/api/mock-storage-upload**', async (route) => {
       await route.fulfill({ status: 200, body: 'OK' });

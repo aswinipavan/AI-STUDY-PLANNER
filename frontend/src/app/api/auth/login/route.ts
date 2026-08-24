@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             path: '/',
-            maxAge: 60 * 60, // 1 hour
+            maxAge: 60 * 60 * 24, // 24h — matches backend jwt.expiration (86400000ms) and the refresh route
           });
           console.log('[auth/login] JWT token cookie set');
         }
@@ -90,50 +90,11 @@ export async function POST(req: NextRequest) {
         );
       }
     } catch (backendErr) {
-      console.warn('[auth/login] Backend unavailable/timeout, falling back to Firebase token claims:', backendErr);
-      
-      // Resilient fallback: decode Firebase JWT payload so user is never blocked by cold starts
-      try {
-        const parts = firebaseToken.split('.');
-        if (parts.length >= 2) {
-          const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-          const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
-          
-          const uid = payload.user_id || payload.sub || 'user_' + Date.now();
-          const studentName = payload.name || payload.email?.split('@')[0] || 'Student';
-          
-          user = {
-            id: uid,
-            firebaseUid: uid,
-            name: studentName,
-            fullName: studentName,
-            email: payload.email || '',
-            photoUrl: payload.picture || undefined,
-            profilePictureUrl: payload.picture || undefined,
-            isPremium: false,
-            createdAt: new Date().toISOString(),
-          };
-
-          cookieStore.set('access_token', firebaseToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 60 * 60 * 24, // 24 hours
-          });
-          
-          console.log('[auth/login] Session created via token fallback for user:', user.email);
-        }
-      } catch (fallbackErr) {
-        console.error('[auth/login] Failed to parse token fallback:', fallbackErr);
-      }
-
-      if (!user) {
-        return NextResponse.json(
-          { error: 'Backend service unavailable. Please try again later.' },
-          { status: 502 }
-        );
-      }
+      console.error('[auth/login] Backend authentication request failed:', backendErr);
+      return NextResponse.json(
+        { error: 'Backend authentication is temporarily unavailable. Please try again.' },
+        { status: 503 }
+      );
     }
 
     if (!user) {

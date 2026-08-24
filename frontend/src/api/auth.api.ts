@@ -38,6 +38,8 @@ export const authApi = {
       collegeName: data.collegeName,
       semester: data.semester,
       department: data.department,
+      availableHoursPerDay: data.availableHoursPerDay,
+      preferredStudyTime: data.preferredStudyTime,
       profilePictureUrl: data.profilePictureUrl || data.photoUrl,
     };
     // Remove undefined values to avoid overwriting with null
@@ -57,6 +59,35 @@ export const authApi = {
       `/api/students/me/avatar-upload-url?${params.toString()}`
     );
     return response.data.data;
+  },
+
+  /**
+   * Upload a new profile avatar in a single multipart request and return the updated profile.
+   *
+   * Uses native fetch (not the axios apiClient) so the browser sets the multipart boundary itself.
+   * The request goes through the Next.js proxy, which attaches the httpOnly auth cookie. The backend
+   * stores the image (Supabase or local FS) and persists the cache-busted URL on the profile.
+   */
+  uploadAvatar: async (file: File): Promise<StudentProfile> => {
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch('/api/students/me/avatar', {
+      method: 'POST',
+      body: form,
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      let message = `Upload failed (${res.status})`;
+      try {
+        const err = await res.json();
+        message = err.message || err.error || message;
+      } catch {
+        // response body was not JSON; keep the status-based message
+      }
+      throw new Error(message);
+    }
+    const data = await res.json();
+    return data.data ?? data;
   },
 
   deleteAccount: async (): Promise<void> => {

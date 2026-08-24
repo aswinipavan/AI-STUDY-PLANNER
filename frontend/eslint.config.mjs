@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "debug-firebase-config.js",
+    "playwright/**",
   ]),
   // Project-level rule overrides
   {

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useActiveStudyRooms, useCreateStudyRoom, useJoinStudyRoom } from '@/hooks/useStudyRoom';
 import { useSubjects } from '@/hooks/useSubjects';
-import { Users, Plus, LogIn, Clock, Sparkles, BookOpen, User, X } from 'lucide-react';
+import { Users, Plus, LogIn, Clock, Sparkles, User, X } from 'lucide-react';
 import styles from './studyTogether.module.css';
 
 export default function StudyTogetherPage() {

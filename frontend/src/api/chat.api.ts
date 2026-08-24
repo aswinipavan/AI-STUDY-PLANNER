@@ -1,14 +1,24 @@
 import { apiClient } from '@/lib/apiClient';
 import { ChatMessage } from '@/types/api.types';
 
+interface RawChatHistoryItem {
+  id?: string;
+  role: 'user' | 'assistant';
+  message?: string;
+  content?: string;
+  sessionId?: string;
+  createdAt?: string;
+  timestamp?: string;
+}
+
 export const chatApi = {
   getHistory: async (sessionId: string, offset: number = 0, limit: number = 50): Promise<ChatMessage[]> => {
     const response = await apiClient.get(`/api/ai/chat/history`, {
       params: { sessionId, offset, limit },
     });
     // Backend wraps response in ApiResponse<List<ChatHistory>>: { success: true, data: [...] }
-    const rawHistory = response.data?.data || [];
-    return rawHistory.map((item: any) => ({
+    const rawHistory: RawChatHistoryItem[] = response.data?.data || [];
+    return rawHistory.map((item) => ({
       id: item.id || String(Math.random()),
       role: item.role,
       content: item.message || item.content || '',

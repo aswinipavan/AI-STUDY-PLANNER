@@ -5,7 +5,7 @@ import { ChatMessage } from '@/types/api.types';
 import ReactMarkdown from 'react-markdown';
 import { Bot } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import Image from 'next/image';
+import AvatarImage from '@/components/common/AvatarImage';
 import styles from './chat.module.css';
 
 interface Props {
@@ -32,7 +32,14 @@ export default function MessageBubble({ message }: Props) {
         <div className={`${styles.avatar} ${avatarClass}`} style={{ overflow: 'hidden' }}>
           {isUser ? (
             photo ? (
-              <Image src={photo} alt="User" width={32} height={32} style={{ borderRadius: '50%', objectFit: 'cover' }} unoptimized />
+              <AvatarImage
+                src={photo}
+                alt="User"
+                width={32}
+                height={32}
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                fallback={<span style={{ fontSize: '0.75rem', fontWeight: 700 }}>{initial}</span>}
+              />
             ) : (
               <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>{initial}</span>
             )

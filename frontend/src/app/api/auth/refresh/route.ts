@@ -14,35 +14,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No Firebase token provided' }, { status: 401 });
     }
 
-    let jwtToken = null;
     try {
       const res = await fetch(`${ENV.BACKEND_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
           'Firebase-Token': firebaseToken,
         },
         signal: AbortSignal.timeout(10000),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        jwtToken = data.data?.token ?? data.token ?? data.accessToken;
+      if (!res.ok) {
+        return NextResponse.json({ error: 'Your sign-in session has expired. Please sign in again.' }, { status: 401 });
       }
-    } catch (err) {
-      console.warn('[refresh] Backend refresh error, using Firebase token fallback:', err);
-    }
-    
-    // Use either backend JWT token or fresh Firebase token
-    const tokenToSet = jwtToken || firebaseToken;
-    if (tokenToSet) {
-      cookieStore.set('access_token', tokenToSet, {
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'lax', 
+      const data = await res.json();
+      const jwtToken = data.data?.token ?? data.token ?? data.accessToken;
+      if (!jwtToken) {
+        return NextResponse.json({ error: 'Session refresh returned an invalid response.' }, { status: 502 });
+      }
+
+      cookieStore.set('access_token', jwtToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
         path: '/',
-        maxAge: 60 * 60 * 24, // 24 hours
+        maxAge: 60 * 60 * 24,
       });
+    } catch (err) {
+      console.error('[refresh] Backend refresh request failed:', err);
+      return NextResponse.json({ error: 'Session refresh is temporarily unavailable. Please try again.' }, { status: 503 });
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

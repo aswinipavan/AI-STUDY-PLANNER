@@ -139,15 +139,50 @@ export const useChat = (initialSessionId: string | null) => {
         materialId: currentMaterialId
       });
     } catch (err: unknown) {
-      // Handle error gracefully with clear assistant feedback in chat
       setIsThinking(false);
-      const errMsg = err instanceof Error ? err.message : 'Unable to generate response. Please try again.';
+
+      // Determine if this is an auth error (401 or 403)
+      const isAuthError = err instanceof Error && 
+        (err.message.includes('Session expired') || err.message.includes('sign in'));
+      
+      // Determine if it's a network error
+      const isNetworkError = err instanceof Error && 
+        (err.message.includes('reach the server') || err.message.includes('timed out'));
+
+      let displayMessage: string;
+
+      if (isAuthError) {
+        // Auth errors: guide the user to re-login; also attempt a background token refresh
+        displayMessage = '🔐 Your session has expired. Please **sign out and sign back in** to continue chatting.';
+        // Attempt silent refresh so next message works without page reload
+        try {
+          const { auth } = await import('@/lib/firebase');
+          const currentUser = auth.currentUser;
+          if (currentUser) {
+            const freshToken = await currentUser.getIdToken(true);
+            await fetch('/api/auth/refresh', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ firebaseToken: freshToken }),
+            });
+            // Retry succeeded — clear error message and try sending again
+            displayMessage = '🔄 Session refreshed. Please send your message again.';
+          }
+        } catch {
+          // Silent refresh failed — keep the re-login message
+        }
+      } else if (isNetworkError) {
+        displayMessage = '📡 Unable to reach the AI service. Please check your connection and try again.';
+      } else {
+        displayMessage = err instanceof Error ? err.message : '⚠️ Unable to generate a response. Please try again.';
+      }
+
       setMessages(prev => [
         ...prev,
         {
           id: String(Date.now()),
           role: 'assistant',
-          content: `⚠️ ${errMsg}`,
+          content: displayMessage,
           sessionId: sessionId || 'temp',
           timestamp: new Date().toISOString(),
         },

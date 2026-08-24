@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 // Group 6: Study Materials Library (SEL-116 to SEL-130)
 test.describe('Materials Section', () => {
 
-  test.beforeEach(async ({ page, context }) => {
+  test.beforeEach(async ({ context }) => {
     // Skip onboarding for all tests
     await context.addInitScript(() => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
