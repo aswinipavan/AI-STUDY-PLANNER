@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/apiClient';
+import { AppError } from '@/utils/errorHandler';
 import { Timetable, TimetableSlot, GenerateTimetableDTO } from '@/types/api.types';
 
 export const timetableApi = {
@@ -12,10 +13,16 @@ export const timetableApi = {
     return response.data.data ?? response.data;
   },
 
-  getActive: async (): Promise<Timetable> => {
-    const response = await apiClient.get('/api/timetable/active');
-    // Backend returns ApiResponse wrapper: {success, message, data}
-    return response.data.data ?? response.data;
+  getActive: async (): Promise<Timetable | null> => {
+    try {
+      const response = await apiClient.get('/api/timetable/active');
+      // Backend returns ApiResponse wrapper: {success, message, data}
+      return response.data.data ?? response.data;
+    } catch (err) {
+      // A 404 here is a valid "no active timetable yet" empty state, not an error.
+      if (err instanceof AppError && err.statusCode === 404) return null;
+      throw err;
+    }
   },
 
   markSlotComplete: async (id: string): Promise<TimetableSlot> => {

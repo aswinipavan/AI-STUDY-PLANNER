@@ -6,6 +6,7 @@ import com.aistudyplanner.model.dto.request.SlotRequest;
 import com.aistudyplanner.model.dto.request.TimetableRequest;
 import com.aistudyplanner.model.dto.response.SlotResponse;
 import com.aistudyplanner.model.dto.response.TimetableResponse;
+import com.aistudyplanner.model.StudyTimeWindow;
 import com.aistudyplanner.model.entity.Exam;
 import com.aistudyplanner.model.entity.Material;
 import com.aistudyplanner.model.entity.Student;
@@ -30,9 +31,11 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,38 +59,15 @@ public class TimetableService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        // Calculate actual study period
         LocalDate startDate = request.getStartDate();
-        LocalDate endDate;
-        int actualDurationDays;
-        
-        if (request.getUseDeadlines() != null && request.getUseDeadlines() && request.getTargetDeadlineDate() != null) {
-            // Use specific target deadline
-            endDate = request.getTargetDeadlineDate();
-            actualDurationDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
-            if (actualDurationDays < 1) {
-                throw new IllegalArgumentException("Target deadline must be after start date");
-            }
-        } else if (request.getDurationDays() != null) {
-            // Use duration from request
-            actualDurationDays = request.getDurationDays();
-            endDate = startDate.plusDays(actualDurationDays);
-        } else {
-            // Default to 14 days
-            actualDurationDays = 14;
-            endDate = startDate.plusDays(actualDurationDays);
-        }
-        
-        log.info("Generating timetable from {} to {} ({} days)", startDate, endDate, actualDurationDays);
-
         double availableHours = request.getAvailableHoursPerDay().doubleValue();
+
+        // Resolve the subjects to plan for FIRST — the exam deadline that defines the planning
+        // horizon must be read from these specific subjects.
         List<Subject> allSubjects = subjectRepository.findAllByStudentId(studentId, org.springframework.data.domain.PageRequest.of(0, 100));
-        
         if (allSubjects.isEmpty()) {
             throw new IllegalArgumentException("No subjects found. Please add subjects first.");
         }
-        
-        // FIXED: Filter subjects by the requested subjectIds (was previously ignored)
         List<Subject> subjects;
         if (request.getSubjectIds() != null && !request.getSubjectIds().isEmpty()) {
             final List<UUID> requestedIds = request.getSubjectIds();
@@ -100,50 +80,133 @@ public class TimetableService {
         } else {
             subjects = allSubjects;
         }
-        
-        // Calculate subject weights with deadline awareness
-        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects, request.getUseDeadlines());
-        
+
+        // Upcoming, not-yet-completed exams for these subjects (earliest first). The exam date is the
+        // real deadline, so this drives BOTH the planning horizon and subject prioritisation.
+        List<Exam> upcomingExams = findUpcomingExamsForSubjects(studentId, subjects, startDate);
+
+        // ---- Planning horizon: START -> the actual deadline. There is NO fixed maximum window. ----
+        // Precedence:
+        //   1) an explicit target deadline the user typed into the UI (their explicit choice wins);
+        //   2) otherwise the FURTHEST upcoming exam for the selected subjects, so a 7/30/60/90-day-away
+        //      exam yields a 7/30/60/90-day plan and a long horizon is never truncated to a fixed cap;
+        //   3) otherwise an explicitly requested duration (there are no exams to plan around);
+        //   4) otherwise a short default.
+        LocalDate endDate;
+        int actualDurationDays;
+        LocalDate latestExamDate = upcomingExams.stream()
+                .map(Exam::getExamDate)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        if (request.getTargetDeadlineDate() != null) {
+            endDate = request.getTargetDeadlineDate();
+            actualDurationDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
+            if (actualDurationDays < 1) {
+                throw new IllegalArgumentException("Target deadline must be after start date");
+            }
+        } else if (latestExamDate != null && latestExamDate.isAfter(startDate)) {
+            // Dynamic horizon: span every day from the start up to the last exam.
+            endDate = latestExamDate;
+            actualDurationDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
+            log.info("Planning horizon derived from exam deadline: {} preparation days (start {} -> exam {})",
+                    actualDurationDays, startDate, endDate);
+        } else if (request.getDurationDays() != null) {
+            actualDurationDays = request.getDurationDays();
+            endDate = startDate.plusDays(actualDurationDays);
+        } else {
+            actualDurationDays = com.aistudyplanner.util.Constants.DAYS_PER_WEEK * 2;
+            endDate = startDate.plusDays(actualDurationDays);
+        }
+
+        log.info("Generating timetable from {} to {} ({} days)", startDate, endDate, actualDurationDays);
+
+        // Subject weights: weaker performance + higher difficulty + nearer exams => more sessions.
+        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects, upcomingExams);
+
+        // Revision-before-each-exam: for any exam that falls INSIDE the plan (before the last study
+        // day) reserve the day before it as revision for that subject. The final exam (at the horizon
+        // end) is already covered by the generator's final-day revision.
+        Map<UUID, LocalDate> examEveBySubject = buildExamEveMap(upcomingExams, startDate, endDate);
+
         // Deactivate all other timetables
         deactivateExistingTimetables(studentId);
-        
+
         // Create new timetable with start date
         Timetable timetable = createNewTimetable(student, startDate, actualDurationDays);
-        
-        // Generate slots for actual duration
+
+        // Generate slots for actual duration.
+        // Time source = the student's preferred study window; pace/session length = the requested style.
         List<TimetableSlot> slots = generateTimetableSlotsForDuration(
-            timetable, 
-            subjects, 
-            subjectWeights, 
-            availableHours, 
-            startDate, 
-            actualDurationDays
+            timetable,
+            subjects,
+            subjectWeights,
+            availableHours,
+            startDate,
+            actualDurationDays,
+            request.getStyle(),
+            examEveBySubject
         );
         timetableSlotRepository.saveAll(slots);
-        
+
         log.info("Generated {} slots for {} days", slots.size(), actualDurationDays);
-        
+
         return getTimetable(studentId);
     }
 
     /**
-     * Calculate weight for each subject based on performance and difficulty
+     * Upcoming, not-yet-completed exams for the given subjects on/after {@code fromDate}, earliest
+     * first. Null-safe against a repository that returns no page (e.g. an unstubbed mock in tests).
      */
-    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects, Boolean useDeadlines) {
+    private List<Exam> findUpcomingExamsForSubjects(UUID studentId, List<Subject> subjects, LocalDate fromDate) {
+        Set<UUID> subjectIds = subjects.stream().map(Subject::getId).collect(Collectors.toSet());
+        org.springframework.data.domain.Page<Exam> page = examRepository
+                .findAllByStudentIdOrderByExamDateAsc(studentId, org.springframework.data.domain.PageRequest.of(0, 500));
+        if (page == null) {
+            return new ArrayList<>();
+        }
+        return page.getContent().stream()
+                .filter(e -> e.getExamDate() != null)
+                .filter(e -> !Boolean.TRUE.equals(e.getIsCompleted()))
+                .filter(e -> !e.getExamDate().isBefore(fromDate))
+                .filter(e -> e.getSubject() != null && subjectIds.contains(e.getSubject().getId()))
+                .sorted(Comparator.comparing(Exam::getExamDate))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * For every subject whose exam falls strictly INSIDE the plan (before the horizon end), map the
+     * subject to the day immediately before that exam so the generator can dedicate it to revision.
+     * The exam at the horizon end is handled by the generator's final-day revision, so it is skipped
+     * here. When a subject has several in-window exams the earliest eve is kept.
+     */
+    private Map<UUID, LocalDate> buildExamEveMap(List<Exam> upcomingExams, LocalDate startDate, LocalDate endDate) {
+        Map<UUID, LocalDate> eves = new HashMap<>();
+        for (Exam exam : upcomingExams) {
+            if (exam.getSubject() == null || exam.getExamDate() == null) continue;
+            LocalDate examDate = exam.getExamDate();
+            if (!examDate.isBefore(endDate)) continue;          // only exams before the horizon end
+            LocalDate eve = examDate.minusDays(1);
+            if (eve.isBefore(startDate)) continue;               // no room to revise before it
+            UUID subjectId = exam.getSubject().getId();
+            LocalDate existing = eves.get(subjectId);
+            if (existing == null || eve.isBefore(existing)) {
+                eves.put(subjectId, eve);
+            }
+        }
+        return eves;
+    }
+
+    /**
+     * Calculate weight for each subject based on performance, difficulty and exam urgency. The exam
+     * list is the already-resolved upcoming exams for the selected subjects (no fixed look-ahead cap),
+     * so an exam far in the future is still considered — it simply carries no urgency bonus yet.
+     */
+    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects, List<Exam> upcomingExams) {
         Map<UUID, Double> subjectAverages = new HashMap<>();
         List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(studentId);
         for (Object[] row : avgData) {
             subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
-        }
-
-        // Fetch upcoming exams if deadline mode is enabled
-        List<Exam> upcomingExams = new ArrayList<>();
-        if (useDeadlines != null && useDeadlines) {
-            LocalDate next30Days = LocalDate.now().plusDays(com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS);
-            upcomingExams = examRepository.findAllByStudentIdOrderByExamDateAsc(studentId, org.springframework.data.domain.PageRequest.of(0, 100)).stream()
-                    .filter(e -> e.getExamDate() != null && !e.getExamDate().isAfter(next30Days) && !e.getExamDate().isBefore(LocalDate.now()))
-                    .collect(Collectors.toList());
-            log.info("Found {} upcoming exams for deadline-based prioritization", upcomingExams.size());
         }
 
         Map<UUID, Double> subjectWeights = new HashMap<>();
@@ -156,16 +219,18 @@ public class TimetableService {
     }
 
     /**
-     * Calculate weight for a single subject
+     * Calculate weight for a single subject. Weaker performance and higher difficulty raise the base
+     * weight; a near exam adds an urgency bonus. There is no maximum look-ahead — a distant exam just
+     * produces a large day count and therefore no bonus.
      */
     private double calculateIndividualWeight(Subject subject, Map<UUID, Double> subjectAverages, List<Exam> upcomingExams) {
         double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
         double diffLevel = subject.getDifficultyLevel() != null ? subject.getDifficultyLevel() : com.aistudyplanner.util.Constants.DEFAULT_SUBJECT_DIFFICULTY;
         double weight = (100 - avg) + (diffLevel * 10);
-        
-        long minDaysToExam = com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS + 1;
+
+        long minDaysToExam = Long.MAX_VALUE;
         for (Exam exam : upcomingExams) {
-            if (exam.getSubject().getId().equals(subject.getId())) {
+            if (exam.getSubject() != null && exam.getSubject().getId().equals(subject.getId()) && exam.getExamDate() != null) {
                 long days = ChronoUnit.DAYS.between(LocalDate.now(), exam.getExamDate());
                 if (days < minDaysToExam) minDaysToExam = days;
             }
@@ -209,262 +274,250 @@ public class TimetableService {
     }
 
     /**
-     * Generate all timetable slots for the week.
-     * FIXED: pre-fetch subject averages once (not per-day).
-     */
-    private List<TimetableSlot> generateTimetableSlots(Timetable timetable, List<Subject> subjects, 
-                                                        Map<UUID, Double> subjectWeights, double availableHours) {
-        List<TimetableSlot> slotsToSave = new ArrayList<>();
-        double totalWeight = subjectWeights.values().stream().mapToDouble(w -> w != null ? w : 0.0).sum();
-        double totalDailyMinutes = availableHours * 60;
-
-        Map<UUID, Integer> allocatedMinutesMap = allocateStudyTime(subjects, subjectWeights, totalWeight, totalDailyMinutes);
-        
-        // Pre-fetch subject averages ONCE instead of per-day
-        Map<UUID, Double> subjectAverages = new HashMap<>();
-        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
-        for (Object[] row : avgData) {
-            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
-        }
-        
-        for (int dayIndex = 0; dayIndex < com.aistudyplanner.util.Constants.DAYS_PER_WEEK; dayIndex++) {
-            slotsToSave.addAll(generateDaySlots(timetable, subjects, allocatedMinutesMap, dayIndex, subjectAverages));
-        }
-        
-        return slotsToSave;
-    }
-    
-    /**
-     * Generate timetable slots for actual duration (deadline-based planning).
-     * FIXED: pre-fetch subject averages once before the day loop.
+     * Generate all study slots across the full plan duration.
+     *
+     * <p>Design (matches the product spec — user settings drive <i>time</i>, materials drive
+     * <i>topics</i>, performance/exams drive <i>priority</i>):</p>
+     * <ul>
+     *   <li><b>When</b>: start times come from the student's preferred {@link StudyTimeWindow}
+     *       (no hard-coded clock time). Each day is filled from the window start with fixed-length
+     *       sessions separated by a short buffer, never exceeding the window or the requested hours.</li>
+     *   <li><b>How long</b>: session length is derived from the requested study {@code style}
+     *       (intense/balanced/relaxed).</li>
+     *   <li><b>Which subject</b>: a smooth weighted round-robin over subject weights (weaker
+     *       performance, higher difficulty, nearer exams → more weight → more sessions) picks the
+     *       subject of each session, while still interleaving every subject rather than starving any.</li>
+     *   <li><b>What topic</b>: each subject's extracted material topics are consumed <i>in document
+     *       order</i> via a per-subject cursor — real topics, progressing, not repeating. Once a
+     *       subject's topics are exhausted (and on the final day) sessions become spaced revision.</li>
+     * </ul>
      */
     private List<TimetableSlot> generateTimetableSlotsForDuration(
-            Timetable timetable, 
-            List<Subject> subjects, 
-            Map<UUID, Double> subjectWeights, 
+            Timetable timetable,
+            List<Subject> subjects,
+            Map<UUID, Double> subjectWeights,
             double availableHours,
             LocalDate startDate,
-            int durationDays) {
-        
-        List<TimetableSlot> slotsToSave = new ArrayList<>();
-        double totalWeight = subjectWeights.values().stream().mapToDouble(w -> w != null ? w : 0.0).sum();
-        double totalDailyMinutes = availableHours * 60;
+            int durationDays,
+            String style,
+            Map<UUID, LocalDate> examEveBySubject) {
 
-        Map<UUID, Integer> allocatedMinutesMap = allocateStudyTime(subjects, subjectWeights, totalWeight, totalDailyMinutes);
-        
-        // FIXED: Pre-fetch subject averages ONCE (was re-queried for every single day)
-        Map<UUID, Double> subjectAverages = new HashMap<>();
-        List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(timetable.getStudent().getId());
-        for (Object[] row : avgData) {
-            subjectAverages.put((UUID) row[0], ((Number) row[1]).doubleValue());
+        List<TimetableSlot> slotsToSave = new ArrayList<>();
+        if (subjects.isEmpty() || durationDays <= 0) {
+            return slotsToSave;
         }
-        
-        // Generate slots for each day in the duration
+
+        // TIME comes from the user's saved preference — never a hard-coded clock time.
+        StudyTimeWindow window = StudyTimeWindow.fromSetting(timetable.getStudent().getPreferredStudyTime());
+        int sessionMinutes = sessionMinutesForStyle(style);
+        int buffer = com.aistudyplanner.util.Constants.BUFFER_BETWEEN_SLOTS_MINUTES;
+
+        // Daily budget = the smaller of what the user asked for and what their window physically allows,
+        // so we honour both "available hours per day" and "only study inside my chosen window".
+        int requestedDailyMinutes = (int) Math.round(availableHours * 60);
+        int dailyMinutes = Math.min(requestedDailyMinutes, window.getWindowMinutes());
+        if (dailyMinutes <= 0) {
+            dailyMinutes = sessionMinutes;
+        }
+
+        // Whole sessions that fit the budget: n*session + (n-1)*buffer <= dailyMinutes.
+        int sessionsPerDay = (dailyMinutes + buffer) / (sessionMinutes + buffer);
+        int effectiveSessionMinutes = sessionMinutes;
+        if (sessionsPerDay < 1) {
+            // Window/hours smaller than one full session — still schedule one, clamped to the budget.
+            sessionsPerDay = 1;
+            effectiveSessionMinutes = Math.max(com.aistudyplanner.util.Constants.MIN_SLOT_DURATION_MINUTES, dailyMinutes);
+        }
+
+        // Pre-compute each subject's ordered topic list (document order preserved) and progress cursors.
+        Map<UUID, List<String>> orderedTopics = new HashMap<>();
+        Map<UUID, Integer> topicCursor = new HashMap<>();
+        Map<UUID, Integer> revisionCursor = new HashMap<>();
+        for (Subject subject : subjects) {
+            orderedTopics.put(subject.getId(), getOrderedTopicsForSubject(timetable.getStudent().getId(), subject.getId()));
+            topicCursor.put(subject.getId(), 0);
+            revisionCursor.put(subject.getId(), 0);
+        }
+
+        // Priority-weighted, evenly-spread ordering of which subject each session belongs to.
+        List<Subject> sessionOrder = buildWeightedSessionOrder(subjects, subjectWeights, sessionsPerDay * durationDays);
+
+        int globalSession = 0;
         for (int dayOffset = 0; dayOffset < durationDays; dayOffset++) {
             LocalDate currentDate = startDate.plusDays(dayOffset);
-            // Java DayOfWeek: MONDAY=1 to SUNDAY=7
-            // Database expects: 0=Sunday to 6=Saturday
-            int dayOfWeek = (currentDate.getDayOfWeek().getValue() % 7); // SUNDAY=0, MONDAY=1, ..., SATURDAY=6
-            
-            slotsToSave.addAll(generateDaySlotsForDate(timetable, subjects, allocatedMinutesMap, dayOffset, dayOfWeek, subjectAverages));
+            // Store Monday=0 .. Sunday=6 (matches the entity contract and the weekly grid on the client).
+            int dayOfWeek = (currentDate.getDayOfWeek().getValue() + 6) % 7;
+            boolean isFinalDay = (dayOffset == durationDays - 1);
+
+            LocalTime currentTime = window.getStartTime();
+            for (int s = 0; s < sessionsPerDay && globalSession < sessionOrder.size(); s++, globalSession++) {
+                Subject subject = sessionOrder.get(globalSession);
+                LocalDate examEve = examEveBySubject.get(subject.getId());
+                String topic;
+                if (examEve != null && examEve.equals(currentDate)) {
+                    // The day before this subject's (interior) exam — dedicate the session to revision.
+                    topic = revisionTopicForSubject(subject, orderedTopics, revisionCursor);
+                } else {
+                    topic = nextTopicForSubject(subject, orderedTopics, topicCursor, revisionCursor, isFinalDay);
+                }
+
+                TimetableSlot slot = TimetableSlot.builder()
+                        .timetable(timetable)
+                        .subject(subject)
+                        .dayOfWeek(dayOfWeek)
+                        .slotDate(currentDate)
+                        .startTime(currentTime)
+                        .endTime(currentTime.plusMinutes(effectiveSessionMinutes))
+                        .topic(topic)
+                        .isCompleted(false)
+                        .build();
+                slotsToSave.add(slot);
+
+                currentTime = currentTime.plusMinutes(effectiveSessionMinutes + buffer);
+            }
         }
-        
-        log.info("Generated {} total slots across {} days", slotsToSave.size(), durationDays);
+
+        log.info("Generated {} slots across {} days ({} sessions/day, {}-min {} sessions, window {} {}-{})",
+                slotsToSave.size(), durationDays, sessionsPerDay, effectiveSessionMinutes,
+                style, window.name(), window.getStartTime(), window.getEndTime());
         return slotsToSave;
     }
 
-    /**
-     * Allocate daily study time across subjects
-     */
-    private Map<UUID, Integer> allocateStudyTime(List<Subject> subjects, Map<UUID, Double> subjectWeights, 
-                                                  double totalWeight, double totalDailyMinutes) {
-        Map<UUID, Integer> allocatedMinutesMap = new HashMap<>();
-        
-        for (Subject subject : subjects) {
-            double weight = subjectWeights.get(subject.getId());
-            double allocated = (weight / totalWeight) * totalDailyMinutes;
-            int minutes = Math.max(com.aistudyplanner.util.Constants.MIN_SLOT_DURATION_MINUTES, (int) allocated);
-            minutes = Math.round(minutes / (float) com.aistudyplanner.util.Constants.SLOT_DURATION_ROUNDING_MINUTES) * com.aistudyplanner.util.Constants.SLOT_DURATION_ROUNDING_MINUTES;
-            if (minutes == 0) minutes = com.aistudyplanner.util.Constants.SLOT_DURATION_ROUNDING_MINUTES;
-            allocatedMinutesMap.put(subject.getId(), minutes);
+    /** Session length in minutes for the requested study style. */
+    private int sessionMinutesForStyle(String style) {
+        if (style == null) return com.aistudyplanner.util.Constants.SESSION_MINUTES_BALANCED;
+        switch (style.trim().toLowerCase()) {
+            case "intense": return com.aistudyplanner.util.Constants.SESSION_MINUTES_INTENSE;
+            case "relaxed": return com.aistudyplanner.util.Constants.SESSION_MINUTES_RELAXED;
+            case "balanced":
+            default:        return com.aistudyplanner.util.Constants.SESSION_MINUTES_BALANCED;
         }
-        return allocatedMinutesMap;
     }
 
     /**
-     * Generate slots for a specific day of the week
+     * Read a subject's extracted material topics in their natural document order (chapter/topic
+     * sequence preserved) and format them as "Chapter - Topic" (or just the topic name). Returns an
+     * empty list when the subject has no processed material, so the caller can fall back cleanly.
      */
-    /**
-     * Generate slots for a specific day of the week.
-     * FIXED: subject averages hoisted outside loop, Groq calls wrapped in try-catch.
-     */
-    private List<TimetableSlot> generateDaySlots(Timetable timetable, List<Subject> subjects,
-                                                  Map<UUID, Integer> allocatedMinutesMap, int dayIndex,
-                                                  Map<UUID, Double> subjectAverages) {
-        List<TimetableSlot> daySlots = new ArrayList<>();
-        LocalTime currentTime = LocalTime.of(18, 0);
-        boolean isSunday = (dayIndex == 6);
-        double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
-
-        Map<UUID, List<String>> subjectTopicPools = new HashMap<>();
-        for (Subject subject : subjects) {
-            int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
-            if (subjectMinutes <= 0) continue;
-
-            double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
-            String topicSuggestion = getTopicFromMaterialsOrFallback(
-                    timetable.getStudent().getId(),
-                    subject,
-                    avg,
-                    subjectMinutes,
-                    dayIndex,
-                    subjectTopicPools,
-                    null
-            );
-
-            TimetableSlot slot = TimetableSlot.builder()
-                    .timetable(timetable)
-                    .subject(subject)
-                    .dayOfWeek(dayIndex)
-                    .startTime(currentTime)
-                    .endTime(currentTime.plusMinutes(subjectMinutes))
-                    .topic(topicSuggestion)
-                    .isCompleted(false)
-                    .build();
-
-            daySlots.add(slot);
-            currentTime = currentTime.plusMinutes(subjectMinutes + com.aistudyplanner.util.Constants.BUFFER_BETWEEN_SLOTS_MINUTES);
-        }
-        return daySlots;
-    }
-
-    /**
-     * Extract structured topics from uploaded materials for a subject, prioritized by student performance and exam urgency.
-     */
-    private List<String> getPrioritizedTopicsForSubject(UUID studentId, UUID subjectId, double avgPercentage, List<Exam> upcomingExams) {
+    private List<String> getOrderedTopicsForSubject(UUID studentId, UUID subjectId) {
         List<Material> materials = materialRepository.findAllByStudentIdAndSubjectId(studentId, subjectId);
         if (materials.isEmpty()) return Collections.emptyList();
 
-        List<Map<String, Object>> allTopics = new ArrayList<>();
-        boolean isNearExam = upcomingExams != null && upcomingExams.stream()
-                .anyMatch(e -> e.getSubject() != null && e.getSubject().getId().equals(subjectId)
-                        && e.getExamDate() != null && ChronoUnit.DAYS.between(LocalDate.now(), e.getExamDate()) <= 7);
-
+        List<String> topics = new ArrayList<>();
         for (Material material : materials) {
             String topicsJson = material.getExtractedTopics();
-            if (topicsJson != null && !topicsJson.isBlank() && !topicsJson.equals("[]")) {
-                try {
-                    List<Map<String, Object>> parsed = objectMapper.readValue(topicsJson, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
-                    allTopics.addAll(parsed);
-                } catch (Exception e) {
-                    log.debug("Could not parse extractedTopics JSON for material {}: {}", material.getId(), e.getMessage());
+            if (topicsJson == null || topicsJson.isBlank() || topicsJson.equals("[]")) continue;
+            try {
+                List<Map<String, Object>> parsed = objectMapper.readValue(
+                        topicsJson, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+                for (Map<String, Object> t : parsed) {
+                    String name = t.get("name") instanceof String ? ((String) t.get("name")).trim() : null;
+                    if (name == null || name.isBlank()) continue;
+                    String chapter = t.get("chapter") instanceof String ? ((String) t.get("chapter")).trim() : null;
+                    String label;
+                    if (chapter != null && !chapter.isBlank()
+                            && !chapter.equalsIgnoreCase(name) && !chapter.equalsIgnoreCase("General")) {
+                        label = chapter + " - " + name;
+                    } else {
+                        label = name;
+                    }
+                    topics.add(label.length() > 200 ? label.substring(0, 200) : label);
                 }
+            } catch (Exception e) {
+                log.debug("Could not parse extractedTopics JSON for material {}: {}", material.getId(), e.getMessage());
             }
         }
-
-        if (allTopics.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // If student is weak (<60%) or exam is near, sort higher relevance / difficult topics first
-        if (avgPercentage < 60.0 || isNearExam) {
-            allTopics.sort((a, b) -> {
-                double relA = a.get("relevanceScore") instanceof Number ? ((Number) a.get("relevanceScore")).doubleValue() : 0.5;
-                double relB = b.get("relevanceScore") instanceof Number ? ((Number) b.get("relevanceScore")).doubleValue() : 0.5;
-                return Double.compare(relB, relA);
-            });
-        }
-
-        List<String> formattedTopics = new ArrayList<>();
-        for (Map<String, Object> t : allTopics) {
-            String name = (String) t.get("name");
-            String chapter = (String) t.get("chapter");
-            if (name != null && !name.isBlank()) {
-                String prefix = (avgPercentage < 50.0) ? "Focus: " : (isNearExam ? "Exam Prep: " : "Study: ");
-                if (chapter != null && !chapter.isBlank() && !chapter.equalsIgnoreCase(name) && !chapter.equalsIgnoreCase("General")) {
-                    formattedTopics.add(prefix + chapter + " - " + name);
-                } else {
-                    formattedTopics.add(prefix + name);
-                }
-            }
-        }
-
-        return formattedTopics;
+        return topics;
     }
 
     /**
-     * Extract a specific topic from materials or fallback to Groq / deterministic generation
+     * Next topic label for a subject's session. Walks the ordered topic list once (in order, no
+     * repeats) to progress through the material, then switches to spaced revision that cycles back
+     * through the same topics. On the final day every session is explicit revision. When a subject
+     * has no extracted material, falls back to a subject-specific (non-generic) session label.
      */
-    private String getTopicFromMaterialsOrFallback(UUID studentId, Subject subject, double avgPercentage,
-                                                  int durationMinutes, int slotIndex,
-                                                  Map<UUID, List<String>> subjectTopicPools,
-                                                  List<Exam> upcomingExams) {
-        // 1. Try to get progressive topic from extracted material topic pool
-        List<String> topicPool = subjectTopicPools.computeIfAbsent(
-                subject.getId(),
-                id -> getPrioritizedTopicsForSubject(studentId, id, avgPercentage, upcomingExams)
-        );
+    private String nextTopicForSubject(Subject subject, Map<UUID, List<String>> orderedTopics,
+                                       Map<UUID, Integer> topicCursor, Map<UUID, Integer> revisionCursor,
+                                       boolean isFinalDay) {
+        List<String> topics = orderedTopics.getOrDefault(subject.getId(), Collections.emptyList());
 
-        if (!topicPool.isEmpty()) {
-            int index = slotIndex % topicPool.size();
-            return topicPool.get(index);
+        if (topics.isEmpty()) {
+            // No processed material for this subject — do NOT invent generic topics; use a clear,
+            // subject-specific session label instead. Still honour revision before the exam: the
+            // final day becomes explicit revision even when there is nothing extracted to cycle.
+            if (isFinalDay) {
+                return "Final revision: " + subject.getSubjectName();
+            }
+            int n = topicCursor.merge(subject.getId(), 1, Integer::sum);
+            return subject.getSubjectName() + " — study session " + n;
         }
 
-        // 2. Try Groq topic generation
-        try {
-            return groqService.generateTopicSuggestion(
-                    subject.getSubjectName(),
-                    avgPercentage,
-                    durationMinutes,
-                    com.aistudyplanner.util.Constants.UPCOMING_EXAMS_WINDOW_DAYS
-            );
-        } catch (Exception e) {
-            log.warn("Groq topic generation failed for {}, using deterministic fallback: {}", subject.getSubjectName(), e.getMessage());
-            return "Study: " + subject.getSubjectName() + " (Session " + (slotIndex + 1) + ")";
+        int cursor = topicCursor.getOrDefault(subject.getId(), 0);
+        if (!isFinalDay && cursor < topics.size()) {
+            topicCursor.put(subject.getId(), cursor + 1);
+            return topics.get(cursor);
         }
+
+        // Topics covered (or final day) → spaced revision, cycling through the material in order.
+        int rev = revisionCursor.getOrDefault(subject.getId(), 0);
+        revisionCursor.put(subject.getId(), rev + 1);
+        String base = topics.get(rev % topics.size());
+        String label = (isFinalDay ? "Final revision: " : "Revision: ") + base;
+        return label.length() > 200 ? label.substring(0, 200) : label;
     }
 
     /**
-     * Generate slots for a specific date in deadline-based planning.
+     * Revision label for the day before a subject's (interior) exam — cycles through the subject's
+     * material for review, or names the subject when it has no processed material. Kept consistent with
+     * the "Revision: " prefix used elsewhere so downstream display/logic treats it uniformly.
      */
-    private List<TimetableSlot> generateDaySlotsForDate(Timetable timetable, List<Subject> subjects,
-                                                        Map<UUID, Integer> allocatedMinutesMap, int dayOffset, int dayOfWeek,
-                                                        Map<UUID, Double> subjectAverages) {
-        List<TimetableSlot> daySlots = new ArrayList<>();
-        LocalTime currentTime = LocalTime.of(18, 0);
-        boolean isSunday = (dayOfWeek == 6);
-        double dayMultiplier = isSunday ? com.aistudyplanner.util.Constants.DEFAULT_SUNDAY_STUDY_MULTIPLIER : com.aistudyplanner.util.Constants.NORMAL_DAY_STUDY_MULTIPLIER;
-        Map<UUID, List<String>> subjectTopicPools = new HashMap<>();
-
-        for (Subject subject : subjects) {
-            int subjectMinutes = (int) (allocatedMinutesMap.get(subject.getId()) * dayMultiplier);
-            if (subjectMinutes <= 0) continue;
-
-            double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
-            String topicSuggestion = getTopicFromMaterialsOrFallback(
-                    timetable.getStudent().getId(),
-                    subject,
-                    avg,
-                    subjectMinutes,
-                    dayOffset,
-                    subjectTopicPools,
-                    null
-            );
-
-            TimetableSlot slot = TimetableSlot.builder()
-                    .timetable(timetable)
-                    .subject(subject)
-                    .dayOfWeek(dayOfWeek)
-                    .startTime(currentTime)
-                    .endTime(currentTime.plusMinutes(subjectMinutes))
-                    .topic(topicSuggestion)
-                    .isCompleted(false)
-                    .build();
-
-            daySlots.add(slot);
-            currentTime = currentTime.plusMinutes(subjectMinutes + com.aistudyplanner.util.Constants.BUFFER_BETWEEN_SLOTS_MINUTES);
+    private String revisionTopicForSubject(Subject subject, Map<UUID, List<String>> orderedTopics,
+                                           Map<UUID, Integer> revisionCursor) {
+        List<String> topics = orderedTopics.getOrDefault(subject.getId(), Collections.emptyList());
+        if (topics.isEmpty()) {
+            return "Revision: " + subject.getSubjectName();
         }
-        return daySlots;
+        int rev = revisionCursor.getOrDefault(subject.getId(), 0);
+        revisionCursor.put(subject.getId(), rev + 1);
+        String label = "Revision: " + topics.get(rev % topics.size());
+        return label.length() > 200 ? label.substring(0, 200) : label;
+    }
+
+    /**
+     * Build a flat, priority-weighted ordering of which subject each of {@code totalSessions} sessions
+     * belongs to, using smooth weighted round-robin. Higher-weight subjects appear proportionally more
+     * often, yet every subject with a positive weight is still interleaved throughout the plan.
+     */
+    private List<Subject> buildWeightedSessionOrder(List<Subject> subjects, Map<UUID, Double> subjectWeights,
+                                                    int totalSessions) {
+        List<Subject> order = new ArrayList<>();
+        if (subjects.isEmpty() || totalSessions <= 0) return order;
+
+        Map<UUID, Double> weights = new HashMap<>();
+        double totalWeight = 0.0;
+        for (Subject s : subjects) {
+            double w = subjectWeights.getOrDefault(s.getId(), 1.0);
+            if (w <= 0) w = 1.0;
+            weights.put(s.getId(), w);
+            totalWeight += w;
+        }
+
+        Map<UUID, Double> current = new HashMap<>();
+        for (Subject s : subjects) current.put(s.getId(), 0.0);
+
+        for (int i = 0; i < totalSessions; i++) {
+            Subject chosen = null;
+            for (Subject s : subjects) {
+                double cw = current.get(s.getId()) + weights.get(s.getId());
+                current.put(s.getId(), cw);
+                if (chosen == null || cw > current.get(chosen.getId())) {
+                    chosen = s;
+                }
+            }
+            current.put(chosen.getId(), current.get(chosen.getId()) - totalWeight);
+            order.add(chosen);
+        }
+        return order;
     }
 
     @Transactional(readOnly = true)
@@ -544,8 +597,25 @@ public class TimetableService {
             throw new IllegalArgumentException("Slot does not belong to student");
         }
 
-        slot.setIsCompleted(!slot.getIsCompleted()); 
+        boolean wasCompleted = Boolean.TRUE.equals(slot.getIsCompleted());
+        slot.setIsCompleted(!wasCompleted);
         slot = timetableSlotRepository.save(slot);
+
+        // Feedback loop: update student streak and active date upon completing a study session
+        if (!wasCompleted) {
+            Student student = slot.getTimetable().getStudent();
+            LocalDate today = LocalDate.now();
+            if (student.getLastActiveDate() == null || !student.getLastActiveDate().equals(today)) {
+                if (student.getLastActiveDate() != null && ChronoUnit.DAYS.between(student.getLastActiveDate(), today) == 1) {
+                    student.setStudyStreak((student.getStudyStreak() != null ? student.getStudyStreak() : 0) + 1);
+                } else if (student.getStudyStreak() == null || student.getStudyStreak() == 0) {
+                    student.setStudyStreak(1);
+                }
+                student.setLastActiveDate(today);
+                studentRepository.save(student);
+            }
+        }
+
         return toSlotResponse(slot, slot.getTimetable().getWeekStartDate());
     }
 
@@ -584,9 +654,10 @@ public class TimetableService {
     }
 
     private SlotResponse toSlotResponse(TimetableSlot slot, LocalDate weekStartDate) {
-        // Calculate actual date: weekStartDate + dayOfWeek
-        LocalDate slotDate = null;
-        if (weekStartDate != null && slot.getDayOfWeek() != null) {
+        // Prefer the concrete persisted date (correct across multi-week/deadline plans); fall back to
+        // the legacy weekStartDate + dayOfWeek derivation for rows created before slot_date existed.
+        LocalDate slotDate = slot.getSlotDate();
+        if (slotDate == null && weekStartDate != null && slot.getDayOfWeek() != null) {
             slotDate = weekStartDate.plusDays(slot.getDayOfWeek());
         }
         

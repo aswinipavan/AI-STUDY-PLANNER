@@ -15,6 +15,7 @@ export interface StudentProfile {
   isPremium: boolean;
   studyStreak?: number;
   availableHoursPerDay?: number;
+  preferredStudyTime?: string; // backend StudyTimeWindow enum: MORNING | AFTERNOON | EVENING | LATE_NIGHT
   createdAt: string;
   emailNotifications?: boolean;
   pushNotifications?: boolean;

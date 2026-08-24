@@ -16,7 +16,7 @@ import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCa
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import Image from 'next/image';
+import AvatarImage from '@/components/common/AvatarImage';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -28,7 +28,35 @@ const DEPARTMENTS = [
 ];
 
 const STUDY_DURATIONS = ['1 hour / day', '2 hours / day', '3 hours / day', '4+ hours / day'];
-const STUDY_TIMES = ['Morning (6 AM - 12 PM)', 'Afternoon (12 PM - 5 PM)', 'Evening (5 PM - 9 PM)', 'Late Night (9 PM - 2 AM)'];
+const STUDY_TIMES = ['Morning (6 AM - 12 PM)', 'Afternoon (12 PM - 5 PM)', 'Evening (5 PM - 9 PM)', 'Late Night (9 PM - 12 AM)'];
+
+// The backend timetable generator reads these as the source of truth for WHEN to schedule study
+// sessions, so the settings labels must map cleanly to the StudyTimeWindow enum and an hours number.
+const STUDY_TIME_TO_ENUM: Record<string, string> = {
+  'Morning (6 AM - 12 PM)': 'MORNING',
+  'Afternoon (12 PM - 5 PM)': 'AFTERNOON',
+  'Evening (5 PM - 9 PM)': 'EVENING',
+  'Late Night (9 PM - 12 AM)': 'LATE_NIGHT',
+};
+const ENUM_TO_STUDY_TIME: Record<string, string> = {
+  MORNING: 'Morning (6 AM - 12 PM)',
+  AFTERNOON: 'Afternoon (12 PM - 5 PM)',
+  EVENING: 'Evening (5 PM - 9 PM)',
+  LATE_NIGHT: 'Late Night (9 PM - 12 AM)',
+};
+const DURATION_TO_HOURS: Record<string, number> = {
+  '1 hour / day': 1,
+  '2 hours / day': 2,
+  '3 hours / day': 3,
+  '4+ hours / day': 4,
+};
+const hoursToDurationLabel = (h?: number): string => {
+  if (h == null) return '2 hours / day';
+  if (h < 1.5) return '1 hour / day';
+  if (h < 2.5) return '2 hours / day';
+  if (h < 3.5) return '3 hours / day';
+  return '4+ hours / day';
+};
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required').max(80),
@@ -92,33 +120,14 @@ export default function SettingsPage() {
 
     setAvatarError(null);
     setAvatarUploading(true);
-    setAvatarProgress(20);
+    setAvatarProgress(30);
 
     try {
-      const uploadInfo = await authApi.getAvatarUploadUrl(file.name, file.type);
-      setAvatarProgress(40);
-
-      const headers: Record<string, string> = { 'Content-Type': file.type };
-      if (uploadInfo.anonKey) {
-        headers['Authorization'] = `Bearer ${uploadInfo.anonKey}`;
-        headers['apikey'] = uploadInfo.anonKey;
-      }
-
-      const res = await fetch(uploadInfo.uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers,
-      });
-
-      if (!res.ok) {
-        const errText = await res.text().catch(() => '');
-        throw new Error(`Upload failed (${res.status}): ${errText}`);
-      }
-      setAvatarProgress(75);
-
-      const updatedProfile = await authApi.updateMe({ profilePictureUrl: uploadInfo.fileUrl });
-      setUser(updatedProfile);
+      // Single multipart request: backend stores the image and returns the updated profile with the
+      // new (cache-busted) avatar URL. Replaces the old signed-URL + direct-PUT flow (HTTP 400 local).
+      const updatedProfile = await authApi.uploadAvatar(file);
       setAvatarProgress(100);
+      setUser(updatedProfile);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
       setAvatarError(message);
@@ -140,6 +149,14 @@ export default function SettingsPage() {
     if (user) {
       setEmailNotifs(user.emailNotifications ?? true);
       setPushNotifs(user.pushNotifications ?? false);
+    }
+  }, [user]);
+
+  // Load saved study preferences so the dropdowns reflect what the timetable generator will actually use.
+  useEffect(() => {
+    if (user) {
+      setStudyTime(ENUM_TO_STUDY_TIME[user.preferredStudyTime ?? ''] ?? 'Evening (5 PM - 9 PM)');
+      setStudyDuration(hoursToDurationLabel(user.availableHoursPerDay));
     }
   }, [user]);
 
@@ -198,9 +215,22 @@ export default function SettingsPage() {
     saveNotifications({ emailNotifications: emailNotifs, pushNotifications: pushNotifs });
   };
 
+  // Persist study preferences to the backend. These drive automated timetable generation:
+  // preferredStudyTime = WHEN sessions are scheduled (StudyTimeWindow), availableHoursPerDay = daily budget.
+  const { mutate: savePreferences, isPending: isPrefPending } = useMutation({
+    mutationFn: () => authApi.updateMe({
+      preferredStudyTime: STUDY_TIME_TO_ENUM[studyTime] ?? 'EVENING',
+      availableHoursPerDay: DURATION_TO_HOURS[studyDuration] ?? 2,
+    }),
+    onSuccess: (updated) => {
+      setUser(updated);
+      setPrefSaved(true);
+      setTimeout(() => setPrefSaved(false), 3000);
+    },
+  });
+
   const handleSavePreferences = () => {
-    setPrefSaved(true);
-    setTimeout(() => setPrefSaved(false), 3000);
+    savePreferences();
   };
 
   const handlePasswordReset = async () => {
@@ -289,13 +319,17 @@ export default function SettingsPage() {
               onKeyDown={(e) => e.key === 'Enter' && handleAvatarClick()}
             >
               {user?.photoUrl || user?.profilePictureUrl ? (
-                <Image
+                <AvatarImage
                   src={(user.photoUrl || user.profilePictureUrl)!}
                   alt="Profile"
                   width={72}
                   height={72}
                   className={styles.avatarImg}
-                  unoptimized
+                  fallback={
+                    <div className={styles.avatarFallback}>
+                      {(user?.name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  }
                 />
               ) : (
                 <div className={styles.avatarFallback}>
@@ -496,6 +530,7 @@ export default function SettingsPage() {
               <AppButton
                 variant="outline"
                 onClick={handleSavePreferences}
+                loading={isPrefPending}
                 className="w-full"
               >
                 Save Study Preferences

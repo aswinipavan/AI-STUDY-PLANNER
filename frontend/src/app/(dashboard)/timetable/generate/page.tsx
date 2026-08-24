@@ -28,7 +28,11 @@ const STUDY_STYLES = [
   { value: 'relaxed', label: 'Relaxed', description: 'Shorter sessions, spaced repetition' },
 ];
 
-const DURATIONS = ['1 week', '2 weeks', '3 weeks', '4 weeks'];
+// Fallback durations only — used when a subject has no upcoming exam and no target deadline is set.
+// Deliberately NOT capped at 4 weeks: the planning window must never impose a fixed maximum.
+const DURATIONS = ['1 week', '2 weeks', '3 weeks', '4 weeks', '6 weeks', '8 weeks', '12 weeks'];
+
+const DAY_MS = 1000 * 60 * 60 * 24;
 
 interface GeneratePayload {
   subjectIds: string[];
@@ -45,6 +49,9 @@ const DURATION_DAYS: Record<string, number> = {
   '2 weeks': 14,
   '3 weeks': 21,
   '4 weeks': 28,
+  '6 weeks': 42,
+  '8 weeks': 56,
+  '12 weeks': 84,
 };
 
 export default function GenerateTimetablePage() {
@@ -60,6 +67,56 @@ export default function GenerateTimetablePage() {
   const [useDeadlines, setUseDeadlines] = useState(true);
   const [targetDeadlineDate, setTargetDeadlineDate] = useState<string | null>(null);
   const [error, setError] = useState('');
+
+  // The furthest upcoming exam among the selected subjects. This — not the coarse duration picker —
+  // is what actually drives the plan length when "Use exam deadlines" is on, so we surface it to the
+  // user instead of implying a fixed 1–4 week window. The backend remains authoritative.
+  const furthestExamDate: Date | null = (() => {
+    const start = new Date(startDate);
+    const dates = subjects
+      .filter((s) => selectedSubjects.includes(s.id))
+      .map((s) => s.examDate)
+      .filter((d): d is string => Boolean(d))
+      .map((d) => new Date(d))
+      .filter((d) => !Number.isNaN(d.getTime()) && d.getTime() >= start.getTime());
+    if (dates.length === 0) return null;
+    return dates.reduce((a, b) => (a.getTime() >= b.getTime() ? a : b));
+  })();
+
+  // Human-readable description of the real planning window, honouring the same precedence the backend
+  // uses: explicit target deadline → furthest exam → fallback duration.
+  const planHorizon: { short: string; sentence: string } = (() => {
+    const start = new Date(startDate);
+    const fmt = (d: string | Date) =>
+      new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+    const daysUntil = (end: Date) => Math.max(0, Math.ceil((end.getTime() - start.getTime()) / DAY_MS));
+    const plural = (n: number) => (n === 1 ? '' : 's');
+
+    if (!useDeadlines) {
+      if (targetDeadlineDate) {
+        const days = daysUntil(new Date(targetDeadlineDate));
+        return {
+          short: `Until ${fmt(targetDeadlineDate)} · ${days} day${plural(days)}`,
+          sentence: `every day from now until ${fmt(targetDeadlineDate)} — about ${days} day${plural(days)} of preparation.`,
+        };
+      }
+      return {
+        short: 'Target deadline not set',
+        sentence: "a target date you haven't chosen yet — pick one below.",
+      };
+    }
+    if (furthestExamDate) {
+      const days = daysUntil(furthestExamDate);
+      return {
+        short: `Until your last exam · ${fmt(furthestExamDate)} · ~${days} day${plural(days)}`,
+        sentence: `every day from now until your last exam on ${fmt(furthestExamDate)} — about ${days} day${plural(days)} of preparation. It won't be capped to a fixed number of weeks.`,
+      };
+    }
+    return {
+      short: `${duration} (fallback — no upcoming exams)`,
+      sentence: `${duration} — used because your selected subjects have no upcoming exam dates yet.`,
+    };
+  })();
 
   const { mutate: generate, isPending } = useMutation({
     mutationFn: (payload: GeneratePayload) => timetableApi.generate(payload),
@@ -229,6 +286,9 @@ export default function GenerateTimetablePage() {
                   </button>
                 ))}
               </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-muted-foreground)', marginTop: '0.5rem' }}>
+                Only used as a fallback when a subject has no upcoming exam and no target deadline is set.
+              </p>
             </div>
 
             <div className={styles.inputGroup} style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
@@ -265,12 +325,27 @@ export default function GenerateTimetablePage() {
                     className={styles.dateInput}
                   />
                   <p style={{ fontSize: '0.75rem', color: 'var(--color-muted-foreground)', marginTop: '0.5rem' }}>
-                    {targetDeadlineDate 
+                    {targetDeadlineDate
                       ? `${Math.max(0, Math.ceil((new Date(targetDeadlineDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)))} days available for study`
                       : 'Choose a date to see available study time'}
                   </p>
                 </div>
               )}
+            </div>
+
+            <div
+              style={{
+                marginTop: '1.5rem',
+                padding: '0.875rem 1rem',
+                borderRadius: '0.5rem',
+                background: 'var(--color-muted, rgba(127,127,127,0.08))',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-muted-foreground)', lineHeight: 1.5, margin: 0 }}>
+                <strong style={{ color: 'var(--color-foreground)' }}>Your plan will cover</strong>{' '}
+                {planHorizon.sentence}
+              </p>
             </div>
           </div>
         )}
@@ -285,7 +360,7 @@ export default function GenerateTimetablePage() {
                 { label: 'Daily Study', value: `${hoursPerDay} hours/day` },
                 { label: 'Study Style', value: studyStyle.charAt(0).toUpperCase() + studyStyle.slice(1) },
                 { label: 'Start Date', value: new Date(startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) },
-                { label: 'Duration', value: duration },
+                { label: 'Plan covers', value: planHorizon.short },
                 { label: 'Planning Mode', value: useDeadlines ? 'Auto-prioritize by exam dates' : 'Target deadline: ' + (targetDeadlineDate ? new Date(targetDeadlineDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long' }) : 'Not set') },
               ].map(({ label, value }) => (
                 <div key={label} className={styles.reviewRow}>
