@@ -20,7 +20,7 @@ An intelligent, AI-powered study planner that helps college students manage thei
 ### Frontend
 | Technology     | Purpose                          |
 |----------------|----------------------------------|
-| Next.js 14     | React framework with App Router  |
+| Next.js 16     | React 19 framework with App Router & Turbopack |
 | TypeScript     | Type-safe development            |
 | Tailwind CSS   | Utility-first styling            |
 | Firebase Auth  | Client-side authentication       |
@@ -32,13 +32,13 @@ An intelligent, AI-powered study planner that helps college students manage thei
 
 ```
 AI-Study-Planner/
-├── backend/          # Spring Boot REST API
+├── backend/          # Spring Boot 3.2 REST API (Java 17, Groq AI, Supabase)
 │   ├── src/          # Java source code
 │   ├── Dockerfile    # Docker build config
 │   ├── render.yaml   # Render deployment blueprint
 │   └── pom.xml       # Maven build file
 │
-└── frontend/         # Next.js 14 web app
+└── frontend/         # Next.js 16 web app (React 19, TypeScript, Tailwind)
     ├── src/          # TypeScript source code
     ├── public/       # Static assets
     └── package.json  # Node dependencies

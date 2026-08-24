@@ -55,6 +55,15 @@
 - [2026-08-20] Integrated `CloudShader` WebGL component and `CloudShaderDemo` into `@/components/ui/cloud-shader.tsx` and `@/components/cloud-shader-demo.tsx`. Created unit test suite (`cloud-shader.test.tsx`, 4/4 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
 - [2026-08-20] Integrated `FloatingDock` spring-physics component and `FloatingDockDemo` into `@/components/ui/floating-dock.tsx` and `@/components/floating-dock-demo.tsx`. Created unit test suite (`floating-dock.test.tsx`, 3/3 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
 - [2026-08-20] Integrated `PlaceholdersAndVanishInput` component (`@/components/ui/placeholders-and-vanish-input.tsx`), created `PlaceholdersAndVanishInputDemo`, and upgraded `ChatInput.tsx` with animated rotating study placeholders and canvas particle vanish effect. Created unit test suites (`placeholders-and-vanish-input.test.tsx`, `chat-input.test.tsx`, 77/77 tests passing across 11 suites). Next.js 16 build passed with 0 errors (23/23 routes).
+- [2026-08-22] Master Repair & Production Hardening:
+  - Resolved 100% of ESLint errors (15 -> 0). Fixed React purity in `Topbar.tsx` (removed impure `Date.now()`) and ref access in `cloud-shader.tsx`.
+  - Replaced untyped `any` annotations across `ai.api.ts`, `chat.api.ts`, `subjects.api.ts`, `FirebaseDebugPanel.tsx` with strongly-typed interfaces.
+  - Verified 110/110 Spring Boot backend tests passing (`mvnw test`, 0 failures, 0 errors).
+  - Verified 77/77 Jest frontend tests passing (11 suites).
+  - Verified Next.js 16 production build passing cleanly (24/24 routes generated, 0 type errors).
+  - Added `-XX:MaxMetaspaceSize=160m -XX:+ExitOnOutOfMemoryError` JVM tuning to `Dockerfile`.
+  - Updated GitHub Actions `master-test-suite.yml` with `frontend-ci` and `backend-ci` validation jobs.
+  - Corrected `README.md` documentation to accurately reflect Next.js 16 and React 19 architecture.
 
 ## In Progress
 - (none)

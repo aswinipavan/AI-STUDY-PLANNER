@@ -1,9 +1,9 @@
 # Current State
 
 ## Current Build Status
-- **Frontend:** Next.js 16.2.9 (App Router) + Turbopack. Fully builds with 0 errors (`npm run build`, 23/23 routes generated cleanly).
-- **Backend:** Spring Boot 3.2.4 (Java 17). Builds and tests with 0 errors (110/110 tests passed, 0 failures, 0 errors).
-- **Database:** Supabase PostgreSQL connected and stable with Flyway migrations `V1`, `V2`, `V3` (15 tables).
+- **Frontend:** Next.js 16.2.9 (App Router) + Turbopack + React 19. Fully builds with 0 errors (`npm run build`, 24/24 routes generated cleanly), 0 ESLint errors (`npm run lint`), 0 TypeScript errors (`npx tsc --noEmit`), and 77/77 tests passed (`npm test`).
+- **Backend:** Spring Boot 3.2.4 (Java 17). Builds and tests with 0 errors (110/110 tests passed, 0 failures, 0 errors via `mvnw test`).
+- **Database:** Supabase PostgreSQL connected and stable with Flyway migrations `V1`, `V2`, `V3` (15 tables) and `ddl-auto=validate`.
 - **Storage:** Supabase Storage configured with anon key for browser uploads (`materials/` and `avatars/` buckets).
 - **Mobile (Android):** Untouched & preserved in `mobile/`.
 
