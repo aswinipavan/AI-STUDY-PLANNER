@@ -9,6 +9,7 @@ import com.aistudyplanner.model.dto.response.SubjectResponse;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.security.CurrentStudent;
 import com.aistudyplanner.service.MaterialService;
+import com.aistudyplanner.service.StorageService;
 import com.aistudyplanner.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,10 +17,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,6 +38,7 @@ public class StudentController {
 
     private final StudentService studentService;
     private final MaterialService materialService;
+    private final StorageService storageService;
 
     @GetMapping("/me")
     @Operation(summary = "Get current student profile")
@@ -85,6 +90,58 @@ public class StudentController {
         log.info("Generating avatar upload URL for student: {}", student.getId());
         Map<String, String> uploadInfo = materialService.getAvatarUploadUrl(student.getId(), fileName, fileType);
         return ResponseEntity.ok(ApiResponse.success(uploadInfo, "Avatar upload URL generated"));
+    }
+
+    /**
+     * Uploads a profile avatar image in a single multipart request and persists the resulting URL.
+     *
+     * <p>Replaces the old three-step flow (get signed URL → browser PUT to Supabase → PUT /me), which
+     * returned HTTP 400 locally because no Supabase Storage backend is configured. The bytes are sent
+     * through {@link StorageService} (Supabase in production, local filesystem otherwise). The stored
+     * URL is cache-busted with {@code ?v=<timestamp>} because the object path is stable per student,
+     * so the browser would otherwise keep showing the previous image.
+     */
+    @PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload profile avatar image")
+    public ResponseEntity<ApiResponse<StudentResponse>> uploadAvatar(
+            @CurrentStudent Student student,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is required");
+        }
+        if (file.getSize() > 5L * 1024 * 1024) {
+            throw new IllegalArgumentException("Image must be under 5MB");
+        }
+        String contentType = file.getContentType();
+        String ext = avatarExtension(contentType, file.getOriginalFilename());
+        if (ext == null) {
+            throw new IllegalArgumentException("Only JPG, PNG, WEBP, or GIF images are allowed");
+        }
+
+        String objectPath = student.getId() + "/avatar" + ext;
+        String fileUrl = storageService.upload("avatars", objectPath, file.getBytes(), contentType);
+        // Cache-bust so the browser fetches the new image despite the stable path.
+        String cacheBusted = fileUrl + (fileUrl.contains("?") ? "&" : "?") + "v=" + System.currentTimeMillis();
+
+        UpdateProfileRequest req = UpdateProfileRequest.builder().profilePictureUrl(cacheBusted).build();
+        StudentResponse response = studentService.updateProfile(student.getId(), req);
+        return ResponseEntity.ok(ApiResponse.success(response, "Avatar updated successfully"));
+    }
+
+    /** Returns the file extension (with dot) for an allowed avatar image, or null if not allowed. */
+    private String avatarExtension(String contentType, String fileName) {
+        String ct = contentType != null ? contentType.toLowerCase() : "";
+        if (ct.contains("jpeg") || ct.contains("jpg")) return ".jpg";
+        if (ct.contains("png")) return ".png";
+        if (ct.contains("webp")) return ".webp";
+        if (ct.contains("gif")) return ".gif";
+        // Fall back to the filename extension when the browser omits a usable content type.
+        String lower = fileName != null ? fileName.toLowerCase() : "";
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return ".jpg";
+        if (lower.endsWith(".png")) return ".png";
+        if (lower.endsWith(".webp")) return ".webp";
+        if (lower.endsWith(".gif")) return ".gif";
+        return null;
     }
 
     @GetMapping("/me/subjects")

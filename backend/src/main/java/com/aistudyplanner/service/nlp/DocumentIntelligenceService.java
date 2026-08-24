@@ -23,10 +23,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * High-performance Document Intelligence & NLP Service.
@@ -152,6 +155,8 @@ public class DocumentIntelligenceService {
 
             // 7. Persist structured intelligence
             material.setAiSummary(summary);
+            // Keep a bounded text excerpt for grounded AI retrieval. This is not exposed to the client.
+            material.setExtractedText(normalizedText.substring(0, Math.min(normalizedText.length(), 20_000)));
             material.setProcessingStatus(ProcessingStatus.COMPLETED);
             material.setExtractedChapters(objectMapper.writeValueAsString(chapters));
             material.setExtractedTopics(objectMapper.writeValueAsString(topics));
@@ -174,25 +179,28 @@ public class DocumentIntelligenceService {
     }
 
     /**
-     * Extract text from PDF via Apache PDFBox, or from remote URL, or use text preview.
+     * Extract text from PDF or DOCX files, or use text supplied by the upload client.
      */
     public String extractDocumentText(Material material, String fallbackPreview) {
-        // Priority 1: Try reading from URL if it's a PDF
+        // Priority 1: Download and extract supported document formats.
         if (material.getFileUrl() != null && !material.getFileUrl().isBlank()) {
             String fileType = material.getFileType() != null ? material.getFileType().toLowerCase() : "";
             boolean isPdf = fileType.contains("pdf") || material.getFileUrl().toLowerCase().endsWith(".pdf");
+            boolean isDocx = fileType.contains("docx") || material.getFileUrl().toLowerCase().endsWith(".docx");
 
-            if (isPdf) {
+            if (isPdf || isDocx) {
                 try {
-                    byte[] pdfBytes = downloadFileBytes(material.getFileUrl());
-                    if (pdfBytes != null && pdfBytes.length > 0) {
-                        String pdfText = extractTextFromPdfBytes(pdfBytes);
-                        if (pdfText != null && !pdfText.isBlank()) {
-                            return pdfText;
+                    byte[] documentBytes = downloadFileBytes(material.getFileUrl());
+                    if (documentBytes != null && documentBytes.length > 0) {
+                        String documentText = isPdf
+                                ? extractTextFromPdfBytes(documentBytes)
+                                : extractTextFromDocxBytes(documentBytes);
+                        if (documentText != null && !documentText.isBlank()) {
+                            return documentText;
                         }
                     }
                 } catch (Exception e) {
-                    log.warn("Could not extract text from PDF URL for material {}: {}", material.getId(), e.getMessage());
+                    log.warn("Could not extract text from material {}: {}", material.getId(), e.getMessage());
                 }
             }
         }
@@ -224,6 +232,31 @@ public class DocumentIntelligenceService {
             log.error("PDFBox text extraction failed: {}", e.getMessage());
             return "";
         }
+    }
+
+    /**
+     * Extract text from Office Open XML Word documents without adding a heavy runtime dependency.
+     * Legacy .doc files are intentionally not parsed because they are a binary format; clients should
+     * upload .docx or PDF so the text can be analysed reliably.
+     */
+    public String extractTextFromDocxBytes(byte[] docxBytes) {
+        if (docxBytes == null || docxBytes.length == 0) return "";
+        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(docxBytes))) {
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                if ("word/document.xml".equals(entry.getName())) {
+                    String xml = new String(zip.readAllBytes(), StandardCharsets.UTF_8);
+                    return xml
+                            .replaceAll("</w:p>", "\n")
+                            .replaceAll("<[^>]+>", " ")
+                            .replaceAll("\\s+", " ")
+                            .trim();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("DOCX text extraction failed: {}", e.getMessage());
+        }
+        return "";
     }
 
     private byte[] downloadFileBytes(String urlStr) {

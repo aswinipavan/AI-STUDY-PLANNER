@@ -8,6 +8,7 @@ import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.service.MaterialService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MaterialController.class)
 @DisplayName("Material Controller Tests - Module 3")
 class MaterialControllerTest {
+
+    @MockBean
+    private FirebaseAuth firebaseAuth;
 
     @Autowired
     private MockMvc mockMvc;

@@ -12,6 +12,7 @@ import java.util.UUID;
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, UUID> {
 
+    List<Material> findAllByStudentId(UUID studentId);
     List<Material> findAllByStudentIdOrderByCreatedAtDesc(UUID studentId);
     Page<Material> findAllByStudentIdOrderByCreatedAtDesc(UUID studentId, Pageable pageable);
 

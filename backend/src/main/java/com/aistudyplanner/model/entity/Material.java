@@ -68,6 +68,9 @@ public class Material {
     @Column(name = "extracted_keywords", columnDefinition = "TEXT")
     private String extractedKeywords;
 
+    @Column(name = "extracted_text", columnDefinition = "TEXT")
+    private String extractedText;
+
     @Column(name = "overall_difficulty", length = 20)
     private String overallDifficulty;
 
