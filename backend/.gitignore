@@ -20,6 +20,14 @@ serviceAccountKey.json
 *.log
 /logs
 
+# Local file-based H2 database (persistent local dev data — must not be committed)
+/data/
+*.mv.db
+*.trace.db
+
+# Locally uploaded material files (persist on disk alongside the local DB)
+/uploads/
+
 # Maven wrapper
 .mvn/wrapper/maven-wrapper.jar
 !.mvn/wrapper/maven-wrapper.properties
