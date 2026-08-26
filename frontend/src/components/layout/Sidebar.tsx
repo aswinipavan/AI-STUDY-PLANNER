@@ -167,7 +167,7 @@ export function Sidebar() {
       <aside
         role="navigation"
         aria-label="Main navigation"
-        className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed} lg:static lg:translate-x-0 lg:transform-none`}
+        className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
       >
         {/* Logo */}
         <div className={styles.logoBox}>

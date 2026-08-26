@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,10 +9,12 @@ import { useMutation } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInput } from '@/components/ui/AppInput';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme, type Theme } from '@/hooks/useTheme';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
+import { useDialog } from '@/hooks/useDialog';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
-import { Moon, Sun, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera, Shield, Clock, AlertTriangle, Key, Trash2 } from 'lucide-react';
+import { Moon, Sun, Monitor, Volume2, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera, Shield, Clock, AlertTriangle, Key, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
@@ -58,6 +60,23 @@ const hoursToDurationLabel = (h?: number): string => {
   return '4+ hours / day';
 };
 
+/**
+ * "System" is a real, distinct choice, not the absence of one — the old two-state
+ * button could not express it, so following the OS was unreachable once anyone
+ * had clicked the toggle even by accident.
+ */
+const THEME_OPTIONS: Array<{ value: Theme; label: string; icon: typeof Sun; id: string }> = [
+  { value: 'light', label: 'Light', icon: Sun, id: 'settings-theme-light' },
+  { value: 'dark', label: 'Dark', icon: Moon, id: 'settings-theme-dark' },
+  { value: 'system', label: 'System', icon: Monitor, id: 'settings-theme-system' },
+];
+
+const THEME_DESCRIPTION: Record<Theme, string> = {
+  light: 'Always light, whatever this device is set to',
+  dark: 'Always dark, whatever this device is set to',
+  system: 'Follows your device appearance setting',
+};
+
 const profileSchema = z.object({
   name: z.string().min(1, 'Name is required').max(80),
   collegeName: z.string().max(200).optional(),
@@ -69,7 +88,8 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function SettingsPage() {
-  const { toggleTheme, isDark } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const { soundEnabled, setSoundEnabled } = useSoundPreference();
   const { user, setUser, clearAuth } = useAuthStore();
   const router = useRouter();
   const { replayOnboarding } = useOnboarding();
@@ -635,21 +655,71 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ── E. APPEARANCE ── */}
+        {/* ── E. APPEARANCE & FEEDBACK ── */}
         <div className={`${styles.card} ${styles.cardDelay1}`}>
-          <div className={styles.cardRow}>
-            <div className={`${styles.cardHeader} ${styles.cardHeaderFlush}`}>
-              <div className={`${styles.iconWrap} ${styles.iconWarning}`}>
-                {isDark() ? <Moon size={20} /> : <Sun size={20} />}
-              </div>
-              <div>
-                <h3 className={styles.cardTitle}>Appearance</h3>
-                <p className={styles.cardSubtitle}>Toggle dark / light theme</p>
-              </div>
+          <div className={styles.cardHeader}>
+            {/* Which glyph shows is decided by CSS from the `.dark` class the
+                pre-paint script sets. The card used to call isDark() during
+                render, which reads the DOM mid-render and never re-ran when the
+                OS flipped, so the icon and the button label went stale. */}
+            <div className={`${styles.iconWrap} ${styles.iconWarning}`}>
+              <Sun size={20} className="dark:hidden" aria-hidden="true" />
+              <Moon size={20} className="hidden dark:block" aria-hidden="true" />
             </div>
-            <AppButton variant="outline" onClick={toggleTheme} id="settings-theme-toggle">
-              {isDark() ? 'Switch to Light' : 'Switch to Dark'}
-            </AppButton>
+            <div>
+              <h3 className={styles.cardTitle}>Appearance & Feedback</h3>
+              <p className={styles.cardSubtitle}>Theme and interface sound, saved on this device</p>
+            </div>
+          </div>
+
+          <div className={styles.toggleRow}>
+            <div className={styles.toggleInfo}>
+              <h4 className={styles.toggleTitle}>Theme</h4>
+              <p className={styles.toggleDesc}>{THEME_DESCRIPTION[theme]}</p>
+            </div>
+            <div className={styles.segmented} role="group" aria-label="Theme">
+              {THEME_OPTIONS.map(({ value, label, icon: Icon, id }) => (
+                <label
+                  key={value}
+                  htmlFor={id}
+                  className={`${styles.segment} ${theme === value ? styles.segmentActive : ''}`}
+                >
+                  <input
+                    id={id}
+                    type="radio"
+                    name="theme"
+                    value={value}
+                    checked={theme === value}
+                    onChange={() => setTheme(value)}
+                  />
+                  <Icon size={14} aria-hidden="true" />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.toggleRow}>
+            <div className={styles.toggleInfo}>
+              <h4 className={styles.toggleTitle}>
+                <Volume2 size={14} className="mr-1 inline" aria-hidden="true" />
+                Sound Feedback
+              </h4>
+              <p className={styles.toggleDesc}>
+                A short cue when a study session completes, a badge unlocks, or an upload
+                finishes. Nothing plays in a background tab, and never continuously.
+              </p>
+            </div>
+            <label className={styles.switch}>
+              <input
+                id="settings-sound-toggle"
+                type="checkbox"
+                checked={soundEnabled}
+                onChange={(e) => setSoundEnabled(e.target.checked)}
+                aria-label="Toggle sound feedback"
+              />
+              <span className={styles.slider}></span>
+            </label>
           </div>
         </div>
 
@@ -709,86 +779,107 @@ export default function SettingsPage() {
       </div>
 
       {/* Delete Account Modal */}
-      {showDeleteModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.7)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '1rem',
-        }}>
-          <div style={{
-            background: 'var(--color-card, #1a1a24)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            maxWidth: '480px',
-            width: '100%',
-            padding: '2rem',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', color: '#ef4444' }}>
-              <AlertTriangle size={24} />
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>Delete Student Account</h3>
-            </div>
+      <DeleteAccountDialog
+        isOpen={showDeleteModal}
+        onClose={() => { setShowDeleteModal(false); setDeleteConfirmText(''); setDeleteError(null); }}
+        confirmText={deleteConfirmText}
+        onConfirmTextChange={setDeleteConfirmText}
+        error={deleteError}
+        loading={deleteLoading}
+        onConfirm={handleDeleteAccount}
+      />
+    </div>
+  );
+}
 
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-muted)', lineHeight: 1.5, marginBottom: '1rem' }}>
-              This action is <strong>irreversible</strong>. Permanently deleting your account will erase:
-            </p>
-            <ul style={{ fontSize: '0.8125rem', color: 'var(--color-muted)', marginBottom: '1.5rem', paddingLeft: '1.25rem', lineHeight: 1.6 }}>
-              <li>All uploaded academic study materials & NLP extracted intelligence</li>
-              <li>Generated timetables, slots, and study progress</li>
-              <li>All subjects, marks, exams, and performance analytics</li>
-              <li>Complete AI chat conversation history</li>
-            </ul>
+interface DeleteAccountDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  confirmText: string;
+  onConfirmTextChange: (value: string) => void;
+  error: string | null;
+  loading: boolean;
+  onConfirm: () => void;
+}
 
-            {deleteError && (
-              <div className={styles.avatarError} style={{ marginBottom: '1rem' }}>
-                {deleteError}
-              </div>
-            )}
+/**
+ * Its own component so {@link useDialog} can be called unconditionally — the
+ * modal used to be inline JSX behind `showDeleteModal &&`, which meant no
+ * Escape, no focus trap, no scroll lock, and a `z-index: 9999` that put it above
+ * even the onboarding takeover. It now behaves like every other dialog.
+ */
+function DeleteAccountDialog({
+  isOpen, onClose, confirmText, onConfirmTextChange, error, loading, onConfirm,
+}: DeleteAccountDialogProps) {
+  const panelRef = useDialog(isOpen, onClose);
+  const titleId = useId();
+  // A fixed id, not useId(): there is only ever one of these dialogs, and the
+  // e2e suite selects the field by it.
+  const confirmId = 'input-delete-confirm';
 
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8125rem', marginBottom: '0.5rem', fontWeight: 600 }}>
-                Type <strong>DELETE</strong> to confirm:
-              </label>
-              <input
-                id="input-delete-confirm"
-                type="text"
-                value={deleteConfirmText}
-                onChange={(e) => setDeleteConfirmText(e.target.value)}
-                placeholder="DELETE"
-                className={styles.input}
-                style={{ borderColor: 'rgba(239, 68, 68, 0.4)' }}
-              />
-            </div>
+  if (!isOpen) return null;
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <AppButton
-                variant="outline"
-                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); setDeleteError(null); }}
-              >
-                Cancel
-              </AppButton>
-              <AppButton
-                variant="danger"
-                id="btn-confirm-delete-account"
-                loading={deleteLoading}
-                disabled={deleteConfirmText.trim().toUpperCase() !== 'DELETE'}
-                onClick={handleDeleteAccount}
-              >
-                <Trash2 size={16} className="mr-1 inline" /> Delete Permanently
-              </AppButton>
-            </div>
-          </div>
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div
+        ref={panelRef}
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={styles.modalPanel}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className={styles.modalTitleRow}>
+          <AlertTriangle size={24} aria-hidden="true" />
+          <h3 id={titleId} className={styles.modalTitle}>Delete Student Account</h3>
         </div>
-      )}
+
+        <p className={styles.modalText}>
+          This action is <strong>irreversible</strong>. Permanently deleting your account will erase:
+        </p>
+        <ul className={styles.modalList}>
+          <li>All uploaded academic study materials &amp; NLP extracted intelligence</li>
+          <li>Generated timetables, slots, and study progress</li>
+          <li>All subjects, marks, exams, and performance analytics</li>
+          <li>Complete AI chat conversation history</li>
+        </ul>
+
+        {error && (
+          <div className={styles.avatarError} role="alert" style={{ marginBottom: '1rem' }}>
+            {error}
+          </div>
+        )}
+
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label htmlFor={confirmId} className={styles.modalConfirmLabel}>
+            Type <strong>DELETE</strong> to confirm:
+          </label>
+          <input
+            id={confirmId}
+            type="text"
+            value={confirmText}
+            onChange={(e) => onConfirmTextChange(e.target.value)}
+            placeholder="DELETE"
+            className={`${styles.input} ${styles.modalDanger}`}
+          />
+        </div>
+
+        <div className={styles.modalActions}>
+          <AppButton variant="outline" onClick={onClose}>
+            Cancel
+          </AppButton>
+          <AppButton
+            variant="danger"
+            id="btn-confirm-delete-account"
+            loading={loading}
+            disabled={confirmText.trim().toUpperCase() !== 'DELETE'}
+            onClick={onConfirm}
+          >
+            <Trash2 size={16} className="mr-1 inline" aria-hidden="true" /> Delete Permanently
+          </AppButton>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,27 +2,32 @@
   padding: 2rem;
   max-width: 1024px;
   margin: 0 auto;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
 .card {
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
+  /* No box-shadow here, so this border is the card's only boundary — as
+     white-alpha it made a white card vanish into the near-white page. */
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
   padding: 1.5rem;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: all var(--app-duration-slow) var(--app-ease-spring);
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  background: rgba(255,255,255,0.02);
-  border-color: rgba(255,255,255,0.1);
+  /* `--muted` reads as a lift in both themes: a faint grey tint on the light
+     card, and genuinely lighter than the dark card. Brightening with white-alpha
+     only worked in dark mode. */
+  background: var(--color-muted);
+  border-color: hsl(var(--foreground) / 0.2);
 }
 
 .leftContent {
@@ -36,7 +41,7 @@
   height: 3.5rem;
   background: rgba(0, 229, 192, 0.05);
   border: 1px solid rgba(0, 229, 192, 0.1);
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,7 +49,7 @@
 }
 
 .dateDay {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   color: var(--color-primary);
   font-size: 1.25rem;
   font-weight: 500;
@@ -67,7 +72,7 @@
 }
 
 .subjectName {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-weight: 500;
   font-size: 1.125rem;
   margin: 0;
@@ -86,7 +91,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   border: 1px solid transparent;
 }
 
@@ -123,10 +128,10 @@
   padding: 0.5rem;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
   color: var(--color-muted-foreground);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,8 +150,8 @@
 .skeletonCard {
   height: 5.5rem;
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 

@@ -199,12 +199,16 @@ test.describe('FINAL INDEPENDENT QA AUDIT SUITE', () => {
     await expect(page.locator('input[name="name"]')).toHaveValue('Aswini Pavan Senior');
     await expect(page.locator('input[name="collegeName"]')).toHaveValue('MIT Institute of Technology');
 
-    // 5. Dark / Light theme toggle
-    const themeBtn = page.locator('#settings-theme-toggle');
-    await expect(themeBtn).toBeVisible();
-    await themeBtn.click();
+    // 5. Theme picker — Light / Dark / System (a radio group, not a two-state
+    //    button, so "follow the device setting" is reachable again)
+    const themeGroup = page.getByRole('group', { name: 'Theme' });
+    await expect(themeGroup).toBeVisible();
+    await page.locator('#settings-theme-dark').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
     await page.waitForTimeout(300);
-    await themeBtn.click();
+    await page.locator('#settings-theme-light').click();
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+    await page.locator('#settings-theme-system').click();
 
     // 6. Security password reset link trigger
     const resetPwdBtn = page.locator('#btn-settings-reset-pwd');

@@ -2,7 +2,7 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
@@ -16,7 +16,7 @@
 }
 
 .title {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.875rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
@@ -43,13 +43,13 @@
   font-weight: 600;
   font-size: 0.875rem;
   padding: 0.65rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   box-shadow: 0 2px 10px rgba(0, 229, 192, 0.25);
 }
 .btnPrimary:hover {
@@ -58,29 +58,29 @@
 }
 
 .btnSecondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--app-overlay);
+  border: 1px solid var(--color-border);
   color: var(--color-foreground);
   font-weight: 600;
   font-size: 0.875rem;
   padding: 0.65rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
 }
 .btnSecondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--app-overlay-strong);
+  border-color: var(--app-hairline-strong);
   transform: translateY(-1px);
 }
 
 .heroBanner {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(0, 229, 192, 0.08) 100%);
   border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 12px;
+  border-radius: var(--app-radius-lg);
   padding: 1.75rem;
   margin-bottom: 2rem;
   display: flex;
@@ -91,7 +91,7 @@
 }
 
 .heroContent h2 {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.35rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
@@ -112,10 +112,10 @@
 }
 
 .heroPill {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--app-overlay);
+  border: 1px solid var(--color-border);
   padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   font-size: 0.75rem;
   display: flex;
   align-items: center;
@@ -131,7 +131,7 @@
 }
 
 .sectionTitle {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
@@ -151,15 +151,15 @@
 
 .roomCard {
   background: var(--color-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   position: relative;
   overflow: hidden;
 }
@@ -176,19 +176,19 @@
 }
 
 .codeBadge {
-  font-family: var(--font-outfit), monospace;
+  font-family: var(--font-display), monospace;
   font-size: 0.8125rem;
   font-weight: 700;
   color: #00e5c0;
   background: rgba(0, 229, 192, 0.1);
   border: 1px solid rgba(0, 229, 192, 0.3);
   padding: 0.2rem 0.6rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   letter-spacing: 0.05em;
 }
 
 .roomSubject {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0.5rem 0 0.25rem 0;
@@ -220,7 +220,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--color-border);
 }
 
 .hostInfo {
@@ -238,9 +238,9 @@
   font-size: 0.8125rem;
   font-weight: 600;
   padding: 0.4rem 0.9rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
 }
 .btnJoinRoom:hover {
   background: #00e5c0;
@@ -249,8 +249,8 @@
 
 .emptyState {
   background: var(--color-card);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  border: 1px dashed var(--app-hairline-strong);
+  border-radius: var(--app-radius-lg);
   padding: 3rem 2rem;
   text-align: center;
   display: flex;
@@ -260,7 +260,7 @@
 }
 
 .emptyTitle {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
   margin: 0;
@@ -282,20 +282,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: var(--app-z-overlay);
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
 }
 
 .modalBox {
   background: var(--color-card);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   padding: 1.75rem;
   width: 100%;
   max-width: 480px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: scaleUp 0.25s var(--app-ease-out);
 }
 
 .modalHeader {
@@ -306,7 +306,7 @@
 }
 
 .modalTitle {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
@@ -318,7 +318,7 @@
   color: var(--color-muted-foreground);
   cursor: pointer;
   padding: 0.25rem;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
 }
 .closeModalBtn:hover {
   color: var(--color-foreground);
@@ -338,14 +338,14 @@
 
 .formInput, .formSelect {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
+  background: var(--app-overlay);
+  border: 1px solid var(--app-hairline-strong);
+  border-radius: var(--app-radius-sm);
   padding: 0.65rem 0.85rem;
   font-size: 0.875rem;
   color: var(--color-foreground);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color var(--app-duration-base) ease;
 }
 .formInput:focus, .formSelect:focus {
   border-color: #00e5c0;

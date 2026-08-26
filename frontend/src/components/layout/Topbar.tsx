@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
-import { useThemeStore } from '@/stores/themeStore';
+import { useTheme } from '@/hooks/useTheme';
 import AvatarImage from '@/components/common/AvatarImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,14 +13,14 @@ import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 /**
  * Topbar — fixed for Issues 2, 3:
- * - Theme toggle now calls themeStore.setTheme(), which ThemeApplier bridges to the DOM
+ * - Theme toggle flips whichever theme is actually showing (see useTheme)
  * - Bell button shows upcoming exams & smart academic notifications dropdown
  * - Avatar now has click dropdown: Settings + Logout
  */
 export function Topbar() {
   const { toggleSidebar } = useUIStore();
   const { user, clearAuth } = useAuthStore();
-  const { theme, setTheme } = useThemeStore();
+  const { toggleTheme } = useTheme();
   const router = useRouter();
 
   const [showBell, setShowBell] = useState(false);
@@ -48,8 +48,6 @@ export function Topbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const isDark = theme === 'dark';
-
   const handleLogout = async () => {
     setShowAvatar(false);
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -71,15 +69,19 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center space-x-2">
-        {/* Theme Toggle */}
+        {/* Theme Toggle — which icon shows is decided by CSS from the `.dark`
+            class the pre-paint script sets, so it is right on the first frame
+            and stays right when "system" is selected. Doing it from React state
+            meant the server and the browser rendered different icons. */}
         <button
           id="topbar-theme-toggle"
-          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          onClick={toggleTheme}
           className="rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors"
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={isDark ? 'Light mode' : 'Dark mode'}
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode"
         >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          <Moon size={20} className="dark:hidden" aria-hidden="true" />
+          <Sun size={20} className="hidden dark:block" aria-hidden="true" />
         </button>
 
         {/* Notifications Bell */}

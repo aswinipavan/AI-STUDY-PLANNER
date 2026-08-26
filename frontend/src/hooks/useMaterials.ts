@@ -18,6 +18,19 @@ export const useMaterials = () => {
     enabled: isReady,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
+    // Document intelligence runs asynchronously on the backend, so a freshly
+    // uploaded file arrives as PENDING and its topics appear seconds later. Poll
+    // only while something is actually in flight and stop the moment everything
+    // has settled — otherwise a student watched "Processing…" until they thought
+    // to reload the page.
+    refetchInterval: (query) => {
+      const data = query.state.data as StudyMaterial[] | undefined;
+      if (!data?.length) return false;
+      const inFlight = data.some(
+        (m) => m.processingStatus === 'PENDING' || m.processingStatus === 'PROCESSING'
+      );
+      return inFlight ? 4000 : false;
+    },
   });
 };
 
@@ -46,7 +59,14 @@ export const useUploadMaterial = () => {
       // the metadata. Replaces the old three-step signed-URL flow that failed with HTTP 400 locally.
       return materialsApi.upload(file, { title, subjectId, textPreview });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: QK.materials }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QK.materials });
+      // A new file means new topics to cover, so the coverage and readiness
+      // signals behind the ranking are stale. The schedule itself is only
+      // re-planned when the student asks for it — see useAdaptTimetable.
+      qc.invalidateQueries({ queryKey: QK.timetableInsights });
+      qc.invalidateQueries({ queryKey: QK.readiness });
+    },
   });
 };
 

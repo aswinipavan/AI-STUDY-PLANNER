@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { ViewTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
-import { ThemeApplier } from '@/components/providers/ThemeApplier';
 import { useFirebaseAuth } from '@/components/providers/AuthProvider';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -32,8 +32,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* ThemeApplier bridges themeStore → DOM .dark class */}
-      <ThemeApplier />
+      {/* Lets keyboard users reach the page without tabbing the whole nav */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
 
       {/* Sidebar for Desktop & Mobile Overlay */}
       <Sidebar />
@@ -41,12 +43,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Topbar />
-        
+
         {/* Scrollable Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-          <div className="mx-auto max-w-7xl">
-            {children}
-          </div>
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-4 lg:p-8">
+          {/*
+            Only the page body animates between routes — the sidebar and topbar
+            are anchored in globals.css so navigation never reads as a reload.
+            The browser drives it via the View Transitions API; nothing here
+            runs JS per frame.
+          */}
+          <ViewTransition default="page-body">
+            <div className="mx-auto max-w-7xl">
+              {children}
+            </div>
+          </ViewTransition>
         </main>
       </div>
     </div>

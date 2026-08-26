@@ -5,6 +5,14 @@ import { ChatMessage, ChatSession } from '@/types/api.types';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBackendHealth } from '@/hooks/useBackendHealth';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
+
+/**
+ * Below this, the reply lands while the student is still looking at the screen and
+ * a chime would only be noise. Above it they have probably glanced away, which is
+ * the one chat moment worth an audible cue.
+ */
+const AI_CUE_THRESHOLD_MS = 800;
 
 export interface ChatState {
   messages: ChatMessage[];
@@ -45,12 +53,17 @@ export interface AttachedMaterial {
 export const useChat = (initialSessionId: string | null) => {
   const qc = useQueryClient();
   const router = useRouter();
-  
+  const { play } = useSoundPreference();
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId);
   const [attachedMaterial, setAttachedMaterial] = useState<AttachedMaterial | null>(null);
+
+  // When the in-flight question was sent, so the cue can tell "answered instantly"
+  // from "answered after a wait". Cleared once used.
+  const askedAtRef = useRef<number | null>(null);
 
   // Track last loaded sessionId to detect session changes
   const loadedSessionRef = useRef<string | null>(null);
@@ -81,7 +94,10 @@ export const useChat = (initialSessionId: string | null) => {
     onSuccess: (data) => {
       // 4. Append response
       setMessages(prev => [...prev, data.message]);
-      
+
+      const waited = askedAtRef.current !== null && Date.now() - askedAtRef.current >= AI_CUE_THRESHOLD_MS;
+      if (waited) play('aiResponse');
+
       // If a new session was created, update URL and state
       if (!sessionId && data.sessionId) {
         setSessionId(data.sessionId);
@@ -92,6 +108,7 @@ export const useChat = (initialSessionId: string | null) => {
     onSettled: () => {
       // 5. setIsThinking(false)
       setIsThinking(false);
+      askedAtRef.current = null;
     }
   });
 
@@ -130,6 +147,7 @@ export const useChat = (initialSessionId: string | null) => {
     
     // 2. setIsThinking(true)
     setIsThinking(true);
+    askedAtRef.current = Date.now();
 
     try {
       // 3. POST /api/ai/chat

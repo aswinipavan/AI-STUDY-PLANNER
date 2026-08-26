@@ -68,7 +68,7 @@
   z-index: 1;
   width: 100%;
   max-width: 440px;
-  animation: fadeUpIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fadeUpIn 0.75s var(--app-ease-out) both;
 }
 
 @keyframes fadeUpIn {
@@ -85,7 +85,7 @@
 .logoBox {
   width: 60px;
   height: 60px;
-  border-radius: 18px;
+  border-radius: var(--app-radius-2xl);
   background: linear-gradient(135deg, #00e5c0 0%, #3b82f6 50%, #a78bfa 100%);
   display: flex;
   align-items: center;
@@ -129,7 +129,7 @@
 .card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.75rem;
+  border-radius: var(--app-radius-2xl);
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
   padding: 2.25rem;
@@ -143,7 +143,7 @@
   display: flex;
   gap: 0.25rem;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   padding: 0.3rem;
   margin-bottom: 1.75rem;
 }
@@ -151,12 +151,12 @@
 .tabBtn {
   flex: 1;
   padding: 0.65rem 1rem;
-  border-radius: 0.625rem;
+  border-radius: var(--app-radius-md);
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   font-family: inherit;
 }
 
@@ -181,7 +181,7 @@
 .errorBanner {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   padding: 0.8rem 1rem;
   color: #fca5a5;
   font-size: 0.85rem;
@@ -193,7 +193,7 @@
 .successBanner {
   background: rgba(0, 229, 192, 0.08);
   border: 1px solid rgba(0, 229, 192, 0.2);
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   padding: 0.8rem 1rem;
   color: #6ee7e7;
   font-size: 0.85rem;
@@ -222,7 +222,7 @@
 .input {
   width: 100%;
   padding: 0.8rem 1.1rem;
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
@@ -230,7 +230,7 @@
   font-family: inherit;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  transition: border-color var(--app-duration-base), box-shadow var(--app-duration-base), background var(--app-duration-base);
 }
 
 .input:focus {
@@ -266,7 +266,7 @@
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: color 0.2s;
+  transition: color var(--app-duration-base);
 }
 
 .togglePwdBtn:hover {
@@ -277,12 +277,12 @@
 .submitBtn {
   width: 100%;
   padding: 0.9rem;
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   border: none;
   font-weight: 700;
   font-size: 0.95rem;
   font-family: inherit;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -350,7 +350,7 @@
 .googleBtn {
   width: 100%;
   padding: 0.85rem 1rem;
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
@@ -361,7 +361,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
-  transition: all 0.25s;
+  transition: all var(--app-duration-base);
   cursor: pointer;
 }
 
@@ -397,7 +397,7 @@
   font-weight: 600;
   font-size: inherit;
   font-family: inherit;
-  transition: color 0.2s;
+  transition: color var(--app-duration-base);
 }
 
 .linkBtn:hover {
@@ -415,7 +415,7 @@
 .backHomeLink {
   color: rgba(255, 255, 255, 0.3);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--app-duration-base);
 }
 
 .backHomeLink:hover {
@@ -426,6 +426,6 @@
 @media (max-width: 480px) {
   .card {
     padding: 1.75rem 1.5rem;
-    border-radius: 1.25rem;
+    border-radius: var(--app-radius-2xl);
   }
 }

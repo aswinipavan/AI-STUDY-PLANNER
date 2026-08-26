@@ -36,12 +36,12 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: clamp(1.75rem, 3vw, 2.5rem);
-  border-radius: 1.25rem;
+  border-radius: var(--app-radius-2xl);
   background: hsl(var(--card));
   border: 1px solid rgba(0, 229, 192, 0.1);
   position: relative;
   overflow: hidden;
-  animation: dashFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: dashFadeUp 0.5s var(--app-ease-out) both;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -69,7 +69,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.3rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--app-radius-pill);
   background: rgba(0, 229, 192, 0.08);
   border: 1px solid rgba(0, 229, 192, 0.2);
   margin-bottom: 1rem;
@@ -112,7 +112,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.5rem;
-  border-radius: 0.75rem;
+  border-radius: var(--app-radius-lg);
   border: 1px solid hsl(var(--primary));
   background: rgba(0, 229, 192, 0.06);
   color: hsl(var(--primary));
@@ -120,7 +120,7 @@
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   text-decoration: none;
   margin-top: 1.75rem;
   width: fit-content;
@@ -138,15 +138,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
-  animation: dashFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+  animation: dashFadeUp 0.5s var(--app-ease-out) 0.06s both;
 }
 
 .statCard {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 1rem;
+  border-radius: var(--app-radius-xl);
   padding: 1.4rem 1.25rem;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   position: relative;
   overflow: hidden;
 }
@@ -158,7 +158,7 @@
   height: 2px;
   background: linear-gradient(90deg, hsl(var(--primary)), transparent);
   opacity: 0;
-  transition: opacity 0.25s;
+  transition: opacity var(--app-duration-base);
 }
 
 .statCard:hover {
@@ -212,7 +212,7 @@
 
 /* ── Section blocks ──────────────────────────────────────────────────────── */
 .sectionBlock {
-  animation: dashFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  animation: dashFadeUp 0.5s var(--app-ease-out) 0.1s both;
 }
 
 .sectionHeader { margin-bottom: 1.25rem; }
@@ -242,10 +242,10 @@
 .aiActionBtn {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 1rem;
+  border-radius: var(--app-radius-xl);
   padding: 1.1rem 1.25rem;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   display: flex;
   align-items: center;
   gap: 0.875rem;
@@ -260,7 +260,7 @@
   inset: 0;
   background: linear-gradient(90deg, rgba(0, 229, 192, 0.04), transparent);
   opacity: 0;
-  transition: opacity 0.25s;
+  transition: opacity var(--app-duration-base);
 }
 
 .aiActionBtn:hover {
@@ -274,7 +274,7 @@
 .aiActionIconBox {
   width: 38px;
   height: 38px;
-  border-radius: 0.625rem;
+  border-radius: var(--app-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -282,7 +282,7 @@
   border: 1px solid rgba(0, 229, 192, 0.15);
   color: hsl(var(--primary));
   flex-shrink: 0;
-  transition: all 0.25s;
+  transition: all var(--app-duration-base);
 }
 
 .aiActionBtn:hover .aiActionIconBox {
@@ -308,7 +308,7 @@
 .aiActionArrow {
   color: hsl(var(--muted-foreground));
   opacity: 0.5;
-  transition: all 0.25s;
+  transition: all var(--app-duration-base);
 }
 
 .aiActionBtn:hover .aiActionArrow {
@@ -323,9 +323,9 @@
   top: 1.5rem;
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 1.25rem;
+  border-radius: var(--app-radius-2xl);
   padding: 1.5rem;
-  animation: dashFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  animation: dashFadeUp 0.5s var(--app-ease-out) 0.15s both;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
@@ -350,7 +350,7 @@
   color: hsl(var(--primary));
   text-decoration: none;
   font-weight: 600;
-  transition: opacity 0.2s;
+  transition: opacity var(--app-duration-base);
 }
 
 .viewAllLink:hover { opacity: 0.75; }
@@ -368,7 +368,7 @@
 .emptyStateIcon {
   width: 48px;
   height: 48px;
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   background: rgba(0, 229, 192, 0.06);
   border: 1px solid rgba(0, 229, 192, 0.12);
   display: flex;
@@ -394,14 +394,14 @@
 
 .btnSecondary {
   padding: 0.5rem 1.1rem;
-  border-radius: 0.625rem;
+  border-radius: var(--app-radius-md);
   background: transparent;
   border: 1px solid hsl(var(--border));
   color: hsl(var(--foreground));
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
   font-family: inherit;
 }
 
@@ -445,10 +445,10 @@
   gap: 0.875rem;
   padding: 0.875rem;
   background: rgba(0, 229, 192, 0.03);
-  border-radius: 0.75rem;
+  border-radius: var(--app-radius-lg);
   border: 1px solid hsl(var(--border));
   border-left: 2px solid hsl(var(--primary));
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
 }
 
 .recItem:hover {
@@ -479,7 +479,7 @@
 /* ── Gamification Milestone Badges ───────────────────────────────────────── */
 .milestonesSection {
   margin-top: 1.5rem;
-  animation: dashFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  animation: dashFadeUp 0.5s var(--app-ease-out) 0.12s both;
 }
 
 .badgesGrid {
@@ -492,14 +492,14 @@
 .badgeCard {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  border-radius: 1rem;
+  border-radius: var(--app-radius-xl);
   padding: 1rem;
   display: flex;
   align-items: center;
   gap: 0.875rem;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
 }
 
 .badgeUnlocked {
@@ -526,7 +526,7 @@
   justify-content: center;
   font-size: 1.25rem;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--app-overlay);
 }
 
 .badgeUnlocked .badgeIconBox {

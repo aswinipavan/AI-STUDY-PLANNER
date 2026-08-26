@@ -1,12 +1,26 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    AI Study Planner — Global Stylesheet
    Premium AI SaaS Design System
+
+   Inter and Outfit are self-hosted through `next/font/google` in app/layout.tsx,
+   which exposes them as --font-sans / --font-display. Do not re-add an
+   @import from fonts.googleapis.com: it blocks first render on two extra
+   round-trips and re-downloads families the app already ships.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Google Fonts — Inter (body) + Outfit (display) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap');
-
 @import "tailwindcss";
+
+/* Tailwind v4 does not pick up tailwind.config.ts on its own — it has to be
+   pointed at it. Without this line the config was inert, which cost two things
+   the app was already written to rely on:
+     • `darkMode: "class"` — so every `dark:` utility keyed off the OS setting
+       instead of the app's own theme switch, and stayed light for anyone who
+       picked Dark on a light system;
+     • the `tailwindcss-animate` plugin — so `animate-in`, `fade-in` and
+       `slide-in-from-*` (toasts, offline banner, loading skeletons) emitted
+       nothing at all.
+   The config file is also what components.json points at, so it stays. */
+@config "../../tailwind.config.ts";
 
 @theme inline {
   --color-background: hsl(var(--background));
@@ -60,10 +74,77 @@
   --glow-blue: 0 0 20px rgba(59, 130, 246, 0.25), 0 0 60px rgba(59, 130, 246, 0.08);
   --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
   --shadow-elevated: 0 20px 60px -10px rgba(0,0,0,0.15), 0 8px 24px -6px rgba(0,0,0,0.1);
+
+  /* ── Shared scales ──────────────────────────────────────────────────────
+     One ladder for the whole app, consumed by both Tailwind-styled components
+     and the CSS Modules. Deliberately namespaced `--app-*` so they can never
+     collide with Tailwind v4's own theme namespaces (--radius-*, --ease-*,
+     --shadow-*, …) and silently re-scale existing utility classes.
+
+     Values match the rungs the codebase already used most often, so adopting
+     a token is a rename, not a redesign. */
+
+  /* Corner radii — 4 / 6 / 8 / 12 / 16 / 24px + pill */
+  --app-radius-xs: 0.25rem;    /* inline chips, progress bars, tag pills   */
+  --app-radius-sm: 0.375rem;   /* dense controls, table cells, list rows   */
+  --app-radius-md: 0.5rem;     /* buttons, inputs, selects, badges         */
+  --app-radius-lg: 0.75rem;    /* cards, panels, widgets                   */
+  --app-radius-xl: 1rem;       /* modals, sheets, section surfaces         */
+  --app-radius-2xl: 1.5rem;    /* hero panels, the login card, big tiles   */
+  --app-radius-pill: 9999px;   /* avatars, toggles, fully-round buttons    */
+
+  /* Motion — every transition/animation in the app picks from these two
+     ladders so nothing feels out of step with anything else. */
+  --app-duration-instant: 100ms; /* press/active feedback                  */
+  --app-duration-fast: 150ms;    /* colour + border hovers                 */
+  --app-duration-base: 200ms;    /* the default: most hovers and reveals   */
+  --app-duration-slow: 300ms;    /* panels, modals, layout shifts          */
+  --app-duration-slower: 500ms;  /* first-paint entrances, progress fills  */
+
+  --app-ease-out: cubic-bezier(0.22, 1, 0.36, 1);      /* expo-out: entrances */
+  --app-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);     /* symmetric moves     */
+  --app-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1); /* a little overshoot  */
+
+  /* Stacking order. Local stacking contexts (0–5) stay as they are; these
+     are for anything that escapes its parent and floats over the page. */
+  --app-z-sticky: 40;    /* topbar, landing nav                            */
+  --app-z-drawer: 50;    /* mobile sidebar + its scrim                     */
+  --app-z-overlay: 60;   /* dialog backdrop                                */
+  --app-z-modal: 70;     /* dialog surface                                 */
+  --app-z-popover: 80;   /* menus, dropdowns, date pickers                 */
+  --app-z-toast: 90;     /* transient notifications                        */
+  --app-z-takeover: 200; /* full-screen onboarding                         */
+
+  /* Focus. A single visible ring, used by :focus-visible everywhere. */
+  --app-focus-ring: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+
+  /* ── Contrast overlays ────────────────────────────────────────────────────
+     The page CSS was written when the app was dark-only, so its elevation
+     layers and hairlines are literal `rgba(255,255,255,α)`. `:root` is the
+     *light* theme, where white-on-white renders nothing: cards lost their
+     edges, the settings switches became invisible, and unfilled controls had
+     no boundary to aim at.
+
+     These derive from `--foreground` instead of a fixed white, so the same
+     declaration is a white veil over the dark canvas and a soft grey tint on
+     the light one. Anything sitting on a deliberately dark surface — the video
+     stage, the landing hero — keeps its literal white-alpha, because there the
+     white is the point. */
+  --app-overlay-subtle: hsl(var(--foreground) / 0.03);
+  --app-overlay: hsl(var(--foreground) / 0.06);
+  --app-overlay-strong: hsl(var(--foreground) / 0.1);
+  --app-hairline: hsl(var(--foreground) / 0.08);
+  --app-hairline-strong: hsl(var(--foreground) / 0.16);
+
+  /* Tells the browser which palette to use for the parts of the UI CSS cannot
+     reach — scrollbars, autofill, date pickers, the canvas behind the app. Set
+     alongside the tokens rather than from JS so it lands with the first paint. */
+  color-scheme: light;
 }
 
 /* ── Dark Mode ──────────────────────────────────────────────────────────── */
 .dark {
+  color-scheme: dark;
   --background: 225 17% 5%;
   --foreground: 210 40% 98%;
   --card: 220 15% 9%;
@@ -105,6 +186,29 @@ body {
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
+}
+
+/* One visible focus ring for the whole app. Keyboard users always get a ring;
+   pointer users never see one. Components may override the offset, not the
+   presence of the ring. */
+:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: var(--app-focus-ring);
+}
+
+/* Interactive elements should be at least a comfortable thumb-tap on touch
+   devices. Scoped to coarse pointers so desktop density is untouched, and
+   opt-out-able with `data-compact` for genuinely dense controls. */
+@media (pointer: coarse) {
+  button:not([data-compact]),
+  [role='button']:not([data-compact]),
+  a[role='button'],
+  summary,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* ── Premium Global Keyframe Animations ─────────────────────────────────── */
@@ -167,7 +271,28 @@ h1, h2, h3, h4 {
   66%       { transform: translate(-15px, 10px) scale(0.97); }
 }
 
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Page transitions (see the ::view-transition rules below). */
+@keyframes vtFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vtFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
 /* ── Premium Utility Classes ─────────────────────────────────────────────── */
+/* Both are currently unused. `.glass` is a *dark-surface-only* effect: its white
+   fill and hairline vanish on the light theme's near-white canvas, so it belongs
+   on the landing hero or the login card, not on a page card — use `.glass-light`
+   there, or the `--app-overlay-*` tokens, which derive from `--foreground` and so
+   read correctly in both themes. */
 .glass {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -208,6 +333,121 @@ h1, h2, h3, h4 {
   animation: slideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ── Shared interaction patterns ─────────────────────────────────────────────
+   Defined once here rather than re-invented per CSS Module, so a card on the
+   dashboard reacts exactly like a card on the exams page. */
+
+/* Entrance for a list/grid of cards. Put `.stagger` on the container: each
+   direct child fades up slightly after the one before it. Pure CSS — no
+   scroll listeners, no per-item state, no re-renders. */
+.stagger > * {
+  animation: fadeUp var(--app-duration-slower) var(--app-ease-out) both;
+}
+.stagger > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger > *:nth-child(2)  { animation-delay: 40ms; }
+.stagger > *:nth-child(3)  { animation-delay: 80ms; }
+.stagger > *:nth-child(4)  { animation-delay: 120ms; }
+.stagger > *:nth-child(5)  { animation-delay: 160ms; }
+.stagger > *:nth-child(6)  { animation-delay: 200ms; }
+.stagger > *:nth-child(7)  { animation-delay: 240ms; }
+.stagger > *:nth-child(8)  { animation-delay: 280ms; }
+/* Anything past the eighth item arrives with the eighth — a long list should
+   not make the reader wait for a wave to cross the screen. */
+.stagger > *:nth-child(n + 9) { animation-delay: 280ms; }
+
+/* A card that responds to the pointer. Only transform/box-shadow animate, so
+   this stays on the compositor and never triggers layout. */
+.card-interactive {
+  transition:
+    transform var(--app-duration-base) var(--app-ease-out),
+    box-shadow var(--app-duration-base) var(--app-ease-out),
+    border-color var(--app-duration-fast) linear;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+  }
+}
+
+.card-interactive:active {
+  transform: translateY(0);
+  transition-duration: var(--app-duration-instant);
+}
+
+/* Tactile press feedback. Deliberately declares only the :active transform and
+   no `transition` of its own, so it can be combined with a component's own
+   transition utilities without clobbering them. */
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Keyboard-only bypass of the sidebar/topbar, visible only while focused. */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: var(--app-z-takeover);
+  padding: 0.625rem 1rem;
+  border-radius: var(--app-radius-md);
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--app-duration-base) var(--app-ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Screen-reader-only text that still becomes visible on focus. */
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Page transitions ────────────────────────────────────────────────────────
+   Driven by React's <ViewTransition> in the dashboard layout, which hands the
+   work to the browser's View Transitions API. No animation library, no JS on
+   the interaction path.
+
+   `root` is the snapshot the browser takes of the document by default. The
+   page body is pulled out of it into its own `.page-body` group, so all that
+   is left in `root` is the chrome (sidebar + topbar) — and that must not
+   animate, or every navigation would read as a full page reload. */
+::view-transition-group(root) {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(.page-body) {
+  animation: vtFadeOut var(--app-duration-fast) var(--app-ease-in-out) both;
+}
+
+::view-transition-new(.page-body) {
+  animation: vtFadeIn var(--app-duration-slow) var(--app-ease-out) both;
+}
+
 /* ── Accessibility: Reduced Motion ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -215,7 +455,29 @@ h1, h2, h3, h4 {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* Staggered entrances (`.stagger`, the priority and settings cards) combine a
+       delay with `animation-fill-mode: both`, which holds the element at its
+       `from` keyframe — opacity 0 — for the whole delay. Collapsing the duration
+       alone would leave content invisible for up to half a second and then snap
+       in, which is worse than the animation. */
+    animation-delay: 0s !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* View-transition pseudo-elements live outside the normal element tree, so
+     the universal selector above never reaches them. Without this, page
+     transitions would keep animating for people who asked us not to. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+
+  /* Hover lifts and press scales are movement too. */
+  .card-interactive:hover,
+  .press:active:not(:disabled) {
+    transform: none;
   }
 }

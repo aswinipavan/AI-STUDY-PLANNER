@@ -1,61 +1,53 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { useThemeStore } from '@/stores/themeStore';
 
+/** The pre-store preference, imported once for users upgrading from it. */
+const LEGACY_KEY = 'theme';
+
 /**
- * ThemeApplier - bridges the Zustand themeStore → actual DOM .dark class.
+ * Keeps the `.dark` class on `<html>` in step with `themeStore` after mount.
  *
- * ROOT CAUSE FIX (Issue 3):
- * The Topbar called useThemeStore().setTheme() which updated Zustand state,
- * but NO component ever read that state and applied/removed the '.dark' CSS
- * class on <html>. So clicking the theme toggle did nothing visible.
- *
- * This component must be mounted at layout level (dashboard layout.tsx).
- * It applies the theme on every render when the store changes.
+ * The first paint is not this component's job — the inline script in the root
+ * layout has already applied the right class by the time React runs, which is
+ * what stopped dark-mode users seeing a light flash on every hard load. This
+ * only handles changes made while the app is open.
  */
 export function ThemeApplier() {
-  const { theme, setTheme } = useThemeStore();
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
 
   useEffect(() => {
     const root = document.documentElement;
+    const apply = (dark: boolean) => root.classList.toggle('dark', dark);
 
-    const applyTheme = (t: 'light' | 'dark') => {
-      if (t === 'dark') {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-      // Also write to localStorage for useTheme hook compatibility
-      localStorage.setItem('theme', t);
-    };
-
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(prefersDark ? 'dark' : 'light');
-
-      // Listen for system preference changes
-      const mql = window.matchMedia('(prefers-color-scheme: dark)');
-      const handler = (e: MediaQueryListEvent) => {
-        if (useThemeStore.getState().theme === 'system') {
-          applyTheme(e.matches ? 'dark' : 'light');
-        }
-      };
-      mql.addEventListener('change', handler);
-      return () => mql.removeEventListener('change', handler);
-    } else {
-      applyTheme(theme);
+    if (theme !== 'system') {
+      apply(theme === 'dark');
+      return;
     }
+
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    apply(mql.matches);
+    const onChange = (event: MediaQueryListEvent) => apply(event.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
   }, [theme]);
 
-  // On mount: also sync localStorage → themeStore (for pages that use the old useTheme hook)
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (stored && stored !== theme) {
-      setTheme(stored);
+    // One-time import of the old `localStorage['theme']` value, gated on the
+    // store never having been written. Running it unconditionally (as this used
+    // to) overwrote an explicit "system" choice with the last resolved
+    // light/dark value on every single load, so "system" never survived.
+    try {
+      if (window.localStorage.getItem('theme-storage')) return;
+      const legacy = window.localStorage.getItem(LEGACY_KEY);
+      if (legacy === 'light' || legacy === 'dark') setTheme(legacy);
+    } catch {
+      /* storage unavailable — the default stands */
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setTheme]);
 
-  return null; // renders nothing — effect only
+  return null; // effects only
 }

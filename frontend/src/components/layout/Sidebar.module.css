@@ -1,13 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Sidebar — Premium Dark AI SaaS
    Glassmorphism panel, teal active states, glowing AI badge
+
+   This panel is dark in BOTH themes (`.sidebar` is a near-opaque #08090e), so
+   unlike the page-level CSS Modules its `rgba(255,255,255,α)` fills and
+   hairlines are correct as written and must stay literal. The `--app-overlay-*`
+   / `--color-border` tokens derive from `--foreground`, which in light mode is
+   near-black — using them here would paint a black veil on a black panel.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Layout ──────────────────────────────────────────────────────────────── */
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: calc(var(--app-z-drawer) - 1);
   background: rgba(0, 0, 0, 0.6);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -18,7 +24,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 50;
+  z-index: var(--app-z-drawer);
   width: 252px;
   display: flex;
   flex-direction: column;
@@ -26,13 +32,44 @@
   border-right: 1px solid rgba(255, 255, 255, 0.07);
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--app-duration-slow) var(--app-ease-in-out);
   font-family: 'Inter', system-ui, sans-serif;
   box-shadow: 4px 0 32px rgba(0, 0, 0, 0.4);
 }
 
 .sidebarOpen  { transform: translateX(0); }
 .sidebarClosed { transform: translateX(-100%); }
+
+/* Desktop: the panel is part of the page flow, not an overlay drawer.
+   This has to live here rather than as `lg:static lg:translate-x-0
+   lg:transform-none` utilities on the element, which is what it used to be and
+   which silently did nothing — two separate Tailwind v4 changes each defeated it:
+
+   1. v4 emits utilities into `@layer utilities`, and unlayered rules beat *any*
+      layered rule regardless of specificity. These CSS-Module rules are
+      unlayered, so `.sidebar { position: fixed }` and `.sidebarClosed`'s
+      transform always won over `lg:static` / `lg:transform-none`.
+   2. v4 maps `translate-*` onto the standalone `translate` property, so
+      `lg:translate-x-0` resolved to `translate: 0px` — which composes with
+      `transform` instead of overriding it, and could never cancel the offset.
+
+   Net effect was a sidebar parked at translateX(-252px) on every desktop
+   viewport: the app rendered with no navigation at all.
+
+   64rem is Tailwind's `lg` verbatim, so this switches at exactly the same width
+   as the `lg:hidden` still on the backdrop and the close button — otherwise
+   there would be a band where the panel is in-flow but the drawer chrome shows. */
+@media (min-width: 64rem) {
+  .sidebar {
+    position: static;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+  .sidebarOpen,
+  .sidebarClosed {
+    transform: none;
+  }
+}
 
 /* ── Logo header ─────────────────────────────────────────────────────────── */
 .logoBox {
@@ -55,14 +92,14 @@
 .logoIconBox {
   width: 32px;
   height: 32px;
-  border-radius: 9px;
+  border-radius: var(--app-radius-md);
   background: linear-gradient(135deg, #00e5c0 0%, #3b82f6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 16px rgba(0, 229, 192, 0.4), 0 0 40px rgba(0, 229, 192, 0.12);
   flex-shrink: 0;
-  transition: box-shadow 0.3s;
+  transition: box-shadow var(--app-duration-slow);
 }
 
 .logoIconBox:hover {
@@ -87,8 +124,8 @@
   color: rgba(255, 255, 255, 0.35);
   cursor: pointer;
   padding: 6px;
-  border-radius: 8px;
-  transition: color 0.2s, background 0.2s;
+  border-radius: var(--app-radius-md);
+  transition: color var(--app-duration-base), background var(--app-duration-base);
 }
 
 .closeBtn:hover {
@@ -107,7 +144,7 @@
 
 .navArea::-webkit-scrollbar { width: 4px; }
 .navArea::-webkit-scrollbar-track { background: transparent; }
-.navArea::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
+.navArea::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: var(--app-radius-xs); }
 
 .navSection {
   margin-bottom: 1.5rem;
@@ -134,9 +171,9 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.625rem 0.875rem;
-  border-radius: 0.75rem;
+  border-radius: var(--app-radius-lg);
   text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all var(--app-duration-base) var(--app-ease-out);
   position: relative;
   background: transparent;
   border: 1px solid transparent;
@@ -149,7 +186,7 @@
   inset: 0;
   background: linear-gradient(90deg, rgba(0, 229, 192, 0.06) 0%, transparent 80%);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--app-duration-base);
   border-radius: inherit;
 }
 
@@ -175,7 +212,7 @@
 .navIcon {
   color: rgba(255, 255, 255, 0.35);
   flex-shrink: 0;
-  transition: color 0.2s;
+  transition: color var(--app-duration-base);
 }
 
 .navLinkActive .navIcon {
@@ -192,7 +229,7 @@
   font-weight: 400;
   color: rgba(255, 255, 255, 0.5);
   flex: 1;
-  transition: color 0.2s;
+  transition: color var(--app-duration-base);
 }
 
 .navLinkActive .navText {
@@ -210,7 +247,7 @@
   align-items: center;
   gap: 3px;
   padding: 2px 7px;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   background: rgba(0, 229, 192, 0.1);
   border: 1px solid rgba(0, 229, 192, 0.25);
   font-size: 0.58rem;
@@ -242,7 +279,7 @@
 .upgradeBanner {
   margin: 0 0.75rem 0.75rem;
   padding: 0.875rem 1rem;
-  border-radius: 0.875rem;
+  border-radius: var(--app-radius-lg);
   background: linear-gradient(135deg, rgba(0, 229, 192, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
   border: 1px solid rgba(0, 229, 192, 0.18);
 }
@@ -266,13 +303,13 @@
   justify-content: center;
   gap: 0.375rem;
   padding: 0.5rem;
-  border-radius: 0.625rem;
+  border-radius: var(--app-radius-md);
   background: linear-gradient(135deg, #00e5c0, #3b82f6);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
   text-decoration: none;
-  transition: opacity 0.2s, transform 0.2s;
+  transition: opacity var(--app-duration-base), transform var(--app-duration-base);
 }
 
 .upgradeBtn:hover {
@@ -348,7 +385,7 @@
 
 .settingsIcon {
   color: rgba(255, 255, 255, 0.25);
-  transition: color 0.2s;
+  transition: color var(--app-duration-base);
   flex-shrink: 0;
 }
 

@@ -91,7 +91,15 @@ export default function LoginPage() {
         // Retry every 6 seconds until backend is awake
         timeoutId = setTimeout(checkWakeStatus, 6000);
       } catch {
-        if (isMounted) setBackendStatus(null);
+        // A thrown fetch is a transient network fault, not "backend is cold", so
+        // it has to retry on the same cadence as the !res.ok path above. Giving
+        // up here — which is what this did — meant one blip on page load
+        // abandoned the warm-up for good, and the student then paid the full
+        // Render cold start at submit time with no indicator that anything was
+        // happening. Still bounded by the unmount cleanup below.
+        if (!isMounted) return;
+        setBackendStatus(null);
+        timeoutId = setTimeout(checkWakeStatus, 6000);
       }
     };
 

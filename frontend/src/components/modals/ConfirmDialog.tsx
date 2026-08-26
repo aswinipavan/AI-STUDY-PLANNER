@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { useDialog } from '@/hooks/useDialog';
 
 type ConfirmVariant = 'danger' | 'warning';
 
@@ -24,47 +27,67 @@ export function ConfirmDialog({
   variant = 'danger',
   confirmLabel = 'Confirm',
 }: ConfirmDialogProps) {
+  const panelRef = useDialog(isOpen, onClose);
+  const titleId = useId();
+  const messageId = useId();
+
   if (!isOpen) return null;
+
+  const isDanger = variant === 'danger';
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[var(--app-z-overlay)] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      style={{ animation: 'fadeIn var(--app-duration-fast) var(--app-ease-out) both' }}
       onClick={onClose}
     >
       <div
-        className="bg-card border border-border rounded-2xl shadow-xl p-6 w-full max-w-md"
+        ref={panelRef}
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={messageId}
+        tabIndex={-1}
+        className="z-[var(--app-z-modal)] w-full max-w-md rounded-[var(--app-radius-xl)] border border-border bg-card p-6 shadow-[var(--shadow-elevated)]"
+        style={{ animation: 'scaleIn var(--app-duration-base) var(--app-ease-spring) both' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-2 rounded-lg ${variant === 'danger' ? 'bg-destructive/10' : 'bg-amber-500/10'}`}>
-            {variant === 'danger'
-              ? <Trash2 className="w-5 h-5 text-destructive" />
-              : <AlertTriangle className="w-5 h-5 text-amber-500" />
-            }
-          </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <h3 className="text-lg font-bold text-foreground mb-2">{title}</h3>
-        <p className="text-sm text-muted-foreground mb-6">{message}</p>
-        <div className="flex space-x-3">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2.5 border border-border rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+        <div className="mb-4 flex items-start justify-between">
+          <div
+            className={`rounded-[var(--app-radius-md)] p-2 ${isDanger ? 'bg-destructive/10' : 'bg-amber-500/10'}`}
           >
+            {isDanger ? (
+              <Trash2 className="h-5 w-5 text-destructive" aria-hidden="true" />
+            ) : (
+              <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden="true" />
+            )}
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close dialog">
+            <X aria-hidden="true" />
+          </Button>
+        </div>
+
+        <h3 id={titleId} className="mb-2 font-display text-lg font-bold text-foreground">
+          {title}
+        </h3>
+        <p id={messageId} className="mb-6 text-sm text-muted-foreground">
+          {message}
+        </p>
+
+        <div className="flex gap-3">
+          <Button variant="outline" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            onClick={() => { onConfirm(); onClose(); }}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              variant === 'danger'
-                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                : 'bg-amber-500 text-white hover:bg-amber-600'
-            }`}
+          </Button>
+          <Button
+            variant={isDanger ? 'destructive' : 'default'}
+            className={`flex-1 ${isDanger ? '' : 'bg-amber-500 text-white hover:bg-amber-600'}`}
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

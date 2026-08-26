@@ -1,44 +1,66 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark';
+import { useThemeStore } from '@/stores/themeStore';
 
+export type Theme = 'light' | 'dark' | 'system';
+
+/**
+ * Read and write the app's theme.
+ *
+ * There used to be two sources of truth: this hook owned `localStorage['theme']`
+ * and mutated the `.dark` class itself, while the topbar owned `themeStore`.
+ * They could disagree, a toggle from here never re-rendered its own caller, and
+ * `ThemeApplier` imported the mirror back into the store on every load — which
+ * quietly converted an explicit "system" choice into a hard light/dark.
+ *
+ * Now `themeStore` is the only stored preference, `ThemeApplier` is the only
+ * writer of the `.dark` class after mount, and the pre-paint script in the root
+ * layout sets that class before the first frame so nothing flashes.
+ */
 export function useTheme() {
-  const applyTheme = (theme: Theme) => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  };
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
 
-  // On mount: read localStorage 'theme' or system preference
+  // `null` until mounted. The OS preference is not knowable while rendering on
+  // the server, and guessing would make the server and client markup disagree.
+  const [systemDark, setSystemDark] = useState<boolean | null>(null);
+
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as Theme | null;
-    if (stored) {
-      applyTheme(stored);
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(prefersDark ? 'dark' : 'light');
-    }
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    setSystemDark(mql.matches);
+    const onChange = (event: MediaQueryListEvent) => setSystemDark(event.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  /**
+   * What is actually on screen, with `system` resolved — or `null` before mount
+   * while the OS preference is still unknown. Render a neutral state for `null`
+   * rather than assuming light.
+   */
+  const resolvedTheme: 'light' | 'dark' | null =
+    theme === 'system' ? (systemDark === null ? null : systemDark ? 'dark' : 'light') : theme;
+
+  /**
+   * Whether dark is showing right now, straight from the class that the
+   * pre-paint script maintains — so it is correct for `system` too.
+   *
+   * Deliberately a function rather than a value: reading the DOM during render
+   * would disagree with the server. Call it from an event handler.
+   */
+  const isDark = useCallback(() => {
+    if (typeof document === 'undefined') return false;
+    return document.documentElement.classList.contains('dark');
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    applyTheme(isDark ? 'light' : 'dark');
-  }, []);
+    // Toggle away from what the user can see, not from the stored preference:
+    // with "system" selected on a dark OS, flipping to "dark" would look like
+    // the button did nothing.
+    setTheme(isDark() ? 'light' : 'dark');
+  }, [isDark, setTheme]);
 
-  const setTheme = useCallback((theme: Theme) => {
-    applyTheme(theme);
-  }, []);
-
-  const isDark = () => {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  };
-
-  return { toggleTheme, setTheme, isDark };
+  return { theme, resolvedTheme, isDark, setTheme, toggleTheme };
 }

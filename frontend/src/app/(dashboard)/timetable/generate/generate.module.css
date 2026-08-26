@@ -2,7 +2,7 @@
   padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
@@ -25,10 +25,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--app-duration-slow) var(--app-ease-spring);
 }
 
 .stepCircleDone {
@@ -47,7 +47,7 @@
 .stepCirclePending {
   background: transparent;
   color: var(--color-muted-foreground);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--color-input);
 }
 
 .stepLabel {
@@ -70,23 +70,23 @@
   flex: 1;
   height: 1px;
   margin: 0 0.5rem;
-  transition: background 0.3s;
+  transition: background var(--app-duration-slow);
 }
 
 .stepLineDone { background: var(--color-primary); }
-.stepLinePending { background: rgba(255,255,255,0.1); }
+.stepLinePending { background: var(--color-input); }
 
 .card {
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
   padding: 2rem;
   min-height: 360px;
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
 }
 
 .stepTitle {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.5rem;
   font-weight: 500;
   color: var(--color-foreground);
@@ -105,16 +105,18 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--app-radius-md);
+  /* These are the pickable subject/style options — an unfilled control whose
+     border is the only thing separating one choice from the next. */
+  border: 1px solid var(--color-input);
   background: transparent;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--app-duration-slow) var(--app-ease-spring);
   cursor: pointer;
   text-align: left;
 }
 
 .selectableCard:hover {
-  background: rgba(255,255,255,0.02);
+  background: hsl(var(--foreground) / 0.05);
   transform: translateY(-2px);
 }
 
@@ -159,7 +161,7 @@
 }
 
 .hoursValue {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 4rem;
   font-weight: 400;
   color: var(--color-primary);
@@ -175,8 +177,8 @@
   width: 100%;
   accent-color: var(--color-primary);
   height: 4px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 2px;
+  background: var(--color-input);
+  border-radius: var(--app-radius-xs);
   outline: none;
   -webkit-appearance: none;
   margin-bottom: 0.5rem;
@@ -231,12 +233,12 @@
   width: 100%;
   padding: 0.875rem 1rem;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
+  border: 1px solid var(--color-input);
+  border-radius: var(--app-radius-md);
   color: var(--color-foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-sans), sans-serif;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--app-duration-base);
 }
 .dateInput:focus {
   border-color: var(--color-primary);
@@ -250,17 +252,18 @@
 
 .durationBtn {
   padding: 0.875rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--app-radius-md);
+  /* Unfilled button — the border is its only outline. */
+  border: 1px solid var(--color-input);
   background: transparent;
   color: var(--color-foreground);
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--app-duration-slow) var(--app-ease-spring);
 }
 .durationBtn:hover {
-  background: rgba(255,255,255,0.02);
+  background: hsl(var(--foreground) / 0.05);
   transform: translateY(-2px);
 }
 .durationBtnSelected {
@@ -278,7 +281,7 @@
   display: flex;
   justify-content: space-between;
   padding: 1rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--color-border);
 }
 .reviewRow:last-child {
   border-bottom: none;
@@ -300,7 +303,7 @@
   padding: 1rem;
   background: rgba(255, 50, 50, 0.1);
   border: 1px solid rgba(255, 50, 50, 0.2);
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   color: #ff6b6b;
   font-size: 0.875rem;
   margin-bottom: 1rem;

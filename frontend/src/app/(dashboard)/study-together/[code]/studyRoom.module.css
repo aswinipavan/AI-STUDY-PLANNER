@@ -6,7 +6,7 @@
   gap: 1rem;
   max-width: 1600px;
   margin: 0 auto;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
@@ -15,8 +15,8 @@
   justify-content: space-between;
   align-items: center;
   background: var(--color-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   padding: 0.85rem 1.25rem;
   flex-wrap: wrap;
   gap: 1rem;
@@ -29,14 +29,14 @@
 }
 
 .codePill {
-  font-family: var(--font-outfit), monospace;
+  font-family: var(--font-display), monospace;
   font-size: 0.875rem;
   font-weight: 700;
   color: #00e5c0;
   background: rgba(0, 229, 192, 0.12);
   border: 1px solid rgba(0, 229, 192, 0.3);
   padding: 0.25rem 0.65rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   letter-spacing: 0.05em;
   display: flex;
   align-items: center;
@@ -48,7 +48,7 @@
 }
 
 .roomTitle {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
   margin: 0;
@@ -67,12 +67,12 @@
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(0, 229, 192, 0.3);
   padding: 0.4rem 1rem;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   box-shadow: 0 0 12px rgba(0, 229, 192, 0.15);
 }
 
 .timerDigits {
-  font-family: var(--font-outfit), monospace;
+  font-family: var(--font-display), monospace;
   font-size: 1.25rem;
   font-weight: 700;
   color: #00e5c0;
@@ -92,12 +92,12 @@
   font-size: 0.8125rem;
   font-weight: 600;
   padding: 0.45rem 0.95rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
 }
 .btnLeave:hover {
   background: #ef4444;
@@ -111,12 +111,12 @@
   font-size: 0.8125rem;
   font-weight: 600;
   padding: 0.45rem 0.95rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
 }
 .btnEndSession:hover {
   background: #f59e0b;
@@ -146,8 +146,11 @@
 .videoStage {
   flex: 1;
   background: var(--color-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  /* The stage itself is a themed card surface — only the tiles inside it are
+     hardcoded dark. So this edge has to be themed too, or it disappears into
+     the light page. */
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -168,7 +171,7 @@
 .videoCard {
   background: #090d16;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: var(--app-radius-md);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -199,7 +202,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
   color: #0d1117;
@@ -212,7 +215,7 @@
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
   font-size: 0.75rem;
   font-weight: 500;
   display: flex;
@@ -226,24 +229,27 @@
   align-items: center;
   gap: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--color-border);
 }
 
 .mediaBtn {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.06);
+  /* Mic/camera/leave controls. These sit on `.videoStage`, a themed card — not
+     on a video tile — so as white-alpha the whole control vanished in light
+     mode. `.mediaBtnActive` below stays literal: it is a red state colour. */
+  border: 1px solid var(--app-hairline-strong);
+  background: var(--app-overlay);
   color: var(--color-foreground);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
 }
 .mediaBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--app-hairline-strong);
   transform: scale(1.05);
 }
 .mediaBtnActive {
@@ -254,8 +260,8 @@
 
 .rightSidebar {
   background: var(--color-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -264,7 +270,7 @@
 
 .tabHeader {
   display: flex;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .tabBtn {
@@ -280,7 +286,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
 }
 .tabBtnActive {
   color: #00e5c0;
@@ -325,7 +331,7 @@
 
 .msgBubble {
   padding: 0.55rem 0.85rem;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   font-size: 0.8125rem;
   line-height: 1.4;
 }
@@ -337,8 +343,11 @@
 }
 
 .msgBubbleOther {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* The other two bubble variants are a solid teal and a purple tint, so this
+     one being white-alpha on the white chat panel made incoming messages the
+     only unreadable kind. */
+  background: var(--app-overlay);
+  border: 1px solid var(--color-border);
   color: var(--color-foreground);
 }
 
@@ -350,7 +359,7 @@
 
 .chatInputBox {
   padding: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -368,7 +377,7 @@
   font-size: 0.6875rem;
   font-weight: 600;
   padding: 0.2rem 0.55rem;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -385,9 +394,9 @@
 
 .chatInput {
   flex: 1;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
+  background: var(--app-overlay);
+  border: 1px solid var(--app-hairline-strong);
+  border-radius: var(--app-radius-sm);
   padding: 0.5rem 0.75rem;
   font-size: 0.8125rem;
   color: var(--color-foreground);
@@ -401,7 +410,7 @@
   background: #00e5c0;
   color: #0d1117;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   display: flex;
@@ -425,9 +434,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.65rem 0.85rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
+  background: var(--app-overlay-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
 }
 
 .participantLeft {

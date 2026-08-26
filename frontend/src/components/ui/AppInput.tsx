@@ -1,6 +1,9 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
+
+import { Input } from './input';
+import { cn } from '@/lib/utils';
 
 interface AppInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,32 +11,49 @@ interface AppInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   leftIcon?: React.ReactNode;
 }
 
+/**
+ * A labelled text field: the canonical {@link Input} plus a label, an optional
+ * leading icon, and an error message that is actually wired to the input for
+ * screen readers (`aria-invalid` + `aria-describedby`).
+ */
 export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
-  ({ label, error, leftIcon, className = '', id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  ({ label, error, leftIcon, className, id, ...props }, ref) => {
+    // A generated id, not a slug of the label — two fields can share a label
+    // text, and `htmlFor` pointing at the wrong input is worse than no label.
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+    const errorId = `${inputId}-error`;
+
     return (
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-foreground">
+          <label htmlFor={inputId} className="block text-sm font-medium text-foreground">
             {label}
           </label>
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <span
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground [&_svg]:size-4"
+              aria-hidden="true"
+            >
               {leftIcon}
-            </div>
+            </span>
           )}
-          <input
+          <Input
             ref={ref}
             id={inputId}
-            className={`w-full bg-background border rounded-lg py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors ${
-              leftIcon ? 'pl-10 pr-4' : 'px-4'
-            } ${error ? 'border-destructive focus:ring-destructive' : 'border-border'} ${className}`}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            className={cn(leftIcon && 'pl-10', className)}
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        {error && (
+          <p id={errorId} role="alert" className="text-xs text-destructive">
+            {error}
+          </p>
+        )}
       </div>
     );
   }
