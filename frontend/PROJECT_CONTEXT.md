@@ -11,7 +11,7 @@
 
 **Backend (as inferred from proxy and configs):**
 - **Framework:** Java Spring Boot.
-- **Host:** Render (`https://aistudyplannerbackend.onrender.com`).
+- **Host:** Render (`https://ai-study-planner-hp0e.onrender.com`).
 - **Capabilities:** Auth, Subjects, Materials, Chat (Groq), Timetable, Subscriptions, Performance.
 
 ## Authentication Flow

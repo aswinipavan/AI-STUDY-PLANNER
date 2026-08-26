@@ -13,7 +13,7 @@ import type {ApiError} from '@/types/api.types';
  * Unlike the web app there is NO Next.js proxy — mobile sends
  * Authorization: Bearer <jwt> directly to Render.
  *
- * Backend URL: https://aistudyplannerbackend.onrender.com
+ * The host comes from CONFIG.BACKEND_URL — see mobile/src/constants/config.ts.
  */
 const apiClient: AxiosInstance = axios.create({
   baseURL: CONFIG.BACKEND_URL,

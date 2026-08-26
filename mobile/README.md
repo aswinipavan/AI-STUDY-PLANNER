@@ -12,7 +12,7 @@ React Native Android application for the AI Study Planner.
 - **HTTP Client**: Axios (direct to backend, no proxy)
 - **Auth**: `@react-native-firebase/auth` + backend JWT
 - **Secure Storage**: `react-native-encrypted-storage` (Android Keystore)
-- **Backend URL**: `https://aistudyplannerbackend.onrender.com`
+- **Backend URL**: `https://ai-study-planner-hp0e.onrender.com`
 
 ## Prerequisites
 
@@ -81,6 +81,6 @@ mobile/
 ## Notes
 
 - The mobile app calls the Spring Boot backend **directly** (no Next.js proxy needed)
-- Backend URL: `https://aistudyplannerbackend.onrender.com` (Render cold-start may take 30-60s)
+- Backend URL: `https://ai-study-planner-hp0e.onrender.com` (Render cold-start may take 30-60s)
 - JWT is stored securely in Android Keystore via `react-native-encrypted-storage`
 - Never store the JWT in `AsyncStorage`

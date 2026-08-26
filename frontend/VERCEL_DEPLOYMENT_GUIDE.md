@@ -3,7 +3,7 @@
 **Project:** AI Study Planner  
 **Date:** July 22, 2026  
 **Frontend Repository:** GitHub repository with Next.js app  
-**Backend API:** https://aistudyplannerbackend.onrender.com  
+**Backend API:** https://ai-study-planner-hp0e.onrender.com  
 
 ---
 
@@ -43,7 +43,9 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 
 # Backend API
-NEXT_PUBLIC_API_URL=https://aistudyplannerbackend.onrender.com
+# NOTE: the variable the app actually reads is NEXT_PUBLIC_BACKEND_URL
+# (see frontend/src/constants/config.ts). NEXT_PUBLIC_API_URL is not read anywhere.
+NEXT_PUBLIC_BACKEND_URL=https://ai-study-planner-hp0e.onrender.com
 
 # Environment
 NEXT_PUBLIC_ENV=production
@@ -298,13 +300,15 @@ For each pull request:
 
 ### Development/Preview
 ```env
-NEXT_PUBLIC_API_URL=https://aistudyplannerbackend-dev.onrender.com
+# Replace with your staging backend if you run one; there is no dev service today,
+# so Preview deployments normally point at the production backend below.
+NEXT_PUBLIC_BACKEND_URL=https://<your-staging-backend>.onrender.com
 NEXT_PUBLIC_ENV=development
 ```
 
 ### Production
 ```env
-NEXT_PUBLIC_API_URL=https://aistudyplannerbackend.onrender.com
+NEXT_PUBLIC_BACKEND_URL=https://ai-study-planner-hp0e.onrender.com
 NEXT_PUBLIC_ENV=production
 ```
 
@@ -595,7 +599,7 @@ vercel projects list
 - **Custom Domain:** [Your domain]
 - **Deployment Date:** July 22, 2026
 - **Deployed By:** [Your name]
-- **Backend API:** https://aistudyplannerbackend.onrender.com
+- **Backend API:** https://ai-study-planner-hp0e.onrender.com
 - **Status:** ✓ Live in Production
 
 ---
