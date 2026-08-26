@@ -49,9 +49,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler(GroqApiException.class)
-    public ResponseEntity<ApiResponse<Void>> handleGroqApi(GroqApiException ex) {
-        log.error("Groq API Error: ", ex);
+    /**
+     * One consistent, provider-agnostic AI failure. Raised only once every configured AI provider has
+     * been tried and none could answer. Which provider failed and why is in the server log, not in this
+     * response — the student sees the same message whether AgentRouter, Groq, or both went down.
+     */
+    @ExceptionHandler(AiProviderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAiProvider(AiProviderException ex) {
+        log.error("AI provider error: {}", ex.getMessage());
         return buildErrorResponse("AI service temporarily unavailable", HttpStatus.SERVICE_UNAVAILABLE);
     }
 
