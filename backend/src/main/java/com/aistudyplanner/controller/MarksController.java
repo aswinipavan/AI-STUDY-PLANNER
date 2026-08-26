@@ -31,7 +31,7 @@ public class MarksController {
 
     private final MarksService marksService;
 
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     @Operation(summary = "Add marks")
     public ResponseEntity<ApiResponse<MarksResponse>> addMarks(
             @CurrentStudent Student student,
@@ -41,7 +41,7 @@ public class MarksController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Marks added successfully"));
     }
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     @Operation(summary = "Get all marks with pagination")
     public ResponseEntity<ApiResponse<Page<MarksResponse>>> getAllMarks(
             @CurrentStudent Student student,

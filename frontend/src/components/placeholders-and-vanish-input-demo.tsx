@@ -12,7 +12,7 @@ export default function PlaceholdersAndVanishInputDemo() {
     "Generate 5 practice multiple-choice questions for biology...",
   ];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (_e: React.ChangeEvent<HTMLInputElement>) => {
     // Demo change handler
   };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {

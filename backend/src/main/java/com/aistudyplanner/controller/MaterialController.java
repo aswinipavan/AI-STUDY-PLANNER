@@ -12,9 +12,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,7 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     @Operation(summary = "Get all materials")
     public ResponseEntity<ApiResponse<List<MaterialResponse>>> getMaterials(@CurrentStudent Student student) {
         log.info("Fetching all materials for student: {}", student.getId());
@@ -59,7 +61,7 @@ public class MaterialController {
         return ResponseEntity.ok(ApiResponse.success(uploadInfo, "Upload URL generated successfully"));
     }
 
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     @Operation(summary = "Save material metadata")
     public ResponseEntity<ApiResponse<MaterialResponse>> saveMaterialMetadata(
             @CurrentStudent Student student,
@@ -70,6 +72,21 @@ public class MaterialController {
         log.info("Saving material metadata for student: {}", student.getId());
         MaterialResponse response = materialService.saveMaterialMetadata(student.getId(), request, fileUrl, fileType, fileSizeBytes);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Material metadata saved successfully"));
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload a study material file and persist its metadata in one request")
+    public ResponseEntity<ApiResponse<MaterialResponse>> uploadMaterial(
+            @CurrentStudent Student student,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("title") String title,
+            @RequestParam(value = "subjectId", required = false) String subjectId,
+            @RequestParam(value = "textPreview", required = false) String textPreview) {
+        log.info("Uploading material '{}' for student: {} ({} bytes)", title, student.getId(),
+                file != null ? file.getSize() : 0);
+        UUID subjectUuid = (subjectId != null && !subjectId.isBlank()) ? UUID.fromString(subjectId) : null;
+        MaterialResponse response = materialService.uploadMaterial(student.getId(), file, title, subjectUuid, textPreview);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Material uploaded successfully"));
     }
 
     @PostMapping("/{materialId}/process")

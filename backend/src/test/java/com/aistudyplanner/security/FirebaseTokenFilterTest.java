@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -23,6 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,6 +44,9 @@ class FirebaseTokenFilterTest {
     private StudentRepository studentRepository;
 
     @Mock
+    private FirebaseAuth firebaseAuth;
+
+    @Mock
     private HttpServletRequest request;
 
     @Mock
@@ -59,7 +63,7 @@ class FirebaseTokenFilterTest {
     private String testFirebaseUid;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         SecurityContextHolder.clearContext();
         testStudentId = UUID.randomUUID();
         testFirebaseUid = "firebase-uid-123";
@@ -74,6 +78,7 @@ class FirebaseTokenFilterTest {
         lenient().when(jwtTokenProvider.validateToken(anyString())).thenReturn(false);
         lenient().when(studentRepository.findById(any())).thenReturn(Optional.empty());
         lenient().when(studentRepository.findByFirebaseUid(anyString())).thenReturn(Optional.empty());
+        lenient().when(response.getWriter()).thenReturn(new PrintWriter(new StringWriter()));
     }
 
     @Test
@@ -204,7 +209,8 @@ class FirebaseTokenFilterTest {
         firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(filterChain);
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
@@ -222,13 +228,8 @@ class FirebaseTokenFilterTest {
         when(studentRepository.findByFirebaseUid(testFirebaseUid)).thenReturn(Optional.of(testStudent));
 
         // Act
-        try (MockedStatic<FirebaseAuth> firebaseAuthMock = mockStatic(FirebaseAuth.class)) {
-            FirebaseAuth firebaseAuth = mock(FirebaseAuth.class);
-            firebaseAuthMock.when(FirebaseAuth::getInstance).thenReturn(firebaseAuth);
-            when(firebaseAuth.verifyIdToken(token)).thenReturn(firebaseToken);
-
-            firebaseTokenFilter.doFilterInternal(request, response, filterChain);
-        }
+        when(firebaseAuth.verifyIdToken(token)).thenReturn(firebaseToken);
+        firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
         verify(filterChain).doFilter(request, response);
@@ -251,16 +252,12 @@ class FirebaseTokenFilterTest {
         when(studentRepository.findByFirebaseUid(testFirebaseUid)).thenReturn(Optional.empty());
 
         // Act
-        try (MockedStatic<FirebaseAuth> firebaseAuthMock = mockStatic(FirebaseAuth.class)) {
-            FirebaseAuth firebaseAuth = mock(FirebaseAuth.class);
-            firebaseAuthMock.when(FirebaseAuth::getInstance).thenReturn(firebaseAuth);
-            when(firebaseAuth.verifyIdToken(token)).thenReturn(firebaseToken);
-
-            firebaseTokenFilter.doFilterInternal(request, response, filterChain);
-        }
+        when(firebaseAuth.verifyIdToken(token)).thenReturn(firebaseToken);
+        firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(filterChain);
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
@@ -274,16 +271,12 @@ class FirebaseTokenFilterTest {
         when(jwtTokenProvider.validateToken(token)).thenReturn(false);
 
         // Act
-        try (MockedStatic<FirebaseAuth> firebaseAuthMock = mockStatic(FirebaseAuth.class)) {
-            FirebaseAuth firebaseAuth = mock(FirebaseAuth.class);
-            firebaseAuthMock.when(FirebaseAuth::getInstance).thenReturn(firebaseAuth);
-            when(firebaseAuth.verifyIdToken(token)).thenThrow(new RuntimeException("Invalid token"));
-
-            firebaseTokenFilter.doFilterInternal(request, response, filterChain);
-        }
+        when(firebaseAuth.verifyIdToken(token)).thenThrow(new RuntimeException("Invalid token"));
+        firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(filterChain);
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
@@ -299,8 +292,9 @@ class FirebaseTokenFilterTest {
         // Act
         firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
-        // Assert - filter should continue despite exception
-        verify(filterChain).doFilter(request, response);
+        // Invalid authentication must terminate the request rather than falling through as anonymous.
+        verifyNoInteractions(filterChain);
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
@@ -336,8 +330,8 @@ class FirebaseTokenFilterTest {
         firebaseTokenFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        verify(filterChain).doFilter(request, response);
-        // Should fail validation due to extra space in token
+        verifyNoInteractions(filterChain);
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test

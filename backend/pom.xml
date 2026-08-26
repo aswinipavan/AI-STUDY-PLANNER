@@ -158,6 +158,12 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+        <!-- Production schema changes are applied through versioned migrations. -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
         <!-- Caffeine Cache (bounded, performant) -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -176,11 +182,11 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- H2 Database for Testing -->
+        <!-- H2 Database — test scope for CI tests, runtime for local dev profile -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Testcontainers -->

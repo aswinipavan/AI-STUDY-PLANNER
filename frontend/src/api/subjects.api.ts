@@ -25,22 +25,48 @@ export const subjectsApi = {
   },
 };
 
+/**
+ * The backend's `SubjectResponse`. Note `subjectName` — the frontend `Subject`
+ * type calls it `name`, so every subject crossing the API boundary (including the
+ * ones *nested* inside timetable slots) has to go through the mapper below.
+ * `studentId` is absent on nested copies, hence optional.
+ */
+export interface BackendSubjectResponse {
+  id: string;
+  subjectName?: string;
+  name?: string;
+  color?: string;
+  icon?: string;
+  targetHours?: number;
+  studentId?: string;
+  nextExamDate?: string;
+  daysUntilExam?: number;
+}
+
+interface BackendSubjectRequest {
+  subjectName?: string;
+  subjectCode?: string;
+  credits: number;
+  difficultyLevel: number;
+  semester: number | null;
+}
+
 // Map backend SubjectResponse to frontend Subject type
-function mapSubjectFromBackend(backend: any): Subject {
+export function mapSubjectFromBackend(backend: BackendSubjectResponse): Subject {
   return {
     id: backend.id,
-    name: backend.subjectName || backend.name,
+    name: backend.subjectName || backend.name || '',
     color: backend.color,
     icon: backend.icon,
     targetHours: backend.targetHours,
-    studentId: backend.studentId,
+    studentId: backend.studentId ?? '',
     examDate: backend.nextExamDate, // Map backend's nextExamDate to frontend's examDate
     daysUntilExam: backend.daysUntilExam,
   };
 }
 
 // Map frontend Subject to backend SubjectRequest
-function mapSubjectToBackend(frontend: Partial<Subject>): Record<string, any> {
+function mapSubjectToBackend(frontend: Partial<Subject>): BackendSubjectRequest {
   return {
     subjectName: frontend.name,
     subjectCode: frontend.color, // reusing color field for code if needed

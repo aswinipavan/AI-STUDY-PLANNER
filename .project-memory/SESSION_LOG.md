@@ -1,5 +1,78 @@
 # Session Log
 
+## 2026-08-23 (Session 19 - Local Data Persistence Fix & Verification)
+- **Task Started:** Make local (H2) data survive backend restarts — the same Firebase/Google account must keep its subjects, marks, exams, materials, timetable, chat/history and progress after a restart + re-login. Production Supabase/PostgreSQL and Firebase auth must stay unchanged; no app rebuild.
+- **Task Completed:** Confirmed + verified the local profile uses a FILE-BASED H2 database (`jdbc:h2:file:./data/studyplanner`, `ddl-auto=update`, Flyway disabled) with an idempotent `schema-local.sql`. Data now persists across real backend restarts; students re-attach by their real Firebase UID via `AuthService.login()` (find-or-create). Material files persist on disk under `uploads/` with consistent DB metadata.
+- **Files Modified:**
+  - `backend/start-local.cmd` — corrected stale "H2 in-memory" banner/console notes to reflect the persistent file DB.
+  - (No functional change needed to `application-local.properties`, `schema-local.sql`, or `AuthService.java` — the file-based strategy from the prior session was already correct; this session verified it end to end.)
+- **Verification:**
+  - `LocalPersistenceVerificationTest` (1/1): inserts student + subject/mark/exam/timetable/slot/material(file on disk)/chat/snapshot, performs a real H2 `SHUTDOWN`, reconnects to the same file, and asserts the same Firebase UID resolves to the SAME student row with every record + material file intact; demo seed stays insert-once.
+  - Real two-process restart (manual): booted the Spring Boot app on the file DB (created `data/studyplanner.mv.db`), stopped it, inserted a student + subject/mark/exam/chat via the H2 tools jar, rebooted the app on the populated file (clean startup in ~12s, no wipe), stopped it — all rows survived; total_students stayed at 2 (demo seed + test user), demo seed not duplicated.
+  - Backend: `mvnw test` → 128 run, 0 failures, 0 errors, 5 skipped (pre-existing). Frontend: `npm test` → 77/77 across 11 suites.
+- **Problems Found:** `start-local.cmd` still described the DB as in-memory (stale/misleading). Manual `spring-boot:run` (fork=false) leaves an orphaned JVM when the wrapper is killed — stop it via the port-owning PID (`taskkill /F /T /PID`).
+- **Solutions:** Updated the script banner/notes; confirmed `/data/`, `*.mv.db`, `*.trace.db`, `/uploads/` are git-ignored so the persistent DB and files are never committed and never reset.
+- **Next Recommended Task:** Review and commit the uncommitted working tree (local-persistence + StorageService/FileController, V4–V6 migrations, timetable date-based scheduling, new integration tests), then push and deploy.
+
+## 2026-08-22 (Session 18 - Full Project Repair & Validation)
+- **Task Started:** Full project repair, frontend lint resolution, React purity/ref fixes, type safety hardening, Dockerfile Metaspace tuning, GitHub Actions CI addition, and comprehensive test suite validation.
+- **Task Completed:** All 25 phases verified. 100% of frontend ESLint errors resolved (0 errors), 100% of TypeScript errors resolved (0 errors), 110/110 Spring Boot backend tests passing (0 failures, 0 errors), 77/77 Jest frontend tests passing (11 suites), Next.js 16 production build passing (24/24 routes generated).
+- **Files Modified:**
+  - `frontend/src/components/layout/Topbar.tsx` — Fixed render purity (removed impure Date.now()), removed unused imports.
+  - `frontend/src/components/ui/cloud-shader.tsx` — Fixed render ref access violation (moved paramsRef update to useEffect).
+  - `frontend/src/api/ai.api.ts` — Replaced `any` types with strongly-typed interfaces.
+  - `frontend/src/api/chat.api.ts` — Replaced `any` types with strongly-typed interfaces.
+  - `frontend/src/api/subjects.api.ts` — Replaced `any` types with typed backend contracts.
+  - `frontend/src/components/debug/FirebaseDebugPanel.tsx` — Replaced `any` with `unknown` and fixed JSX type checking.
+  - `frontend/src/components/placeholders-and-vanish-input-demo.tsx` — Cleaned unused parameters.
+  - `frontend/src/app/(dashboard)/performance/page.tsx` — Cleaned unused imports and variables.
+  - `frontend/src/app/(dashboard)/priority/page.tsx` — Cleaned unused icons.
+  - `frontend/src/app/(dashboard)/study-together/page.tsx` — Removed unused BookOpen icon.
+  - `frontend/src/__tests__/e2e/final_independent_qa_audit.spec.ts` — Removed `any[]` and fixed prefer-const.
+  - `frontend/src/__tests__/e2e/final_production_verification.spec.ts` — Strongly typed with `StudyMaterial`.
+  - `frontend/src/__tests__/e2e/interactions.spec.ts` — Simplified fixture destructuring.
+  - `frontend/src/__tests__/e2e/materials.spec.ts` — Simplified fixture destructuring.
+  - `frontend/src/__tests__/e2e/subjects.spec.ts` — Simplified fixture destructuring.
+  - `frontend/src/__tests__/e2e/workflows.spec.ts` — Removed unused expect import.
+  - `frontend/src/__tests__/hooks/hooks.test.ts` — Cleaned unused testing library imports.
+  - `frontend/eslint.config.mjs` — Configured global ignores.
+  - `backend/Dockerfile` — Added `-XX:MaxMetaspaceSize=160m -XX:+ExitOnOutOfMemoryError` JVM tuning.
+  - `.github/workflows/master-test-suite.yml` — Added frontend-ci and backend-ci jobs.
+  - `README.md` — Updated to reflect Next.js 16 and React 19 architecture.
+- **Problems Found:**
+  - Topbar called `Date.now()` during render causing React purity violation.
+  - CloudShader updated `paramsRef.current` directly in component body violating React ref rules.
+  - 15 ESLint errors and untyped `any` annotations in API layers.
+  - Playwright test files used `any` and unassigned `let`.
+  - `README.md` listed outdated Next.js 14.
+- **Solutions:**
+  - Moved ref updates to `useEffect` and cleaned unused calculation from Topbar.
+  - Added strongly-typed interfaces across `ai.api.ts`, `chat.api.ts`, and `subjects.api.ts`.
+  - Fixed JSX type casting in `FirebaseDebugPanel.tsx`.
+  - Added container Metaspace limits to Dockerfile.
+  - Added Frontend and Backend CI pipeline jobs in GitHub Actions.
+- **Next Recommended Task:** Deploy updated production artifacts to Vercel and Render.
+
+- **Task Started:** Run full local stack (frontend + backend) on developer laptop.
+- **Task Completed:** Both services running locally. Frontend at localhost:3000, Backend at localhost:8080 (H2 in-memory DB).
+- **Files Modified:**
+  - `frontend/.env.local` — switched `NEXT_PUBLIC_BACKEND_URL` to `http://localhost:8080`
+  - `backend/pom.xml` — changed H2 scope from `test` → `runtime`
+  - `backend/src/main/resources/application-local.properties` — NEW: H2 local Spring profile
+  - `backend/src/main/resources/schema-local.sql` — NEW: H2-compatible schema (V1+V2+V3)
+  - `backend/start-local.cmd` — NEW: convenience startup script
+- **Problems Found:**
+  - ISP/router blocks both Supabase PostgreSQL ports (5432 and 6543) — backend cannot connect to Supabase from this network.
+  - H2 `UUID PRIMARY KEY DEFAULT RANDOM_UUID()` syntax error — H2 requires `id UUID NOT NULL DEFAULT RANDOM_UUID(), PRIMARY KEY (id)`.
+  - `email_notifications` and `push_notifications` columns missing from schema-local.sql but present in Student entity — fixed by switching `ddl-auto=update` so Hibernate auto-adds them.
+- **Solutions:**
+  - Created `local` Spring profile with H2 in-memory database, Flyway disabled, `ddl-auto=update`.
+  - Backend starts in ~15s (vs ~2min for Supabase) using H2.
+  - Firebase Auth still works (real Firebase API calls still succeed from local).
+  - ⚠️ Note: H2 is in-memory only — data resets on every backend restart.
+- **Next Recommended Task:** Test login flow locally. Note: user must sign up fresh since H2 DB is empty on every restart.
+
+
 ## 2026-07-22
 - **Task Started:** Backend startup resolution and runtime verification.
 - **Task Completed:** Backend runs on port 8080, DB connects, Firebase fixed, caching added, pagination added.
@@ -1354,3 +1427,23 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
 - **Problems Found:** All production API endpoints timing out with ERR_ABORTED because Render free-tier spins down after 15 min and Spring Boot JVM takes 30-60s to cold start. No coordination between wake endpoint and data hooks. Aggressive polling (30s notifications, 10s/5s/3s study rooms) firing during cold starts.
 - **Solutions:** Created useBackendHealth hook as a centralized gate. All data hooks now wait for backend readiness via `enabled: isReady`. Reduced polling frequencies. Added keep-alive cron to prevent cold starts. Optimized NotificationService with caching and eliminated redundant DB query.
 - **Next Recommended Task**: Deploy to Vercel/Render and verify cold-start resilience in production.
+
+## 2026-08-22 (Session 19 - Full Product Source-of-Truth Architectural Alignment & Verification)
+- **Task Started:** Complete architectural alignment and end-to-end verification against the Product Source-of-Truth blueprint (Student -> Auth -> Academics -> Materials & NLP -> Academic Intelligence & Priority -> AI Study Agent -> Timetable Generation -> Study Sessions & Progress Completion Feedback -> Collaborative Study Together).
+- **Task Completed:** 100% of the product flow connected, functional, and verified live with real Groq LLM integration, NLP extraction, timetable generation, session streak feedback, and collaborative study rooms.
+- **Files Modified:**
+  - `backend/src/main/java/com/aistudyplanner/service/AiAssistantService.java` — Injected uploaded study materials and syllabus knowledge base into general student academic context prompt.
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java` — Tied slot completion (`markSlotComplete`) to student study streak and active date tracking.
+  - `backend/src/main/java/com/aistudyplanner/service/GroqService.java` — Added resilient auto-retry on 429 Too Many Requests with exponential backoff.
+  - `backend/src/main/java/com/aistudyplanner/repository/MaterialRepository.java` — Added `findAllByStudentId` query method.
+  - `scratch/test_local_stack.mjs` — Comprehensive 13-stage end-to-end integration and verification suite.
+- **Problems Found:**
+  - AI Assistant prompt lacked general knowledge base awareness of uploaded materials when answering generic study questions.
+  - Study slot completion did not automatically feed back into student daily streak and readiness metrics.
+  - Rapid successive Groq requests during timetable generation could intermittently encounter free-tier 429 burst limits without client-level retry.
+- **Solutions:**
+  - Added material syllabus knowledge base summary to `buildStudentAcademicContext`.
+  - Added study streak increment and active date recording in `TimetableService.markSlotComplete`.
+  - Added 429 backoff retry in `GroqService.callGroq`.
+  - Verified complete flow across 13 stages with 100% passing tests.
+- **Next Recommended Task:** Deploy updated production artifacts to Vercel and Render.

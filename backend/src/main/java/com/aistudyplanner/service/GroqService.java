@@ -1,96 +1,52 @@
 package com.aistudyplanner.service;
 
-import com.aistudyplanner.config.GroqConfig;
-import com.aistudyplanner.exception.RateLimitException;
 import com.aistudyplanner.model.dto.response.ExamResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.aistudyplanner.service.ai.AiRequest;
+import com.aistudyplanner.service.ai.AiProviderGateway;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Builds every AI prompt the application sends, and nothing else.
+ *
+ * <p>This class used to own the Groq HTTP transport as well. That half now lives in
+ * {@link com.aistudyplanner.service.ai.provider.GroqProvider}, behind
+ * {@link AiProviderGateway}, so the same prompts are served by AgentRouter (Claude) first and Groq
+ * only as a fallback. Every method signature, every prompt string and every truncation limit below is
+ * unchanged, which is why all seven call sites — {@code AiAssistantService}, {@code ExamService},
+ * {@code MaterialService}, {@code DocumentIntelligenceService}, {@code StudyRoomService},
+ * {@code TimetableService}, {@code PerformanceService} — plus both AI controllers, the web frontend and
+ * the mobile app needed no change at all.
+ *
+ * <p>The name is kept for the same reason: renaming it would churn nine files without changing
+ * behaviour. Read it as "the AI prompt layer", not "the Groq client".
+ *
+ * <p>Student context assembly stays deliberately centralised — the prompt methods here, and the richer
+ * document/academic context builders in {@code AiAssistantService} — so both providers receive
+ * byte-identical context and the choice of provider can never change what the model was told.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class GroqService {
 
-    private final RestTemplate groqRestTemplate;
-    private final ObjectMapper objectMapper;
+    private final AiProviderGateway aiProviderGateway;
 
-    @Value("${groq.api-key}")
-    private String apiKey;
-
-    private final ConcurrentHashMap<Long, AtomicInteger> rateLimiter = new ConcurrentHashMap<>();
-
-    private void checkRateLimit() {
-        long currentMinute = Instant.now().getEpochSecond() / 60;
-        rateLimiter.putIfAbsent(currentMinute, new AtomicInteger(0));
-        
-        if (rateLimiter.get(currentMinute).incrementAndGet() > com.aistudyplanner.util.Constants.GROQ_RATE_LIMIT_PER_MINUTE) {
-            throw new RateLimitException("Groq API rate limit exceeded (" + com.aistudyplanner.util.Constants.GROQ_RATE_LIMIT_PER_MINUTE + " requests per minute).");
-        }
-        
-        rateLimiter.keySet().removeIf(minute -> minute < currentMinute - 1);
-    }
-
-    private String callGroq(String prompt) {
-        checkRateLimit();
-        long startTime = System.currentTimeMillis();
-        try {
-            Map<String, Object> body = new HashMap<>();
-            
-            // Groq uses OpenAI-compatible API format
-            body.put("model", "llama-3.3-70b-versatile");  // Groq's fastest model
-            
-            Map<String, Object> message = new HashMap<>();
-            message.put("role", "user");
-            message.put("content", prompt);
-            
-            body.put("messages", List.of(message));
-            body.put("temperature", 0.7);
-            body.put("max_tokens", 1000);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + apiKey);
-
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-
-            String responseStr = groqRestTemplate.postForObject(GroqConfig.GROQ_API_URL, request, String.class);
-            
-            long duration = System.currentTimeMillis() - startTime;
-            log.debug("Groq API call successful. Duration: {}ms", duration);
-            
-            JsonNode root = objectMapper.readTree(responseStr);
-            if (root.has("choices") && root.path("choices").size() > 0) {
-                return root.path("choices").get(0).path("message").path("content").asText();
-            }
-            if (root.has("candidates") && root.path("candidates").size() > 0) {
-                return root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
-            }
-            return "I'm currently unable to generate a response. Please try again later.";
-
-        } catch (Exception e) {
-            long duration = System.currentTimeMillis() - startTime;
-            log.error("Groq API call failed after {}ms. Prompt length: {}. Error: {}", 
-                duration, prompt.length(), e.getMessage(), e);
-            return "I'm currently unable to generate a response. Please try again later.";
-        }
+    /**
+     * Sends a prompt through the provider chain and returns the text.
+     *
+     * <p>{@code purpose} is a short, non-sensitive feature label that appears in provider logs so an
+     * operator can see which feature a call came from without the prompt itself ever being logged.
+     */
+    private String generate(String prompt, String purpose) {
+        return aiProviderGateway.complete(AiRequest.of(prompt, purpose)).text();
     }
 
     public String analyzeMarks(UUID studentId, Map<String, Double> subjectAverages) {
@@ -101,7 +57,7 @@ public class GroqService {
                 "3. Study time recommendation per weak subject per day " +
                 "4. One motivational insight " +
                 "Keep response under 300 words. Be direct and actionable.", subjectAverages);
-        return callGroq(prompt);
+        return generate(prompt, "analyze-marks");
     }
 
     public String chat(String userMessage, List<ChatHistory> history) {
@@ -109,29 +65,29 @@ public class GroqService {
     }
 
     public String chat(String userMessage, List<ChatHistory> history, String documentContext) {
-        // Limit context window to avoid exceeding Groq token limits
+        // Limit context window to avoid exceeding provider token limits
         // Estimate: ~4 tokens per word, max 2000 tokens for context = ~500 words
         final int MAX_CONTEXT_WORDS = 500;
-        
+
         StringBuilder historyBuilder = new StringBuilder();
         int wordCount = 0;
-        
+
         // Build context from most recent messages backwards
         for (int i = history.size() - 1; i >= 0 && wordCount < MAX_CONTEXT_WORDS; i--) {
             ChatHistory h = history.get(i);
             String entry = h.getRole() + ": " + h.getMessage() + "\n";
             int entryWords = h.getMessage().split("\\s+").length;
-            
+
             if (wordCount + entryWords <= MAX_CONTEXT_WORDS) {
                 historyBuilder.insert(0, entry);
                 wordCount += entryWords;
             }
         }
-        
+
         StringBuilder promptBuilder = new StringBuilder();
         promptBuilder.append("You are an AI study assistant and an expert academic problem solver helping a college student.\n");
         promptBuilder.append("When presented with problems, concepts, or academic questions, analyze them step-by-step, explain underlying ideas clearly, and provide accurate, student-friendly explanations.\n\n");
-        
+
         if (documentContext != null && !documentContext.isBlank()) {
             promptBuilder.append("--- RELEVANT ACADEMIC MATERIAL / DOCUMENT CONTEXT ---\n");
             promptBuilder.append(documentContext).append("\n");
@@ -144,22 +100,15 @@ public class GroqService {
         }
 
         promptBuilder.append("Student's question: ").append(userMessage);
-        
-        String response = callGroq(promptBuilder.toString());
-        if (response == null || response.contains("unable to generate a response") || response.isBlank()) {
-            if (documentContext != null && !documentContext.isBlank()) {
-                return "Here is what I found from your uploaded material:\n\n" + documentContext + 
-                       "\n\n*(AI service is operating in deterministic offline mode)*";
-            }
-        }
-        return response;
+
+        return generate(promptBuilder.toString(), "chat");
     }
 
     public String generateTopicSuggestion(String subjectName, double avgPercentage, int durationMinutes, int daysToExam) {
         String prompt = String.format("For student studying %s with %.2f%% average, " +
                 "suggest a specific study topic for today's %d minute session. " +
                 "Be concise (max 10 words). Exam in %d days.", subjectName, avgPercentage, durationMinutes, daysToExam);
-        return callGroq(prompt);
+        return generate(prompt, "topic-suggestion");
     }
 
     public String summarizeMaterial(String textContent) {
@@ -167,7 +116,7 @@ public class GroqService {
             textContent = textContent.substring(0, 10000);
         }
         String prompt = "Summarize this study material in 5 bullet points (max 150 words total): " + textContent;
-        return callGroq(prompt);
+        return generate(prompt, "summarize-material");
     }
 
     public String categorizeMaterial(String fileName, String textPreview) {
@@ -177,9 +126,9 @@ public class GroqService {
         String prompt = String.format("Based on this file name and content preview, identify the college subject name " +
                 "(e.g., 'Data Structures', 'Engineering Mathematics'). Reply with only the subject name, nothing else. " +
                 "File: %s. Preview: %s", fileName, textPreview);
-        return callGroq(prompt).trim();
+        return generate(prompt, "categorize-material").trim();
     }
-    
+
     public String extractTopicFromMaterials(String subjectName, double avgPercentage, int durationMinutes, String materialSummaries) {
         if (materialSummaries.length() > 3000) {
             materialSummaries = materialSummaries.substring(0, 3000) + "...";
@@ -189,7 +138,7 @@ public class GroqService {
             "Student's average: %.2f%%. Pick topics from the materials below. Be concise (max 10 words).\n\n%s",
             subjectName, durationMinutes, avgPercentage, materialSummaries
         );
-        return callGroq(prompt).trim();
+        return generate(prompt, "extract-topic").trim();
     }
 
     public String generateExamPlan(String studentName, List<ExamResponse> exams, Map<String, Double> subjectAverages) {
@@ -198,12 +147,12 @@ public class GroqService {
                 "Subject averages: %s\n" +
                 "Provide a structured plan with: daily goals, priority topics, revision strategy.\n" +
                 "Keep it under 400 words.", studentName, exams, subjectAverages);
-        return callGroq(prompt);
+        return generate(prompt, "exam-plan");
     }
 
     @Cacheable(value = "groq-tips", key = "#date")
     public String getMotivationalTip(String date) {
         String prompt = "Give one unique motivational tip for a college student studying for exams. Max 2 sentences.";
-        return callGroq(prompt);
+        return generate(prompt, "motivation");
     }
 }

@@ -61,3 +61,11 @@ frontend/playwright-report/
 .DS_Store
 Thumbs.db
 
+# ── Local tooling ────────────────────────────
+# Per-machine Claude Code permissions. launch.json IS tracked — it is the shared
+# dev-server config — but this file records one developer's approvals.
+.claude/settings.local.json
+
+# Scratch output from `npm run lint > …`. Regenerate it, don't commit it.
+frontend/lint_results.txt
+

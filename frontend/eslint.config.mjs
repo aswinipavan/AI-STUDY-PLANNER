@@ -12,9 +12,21 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "debug-firebase-config.js",
+    "playwright/**",
   ]),
-  // Project-level rule overrides
+  // Project-level rule overrides.
+  //
+  // `files` is not optional here. eslint-config-next declares the `react`,
+  // `react-hooks`, `import` and `jsx-a11y` plugins on a config object scoped to
+  // `**/*.{js,jsx,mjs,ts,tsx,mts,cts}` — note the absence of `cjs`. An unscoped
+  // object applies to every linted file, so switching a `react-hooks/*` rule
+  // below made ESLint resolve that rule for plain `.cjs` node scripts too, where
+  // the plugin was never defined, and the whole run aborted with
+  // "could not find plugin react-hooks". Matching next's glob keeps these
+  // overrides on exactly the files whose plugins are in scope.
   {
+    files: ["**/*.{js,jsx,mjs,ts,tsx,mts,cts}"],
     rules: {
       // react-compiler plugin is not installed — suppress the "rule not found" error
       'react-compiler/react-compiler': 'off',
@@ -28,6 +40,14 @@ const eslintConfig = defineConfig([
       'react-hooks/set-state-in-effect': 'warn',
       // react-hook-form's watch() is a known incompatibility with React Compiler — acceptable
       'react-hooks/incompatible-library': 'warn',
+    },
+  },
+  // Repo tooling (e.g. scripts/audit-keyframes.cjs) runs directly under node
+  // rather than through the bundler, so CommonJS `require` is the correct form.
+  {
+    files: ["**/*.cjs"],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 ]);

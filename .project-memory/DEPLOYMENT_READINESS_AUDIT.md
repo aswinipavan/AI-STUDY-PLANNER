@@ -45,7 +45,7 @@ The AI Study Planner application is **READY FOR PRODUCTION DEPLOYMENT**. All val
 
 **Issue Found:** Line 34 contained PowerShell command instead of env var:
 ```
-$env:JWT_SECRET = "kneLi8uUFm1oSGr5UCiy1j/zWnM7Ku5HVoeOpbjGTLA="
+$env:JWT_SECRET = "REDACTED_JWT_SECRET_ROTATE_ME"
 ```
 
 **Action Taken:** Removed (this is not valid in .env files and should never be in production)

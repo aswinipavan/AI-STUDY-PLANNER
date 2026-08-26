@@ -140,7 +140,7 @@ export function AiChatScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScreenHeader
         title="AI Study Tutor"
-        subtitle="Powered by Groq Llama 3"
+        subtitle="Ask anything about your syllabus"
         rightElement={
           messages.length > 0 ? (
             <TouchableOpacity onPress={handleClear} style={styles.clearBtn}>

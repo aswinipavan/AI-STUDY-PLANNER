@@ -3,11 +3,14 @@ package com.aistudyplanner.controller;
 import com.aistudyplanner.model.dto.request.GenerateTimetableRequest;
 import com.aistudyplanner.model.dto.request.SlotRequest;
 import com.aistudyplanner.model.dto.request.TimetableRequest;
+import com.aistudyplanner.model.dto.response.AdaptationResponse;
 import com.aistudyplanner.model.dto.response.ApiResponse;
 import com.aistudyplanner.model.dto.response.SlotResponse;
+import com.aistudyplanner.model.dto.response.SubjectReadinessResponse;
 import com.aistudyplanner.model.dto.response.TimetableResponse;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.security.CurrentStudent;
+import com.aistudyplanner.service.AdaptiveScheduleService;
 import com.aistudyplanner.service.TimetableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +34,7 @@ import java.util.UUID;
 public class TimetableController {
 
     private final TimetableService timetableService;
+    private final AdaptiveScheduleService adaptiveScheduleService;
 
     @PostMapping("/generate")
     @Operation(summary = "Generate AI Timetable")
@@ -97,5 +101,33 @@ public class TimetableController {
         log.info("Deleting timetable: {} for student: {}", timetableId, student.getId());
         timetableService.deleteTimetable(student.getId(), timetableId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Re-plan the open future of the active timetable against the student's current reality —
+     * completed sessions, missed sessions, newly processed material, exam dates and marks.
+     *
+     * <p>History and already-completed sessions are preserved; only still-open upcoming sessions are
+     * rewritten. The response explains, in plain language, every adjustment that was made.</p>
+     *
+     * @param trigger optional hint about what caused the adaptation (SESSION_COMPLETED,
+     *                NEW_MATERIAL, EXAM_CHANGED, MARKS_CHANGED, MISSED_SESSIONS); used for wording only
+     */
+    @PostMapping("/adapt")
+    @Operation(summary = "Adapt the active timetable to current progress, material, marks and exams")
+    public ResponseEntity<ApiResponse<AdaptationResponse>> adapt(
+            @CurrentStudent Student student,
+            @RequestParam(required = false) String trigger) {
+        log.info("Adapting timetable for student: {} (trigger: {})", student.getId(), trigger);
+        AdaptationResponse response = adaptiveScheduleService.adapt(student.getId(), trigger);
+        return ResponseEntity.ok(ApiResponse.success(response, response.getSummary()));
+    }
+
+    /** Read-only adaptive insight: per-subject coverage, readiness, priority and the reasons behind them. */
+    @GetMapping("/insights")
+    @Operation(summary = "Per-subject adaptive readiness and priority signals")
+    public ResponseEntity<ApiResponse<List<SubjectReadinessResponse>>> getInsights(@CurrentStudent Student student) {
+        List<SubjectReadinessResponse> insights = adaptiveScheduleService.getSubjectReadiness(student.getId());
+        return ResponseEntity.ok(ApiResponse.success(insights, "Adaptive insights fetched successfully"));
     }
 }

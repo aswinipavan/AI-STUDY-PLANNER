@@ -8,14 +8,11 @@ import com.aistudyplanner.security.JwtTokenProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -41,23 +38,11 @@ class AuthServiceTest {
     @Mock
     private FirebaseToken firebaseToken;
 
+    @Mock
+    private FirebaseAuth firebaseAuth;
+
     @InjectMocks
     private AuthService authService;
-
-    private MockedStatic<FirebaseAuth> mockedFirebaseAuth;
-    private FirebaseAuth firebaseAuthInstance;
-
-    @BeforeEach
-    void setUp() {
-        firebaseAuthInstance = mock(FirebaseAuth.class);
-        mockedFirebaseAuth = mockStatic(FirebaseAuth.class);
-        mockedFirebaseAuth.when(FirebaseAuth::getInstance).thenReturn(firebaseAuthInstance);
-    }
-
-    @AfterEach
-    void tearDown() {
-        mockedFirebaseAuth.close();
-    }
 
     @Test
     @DisplayName("Login new user successfully")
@@ -65,7 +50,7 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest("valid_firebase_token");
         String uid = "newUid123";
 
-        when(firebaseAuthInstance.verifyIdToken(anyString())).thenReturn(firebaseToken);
+        when(firebaseAuth.verifyIdToken(anyString())).thenReturn(firebaseToken);
         when(firebaseToken.getUid()).thenReturn(uid);
         when(firebaseToken.getEmail()).thenReturn("test@example.com");
         when(firebaseToken.getName()).thenReturn("Test User");
@@ -93,7 +78,7 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest("valid_firebase_token");
         String uid = "existingUid";
 
-        when(firebaseAuthInstance.verifyIdToken(anyString())).thenReturn(firebaseToken);
+        when(firebaseAuth.verifyIdToken(anyString())).thenReturn(firebaseToken);
         when(firebaseToken.getUid()).thenReturn(uid);
         when(firebaseToken.getClaims()).thenReturn(new HashMap<>());
 
@@ -122,7 +107,7 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest("valid_firebase_token");
         String uid = "existingUid";
 
-        when(firebaseAuthInstance.verifyIdToken(anyString())).thenReturn(firebaseToken);
+        when(firebaseAuth.verifyIdToken(anyString())).thenReturn(firebaseToken);
         when(firebaseToken.getUid()).thenReturn(uid);
         when(firebaseToken.getClaims()).thenReturn(new HashMap<>());
 
@@ -146,7 +131,7 @@ class AuthServiceTest {
     void testLogin_InvalidToken() throws FirebaseAuthException {
         LoginRequest request = new LoginRequest("invalid_token");
 
-        when(firebaseAuthInstance.verifyIdToken(anyString())).thenThrow(new RuntimeException("Invalid token"));
+        when(firebaseAuth.verifyIdToken(anyString())).thenThrow(new RuntimeException("Invalid token"));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> authService.login(request));
         assertEquals("Invalid token", exception.getMessage());
@@ -156,7 +141,7 @@ class AuthServiceTest {
     @DisplayName("Refresh token successfully")
     void testRefreshToken_Success() throws FirebaseAuthException {
         String uid = "existingUid";
-        when(firebaseAuthInstance.verifyIdToken(anyString())).thenReturn(firebaseToken);
+        when(firebaseAuth.verifyIdToken(anyString())).thenReturn(firebaseToken);
         when(firebaseToken.getUid()).thenReturn(uid);
 
         Student existingStudent = Student.builder().id(UUID.randomUUID()).firebaseUid(uid).build();
@@ -174,12 +159,12 @@ class AuthServiceTest {
     @DisplayName("Refresh token fails for non-existent user")
     void testRefreshToken_UserNotFound() throws FirebaseAuthException {
         String uid = "nonExistentUid";
-        when(firebaseAuthInstance.verifyIdToken(anyString())).thenReturn(firebaseToken);
+        when(firebaseAuth.verifyIdToken(anyString())).thenReturn(firebaseToken);
         when(firebaseToken.getUid()).thenReturn(uid);
         
         when(studentRepository.findByFirebaseUid(uid)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> authService.refreshToken("valid_firebase_token"));
-        assertEquals("User not found", exception.getMessage());
+        assertEquals("No Study Planner account exists for this Firebase user. Please sign in again.", exception.getMessage());
     }
 }

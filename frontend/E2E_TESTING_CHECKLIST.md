@@ -3,14 +3,14 @@
 **Date:** July 22, 2026  
 **Tester:** [Your Name]  
 **Frontend URL:** http://localhost:3000 (dev) or Vercel deployment URL  
-**Backend API:** https://aistudyplannerbackend.onrender.com  
+**Backend API:** https://ai-study-planner-hp0e.onrender.com  
 
 ---
 
 ## Prerequisites
 
 Before running E2E tests:
-- [ ] Backend is running and accessible (check health: https://aistudyplannerbackend.onrender.com/health)
+- [ ] Backend is running and accessible (check health: https://ai-study-planner-hp0e.onrender.com/actuator/health)
 - [ ] Frontend is running (`npm run dev` in `/frontend`)
 - [ ] Browser DevTools console is open (F12) to check for errors
 - [ ] Clear browser cookies/localStorage before starting

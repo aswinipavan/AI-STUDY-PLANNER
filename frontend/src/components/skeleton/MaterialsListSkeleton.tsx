@@ -6,11 +6,13 @@ interface Props {
 
 export function MaterialsListSkeleton({ count = 6 }: Props) {
   return (
-    <div className="space-y-3 animate-pulse">
+    // `animate-pulse` sits on each row, not the wrapper: the per-row
+    // `animationDelay` below only means something if the row is what animates.
+    <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center space-x-4 p-4 bg-card border border-border rounded-xl"
+          className="flex animate-pulse items-center space-x-4 p-4 bg-card border border-border rounded-xl"
           style={{ animationDelay: `${i * 60}ms` }}
         >
           {/* Icon block */}

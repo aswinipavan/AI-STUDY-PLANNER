@@ -2,7 +2,7 @@
   padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
@@ -11,7 +11,6 @@
   flex-direction: column;
   gap: 1rem;
   margin-top: 2rem;
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .itemCard {
@@ -19,15 +18,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem;
-  border-radius: 12px;
+  border-radius: var(--app-radius-lg);
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform var(--app-duration-slow) var(--app-ease-spring),
+              border-color var(--app-duration-base) var(--app-ease-out);
+  /* The page sets an `animationDelay` per card for a staggered entrance, but the
+     animation itself was only ever declared on the wrapper — so every delay was
+     applied to nothing and the cards appeared all at once. */
+  animation: fadeSlideUp var(--app-duration-slow) var(--app-ease-out) both;
 }
 .itemCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.15);
+  border-color: var(--app-hairline-strong);
 }
 
 .itemUrgent0 {
@@ -43,6 +47,24 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  /* Was unconstrained, so a long subject name pushed the progress ring off the
+     card instead of wrapping. */
+  min-width: 0;
+  flex: 1;
+}
+
+/* Replaces `style={{ flex: 1 }}` — same effect, but it can be read alongside the
+   rest of the card's layout instead of being buried in the JSX. */
+.leftBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .rankBadge {
@@ -52,17 +74,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.125rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 .rank0 { background: #ef4444; color: #fff; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); }
 .rank1 { background: #f59e0b; color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
-.rankRest { background: rgba(255,255,255,0.1); color: var(--color-muted-foreground); }
+.rankRest { background: var(--app-overlay-strong); color: var(--color-muted-foreground); }
 
 .subjectName {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0 0 0.25rem 0;
@@ -87,8 +109,8 @@
 .skeletonCard {
   height: 100px;
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -99,8 +121,8 @@
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  font-family: var(--font-outfit), sans-serif;
+  border-radius: var(--app-radius-pill);
+  font-family: var(--font-display), sans-serif;
 }
 .priorityHigh { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 .priorityMed { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
@@ -127,12 +149,102 @@
   background: rgba(0, 229, 192, 0.08);
   border: 1px solid rgba(0, 229, 192, 0.2);
   padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.35rem;
   width: fit-content;
+}
+
+/* ── Adaptive stage + material coverage ─────────────────────────────────────
+   The ranking already said *how urgent* a subject is; this says what the planner
+   is actually doing with it — learning new topics, revising, or drilling a weak
+   area — and how much of the student's own uploaded material is behind that. */
+.stageBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.stageBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: fit-content;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--app-radius-pill);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  color: #c4b5fd;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.coverageRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 22rem;
+}
+
+.coverageLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  color: var(--color-muted-foreground);
+}
+
+.coverageTrack {
+  height: 4px;
+  width: 100%;
+  border-radius: var(--app-radius-pill);
+  background: var(--app-overlay);
+  overflow: hidden;
+}
+
+.coverageFill {
+  height: 100%;
+  border-radius: var(--app-radius-pill);
+  background: var(--color-primary);
+  transition: width var(--app-duration-slower) var(--app-ease-out);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────
+   At 375px the rank badge, the copy and a 64px ring in one row left the subject
+   name a few characters wide. Stack the ring under the copy instead. */
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .list {
+    margin-top: 1.5rem;
+  }
+
+  .itemCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .leftCol {
+    gap: 0.875rem;
+    width: 100%;
+  }
+
+  .rankBadge {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .subjectName {
+    font-size: 1.0625rem;
+  }
 }
 
 @keyframes fadeSlideUp {

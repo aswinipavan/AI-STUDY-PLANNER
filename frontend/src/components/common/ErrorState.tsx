@@ -3,26 +3,31 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+
 interface ErrorStateProps {
   message?: string;
   onRetry?: () => void;
 }
 
+/**
+ * The one failure panel. Same geometry as {@link EmptyState}; `role="alert"` so
+ * a screen reader announces the failure instead of silently swapping content.
+ */
 export function ErrorState({ message = 'Something went wrong.', onRetry }: ErrorStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-16 space-y-4">
-      <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
-        <AlertTriangle className="w-8 h-8 text-destructive" />
+    <div
+      role="alert"
+      className="flex flex-col items-center justify-center gap-4 py-16 text-center"
+    >
+      <div className="flex h-16 w-16 items-center justify-center rounded-[var(--app-radius-pill)] bg-destructive/10">
+        <AlertTriangle className="h-8 w-8 text-destructive" aria-hidden="true" />
       </div>
-      <p className="text-muted-foreground text-sm max-w-xs">{message}</p>
+      <p className="max-w-xs text-sm text-muted-foreground">{message}</p>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className="flex items-center space-x-2 px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-lg hover:bg-muted/70 transition-colors border border-border"
-        >
-          <RefreshCw className="w-4 h-4" />
-          <span>Retry</span>
-        </button>
+        <Button variant="outline" onClick={onRetry} leftIcon={<RefreshCw aria-hidden="true" />}>
+          Retry
+        </Button>
       )}
     </div>
   );

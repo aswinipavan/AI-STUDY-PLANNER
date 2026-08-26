@@ -18,7 +18,16 @@ services:
         sync: false
       - key: FIREBASE_SERVICE_ACCOUNT_JSON
         sync: false
+      # AI providers — AgentRouter (primary) then Groq (fallback). Backend-only secrets.
+      - key: AGENTROUTER_API_KEY
+        sync: false
+      - key: AGENTROUTER_BASE_URL
+        sync: false
+      - key: AGENTROUTER_MODEL
+        sync: false
       - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
         sync: false
       - key: RAZORPAY_KEY_ID
         sync: false

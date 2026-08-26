@@ -25,6 +25,7 @@ public class StudentMapper {
                 .isPremium(student.getIsPremium())
                 .studyStreak(student.getStudyStreak())
                 .availableHoursPerDay(student.getAvailableHoursPerDay())
+                .preferredStudyTime(student.getPreferredStudyTime())
                 .profilePictureUrl(student.getProfilePictureUrl())
                 .emailNotifications(student.getEmailNotifications())
                 .pushNotifications(student.getPushNotifications())

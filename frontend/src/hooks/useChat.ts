@@ -5,6 +5,14 @@ import { ChatMessage, ChatSession } from '@/types/api.types';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBackendHealth } from '@/hooks/useBackendHealth';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
+
+/**
+ * Below this, the reply lands while the student is still looking at the screen and
+ * a chime would only be noise. Above it they have probably glanced away, which is
+ * the one chat moment worth an audible cue.
+ */
+const AI_CUE_THRESHOLD_MS = 800;
 
 export interface ChatState {
   messages: ChatMessage[];
@@ -45,12 +53,17 @@ export interface AttachedMaterial {
 export const useChat = (initialSessionId: string | null) => {
   const qc = useQueryClient();
   const router = useRouter();
-  
+  const { play } = useSoundPreference();
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId);
   const [attachedMaterial, setAttachedMaterial] = useState<AttachedMaterial | null>(null);
+
+  // When the in-flight question was sent, so the cue can tell "answered instantly"
+  // from "answered after a wait". Cleared once used.
+  const askedAtRef = useRef<number | null>(null);
 
   // Track last loaded sessionId to detect session changes
   const loadedSessionRef = useRef<string | null>(null);
@@ -81,7 +94,10 @@ export const useChat = (initialSessionId: string | null) => {
     onSuccess: (data) => {
       // 4. Append response
       setMessages(prev => [...prev, data.message]);
-      
+
+      const waited = askedAtRef.current !== null && Date.now() - askedAtRef.current >= AI_CUE_THRESHOLD_MS;
+      if (waited) play('aiResponse');
+
       // If a new session was created, update URL and state
       if (!sessionId && data.sessionId) {
         setSessionId(data.sessionId);
@@ -92,6 +108,7 @@ export const useChat = (initialSessionId: string | null) => {
     onSettled: () => {
       // 5. setIsThinking(false)
       setIsThinking(false);
+      askedAtRef.current = null;
     }
   });
 
@@ -130,6 +147,7 @@ export const useChat = (initialSessionId: string | null) => {
     
     // 2. setIsThinking(true)
     setIsThinking(true);
+    askedAtRef.current = Date.now();
 
     try {
       // 3. POST /api/ai/chat
@@ -139,15 +157,50 @@ export const useChat = (initialSessionId: string | null) => {
         materialId: currentMaterialId
       });
     } catch (err: unknown) {
-      // Handle error gracefully with clear assistant feedback in chat
       setIsThinking(false);
-      const errMsg = err instanceof Error ? err.message : 'Unable to generate response. Please try again.';
+
+      // Determine if this is an auth error (401 or 403)
+      const isAuthError = err instanceof Error && 
+        (err.message.includes('Session expired') || err.message.includes('sign in'));
+      
+      // Determine if it's a network error
+      const isNetworkError = err instanceof Error && 
+        (err.message.includes('reach the server') || err.message.includes('timed out'));
+
+      let displayMessage: string;
+
+      if (isAuthError) {
+        // Auth errors: guide the user to re-login; also attempt a background token refresh
+        displayMessage = '🔐 Your session has expired. Please **sign out and sign back in** to continue chatting.';
+        // Attempt silent refresh so next message works without page reload
+        try {
+          const { auth } = await import('@/lib/firebase');
+          const currentUser = auth.currentUser;
+          if (currentUser) {
+            const freshToken = await currentUser.getIdToken(true);
+            await fetch('/api/auth/refresh', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ firebaseToken: freshToken }),
+            });
+            // Retry succeeded — clear error message and try sending again
+            displayMessage = '🔄 Session refreshed. Please send your message again.';
+          }
+        } catch {
+          // Silent refresh failed — keep the re-login message
+        }
+      } else if (isNetworkError) {
+        displayMessage = '📡 Unable to reach the AI service. Please check your connection and try again.';
+      } else {
+        displayMessage = err instanceof Error ? err.message : '⚠️ Unable to generate a response. Please try again.';
+      }
+
       setMessages(prev => [
         ...prev,
         {
           id: String(Date.now()),
           role: 'assistant',
-          content: `⚠️ ${errMsg}`,
+          content: displayMessage,
           sessionId: sessionId || 'temp',
           timestamp: new Date().toISOString(),
         },

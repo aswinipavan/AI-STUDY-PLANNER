@@ -15,6 +15,7 @@ export interface StudentProfile {
   isPremium: boolean;
   studyStreak?: number;
   availableHoursPerDay?: number;
+  preferredStudyTime?: string; // backend StudyTimeWindow enum: MORNING | AFTERNOON | EVENING | LATE_NIGHT
   createdAt: string;
   emailNotifications?: boolean;
   pushNotifications?: boolean;
@@ -257,3 +258,75 @@ export interface NotificationItem {
   isRead: boolean;
 }
 
+
+/* ── Adaptive scheduling ──────────────────────────────────────────────────────
+   Mirrors the backend's SubjectReadinessResponse / AdaptationResponse. Every
+   number here is measured from the student's own material, marks, exams and
+   session history — nothing is a fixed ladder. */
+
+export interface SubjectReadiness {
+  subjectId: string;
+  subjectName: string;
+  averagePercentage?: number;
+  difficultyLevel?: number;
+  totalTopics?: number;
+  coveredTopics?: number;
+  coveragePercent?: number;
+  completedSessions?: number;
+  missedSessions?: number;
+  upcomingSessions?: number;
+  consistencyPercent?: number;
+  materialDifficulty?: number;
+  nextExamDate?: string;
+  daysUntilExam?: number;
+  readiness?: number;
+  examPreparedness?: number;
+  priorityWeight?: number;
+  sessionSharePercent?: number;
+  recommendedStudyTime?: string;
+  allTopicsCovered?: boolean;
+  /** COVERING_NEW_MATERIAL | REVISION | EXAM_PREP … — drives the stage badge. */
+  stage?: string;
+  /** Human-readable "why this subject ranks here" lines. */
+  reasons?: string[];
+}
+
+export interface AdaptationResult {
+  adapted: boolean;
+  trigger?: string;
+  summary?: string;
+  /** The "why the plan changed" list, rendered verbatim to the student. */
+  changes?: string[];
+  slotsRemoved?: number;
+  slotsCreated?: number;
+  slotsPreserved?: number;
+  missedSessionsRescheduled?: number;
+  horizonStart?: string;
+  horizonEnd?: string;
+  subjects?: SubjectReadiness[];
+  timetable?: Timetable;
+}
+
+/**
+ * What caused an adaptation — sent to the backend as a hint for the summary.
+ *
+ * These strings must match `AdaptiveScheduleService.TRIGGER_*` exactly. The
+ * backend `switch` in `buildSummary` falls through to a generic "Plan adapted to
+ * your current progress" on anything it does not recognise, so a typo here does
+ * not fail loudly — it just quietly replaces the specific reason the plan changed
+ * with a vague one. Two members were previously misspelled (`SESSION_MISSED` for
+ * `MISSED_SESSIONS`, `PERFORMANCE_CHANGED` for `MARKS_CHANGED`), which is why
+ * this is a runtime array with the union derived from it: a `type` alone cannot
+ * be enumerated, so nothing could check it against the backend. See
+ * `__tests__/types/adaptationTrigger.contract.test.ts`.
+ */
+export const ADAPTATION_TRIGGERS = [
+  'MANUAL',
+  'SESSION_COMPLETED',
+  'MISSED_SESSIONS',
+  'NEW_MATERIAL',
+  'EXAM_CHANGED',
+  'MARKS_CHANGED',
+] as const;
+
+export type AdaptationTrigger = (typeof ADAPTATION_TRIGGERS)[number];

@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Opts in React's <ViewTransition> component (used by the dashboard layout).
+  // Page transitions are then run by the browser's View Transitions API, so no
+  // animation library sits on the navigation path.
+  experimental: {
+    viewTransition: true,
+  },
   images: {
     remotePatterns: [
       {

@@ -9,7 +9,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import AvatarImage from '@/components/common/AvatarImage';
 import { usePathname } from 'next/navigation';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -103,7 +103,14 @@ function UserProfileFooter() {
     <div className={styles.userProfile}>
       {/* Avatar */}
       {user?.photoUrl ? (
-        <Image src={user.photoUrl} alt={user.name || 'User'} width={40} height={40} className={styles.avatarImg} unoptimized />
+        <AvatarImage
+          src={user.photoUrl}
+          alt={user.name || 'User'}
+          width={40}
+          height={40}
+          className={styles.avatarImg}
+          fallback={<div className={styles.avatarFallback}>{initials}</div>}
+        />
       ) : (
         <div className={styles.avatarFallback}>
           {initials}
@@ -160,7 +167,7 @@ export function Sidebar() {
       <aside
         role="navigation"
         aria-label="Main navigation"
-        className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed} lg:static lg:translate-x-0 lg:transform-none`}
+        className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
       >
         {/* Logo */}
         <div className={styles.logoBox}>

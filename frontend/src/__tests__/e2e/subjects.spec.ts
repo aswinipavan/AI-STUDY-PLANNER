@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 // Group 3: Subjects Management (SEL-051 to SEL-070)
 test.describe('Subjects Section', () => {
 
-  test.beforeEach(async ({ page, context }) => {
+  test.beforeEach(async ({ context }) => {
     // Skip onboarding for all tests
     await context.addInitScript(() => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');

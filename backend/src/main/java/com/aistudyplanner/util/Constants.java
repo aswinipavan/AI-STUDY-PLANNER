@@ -9,12 +9,20 @@ public class Constants {
     public static final int DAYS_PER_WEEK = 7;
     public static final int DAYS_IN_MONTH = 30;
     public static final int DAYS_IN_YEAR = 365;
-    public static final int UPCOMING_EXAMS_WINDOW_DAYS = 30;
     
     // Study time constants
     public static final int MIN_SLOT_DURATION_MINUTES = 15;
     public static final int SLOT_DURATION_ROUNDING_MINUTES = 30;
     public static final int BUFFER_BETWEEN_SLOTS_MINUTES = 10;
+
+    // Session length (minutes) per requested study style — the user's chosen pace decides how the
+    // daily study window is divided into focused sessions.
+    public static final int SESSION_MINUTES_INTENSE = 90;
+    public static final int SESSION_MINUTES_BALANCED = 60;
+    public static final int SESSION_MINUTES_RELAXED = 45;
+
+    // Default preferred study window when the student has not set one (StudyTimeWindow name).
+    public static final String DEFAULT_STUDY_WINDOW = "EVENING";
     
     // AI and API constants
     public static final int MAX_CHAT_CONTEXT_WORDS = 500;

@@ -3,27 +3,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
-import { useThemeStore } from '@/stores/themeStore';
-import { useQuery } from '@tanstack/react-query';
-import { examsApi } from '@/api/exams.api';
-import { QK } from '@/constants/queryKeys';
-import Image from 'next/image';
+import { useTheme } from '@/hooks/useTheme';
+import AvatarImage from '@/components/common/AvatarImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles, Loader2 } from 'lucide-react';
+import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 /**
  * Topbar — fixed for Issues 2, 3:
- * - Theme toggle now calls themeStore.setTheme(), which ThemeApplier bridges to the DOM
+ * - Theme toggle flips whichever theme is actually showing (see useTheme)
  * - Bell button shows upcoming exams & smart academic notifications dropdown
  * - Avatar now has click dropdown: Settings + Logout
  */
 export function Topbar() {
   const { toggleSidebar } = useUIStore();
   const { user, clearAuth } = useAuthStore();
-  const { theme, setTheme } = useThemeStore();
+  const { toggleTheme } = useTheme();
   const router = useRouter();
 
   const [showBell, setShowBell] = useState(false);
@@ -32,18 +29,10 @@ export function Topbar() {
   const avatarRef = useRef<HTMLDivElement>(null);
 
   // Backend health gate — prevent API calls while Render is cold-starting
-  const { isReady, isWaking } = useBackendHealth();
+  const { isWaking } = useBackendHealth();
 
   // Fetch smart academic notifications (gated by backend health)
   const { data: notifications, isLoading: notifLoading } = useNotifications();
-
-  // Fetch upcoming exams for notification fallback (also gated)
-  const { data: upcomingExams = [] } = useQuery({
-    queryKey: QK.exams,
-    queryFn: examsApi.getUpcoming,
-    staleTime: 5 * 60 * 1000,
-    enabled: isReady,
-  });
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -58,10 +47,6 @@ export function Topbar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const isDark = theme === 'dark';
-  const daysUntil = (d: string) => Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
-  const urgentExams = upcomingExams.filter(e => daysUntil(e.examDate) <= 7);
 
   const handleLogout = async () => {
     setShowAvatar(false);
@@ -84,15 +69,19 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center space-x-2">
-        {/* Theme Toggle */}
+        {/* Theme Toggle — which icon shows is decided by CSS from the `.dark`
+            class the pre-paint script sets, so it is right on the first frame
+            and stays right when "system" is selected. Doing it from React state
+            meant the server and the browser rendered different icons. */}
         <button
           id="topbar-theme-toggle"
-          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          onClick={toggleTheme}
           className="rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors"
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={isDark ? 'Light mode' : 'Dark mode'}
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode"
         >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          <Moon size={20} className="dark:hidden" aria-hidden="true" />
+          <Sun size={20} className="hidden dark:block" aria-hidden="true" />
         </button>
 
         {/* Notifications Bell */}
@@ -189,7 +178,13 @@ export function Topbar() {
             aria-label="Profile menu"
           >
             {user?.photoUrl ? (
-              <Image src={user.photoUrl} alt="Profile" fill className="object-cover" unoptimized />
+              <AvatarImage
+                src={user.photoUrl}
+                alt="Profile"
+                fill
+                className="object-cover"
+                fallback={<span className="text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>}
+              />
             ) : (
               <span className="text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
             )}

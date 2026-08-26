@@ -6,10 +6,10 @@ import java.util.Properties;
 
 public class CheckDb {
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
+        String url = System.getenv("SUPABASE_DB_URL");
         Properties props = new Properties();
-        props.setProperty("user", "postgres.oxxqyisvczzklaxncgix");
-        props.setProperty("password", "aswinipavan.@database");
+        props.setProperty("user", System.getenv("SUPABASE_DB_USER"));
+        props.setProperty("password", System.getenv("SUPABASE_DB_PASSWORD"));
         try {
             System.out.println("Attempting to connect to database...");
             Connection conn = DriverManager.getConnection(url, props);

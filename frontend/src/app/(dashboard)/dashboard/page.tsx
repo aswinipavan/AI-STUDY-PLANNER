@@ -12,6 +12,7 @@ import { usePriority } from '@/hooks/usePerformance';
 import { useQuery } from '@tanstack/react-query';
 import { timetableApi } from '@/api/timetable.api';
 import { QK } from '@/constants/queryKeys';
+import { dayKey, slotDayKey, mondayBasedIndex } from '@/utils/dateHelpers';
 import {
   Sparkles, Clock, CheckCircle2, CalendarDays, ArrowRight,
   BookOpen, Brain, Zap, Target, TrendingUp, MessageSquare, LucideIcon
@@ -94,11 +95,20 @@ export default function DashboardPage() {
   // Compute real stats from API data
   const examsCount = exams?.length ?? 0;
 
-  const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' });
-  const todayIndex = (new Date().getDay() + 6) % 7; // Mon=0 .. Sun=6
-  const todaySlots = timetable?.slots?.filter(
-    (s) => (s.date && new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) === todayKey) || s.dayOfWeek === todayIndex
-  ) ?? [];
+  /**
+   * "Today" means today's *calendar date*, not merely today's weekday. Matching on
+   * the weekday label pulled in every same-weekday session from the other weeks of
+   * a multi-week plan, so the panel listed sessions the student has no reason to do
+   * today and `completedToday` counted them too. Only a slot with no date at all
+   * falls back to its weekday index.
+   */
+  const today = new Date();
+  const todayIso = dayKey(today);
+  const todayIndex = mondayBasedIndex(today);
+  const todaySlots = timetable?.slots?.filter((s) => {
+    const iso = slotDayKey(s.date);
+    return iso ? iso === todayIso : s.dayOfWeek === todayIndex;
+  }) ?? [];
   const completedToday = todaySlots.filter((s) => s.status === 'completed').length;
 
   // Total completed slots across entire timetable
@@ -268,7 +278,10 @@ export default function DashboardPage() {
                     style={{ color: slot.status === 'completed' ? '#34d399' : '#555' }}
                   />
                   <div>
-                    <p className={styles.recItemTitle}>{slot.subject?.name ?? 'Study Session'}</p>
+                    <p className={styles.recItemTitle}>{slot.subject?.name || 'Study Session'}</p>
+                    {slot.topic && (
+                      <p className={styles.recItemTopic} title={slot.topic}>{slot.topic}</p>
+                    )}
                     <p className={styles.recItemTopic}>
                       {new Date(`1970-01-01T${slot.startTime}`).toLocaleTimeString([], {
                         hour: '2-digit', minute: '2-digit',

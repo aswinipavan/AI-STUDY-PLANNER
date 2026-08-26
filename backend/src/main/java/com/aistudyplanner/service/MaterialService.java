@@ -15,7 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +46,142 @@ public class MaterialService {
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
     private final GroqService groqService;
+    private final StorageService storageService;
     private final com.aistudyplanner.service.nlp.DocumentIntelligenceService documentIntelligenceService;
+
+    /**
+     * Upload a study material file and persist its metadata in a single call.
+     *
+     * <p>The bytes are handed to {@link StorageService}, which stores them on Supabase Storage
+     * (production) or the local filesystem (local/offline) and returns a URL. This replaces the old
+     * three-step flow (get signed URL → browser PUT to Supabase → save metadata), which failed with
+     * HTTP 400 locally because no Supabase Storage backend is configured.
+     */
+    @Transactional
+    public MaterialResponse uploadMaterial(UUID studentId, MultipartFile file, String title,
+                                           UUID subjectId, String textPreview) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is required");
+        }
+        long fileSizeBytes = file.getSize();
+        if (fileSizeBytes > com.aistudyplanner.util.Constants.MAX_FILE_SIZE_BYTES) {
+            throw new IllegalArgumentException("File size exceeds maximum allowed size of 50MB");
+        }
+
+        String originalName = file.getOriginalFilename() != null && !file.getOriginalFilename().isBlank()
+                ? file.getOriginalFilename() : "file";
+        // Preserve the original flow's semantics: fileType is the browser-reported MIME type.
+        String fileType = resolveContentType(file.getContentType(), originalName);
+        if (!isAllowedFileType(fileType)) {
+            throw new IllegalArgumentException("File type not allowed. Allowed: PDF, JPG, JPEG, PNG, WEBP, DOCX, XLS, XLSX, TXT, ZIP");
+        }
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        Subject subject = null;
+        if (subjectId != null) {
+            subject = subjectRepository.findById(subjectId).orElse(null);
+        }
+
+        // Store the bytes and get a persistable URL.
+        String safeName = sanitizeFileName(originalName);
+        String objectPath = studentId + "/" + System.currentTimeMillis() + "_" + safeName;
+        byte[] bytes;
+        try {
+            bytes = file.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read uploaded file: " + e.getMessage(), e);
+        }
+        String fileUrl = storageService.upload("materials", objectPath, bytes, fileType);
+
+        com.aistudyplanner.model.MaterialType resolvedType = resolveMaterialType(fileType);
+
+        Material material = Material.builder()
+                .student(student)
+                .subject(subject)
+                .title(title != null && !title.isBlank() ? title : originalName)
+                .fileName(originalName)
+                .fileUrl(fileUrl)
+                .fileType(fileType)
+                .fileSizeBytes(fileSizeBytes)
+                .materialType(resolvedType)
+                .processingStatus(com.aistudyplanner.model.ProcessingStatus.PENDING)
+                .build();
+
+        material = materialRepository.save(material);
+
+        // Trigger comprehensive document intelligence pipeline once this upload is committed.
+        dispatchProcessingAfterCommit(material.getId(), textPreview);
+
+        return toMaterialResponse(material);
+    }
+
+    /**
+     * Hand the material to the async NLP pipeline, but only once the surrounding write
+     * transaction has actually committed.
+     *
+     * <p>Previously each caller invoked {@code processMaterialAsync} inline. Because every
+     * caller is {@code @Transactional}, the {@code @Async} executor picked the task up on
+     * another thread while the inserting transaction was still open, so its own transaction
+     * could not see the new row: it logged "Material not found for processing" and returned,
+     * leaving {@code processingStatus} stuck on PENDING forever. Deferring the dispatch to
+     * {@code afterCommit} guarantees the row is visible to the worker thread.
+     *
+     * <p>When no transaction is active (direct service call, tests) there is nothing to wait
+     * for, so the task is dispatched immediately.
+     */
+    private void dispatchProcessingAfterCommit(UUID materialId, String textPreview) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    documentIntelligenceService.processMaterialAsync(materialId, textPreview);
+                }
+            });
+        } else {
+            documentIntelligenceService.processMaterialAsync(materialId, textPreview);
+        }
+    }
+
+    /** Derive a MaterialType from a MIME type / extension string. */
+    private com.aistudyplanner.model.MaterialType resolveMaterialType(String fileType) {
+        String lower = fileType != null ? fileType.toLowerCase() : "";
+        if (lower.contains("pdf")) {
+            return com.aistudyplanner.model.MaterialType.PDF;
+        } else if (lower.contains("image") || lower.contains("jpg") || lower.contains("jpeg")
+                || lower.contains("png") || lower.contains("webp")) {
+            return com.aistudyplanner.model.MaterialType.IMAGE;
+        } else if (lower.contains("doc") || lower.contains("word")) {
+            return com.aistudyplanner.model.MaterialType.DOCX;
+        }
+        return com.aistudyplanner.model.MaterialType.NOTES;
+    }
+
+    /** Fall back to an extension-derived MIME type when the browser sends none. */
+    private String resolveContentType(String contentType, String fileName) {
+        if (contentType != null && !contentType.isBlank()) {
+            return contentType;
+        }
+        String lower = fileName.toLowerCase();
+        if (lower.endsWith(".pdf")) return "application/pdf";
+        if (lower.endsWith(".png")) return "image/png";
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+        if (lower.endsWith(".webp")) return "image/webp";
+        if (lower.endsWith(".gif")) return "image/gif";
+        if (lower.endsWith(".txt")) return "text/plain";
+        if (lower.endsWith(".docx") || lower.endsWith(".doc")) return "application/msword";
+        if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) return "application/vnd.ms-excel";
+        if (lower.endsWith(".zip")) return "application/zip";
+        return "application/octet-stream";
+    }
+
+    /** Strip characters that would be awkward in a stored path / URL, keeping the extension. */
+    private String sanitizeFileName(String name) {
+        String cleaned = name.replaceAll("[^a-zA-Z0-9._-]", "_");
+        // Avoid absurdly long names.
+        return cleaned.length() > 120 ? cleaned.substring(cleaned.length() - 120) : cleaned;
+    }
 
     @Transactional
     public MaterialResponse saveMaterialMetadata(UUID studentId, MaterialUploadRequest request,
@@ -94,8 +233,8 @@ public class MaterialService {
 
         material = materialRepository.save(material);
 
-        // Trigger comprehensive document intelligence pipeline asynchronously
-        documentIntelligenceService.processMaterialAsync(material.getId(), request.getTextPreview());
+        // Trigger comprehensive document intelligence pipeline once this insert is committed.
+        dispatchProcessingAfterCommit(material.getId(), request.getTextPreview());
 
         return toMaterialResponse(material);
     }
@@ -129,7 +268,7 @@ public class MaterialService {
         material.setErrorMessage(null);
         material = materialRepository.save(material);
 
-        documentIntelligenceService.processMaterialAsync(materialId, null);
+        dispatchProcessingAfterCommit(materialId, null);
         return toMaterialResponse(material);
     }
 

@@ -1,6 +1,47 @@
 # Changelog
 
-## 2026-08-21 (Session 17 - Production API Timeout Fixes)
+## 2026-08-23 (Session 19 - Local Data Persistence)
+- **Files changed:**
+  - `backend/start-local.cmd` [MODIFIED] — corrected stale "H2 in-memory" wording to the persistent file DB (`jdbc:h2:file:./data/studyplanner`).
+- **Reason:** Local H2 was in-memory (`jdbc:h2:mem:`) and wiped all data on every backend restart. The local profile now uses a file-based H2 database, so subjects, marks, exams, materials, timetable, chat/history and progress survive restarts; students re-attach by their real Firebase UID on re-login. Production Supabase/PostgreSQL and Firebase auth are unchanged; no app rebuild.
+- **Verification:** `LocalPersistenceVerificationTest` (1/1) + a real Spring Boot two-boot restart cycle on the file DB (data survived, seed not duplicated); `mvnw test` 128/0/0 (5 skipped), `npm test` 77/77.
+- **Impact:** Local development/demo data is durable across restarts with zero change to production behavior.
+
+## 2026-08-22 (Session 18 - Full Project Repair & AI Intelligence Master Task)
+- **Files changed:**
+  - `frontend/src/components/layout/Topbar.tsx` [MODIFIED] — Removed impure `Date.now()` during render, removed unused imports (`Loader2`, `examsApi`, `QK`), cleaned notification logic.
+  - `frontend/src/components/ui/cloud-shader.tsx` [MODIFIED] — Fixed ref update during render by moving `paramsRef.current` assignment into `useEffect`.
+  - `frontend/src/api/ai.api.ts` [MODIFIED] — Replaced `any` types with strongly typed `RawHistoryItem` and `RawSessionItem` interfaces.
+  - `frontend/src/api/chat.api.ts` [MODIFIED] — Replaced `any` types with `RawChatHistoryItem` interface.
+  - `frontend/src/api/subjects.api.ts` [MODIFIED] — Replaced `any` with `BackendSubjectResponse` and `BackendSubjectRequest` interfaces.
+  - `frontend/src/components/debug/FirebaseDebugPanel.tsx` [MODIFIED] — Replaced `any` with `unknown` and updated JSX conditional rendering to avoid type-check errors.
+  - `frontend/src/components/placeholders-and-vanish-input-demo.tsx` [MODIFIED] — Fixed unused argument with `_e`.
+  - `frontend/src/app/(dashboard)/performance/page.tsx` [MODIFIED] — Cleaned unused icon imports and unused query states.
+  - `frontend/src/app/(dashboard)/priority/page.tsx` [MODIFIED] — Cleaned unused icon imports (`AlertTriangle`, `CheckCircle`).
+  - `frontend/src/app/(dashboard)/study-together/page.tsx` [MODIFIED] — Removed unused `BookOpen` import.
+  - `frontend/src/__tests__/e2e/final_independent_qa_audit.spec.ts` [MODIFIED] — Replaced `any[]` with strongly-typed message array, changed `let` to `const`.
+  - `frontend/src/__tests__/e2e/final_production_verification.spec.ts` [MODIFIED] — Typed `uploadedMaterial` with `StudyMaterial` and `const`.
+  - `frontend/src/__tests__/e2e/interactions.spec.ts` [MODIFIED] — Simplified `beforeEach` fixture destructuring.
+  - `frontend/src/__tests__/e2e/materials.spec.ts` [MODIFIED] — Simplified `beforeEach` fixture destructuring.
+  - `frontend/src/__tests__/e2e/subjects.spec.ts` [MODIFIED] — Simplified `beforeEach` fixture destructuring.
+  - `frontend/src/__tests__/e2e/workflows.spec.ts` [MODIFIED] — Removed unused `expect` import.
+  - `frontend/src/__tests__/hooks/hooks.test.ts` [MODIFIED] — Removed unused testing-library imports.
+  - `frontend/eslint.config.mjs` [MODIFIED] — Configured global ignores for runner scripts.
+  - `backend/src/main/resources/schema-local.sql` [MODIFIED] — Added demo student seed and entity columns for immediate local offline demonstration.
+  - `backend/src/main/java/com/aistudyplanner/service/GroqService.java` [MODIFIED] — Updated default model to `openai/gpt-oss-20b` (with property fallback) and added regex cleanup for `<think>` reasoning tags.
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java` [MODIFIED] — Added topic length truncation and thinking block sanitization to prevent database length violations.
+  - `backend/start-local.cmd` [MODIFIED] — Hardened PowerShell environment injection and local profile runner.
+  - `frontend/src/lib/apiClient.ts` [MODIFIED] — Fixed infinite 401 redirect loop and page blinking by guarding against repeat redirects on `/login` and unauthenticated state.
+  - `frontend/src/app/(dashboard)/layout.tsx` [MODIFIED] — Added client-side auth guard and smooth loading state to prevent flickering.
+- **Reason:** Comprehensive system repair, fixing all ESLint errors (15 -> 0), resolving React purity and ref access issues, establishing 100% type safety, updating CI/CD, and validating backend & frontend builds.
+- **Summary:**
+  - Resolved 100% of frontend ESLint errors (0 errors).
+  - Resolved 100% of TypeScript type-check issues (`npx tsc --noEmit` exited 0).
+  - Verified 110/110 Spring Boot backend tests passing (0 failures, 0 errors).
+  - Verified 77/77 Jest frontend tests passing (11 suites).
+  - Verified Next.js 16 production build passing cleanly (24/24 routes generated).
+  - Integrated automated Frontend and Backend CI into GitHub Actions.
+- **Impact:** Production-ready state across entire frontend, backend, AI pipelines, auth filters, database migrations, and CI/CD pipelines.
 - **Files changed:**
   - `frontend/src/hooks/useBackendHealth.ts` [NEW]
   - `frontend/src/hooks/useNotifications.ts` [MODIFIED]

@@ -4,7 +4,7 @@
   height: 100%;
   position: relative;
   background: var(--color-background);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 .scrollArea {
@@ -32,7 +32,7 @@
   height: 100%;
   text-align: center;
   margin-top: 6rem;
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
 }
 
 .sparkleWrap {
@@ -48,7 +48,7 @@
 }
 
 .emptyTitle {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.5rem;
   font-weight: 500;
   color: var(--color-foreground);
@@ -66,7 +66,7 @@
 .inputContainer {
   padding: 1rem;
   background: var(--color-background);
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid var(--color-border);
 }
 
 .inputWrap {
@@ -85,9 +85,9 @@
   background: transparent;
   color: var(--color-muted-foreground);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,7 +116,7 @@
   gap: 0.75rem;
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(0, 229, 192, 0.25);
-  border-radius: 10px;
+  border-radius: var(--app-radius-md);
   padding: 0.5rem 0.75rem;
   backdrop-filter: blur(8px);
   animation: fadeIn 0.2s ease-out;
@@ -134,10 +134,12 @@
 .attachedThumbnailWrap {
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   overflow: hidden;
   position: relative;
   background: rgba(0, 0, 0, 0.3);
+  /* Stays literal: this well is a dark scrim inside `.attachedCard`, which is
+     itself hardcoded dark, so a themed hairline would be a bright edge here. */
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
@@ -205,7 +207,7 @@
   font-size: 0.6875rem;
   font-weight: 500;
   padding: 0.1rem 0.4rem;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
 }
 
 .statusUploading {
@@ -238,11 +240,11 @@
   color: var(--color-muted-foreground);
   cursor: pointer;
   padding: 0.35rem;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
   flex-shrink: 0;
 }
 .attachedRemoveBtn:hover {
@@ -255,7 +257,7 @@
   color: #00e5c0;
   background: rgba(0, 229, 192, 0.08);
   border: 1px solid rgba(0, 229, 192, 0.2);
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   padding: 0.35rem 0.65rem;
   display: flex;
   align-items: center;
@@ -268,7 +270,7 @@
   color: #f87171;
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   padding: 0.35rem 0.65rem;
   display: flex;
   align-items: center;
@@ -279,16 +281,16 @@
 .textarea {
   width: 100%;
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
   padding: 1rem 3.5rem 1rem 3.25rem;
   font-size: 0.875rem;
   color: var(--color-foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-sans), sans-serif;
   outline: none;
   resize: none;
   overflow-y: auto;
-  transition: border-color 0.2s;
+  transition: border-color var(--app-duration-base);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 .textarea:focus { border-color: var(--color-primary); }
@@ -347,9 +349,9 @@
   background: var(--color-primary);
   color: var(--color-background);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +372,7 @@
   display: flex;
   width: 100%;
   margin-bottom: 1.5rem;
-  animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.3s var(--app-ease-out) both;
 }
 
 .bubbleRowUser { justify-content: flex-end; }
@@ -403,14 +405,14 @@
 }
 .avatarBot {
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--color-border);
   color: var(--color-foreground);
 }
 
 .bubbleBox {
   position: relative;
   padding: 1rem 1.25rem;
-  border-radius: 12px;
+  border-radius: var(--app-radius-lg);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .bubbleBoxUser {
@@ -420,7 +422,7 @@
 }
 .bubbleBoxBot {
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
   color: var(--color-foreground);
   border-bottom-left-radius: 2px;
 }
@@ -441,7 +443,7 @@
 .bubbleProse pre {
   background: rgba(0,0,0,0.2);
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
   overflow-x: auto;
 }
 
@@ -453,7 +455,7 @@
   color: var(--color-muted-foreground);
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--app-duration-base);
 }
 .bubbleBox:hover .timestamp { opacity: 1; }
 .timestampUser { right: calc(100% + 0.5rem); }
@@ -462,6 +464,16 @@
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Three rules above (.attachedBar, the upload chips, .uploadErrorBanner) already
+   asked for `fadeIn`, but it was only ever declared in globals.css — and CSS
+   Modules scopes @keyframes names, so the reference compiled to a scoped name
+   that existed nowhere and those elements appeared with no fade at all.
+   Declaring it locally is what makes them actually animate. */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .actionChipsWrap {
@@ -477,16 +489,16 @@
 }
 
 .actionChip {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--app-overlay);
+  border: 1px solid var(--app-hairline-strong);
   color: var(--color-foreground);
   font-size: 0.75rem;
   font-weight: 500;
   padding: 0.3rem 0.65rem;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all var(--app-duration-base) ease;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;

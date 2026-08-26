@@ -10,41 +10,32 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
 public class CorsConfig {
 
-    @Value("${allowed.origins:*}")
+    @Value("${allowed.origins}")
     private String allowedOrigins;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        String allowedOriginsEnv = allowedOrigins;
-        List<String> origins = Arrays.asList(allowedOriginsEnv.split(","));
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .collect(Collectors.toList());
 
-        // Security: Only allow * in non-production or reject it entirely
-        if (origins.contains("*")) {
-            if ("prod".equalsIgnoreCase(System.getenv("ENVIRONMENT"))) {
-                log.warn("WARNING: CORS wildcard (*) detected in production! Using explicit Vercel domains.");
-                configuration.setAllowedOriginPatterns(List.of(
-                    "https://ai-study-planner-*.vercel.app",
-                    "https://*.vercel.app"
-                ));
-                log.info("CORS configured for Vercel domain patterns");
-            } else {
-                configuration.setAllowedOriginPatterns(List.of("*"));
-                log.warn("CORS wildcard (*) configured in non-production environment");
-            }
-        } else {
-            configuration.setAllowedOrigins(origins);
-            log.info("CORS configured for origins: {}", String.join(", ", origins));
+        if (origins.isEmpty() || origins.stream().anyMatch(origin -> origin.contains("*"))) {
+            throw new IllegalStateException("ALLOWED_ORIGINS must contain one or more explicit origins; wildcard origins are not permitted when credentials are enabled.");
         }
+        configuration.setAllowedOrigins(origins);
+        log.info("CORS configured for {} explicit origins", origins.size());
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Firebase-Token", "X-Requested-With"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 

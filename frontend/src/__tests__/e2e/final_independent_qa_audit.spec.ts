@@ -199,12 +199,16 @@ test.describe('FINAL INDEPENDENT QA AUDIT SUITE', () => {
     await expect(page.locator('input[name="name"]')).toHaveValue('Aswini Pavan Senior');
     await expect(page.locator('input[name="collegeName"]')).toHaveValue('MIT Institute of Technology');
 
-    // 5. Dark / Light theme toggle
-    const themeBtn = page.locator('#settings-theme-toggle');
-    await expect(themeBtn).toBeVisible();
-    await themeBtn.click();
+    // 5. Theme picker — Light / Dark / System (a radio group, not a two-state
+    //    button, so "follow the device setting" is reachable again)
+    const themeGroup = page.getByRole('group', { name: 'Theme' });
+    await expect(themeGroup).toBeVisible();
+    await page.locator('#settings-theme-dark').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
     await page.waitForTimeout(300);
-    await themeBtn.click();
+    await page.locator('#settings-theme-light').click();
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+    await page.locator('#settings-theme-system').click();
 
     // 6. Security password reset link trigger
     const resetPwdBtn = page.locator('#btn-settings-reset-pwd');
@@ -297,7 +301,7 @@ test.describe('FINAL INDEPENDENT QA AUDIT SUITE', () => {
       { id: 'sess-ai-102', title: 'Minimax & Alpha-Beta Pruning', createdAt: new Date().toISOString() }
     ];
 
-    const sessionMessages: Record<string, any[]> = {
+    const sessionMessages: Record<string, Array<{ id: string; role: string; message: string; content: string; createdAt: string }>> = {
       'sess-ai-101': [
         { id: 'msg-1', role: 'user', message: 'Explain A* heuristic optimality', content: 'Explain A* heuristic optimality', createdAt: new Date().toISOString() },
         { id: 'msg-2', role: 'assistant', message: 'A* is guaranteed to find an optimal path if the heuristic function h(n) is admissible (never overestimates the true cost to goal).', content: 'A* is guaranteed to find an optimal path if the heuristic function h(n) is admissible (never overestimates the true cost to goal).', createdAt: new Date().toISOString() }
@@ -374,7 +378,7 @@ test.describe('FINAL INDEPENDENT QA AUDIT SUITE', () => {
   // 5. CHAT MATERIAL UPLOAD & ACADEMIC Q&A
   // ==========================================
   test('5. CHAT MATERIAL UPLOAD: Upload PDF in Chat, NLP Pipeline Extraction & Context-Aware Q&A', async ({ page }) => {
-    let uploadedMaterialId = 'mat-ai-nlp-777';
+    const uploadedMaterialId = 'mat-ai-nlp-777';
 
     await page.route('**/api/mock-storage-upload**', async (route) => {
       await route.fulfill({ status: 200, body: 'OK' });

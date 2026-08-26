@@ -20,15 +20,24 @@ async function handleProxy(request: NextRequest, context: { params: Promise<{ pa
   }
 
   try {
+    // Read the body as an ArrayBuffer, not text(). text() decodes bytes as UTF-8, which corrupts
+    // binary payloads (PDFs, images) and destroys multipart/form-data boundaries — the root cause of
+    // the HTTP 400 upload failures. ArrayBuffer forwards the exact bytes; the original Content-Type
+    // header (including the multipart boundary) is preserved via the copied headers above.
+    const requestBody =
+      request.method !== 'GET' && request.method !== 'HEAD'
+        ? await request.arrayBuffer()
+        : undefined;
+
     const response = await fetch(url.toString(), {
       method: request.method,
       headers,
-      body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined,
+      body: requestBody,
       signal: AbortSignal.timeout(120000), // 120s — must outlive the longest client timeout (90s for AI chat)
     });
 
-    const body = await response.arrayBuffer();
-    return new NextResponse(body, {
+    const responseBody = await response.arrayBuffer();
+    return new NextResponse(responseBody, {
       status: response.status,
       headers: {
         'Content-Type': response.headers.get('Content-Type') || 'application/json',

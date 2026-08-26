@@ -1,441 +1,354 @@
 package com.aistudyplanner.service;
 
+import com.aistudyplanner.exception.AiProviderException;
+import com.aistudyplanner.exception.RateLimitException;
 import com.aistudyplanner.model.dto.response.ExamResponse;
 import com.aistudyplanner.model.entity.ChatHistory;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.aistudyplanner.service.ai.AiCompletion;
+import com.aistudyplanner.service.ai.AiProviderGateway;
+import com.aistudyplanner.service.ai.AiRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+/**
+ * Prompt-layer behaviour of {@link GroqService}, now that the HTTP transport lives in the provider
+ * package.
+ *
+ * <p>The provider gateway is mocked, so what these tests pin down is the part that must be identical
+ * for both providers: the prompt text, the truncation limits, the chat context window, and the fact
+ * that every feature reaches AI through the one gateway. Transport-level behaviour moved to
+ * {@code AgentRouterProviderTest} and {@code GroqProviderTest}.
+ */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Groq AI Service Tests - Module 2")
+@DisplayName("AI prompt service — prompts, limits and context (provider-agnostic)")
 class GroqServiceTest {
 
     @Mock
-    private RestTemplate groqRestTemplate;
-
-    @Mock
-    private ObjectMapper objectMapper;
+    private AiProviderGateway aiProviderGateway;
 
     @InjectMocks
     private GroqService groqService;
 
     private UUID testStudentId;
-    private ObjectMapper realObjectMapper;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         testStudentId = UUID.randomUUID();
-        ReflectionTestUtils.setField(groqService, "apiKey", "test-groq-api-key");
-        realObjectMapper = new ObjectMapper();
     }
 
-    // ============ Test 1: Analyze Marks Success ============
+    private void aiReturns(String text) {
+        when(aiProviderGateway.complete(any()))
+                .thenReturn(new AiCompletion(text, "AgentRouter", "claude-opus-5", 30L));
+    }
+
+    private AiRequest capturedRequest() {
+        ArgumentCaptor<AiRequest> captor = ArgumentCaptor.forClass(AiRequest.class);
+        verify(aiProviderGateway).complete(captor.capture());
+        return captor.getValue();
+    }
+
+    // ── Performance analysis ─────────────────────────────────────────────────────
+
     @Test
     @DisplayName("Should analyze student marks and return improvement suggestions")
-    void testAnalyzeMarksSuccess() throws IOException {
-        // Arrange
+    void testAnalyzeMarksSuccess() {
         Map<String, Double> subjectAverages = new HashMap<>();
         subjectAverages.put("Mathematics", 75.0);
         subjectAverages.put("Physics", 68.0);
+        aiReturns("Mathematics needs focus. Practice derivatives and integrals.");
 
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Mathematics needs focus. Practice derivatives and integrals.\"}]}}]}";
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
-
-        // Act
         String result = groqService.analyzeMarks(testStudentId, subjectAverages);
 
-        // Assert
         assertThat(result).isNotNull().isNotEmpty();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        verify(aiProviderGateway, times(1)).complete(any());
+
+        AiRequest request = capturedRequest();
+        assertThat(request.purpose()).isEqualTo("analyze-marks");
+        // The marks themselves must reach the provider, not a summary of them.
+        assertThat(request.prompt()).contains("Mathematics", "Physics", "75.0", "68.0");
     }
 
-    // ============ Test 2: Analyze Marks API Failure ============
     @Test
-    @DisplayName("Should handle API failure and return fallback message")
-    void testAnalyzeMarksAPIFailure() {
-        // Arrange
-        Map<String, Double> subjectAverages = new HashMap<>();
-        subjectAverages.put("Chemistry", 80.0);
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(new RuntimeException("Connection failed"));
+    @DisplayName("Should surface AI failures instead of inventing an AI response")
+    void testAnalyzeMarksAiFailure() {
+        Map<String, Double> subjectAverages = Collections.singletonMap("Chemistry", 80.0);
+        when(aiProviderGateway.complete(any()))
+                .thenThrow(new AiProviderException("AI service temporarily unavailable"));
 
-        // Act
-        String result = groqService.analyzeMarks(testStudentId, subjectAverages);
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
+        assertThatThrownBy(() -> groqService.analyzeMarks(testStudentId, subjectAverages))
+                .isInstanceOf(AiProviderException.class);
     }
 
-    // ============ Test 3: Analyze Marks Empty Subjects ============
+    @Test
+    @DisplayName("Should propagate a rate-limited chain as a rate-limit error, not a generic outage")
+    void testRateLimitPropagates() {
+        Map<String, Double> marks = Collections.singletonMap("Math", 80.0);
+        when(aiProviderGateway.complete(any())).thenThrow(new RateLimitException("AI is busy right now."));
+
+        assertThatThrownBy(() -> groqService.analyzeMarks(testStudentId, marks))
+                .isInstanceOf(RateLimitException.class);
+    }
+
     @Test
     @DisplayName("Should handle empty subject averages gracefully")
-    void testAnalyzeMarksEmptySubjects() throws IOException {
-        // Arrange
-        Map<String, Double> emptyAverages = new HashMap<>();
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"No subjects provided\"}]}}]}";
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+    void testAnalyzeMarksEmptySubjects() {
+        aiReturns("No subjects provided");
 
-        // Act
-        String result = groqService.analyzeMarks(testStudentId, emptyAverages);
-
-        // Assert
-        assertThat(result).isNotNull();
+        assertThat(groqService.analyzeMarks(testStudentId, new HashMap<>())).isNotNull();
     }
 
-    // ============ Test 4: Chat Success ============
+    // ── Chat ─────────────────────────────────────────────────────────────────────
+
     @Test
     @DisplayName("Should generate chat response for student questions")
-    void testChatSuccess() throws IOException {
-        // Arrange
-        List<ChatHistory> history = new ArrayList<>();
-        String userMessage = "How does photosynthesis work?";
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Photosynthesis converts light energy into chemical energy through chlorophyll.\"}]}}]}";
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+    void testChatSuccess() {
+        aiReturns("Photosynthesis converts light energy into chemical energy through chlorophyll.");
 
-        // Act
-        String result = groqService.chat(userMessage, history);
+        String result = groqService.chat("How does photosynthesis work?", new ArrayList<>());
 
-        // Assert
         assertThat(result).isNotNull().isNotEmpty().contains("energy");
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        verify(aiProviderGateway, times(1)).complete(any());
+        assertThat(capturedRequest().purpose()).isEqualTo("chat");
+        assertThat(capturedRequest().prompt()).contains("How does photosynthesis work?");
     }
 
-    // ============ Test 5: Chat Context Limiting ============
     @Test
     @DisplayName("Should limit context window to avoid token overflow")
-    void testChatContextLimiting() throws IOException {
-        // Arrange - Create 50 history items to test context window limiting
+    void testChatContextLimiting() {
         List<ChatHistory> history = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
             ChatHistory h = new ChatHistory();
             h.setRole("user");
-            h.setMessage("This is a long conversation message number " + i + " with lots of content to fill the context");
+            h.setMessage("This is a long conversation message number " + i
+                    + " with lots of content to fill the context");
             history.add(h);
         }
+        aiReturns("Context limited response");
 
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Context limited response\"}]}}]}";
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+        groqService.chat("What about this?", history);
 
-        // Act
-        String result = groqService.chat("What about this?", history);
-
-        // Assert
-        assertThat(result).isNotNull();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        // ~500 words of history plus the framing preamble. The cap is what keeps a long conversation
+        // from blowing either provider's context window, so it must survive the refactor.
+        int words = capturedRequest().prompt().split("\\s+").length;
+        assertThat(words).isLessThan(700);
+        assertThat(capturedRequest().prompt()).contains("Previous conversation:");
     }
 
-    // ============ Test 6: Chat Empty History ============
     @Test
     @DisplayName("Should handle chat with empty history")
-    void testChatEmptyHistory() throws IOException {
-        // Arrange
-        String userMessage = "What is calculus?";
-        List<ChatHistory> emptyHistory = new ArrayList<>();
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Calculus is mathematics of change and motion.\"}]}}]}";
+    void testChatEmptyHistory() {
+        aiReturns("Calculus is mathematics of change and motion.");
 
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
-
-        // Act
-        String result = groqService.chat(userMessage, emptyHistory);
-
-        // Assert
-        assertThat(result).isNotNull();
+        assertThat(groqService.chat("What is calculus?", new ArrayList<>())).isNotNull();
+        assertThat(capturedRequest().prompt()).doesNotContain("Previous conversation:");
     }
 
-    // ============ Test 7: Topic Suggestion ============
+    @Test
+    @DisplayName("Should pass document context through to the provider verbatim")
+    void testChatIncludesDocumentContext() {
+        aiReturns("Third normal form removes transitive dependencies.");
+        String documentContext = "Material: Unit-3 Normalization.pdf\nTopics: 1NF, 2NF, 3NF, BCNF\n"
+                + "Difficulty: HARD (score 0.82)\nExtracted text: A relation is in 3NF when...";
+
+        groqService.chat("Explain 3NF", new ArrayList<>(), documentContext);
+
+        // Document grounding is only as good as what actually reaches the model, and both providers
+        // must receive the same grounding text.
+        String prompt = capturedRequest().prompt();
+        assertThat(prompt).contains(documentContext);
+        assertThat(prompt).contains("--- RELEVANT ACADEMIC MATERIAL / DOCUMENT CONTEXT ---");
+        assertThat(prompt).contains("Use the academic material context above directly");
+    }
+
+    @Test
+    @DisplayName("Should handle chat AI failure gracefully")
+    void testChatAiFailure() {
+        when(aiProviderGateway.complete(any()))
+                .thenThrow(new AiProviderException("AI service temporarily unavailable"));
+
+        assertThatThrownBy(() -> groqService.chat("How do I study better?", new ArrayList<>()))
+                .isInstanceOf(AiProviderException.class);
+    }
+
+    // ── Topic suggestions ────────────────────────────────────────────────────────
+
     @Test
     @DisplayName("Should generate topic suggestions based on performance")
-    void testGenerateTopicSuggestion() throws IOException {
-        // Arrange
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Study recursive functions and backtracking\"}]}}]}";
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+    void testGenerateTopicSuggestion() {
+        aiReturns("Study recursive functions and backtracking");
 
-        // Act
         String result = groqService.generateTopicSuggestion("Data Structures", 65.0, 90, 3);
 
-        // Assert
         assertThat(result).isNotNull().isNotEmpty();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        assertThat(capturedRequest().purpose()).isEqualTo("topic-suggestion");
+        assertThat(capturedRequest().prompt()).contains("Data Structures", "65.00", "90 minute", "3 days");
     }
 
-    // ============ Test 8: Summarize Material ============
+    @Test
+    @DisplayName("Should truncate material summaries longer than 3000 characters")
+    void testExtractTopicTruncatesSummaries() {
+        StringBuilder summaries = new StringBuilder();
+        for (int i = 0; i < 500; i++) {
+            summaries.append("Chapter ").append(i).append(" covers a topic in detail. ");
+        }
+        aiReturns("  Graph traversal  ");
+
+        String result = groqService.extractTopicFromMaterials("Algorithms", 70.0, 60, summaries.toString());
+
+        assertThat(result).isEqualTo("Graph traversal");
+        assertThat(capturedRequest().prompt()).contains("...");
+        assertThat(capturedRequest().prompt().length()).isLessThan(3400);
+    }
+
+    // ── Material summarization and categorization ────────────────────────────────
+
     @Test
     @DisplayName("Should summarize material into bullet points")
-    void testSummarizeMaterial() throws IOException {
-        // Arrange
-        String longContent = "Chapter 1 discusses quantum mechanics. It covers wave-particle duality, uncertainty principle, and superposition. " +
-                "These concepts form the basis for understanding atomic structure and behavior.";
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"- Wave-particle duality\\n- Uncertainty principle\\n- Superposition\"}]}}]}";
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+    void testSummarizeMaterial() {
+        aiReturns("- Wave-particle duality\n- Uncertainty principle\n- Superposition");
 
-        // Act
-        String result = groqService.summarizeMaterial(longContent);
+        String result = groqService.summarizeMaterial(
+                "Chapter 1 discusses quantum mechanics. It covers wave-particle duality.");
 
-        // Assert
         assertThat(result).isNotNull();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        assertThat(capturedRequest().purpose()).isEqualTo("summarize-material");
     }
 
-    // ============ Test 9: Summarize Truncates Long Content ============
     @Test
     @DisplayName("Should truncate content longer than 10000 characters")
-    void testSummarizeMaterialTruncatesLongContent() throws IOException {
-        // Arrange - Create content longer than 10000 chars
+    void testSummarizeMaterialTruncatesLongContent() {
         StringBuilder longContent = new StringBuilder();
         for (int i = 0; i < 1500; i++) {
             longContent.append("This is content block number ").append(i).append(" to test truncation. ");
         }
+        aiReturns("Summary created");
 
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Summary created\"}]}}]}";
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+        groqService.summarizeMaterial(longContent.toString());
 
-        // Act
-        String result = groqService.summarizeMaterial(longContent.toString());
-
-        // Assert
-        assertThat(result).isNotNull();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        // The document-context limits are a performance guarantee: neither provider is ever sent the
+        // whole file.
+        assertThat(longContent.length()).isGreaterThan(10000);
+        assertThat(capturedRequest().prompt().length()).isLessThan(10200);
     }
 
-    // ============ Test 10: Categorize Material ============
     @Test
-    @DisplayName("Should categorize material by subject")
-    void testCategorizeMaterial() throws IOException {
-        // Arrange
-        String fileName = "Chapter_3_Algorithms.pdf";
-        String preview = "Algorithm complexity analysis using Big O notation and sorting techniques.";
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Computer Science\"}]}}]}";
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+    @DisplayName("Should categorize material by subject and trim the answer")
+    void testCategorizeMaterial() {
+        aiReturns("  Computer Science\n");
 
-        // Act
-        String result = groqService.categorizeMaterial(fileName, preview);
+        String result = groqService.categorizeMaterial("Chapter_3_Algorithms.pdf",
+                "Algorithm complexity analysis using Big O notation.");
 
-        // Assert
-        assertThat(result).isNotNull().isNotEmpty();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        assertThat(result).isEqualTo("Computer Science");
+        assertThat(capturedRequest().purpose()).isEqualTo("categorize-material");
+        assertThat(capturedRequest().prompt()).contains("Chapter_3_Algorithms.pdf");
     }
 
-    // ============ Test 11: Categorize Material Truncates Preview ============
     @Test
     @DisplayName("Should truncate preview longer than 2000 characters")
-    void testCategorizeMaterialTruncatesPreview() throws IOException {
-        // Arrange - Create preview longer than 2000 chars
+    void testCategorizeMaterialTruncatesPreview() {
         StringBuilder longPreview = new StringBuilder();
         for (int i = 0; i < 300; i++) {
             longPreview.append("This is preview content block number ").append(i).append(". ");
         }
+        aiReturns("Mathematics");
 
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Mathematics\"}]}}]}";
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+        groqService.categorizeMaterial("math.txt", longPreview.toString());
 
-        // Act
-        String result = groqService.categorizeMaterial("math.txt", longPreview.toString());
-
-        // Assert
-        assertThat(result).isNotNull();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        assertThat(longPreview.length()).isGreaterThan(2000);
+        assertThat(capturedRequest().prompt().length()).isLessThan(2400);
     }
 
-    // ============ Test 12: Generate Exam Plan ============
     @Test
-    @DisplayName("Should generate structured exam preparation plan")
-    void testGenerateExamPlan() throws IOException {
-        // Arrange
-        String studentName = "John Doe";
+    @DisplayName("Should handle categorization AI failure")
+    void testCategorizeMaterialFailure() {
+        when(aiProviderGateway.complete(any()))
+                .thenThrow(new AiProviderException("AI service temporarily unavailable"));
+
+        assertThatThrownBy(() -> groqService.categorizeMaterial("file.pdf", "content preview"))
+                .isInstanceOf(AiProviderException.class);
+    }
+
+    @Test
+    @DisplayName("Should handle summarization AI failure")
+    void testSummarizeMaterialFailure() {
+        when(aiProviderGateway.complete(any()))
+                .thenThrow(new AiProviderException("AI service temporarily unavailable"));
+
+        assertThatThrownBy(() -> groqService.summarizeMaterial("Some material to summarize"))
+                .isInstanceOf(AiProviderException.class);
+    }
+
+    // ── Exam planning and motivation ─────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Should generate structured exam preparation plan with exam and marks context")
+    void testGenerateExamPlan() {
         List<ExamResponse> exams = new ArrayList<>();
-        ExamResponse exam1 = ExamResponse.builder()
+        exams.add(ExamResponse.builder()
                 .examName("Mathematics Final")
                 .examDate(LocalDate.of(2026, 8, 15))
                 .daysRemaining(24)
-                .build();
-        exams.add(exam1);
+                .build());
 
         Map<String, Double> averages = new HashMap<>();
         averages.put("Math", 78.0);
-        averages.put("Physics", 75.0);
+        aiReturns("Day-by-day exam plan with structured topics and revision strategy");
 
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Day-by-day exam plan with structured topics and revision strategy\"}]}}]}";
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+        String result = groqService.generateExamPlan("John Doe", exams, averages);
 
-        // Act
-        String result = groqService.generateExamPlan(studentName, exams, averages);
-
-        // Assert
         assertThat(result).isNotNull();
-        verify(groqRestTemplate, times(1)).postForObject(anyString(), any(HttpEntity.class), eq(String.class));
+        assertThat(capturedRequest().purpose()).isEqualTo("exam-plan");
+        // Student name, exams and averages all have to arrive at the provider together.
+        assertThat(capturedRequest().prompt()).contains("John Doe", "Mathematics Final", "Math", "78.0");
     }
 
-    // ============ Test 13: Get Motivational Tip Cached ============
     @Test
-    @DisplayName("Should cache motivational tips by date")
-    void testGetMotivationalTipCached() throws IOException {
-        // Arrange
-        String date = "2026-07-22";
-        String mockResponse = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Stay persistent and trust your preparation!\"}]}}]}";
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse);
-        when(objectMapper.readTree(mockResponse))
-                .thenReturn(realObjectMapper.readTree(mockResponse));
+    @DisplayName("Should request a motivational tip through the same provider chain")
+    void testGetMotivationalTip() {
+        aiReturns("Stay persistent and trust your preparation!");
 
-        // Act
-        String tip1 = groqService.getMotivationalTip(date);
-        String tip2 = groqService.getMotivationalTip(date);
+        String tip = groqService.getMotivationalTip("2026-07-22");
 
-        // Assert
-        assertThat(tip1).isNotNull();
-        assertThat(tip2).isNotNull();
-        assertThat(tip1).isEqualTo(tip2); // Should be cached
+        assertThat(tip).isEqualTo("Stay persistent and trust your preparation!");
+        assertThat(capturedRequest().purpose()).isEqualTo("motivation");
+        // Per-date caching is applied by Spring's proxy in the running app, not by this class.
+        verify(aiProviderGateway, times(1)).complete(any());
     }
 
-    // ============ Test 14: Get Motivational Tip Different Dates ============
+    // ── Provider neutrality ──────────────────────────────────────────────────────
+
     @Test
-    @DisplayName("Should generate different tips for different dates")
-    void testGetMotivationalTipDifferentDates() throws IOException {
-        // Arrange
-        String mockResponse1 = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Tip 1\"}]}}]}";
-        String mockResponse2 = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Tip 2\"}]}}]}";
+    @DisplayName("Returns the answer text only — never which provider produced it")
+    void doesNotLeakProviderIdentityToCallers() {
+        when(aiProviderGateway.complete(any()))
+                .thenReturn(new AiCompletion("A clean answer.", "Groq", "openai/gpt-oss-20b", 900L));
 
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenReturn(mockResponse1)
-                .thenReturn(mockResponse2);
-        when(objectMapper.readTree(mockResponse1))
-                .thenReturn(realObjectMapper.readTree(mockResponse1));
-        when(objectMapper.readTree(mockResponse2))
-                .thenReturn(realObjectMapper.readTree(mockResponse2));
+        String result = groqService.chat("Anything", new ArrayList<>());
 
-        // Act
-        String tip1 = groqService.getMotivationalTip("2026-07-22");
-        String tip2 = groqService.getMotivationalTip("2026-07-23");
-
-        // Assert
-        assertThat(tip1).isNotNull();
-        assertThat(tip2).isNotNull();
-    }
-
-    // ============ Test 15: Rate Limiting ============
-    @Test
-    @DisplayName("Should enforce rate limiting by returning fallback message")
-    void testRateLimitingEnforcement() {
-        // Arrange - Mock the RestTemplate to trigger rate limit check internally
-        // The service will call checkRateLimit() which throws RateLimitException
-        // However, the callGroq() catch block catches it and returns fallback
-        Map<String, Double> marks = Collections.singletonMap("Math", 80.0);
-        
-        // We'll simulate rate limiting by causing the service to hit the limit
-        // by calling it many times. Since we're testing in isolation with mocks,
-        // we instead test that the fallback message is returned on any exception
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(new RuntimeException("Rate limit"));
-
-        // Act
-        String result = groqService.analyzeMarks(testStudentId, marks);
-
-        // Assert - Service catches exceptions and returns fallback
-        assertThat(result).contains("unable to generate a response");
-    }
-
-    // ============ Test 16: Chat Failure ============
-    @Test
-    @DisplayName("Should handle chat API failure gracefully")
-    void testChatAPIFailure() {
-        // Arrange
-        String userMessage = "How do I study better?";
-        List<ChatHistory> history = new ArrayList<>();
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(new RuntimeException("Service unavailable"));
-
-        // Act
-        String result = groqService.chat(userMessage, history);
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
-    }
-
-    // ============ Test 17: Summarize Failure ============
-    @Test
-    @DisplayName("Should handle summarization API failure")
-    void testSummarizeMaterialFailure() {
-        // Arrange
-        String content = "Some material to summarize";
-        
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(new RuntimeException("API error"));
-
-        // Act
-        String result = groqService.summarizeMaterial(content);
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
-    }
-
-    // ============ Test 18: Categorize Failure ============
-    @Test
-    @DisplayName("Should handle categorization API failure")
-    void testCategorizeMaterialFailure() {
-        // Arrange
-        when(groqRestTemplate.postForObject(anyString(), any(HttpEntity.class), eq(String.class)))
-                .thenThrow(new RuntimeException("Categorization failed"));
-
-        // Act
-        String result = groqService.categorizeMaterial("file.pdf", "content preview");
-
-        // Assert
-        assertThat(result).contains("unable to generate a response");
+        // The frontend must not be able to tell AgentRouter from Groq.
+        assertThat(result).isEqualTo("A clean answer.");
+        assertThat(result).doesNotContain("Groq").doesNotContain("AgentRouter");
     }
 }

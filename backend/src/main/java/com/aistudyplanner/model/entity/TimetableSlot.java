@@ -34,6 +34,14 @@ public class TimetableSlot {
     @Column(name = "day_of_week")
     private Integer dayOfWeek; // 0=Monday, 6=Sunday
 
+    /**
+     * The concrete calendar date this slot falls on. Persisted directly so a multi-week plan keeps
+     * distinct dates — deriving date from {@code weekStartDate + dayOfWeek} collapsed every "Monday"
+     * of a 4-week plan onto the same day. Nullable for older rows generated before this column.
+     */
+    @Column(name = "slot_date")
+    private java.time.LocalDate slotDate;
+
     @Column(name = "start_time")
     private LocalTime startTime;
 

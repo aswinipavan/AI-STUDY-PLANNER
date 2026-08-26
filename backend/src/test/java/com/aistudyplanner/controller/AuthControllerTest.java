@@ -9,6 +9,7 @@ import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.config.SecurityConfig;
 import com.aistudyplanner.config.SecurityHeadersConfig;
 import com.aistudyplanner.security.FirebaseTokenFilter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,9 @@ class AuthControllerTest {
 
     @MockBean
     private StudentRepository studentRepository;
+
+    @MockBean
+    private FirebaseAuth firebaseAuth;
 
     private LoginRequest validLoginRequest;
     private AuthResponse mockAuthResponse;
@@ -125,5 +129,16 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.data.token").value("generated.jwt.token"));
 
         verify(authService, times(1)).refreshToken("valid.firebase.token");
+    }
+
+    @Test
+    @DisplayName("Should reject refresh with a missing Firebase-Token header as 400, not 500")
+    void testRefreshMissingHeaderIsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/auth/refresh")
+                .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
+
+        verify(authService, never()).refreshToken(anyString());
     }
 }

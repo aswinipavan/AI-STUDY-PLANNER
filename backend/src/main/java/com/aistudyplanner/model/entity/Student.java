@@ -50,6 +50,15 @@ public class Student {
     @Column(name = "available_hours_per_day", precision = 4, scale = 1)
     private BigDecimal availableHoursPerDay = BigDecimal.valueOf(4.0);
 
+    /**
+     * Preferred daily study window, stored as a {@link com.aistudyplanner.model.StudyTimeWindow}
+     * name (e.g. "EVENING"). Drives the start time of AI-generated timetable slots — the source of
+     * truth for scheduling instead of a hard-coded clock time.
+     */
+    @Builder.Default
+    @Column(name = "preferred_study_time", length = 20)
+    private String preferredStudyTime = "EVENING";
+
     @Builder.Default
     @Column(name = "is_premium")
     private Boolean isPremium = false;

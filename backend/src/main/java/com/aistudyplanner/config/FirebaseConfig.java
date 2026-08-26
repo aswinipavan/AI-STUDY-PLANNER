@@ -7,21 +7,32 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.context.annotation.Profile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Real Firebase Admin SDK wiring. Deliberately fails fast when the credentials are missing
+ * or malformed, so a misconfigured deployment cannot start up and silently accept traffic
+ * it can never authenticate.
+ *
+ * <p>Excluded from the {@code test} profile: a service-account private key is a production
+ * secret and is not available to CI. {@code TestFirebaseConfig} supplies stubbed
+ * {@link FirebaseApp}/{@link FirebaseAuth} beans there instead. The fail-fast contract below
+ * is untouched and still applies to every non-test profile, local included.
+ */
 @Configuration
+@Profile("!test")
 public class FirebaseConfig {
 
     @Value("${firebase.project-id}")
     private String projectId;
 
     @Value("${FIREBASE_SERVICE_ACCOUNT_JSON:}")
-    private String serviceAccountJsonBase64;
+    private String serviceAccountJson;
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
@@ -29,21 +40,28 @@ public class FirebaseConfig {
             return FirebaseApp.getInstance();
         }
 
-        InputStream credentialsStream;
-
-        if (serviceAccountJsonBase64 != null && !serviceAccountJsonBase64.isBlank()) {
-            byte[] decoded = Base64.getDecoder().decode(serviceAccountJsonBase64);
-            credentialsStream = new ByteArrayInputStream(decoded);
-        } else {
-            credentialsStream = new ClassPathResource("serviceAccountKey.json").getInputStream();
+        if (projectId == null || projectId.isBlank()) {
+            throw new IllegalStateException("Firebase is not configured: FIREBASE_PROJECT_ID is required.");
+        }
+        if (serviceAccountJson == null || serviceAccountJson.isBlank()) {
+            throw new IllegalStateException("Firebase is not configured: FIREBASE_SERVICE_ACCOUNT_JSON is required by the backend.");
         }
 
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(credentialsStream))
-                .setProjectId(projectId)
-                .build();
-
-        return FirebaseApp.initializeApp(options);
+        try {
+            String trimmed = serviceAccountJson.trim();
+            byte[] credentialBytes = trimmed.startsWith("{")
+                    ? trimmed.getBytes(StandardCharsets.UTF_8)
+                    : Base64.getDecoder().decode(trimmed);
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(credentialBytes)))
+                    .setProjectId(projectId)
+                    .build();
+            return FirebaseApp.initializeApp(options);
+        } catch (IllegalArgumentException | IOException ex) {
+            throw new IllegalStateException(
+                    "Firebase is not configured correctly: FIREBASE_SERVICE_ACCOUNT_JSON must contain valid service-account JSON or Base64-encoded JSON.",
+                    ex);
+        }
     }
 
     @Bean

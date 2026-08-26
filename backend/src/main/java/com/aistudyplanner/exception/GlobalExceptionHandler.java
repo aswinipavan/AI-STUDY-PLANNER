@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,9 +49,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler(GroqApiException.class)
-    public ResponseEntity<ApiResponse<Void>> handleGroqApi(GroqApiException ex) {
-        log.error("Groq API Error: ", ex);
+    /**
+     * One consistent, provider-agnostic AI failure. Raised only once every configured AI provider has
+     * been tried and none could answer. Which provider failed and why is in the server log, not in this
+     * response — the student sees the same message whether AgentRouter, Groq, or both went down.
+     */
+    @ExceptionHandler(AiProviderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAiProvider(AiProviderException ex) {
+        log.error("AI provider error: {}", ex.getMessage());
         return buildErrorResponse("AI service temporarily unavailable", HttpStatus.SERVICE_UNAVAILABLE);
     }
 
@@ -71,6 +79,42 @@ public class GlobalExceptionHandler {
         }
         ApiResponse<Map<String, String>> response = ApiResponse.error(errors, "Validation failed");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * A required request header being absent is a client error (a malformed request), not a server
+     * fault. Without this it fell through to the generic handler below and surfaced as HTTP 500 — e.g.
+     * {@code POST /api/auth/refresh} with no {@code Firebase-Token} header. Map it to 400 instead.
+     */
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingRequestHeader(MissingRequestHeaderException ex) {
+        log.warn("Bad request - missing header: {}", ex.getHeaderName());
+        return buildErrorResponse("Required request header '" + ex.getHeaderName() + "' is missing.",
+                HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * A request that matches no controller mapping (e.g. an unknown path) must surface as a
+     * proper 404 rather than being swallowed by the generic handler below and reported as 500.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException ex) {
+        log.warn("No handler for resource: {}", ex.getResourcePath());
+        return buildErrorResponse("The requested resource was not found.", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Same reasoning as above for the sibling case: a path that exists but was called with the
+     * wrong HTTP method is a client error (405), not an internal fault. Letting it reach the
+     * generic handler logged a full stack trace and told the caller "internal server error",
+     * which hides the actual mistake.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        log.warn("Unsupported method {} — supported: {}", ex.getMethod(), ex.getSupportedHttpMethods());
+        return buildErrorResponse(
+                "HTTP method " + ex.getMethod() + " is not supported for this endpoint.",
+                HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(Exception.class)

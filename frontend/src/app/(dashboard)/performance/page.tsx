@@ -9,13 +9,13 @@ import {
   LineChart, Line,
   ScatterChart, Scatter, ZAxis,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, Lightbulb, Medal, Sparkles, Brain, CheckCircle2, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Lightbulb, Medal, Sparkles, Brain } from 'lucide-react';
 import styles from './performance.module.css';
 
 export default function PerformancePage() {
   const { data: report, isLoading: loadingReport } = usePerformanceReport();
   const { data: priority, isLoading: loadingPriority } = usePriority();
-  const { data: readiness, isLoading: loadingReadiness } = useAcademicReadiness();
+  const { data: readiness } = useAcademicReadiness();
   const { data: aiAnalysis, isLoading: loadingAiAnalysis, refetch: runAiAnalysis } = useAiPerformanceAnalysis();
   const [showAnalysis, setShowAnalysis] = useState(false);
 

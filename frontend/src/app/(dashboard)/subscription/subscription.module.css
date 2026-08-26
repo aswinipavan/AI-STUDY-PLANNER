@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
@@ -12,13 +12,13 @@
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;
-  z-index: 50;
+  z-index: var(--app-z-toast);
   padding: 0.75rem 1.25rem;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   font-size: 0.875rem;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideIn 0.3s var(--app-ease-out);
 }
 .toastSuccess { background: #10b981; color: #fff; }
 .toastError { background: #ef4444; color: #fff; }
@@ -29,7 +29,7 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
 }
 
 .header {
@@ -43,15 +43,15 @@
   background: rgba(245, 158, 11, 0.1);
   color: #f59e0b;
   padding: 0.5rem 1rem;
-  border-radius: 9999px;
+  border-radius: var(--app-radius-pill);
   margin-bottom: 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
 }
 
 .title {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 2.5rem;
   font-weight: 600;
   color: var(--color-foreground);
@@ -73,7 +73,7 @@
   gap: 1rem;
   background: rgba(16, 185, 129, 0.05);
   border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 12px;
+  border-radius: var(--app-radius-lg);
   padding: 1.25rem;
   color: #10b981;
 }
@@ -100,12 +100,12 @@
 .planCard {
   position: relative;
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-xl);
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--app-duration-slow) var(--app-ease-spring);
 }
 .planCard:hover {
   transform: translateY(-4px);
@@ -129,14 +129,14 @@
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.25rem 1rem;
-  border-radius: 9999px;
-  font-family: var(--font-outfit), sans-serif;
+  border-radius: var(--app-radius-pill);
+  font-family: var(--font-display), sans-serif;
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
 .planName {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 0.25rem 0;
@@ -153,7 +153,7 @@
   margin-bottom: 2rem;
 }
 .priceVal {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1;
@@ -194,7 +194,7 @@
 .btnSubscribe {
   width: 100%;
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   font-weight: 600;
   font-size: 0.875rem;
   display: flex;
@@ -202,7 +202,7 @@
   justify-content: center;
   gap: 0.5rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--app-duration-base);
   border: none;
 }
 .btnPrimary {
@@ -215,11 +215,11 @@
 }
 .btnSecondary {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--color-border);
   color: var(--color-foreground);
 }
 .btnSecondary:hover:not(:disabled) {
-  background: rgba(255,255,255,0.05);
+  background: var(--app-overlay);
 }
 .btnSubscribe:disabled {
   opacity: 0.6;

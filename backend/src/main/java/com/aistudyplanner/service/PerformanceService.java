@@ -3,33 +3,48 @@ package com.aistudyplanner.service;
 import com.aistudyplanner.model.dto.response.AcademicReadinessResponse;
 import com.aistudyplanner.model.dto.response.AiPerformanceAnalysisResponse;
 import com.aistudyplanner.model.dto.response.PerformanceResponse;
+import com.aistudyplanner.model.dto.response.SubjectReadinessResponse;
 import com.aistudyplanner.model.dto.response.SubjectResponse;
+import com.aistudyplanner.model.StudyTimeWindow;
 import com.aistudyplanner.model.entity.Exam;
 import com.aistudyplanner.model.entity.PerformanceSnapshot;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.model.entity.Subject;
+import com.aistudyplanner.model.entity.TimetableSlot;
 import com.aistudyplanner.repository.*;
+import com.aistudyplanner.util.Constants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PerformanceService {
 
+    /**
+     * Neutral stand-in for a pillar that is genuinely unknowable (e.g. subject performance before any
+     * marks exist). Matches the midpoint {@link AdaptiveScheduleService} uses for an unmarked subject,
+     * so the two code paths agree instead of each inventing their own optimistic default.
+     */
+    private static final double NEUTRAL_UNKNOWN_SCORE = 50.0;
+
     private final MarksRepository marksRepository;
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
     private final PerformanceSnapshotRepository snapshotRepository;
     private final ExamRepository examRepository;
-    private final MaterialRepository materialRepository;
+    private final TimetableSlotRepository timetableSlotRepository;
+    private final AdaptiveScheduleService adaptiveScheduleService;
     private final GroqService groqService;
 
     @Transactional(readOnly = true)
@@ -105,10 +120,31 @@ public class PerformanceService {
      */
     @Transactional(readOnly = true)
     public List<SubjectResponse> getExplainablePrioritySubjects(UUID studentId) {
+        return buildPrioritySubjects(studentId, adaptiveScheduleService.getSubjectReadiness(studentId));
+    }
+
+    /**
+     * Priority scoring against an already-loaded set of adaptive signals.
+     *
+     * <p>Callers that also need the readiness pillars pass the same list in rather than letting each
+     * report re-run the adaptive queries, so one HTTP request costs one pass over the student's data.</p>
+     *
+     * @param readiness per-subject adaptive signals; the recommended daily study time and the material
+     *                  coverage / attendance reasons come from here, so they reflect the student's own
+     *                  configured hours and their real progress instead of fixed strings.
+     */
+    private List<SubjectResponse> buildPrioritySubjects(UUID studentId, List<SubjectReadinessResponse> readiness) {
         Student student = studentRepository.findById(studentId).orElseThrow();
         List<Subject> subjects = subjectRepository.findAllByStudentId(studentId);
         if (subjects == null || subjects.isEmpty()) {
             return Collections.emptyList();
+        }
+
+        Map<UUID, SubjectReadinessResponse> readinessById = new HashMap<>();
+        for (SubjectReadinessResponse r : readiness) {
+            if (r.getSubjectId() != null) {
+                readinessById.put(r.getSubjectId(), r);
+            }
         }
 
         List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(studentId);
@@ -136,6 +172,7 @@ public class PerformanceService {
         for (Subject subject : subjects) {
             Double avg = avgMap.get(subject.getId());
             Exam nextExam = nearestExamMap.get(subject.getId());
+            SubjectReadinessResponse signals = readinessById.get(subject.getId());
 
             Long daysUntilExam = null;
             LocalDate nextExamDate = null;
@@ -183,6 +220,17 @@ public class PerformanceService {
                 reasons.add(String.format("High subject complexity (Level %d/5)", diffLevel));
             }
 
+            // Real progress against the uploaded material, not a guess from how many files exist.
+            if (signals != null && signals.getTotalTopics() != null && signals.getTotalTopics() > 0) {
+                reasons.add(String.format("%d of %d material topics covered (%.0f%%)",
+                        signals.getCoveredTopics() != null ? signals.getCoveredTopics() : 0,
+                        signals.getTotalTopics(),
+                        signals.getCoveragePercent() != null ? signals.getCoveragePercent() : 0.0));
+            }
+            if (signals != null && signals.getMissedSessions() != null && signals.getMissedSessions() > 0) {
+                reasons.add(String.format("%d scheduled session(s) missed", signals.getMissedSessions()));
+            }
+
             if (streak < 3) {
                 reasons.add("Study consistency below target");
             }
@@ -191,7 +239,11 @@ public class PerformanceService {
                 reasons.add("Routine revision & syllabus maintenance");
             }
 
-            String recommendedStudyTime = totalScore >= 75 ? "2h 30m" : (totalScore >= 50 ? "1h 45m" : "1h 00m");
+            // Derived from the student's own availableHoursPerDay and this subject's share of the
+            // planner's weighting — never a fixed "2h 30m" / "1h 45m" ladder.
+            String recommendedStudyTime = signals != null && signals.getRecommendedStudyTime() != null
+                    ? signals.getRecommendedStudyTime()
+                    : defaultDailyStudyTime(student);
 
             SubjectResponse resp = SubjectResponse.builder()
                     .id(subject.getId())
@@ -218,48 +270,53 @@ public class PerformanceService {
     }
 
     /**
+     * The student's whole configured daily study allowance, used when there is no adaptive signal for a
+     * subject yet (no active plan). Capped by their chosen study window so the suggestion is one they
+     * could actually follow.
+     */
+    private String defaultDailyStudyTime(Student student) {
+        double hours = student.getAvailableHoursPerDay() != null
+                ? student.getAvailableHoursPerDay().doubleValue()
+                : Constants.DEFAULT_AVAILABLE_HOURS_PER_DAY;
+        StudyTimeWindow window = StudyTimeWindow.fromSetting(student.getPreferredStudyTime());
+        int minutes = Math.max(Constants.MIN_SLOT_DURATION_MINUTES,
+                Math.min((int) Math.round(hours * 60), window.getWindowMinutes()));
+        return AdaptiveScheduleService.formatMinutes(minutes);
+    }
+
+    /**
      * Phase 6: Academic Readiness Composite Metric
      * Calculates overall academic readiness (0-100%) and supporting pillars with AI explanation.
+     *
+     * <p>All four pillars are measured, not assumed: performance from recorded marks, exam preparation
+     * from whether material coverage is keeping pace with each exam date, consistency from real
+     * completed-vs-missed sessions, and material coverage from the topics the NLP pipeline extracted
+     * and the sessions that actually covered them.</p>
      */
     @Transactional(readOnly = true)
     public AcademicReadinessResponse getAcademicReadiness(UUID studentId) {
         Student student = studentRepository.findById(studentId).orElseThrow();
-        List<SubjectResponse> priorities = getExplainablePrioritySubjects(studentId);
+        List<SubjectReadinessResponse> readiness = adaptiveScheduleService.getSubjectReadiness(studentId);
+        List<SubjectResponse> priorities = buildPrioritySubjects(studentId, readiness);
 
-        double subjectPerformanceScore = 70.0;
-        if (!priorities.isEmpty()) {
-            double sumAvg = 0;
-            int count = 0;
-            for (SubjectResponse s : priorities) {
-                if (s.getAveragePercentage() != null) {
-                    sumAvg += s.getAveragePercentage();
-                    count++;
-                }
-            }
-            if (count > 0) {
-                subjectPerformanceScore = Math.min(100.0, Math.max(0.0, sumAvg / count));
-            }
-        }
+        double subjectPerformanceScore = averageOf(priorities, SubjectResponse::getAveragePercentage)
+                .orElse(NEUTRAL_UNKNOWN_SCORE);
+        subjectPerformanceScore = clamp(subjectPerformanceScore, 0.0, 100.0);
 
-        // Exam prep pillar
-        List<Exam> upcomingExams = examRepository.findUpcomingExams(studentId, LocalDate.now());
-        double examPreparationScore = 80.0;
-        if (!upcomingExams.isEmpty()) {
-            long minDays = upcomingExams.stream()
-                    .mapToLong(e -> ChronoUnit.DAYS.between(LocalDate.now(), e.getExamDate()))
-                    .min().orElse(30);
-            if (minDays <= 3) examPreparationScore = 60.0;
-            else if (minDays <= 7) examPreparationScore = 72.0;
-            else examPreparationScore = 85.0;
-        }
+        // Material coverage: the share of extracted topics a completed session has actually covered.
+        double materialCoverageScore = clamp(
+                averageOf(readiness, SubjectReadinessResponse::getCoveragePercent).orElse(0.0), 0.0, 100.0);
 
-        // Consistency pillar
-        int streak = student.getStudyStreak() != null ? student.getStudyStreak() : 0;
-        double studyConsistencyScore = Math.min(100.0, Math.max(30.0, (streak / 7.0) * 50.0 + 50.0));
+        // Consistency: sessions attended vs. sessions that came due, per subject.
+        double studyConsistencyScore = clamp(
+                averageOf(readiness, SubjectReadinessResponse::getConsistencyPercent)
+                        .orElseGet(() -> streakConsistency(student)), 0.0, 100.0);
 
-        // Material coverage pillar
-        var materials = materialRepository.findAllByStudentIdOrderByCreatedAtDesc(studentId);
-        double materialCoverageScore = Math.min(100.0, Math.max(40.0, (materials.size() * 15.0) + 40.0));
+        // Exam preparation: pace against each upcoming exam. With no exam on the calendar there is
+        // nothing to be prepared for, so coverage of the syllabus stands in.
+        double examPreparationScore = clamp(
+                averageOf(readiness, SubjectReadinessResponse::getExamPreparedness).orElse(materialCoverageScore),
+                0.0, 100.0);
 
         double overallReadiness = Math.round((subjectPerformanceScore * 0.35) +
                                              (examPreparationScore * 0.25) +
@@ -294,8 +351,10 @@ public class PerformanceService {
      */
     @Transactional(readOnly = true)
     public AiPerformanceAnalysisResponse getAiPerformanceAnalysis(UUID studentId) {
+        Student student = studentRepository.findById(studentId).orElseThrow();
         PerformanceResponse report = getPerformanceReport(studentId);
-        List<SubjectResponse> priorities = getExplainablePrioritySubjects(studentId);
+        List<SubjectResponse> priorities =
+                buildPrioritySubjects(studentId, adaptiveScheduleService.getSubjectReadiness(studentId));
 
         List<String> weakAreas = new ArrayList<>();
         List<String> strongAreas = new ArrayList<>();
@@ -310,7 +369,7 @@ public class PerformanceService {
         String grade = perf >= 85 ? "A (Distinction)" : (perf >= 70 ? "B (Proficient)" : (perf >= 50 ? "C (Passing)" : "D (Needs Focus)"));
 
         List<Exam> upcoming = examRepository.findUpcomingExams(studentId, LocalDate.now());
-        String examUrgency = upcoming.isEmpty() ? "No exams scheduled within the next 30 days." :
+        String examUrgency = upcoming.isEmpty() ? "No upcoming exams are scheduled." :
                 String.format("%d upcoming exams detected. Nearest is %s in %d days.",
                         upcoming.size(),
                         upcoming.get(0).getExamName() != null ? upcoming.get(0).getExamName() : "Exam",
@@ -336,7 +395,9 @@ public class PerformanceService {
                 .performanceTrend(perf >= 60 ? "Positive / Upward" : "Requires Attention")
                 .examUrgency(examUrgency)
                 .recommendedTopics(recommendedTopics)
-                .recommendedStudyDuration(priorities.isEmpty() ? "2 hours/day" : priorities.get(0).getRecommendedStudyTime())
+                .recommendedStudyDuration(priorities.isEmpty()
+                        ? defaultDailyStudyTime(student)
+                        : priorities.get(0).getRecommendedStudyTime())
                 .aiDetailedSummary(summary)
                 .build();
     }
@@ -355,16 +416,84 @@ public class PerformanceService {
         PerformanceResponse report = getPerformanceReport(studentId);
         Student student = studentRepository.findById(studentId).orElseThrow();
 
+        WeeklyStudyTotals totals = weeklyStudyTotals(studentId, LocalDate.now());
+        double overall = report.getOverallPercentage() != null ? report.getOverallPercentage() : 0.0;
+
         PerformanceSnapshot snapshot = PerformanceSnapshot.builder()
                 .student(student)
                 .snapshotDate(LocalDate.now())
-                .overallPercentage(BigDecimal.valueOf(report.getOverallPercentage()))
-                .studyHoursWeek(BigDecimal.valueOf((report.getStudyStreak() != null ? report.getStudyStreak() : 0) * student.getAvailableHoursPerDay().doubleValue()))
-                .tasksCompleted(0) 
+                .overallPercentage(BigDecimal.valueOf(overall).setScale(2, RoundingMode.HALF_UP))
+                .studyHoursWeek(totals.hours())
+                .tasksCompleted(totals.sessions())
                 .aiRecommendations(String.join(" | ", report.getRecommendations()))
                 .build();
 
         snapshotRepository.save(snapshot);
+    }
+
+    /**
+     * Study sessions the student actually completed in the seven days ending {@code today}, and the
+     * hours those sessions occupied.
+     *
+     * <p>Previously the snapshot multiplied the streak counter by the configured daily hours and stored
+     * zero completed tasks, so the history chart showed a plan rather than what happened. These numbers
+     * come from the completed slots themselves.</p>
+     */
+    private WeeklyStudyTotals weeklyStudyTotals(UUID studentId, LocalDate today) {
+        LocalDate weekStart = today.minusDays(6);
+        List<TimetableSlot> completed = timetableSlotRepository.findCompletedSlotsForStudent(studentId);
+
+        int sessions = 0;
+        long minutes = 0;
+        if (completed != null) {
+            for (TimetableSlot slot : completed) {
+                LocalDate date = slot.getSlotDate();
+                if (date == null || date.isBefore(weekStart) || date.isAfter(today)) {
+                    continue;
+                }
+                sessions++;
+                if (slot.getStartTime() != null && slot.getEndTime() != null) {
+                    minutes += Math.max(0, Duration.between(slot.getStartTime(), slot.getEndTime()).toMinutes());
+                }
+            }
+        }
+
+        BigDecimal hours = BigDecimal.valueOf(minutes)
+                .divide(BigDecimal.valueOf(60), 1, RoundingMode.HALF_UP);
+        return new WeeklyStudyTotals(sessions, hours);
+    }
+
+    /** Completed sessions and the hours they took, for one week. */
+    private record WeeklyStudyTotals(int sessions, BigDecimal hours) {
+    }
+
+    /**
+     * Mean of a nullable numeric field over a list, ignoring entries that have no value.
+     * Empty when nothing could be measured — the caller decides what an absent pillar means rather
+     * than a default being buried in the maths.
+     */
+    private static <T> OptionalDouble averageOf(List<T> items, Function<T, Double> extractor) {
+        if (items == null || items.isEmpty()) {
+            return OptionalDouble.empty();
+        }
+        return items.stream()
+                .map(extractor)
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .average();
+    }
+
+    /**
+     * Consistency when the student has no subjects to measure yet: their study streak as a share of a
+     * full week. The same fallback the adaptive planner uses, so both agree.
+     */
+    private static double streakConsistency(Student student) {
+        int streak = student.getStudyStreak() != null ? student.getStudyStreak() : 0;
+        return clamp((streak / (double) Constants.DAYS_PER_WEEK) * 100.0, 0.0, 100.0);
+    }
+
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     @Transactional(readOnly = true)

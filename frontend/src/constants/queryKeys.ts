@@ -3,6 +3,7 @@ export const QK = {
   subjects: ['subjects'] as const,
   subject: (id: string) => ['subjects', id] as const,
   timetable: ['timetable', 'active'] as const,
+  timetableInsights: ['timetable', 'insights'] as const,
   exams: ['exams', 'upcoming'] as const,
   materials: ['materials'] as const,
   chatSessions: ['chat', 'sessions'] as const,

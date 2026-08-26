@@ -29,7 +29,7 @@ public class ExamController {
 
     private final ExamService examService;
 
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     @Operation(summary = "Create an exam")
     public ResponseEntity<ApiResponse<ExamResponse>> createExam(
             @CurrentStudent Student student,
@@ -39,7 +39,7 @@ public class ExamController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Exam created successfully"));
     }
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     @Operation(summary = "Get all exams")
     public ResponseEntity<ApiResponse<List<ExamResponse>>> getAllExams(@CurrentStudent Student student) {
         log.info("Fetching all exams for student: {}", student.getId());

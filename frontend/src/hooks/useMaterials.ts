@@ -18,45 +18,35 @@ export const useMaterials = () => {
     enabled: isReady,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
+    // Document intelligence runs asynchronously on the backend, so a freshly
+    // uploaded file arrives as PENDING and its topics appear seconds later. Poll
+    // only while something is actually in flight and stop the moment everything
+    // has settled — otherwise a student watched "Processing…" until they thought
+    // to reload the page.
+    refetchInterval: (query) => {
+      const data = query.state.data as StudyMaterial[] | undefined;
+      if (!data?.length) return false;
+      const inFlight = data.some(
+        (m) => m.processingStatus === 'PENDING' || m.processingStatus === 'PROCESSING'
+      );
+      return inFlight ? 4000 : false;
+    },
   });
 };
 
 export const useUploadMaterial = () => {
   const qc = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async ({ file, title, subjectId }: UploadPayload) => {
-      // 1. Get upload URL + auth key from backend
-      const uploadInfo = await materialsApi.getUploadUrl(file.name, file.type);
-      const { uploadUrl, fileUrl, anonKey } = uploadInfo as { uploadUrl: string; fileUrl: string; anonKey?: string };
-      
-      if (!uploadUrl) {
-        throw new Error('Failed to get upload URL from server');
-      }
-
-      // 2. Direct upload to Supabase Storage with required auth headers
-      // FIXED: Supabase requires Authorization + apikey headers, otherwise returns 401
-      const uploadHeaders: Record<string, string> = {
-        'Content-Type': file.type,
-      };
-      if (anonKey) {
-        uploadHeaders['Authorization'] = `Bearer ${anonKey}`;
-        uploadHeaders['apikey'] = anonKey;
-      }
-
-      const res = await fetch(uploadUrl, {
-        method: 'PUT', 
-        body: file,
-        headers: uploadHeaders,
-      });
-      if (!res.ok) {
-        const errText = await res.text().catch(() => '');
-        throw new Error(`Failed to upload file to storage (${res.status}): ${errText}`);
-      }
-      
-      // 3. Extract text preview for text/markdown files for AI summarization
+      // Extract a text preview for text/markdown files so the backend can summarise them.
       let textPreview: string | undefined = undefined;
-      if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.json')) {
+      if (
+        file.type.startsWith('text/') ||
+        file.name.endsWith('.txt') ||
+        file.name.endsWith('.md') ||
+        file.name.endsWith('.json')
+      ) {
         try {
           const text = await file.text();
           textPreview = text.slice(0, 3000);
@@ -65,28 +55,18 @@ export const useUploadMaterial = () => {
         }
       }
 
-      // 4. Save metadata - backend expects MaterialUploadRequest format
-      let materialType = 'TXT';
-      if (file.type.includes('pdf')) materialType = 'PDF';
-      else if (file.type.includes('word') || file.type.includes('docx')) materialType = 'DOCX';
-      else if (file.type.includes('excel') || file.type.includes('spreadsheet')) materialType = 'XLSX';
-      else if (file.type.includes('zip')) materialType = 'ZIP';
-      else if (file.type.startsWith('image/')) materialType = 'IMAGE';
-
-      return materialsApi.save(
-        { 
-          title, 
-          subjectId,
-          fileName: file.name,
-          materialType,
-          textPreview,
-        } as unknown as Record<string, unknown>,
-        fileUrl,
-        file.type,
-        file.size
-      );
+      // Single multipart request: the backend stores the bytes (Supabase or local FS) and persists
+      // the metadata. Replaces the old three-step signed-URL flow that failed with HTTP 400 locally.
+      return materialsApi.upload(file, { title, subjectId, textPreview });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: QK.materials }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QK.materials });
+      // A new file means new topics to cover, so the coverage and readiness
+      // signals behind the ranking are stale. The schedule itself is only
+      // re-planned when the student asks for it — see useAdaptTimetable.
+      qc.invalidateQueries({ queryKey: QK.timetableInsights });
+      qc.invalidateQueries({ queryKey: QK.readiness });
+    },
   });
 };
 

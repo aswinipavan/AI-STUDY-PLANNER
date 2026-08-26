@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { Playfair_Display } from 'next/font/google';
 import styles from './BookOnboarding.module.css';
 import { OnboardingBackground } from './OnboardingBackground';
 import { Page1Welcome } from './pages/Page1Welcome';
@@ -32,6 +33,19 @@ import { EASE_OUT, EASE_IN } from './animationConfig';
    KEY: transform-origin is at the EDGE (left 50% or right 50%)
         NOT at center center — that is what caused the "spinning card" look
    ================================================================ */
+
+/* Display serif for the page label. Self-hosted rather than pulled from
+   fonts.googleapis.com by a CSS @import: that @import was hoisted into the app's
+   stylesheet, so every route paid a blocking round-trip for three weights of a
+   face only this overlay uses. Declaring it here means Next preloads it on the
+   onboarding route alone. */
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  style: ['italic', 'normal'],
+  display: 'swap',
+  variable: '--font-book',
+});
 
 const TOTAL_PAGES = 5;
 const FLIP_MS     = 760;  // ms — animation duration
@@ -198,7 +212,7 @@ export function BookOnboarding({ onComplete, onSkip }: Props) {
   if (prefersReduced) {
     return (
       <motion.div
-        className={styles.overlay}
+        className={`${styles.overlay} ${playfair.variable}`}
         variants={overlayVariants}
         initial="hidden" animate="visible" exit="exit"
         role="dialog" aria-modal="true"
@@ -230,7 +244,7 @@ export function BookOnboarding({ onComplete, onSkip }: Props) {
   /* ── Full 3D Book Page Flip ─────────────────────────────── */
   return (
     <motion.div
-      className={styles.overlay}
+      className={`${styles.overlay} ${playfair.variable}`}
       variants={overlayVariants}
       initial="hidden" animate="visible" exit="exit"
       role="dialog" aria-modal="true"
