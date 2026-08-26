@@ -22,9 +22,9 @@ import java.time.Duration;
  *   <li><b>Supabase Storage (production):</b> when {@code supabase.url} and the service-role key are
  *       configured, bytes are PUT to Supabase using the service-role key. The key stays on the
  *       server and is never exposed to the browser. A public URL is returned.</li>
- *   <li><b>Local filesystem (local/offline):</b> when Supabase is not configured, bytes are written
- *       under {@code storage.local.dir} and served back by {@code FileController} at
- *       {@code /api/files/<bucket>/<objectPath>}.</li>
+ *   <li><b>Local filesystem (local/offline):</b> when Supabase is not configured — or when
+ *       {@code storage.backend=local} pins it — bytes are written under {@code storage.local.dir}
+ *       and served back by {@code FileController} at {@code /api/files/<bucket>/<objectPath>}.</li>
  * </ul>
  *
  * <p>This replaces the previous browser-direct-to-Supabase upload flow, which could not work in the
@@ -35,6 +35,9 @@ import java.time.Duration;
 @Slf4j
 public class StorageService {
 
+    /** Value of {@code storage.backend} that forces the local filesystem backend. */
+    private static final String LOCAL_BACKEND = "local";
+
     @Value("${supabase.url:}")
     private String supabaseUrl;
 
@@ -44,12 +47,29 @@ public class StorageService {
     @Value("${storage.local.dir:uploads}")
     private String localDir;
 
+    /**
+     * Explicit backend selection: {@code auto} (default) uses Supabase when it is configured and
+     * falls back to the local filesystem; {@code local} always uses the local filesystem.
+     *
+     * <p>The local profile pins this to {@code local}. Blanking {@code supabase.url} in
+     * {@code application-local.properties} cannot do that job: {@code SUPABASE_URL} and
+     * {@code SUPABASE_SERVICE_ROLE_KEY} in {@code backend/.env} relaxed-bind to
+     * {@code supabase.url} / {@code supabase.service-role-key}, and OS environment variables
+     * outrank profile property files — so local uploads would silently land in the production
+     * bucket. {@code .env} defines no {@code STORAGE_BACKEND}, so this key is safe from that.
+     */
+    @Value("${storage.backend:auto}")
+    private String storageBackend;
+
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(15))
             .build();
 
-    /** True when a real Supabase Storage backend is configured (production). */
+    /** True when a real Supabase Storage backend is configured and not overridden to local. */
     public boolean usesSupabase() {
+        if (LOCAL_BACKEND.equalsIgnoreCase(storageBackend == null ? null : storageBackend.trim())) {
+            return false;
+        }
         return supabaseUrl != null && !supabaseUrl.isBlank()
                 && serviceRoleKey != null && !serviceRoleKey.isBlank();
     }

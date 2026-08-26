@@ -46,6 +46,57 @@ class StorageServiceTest {
     }
 
     @Test
+    @DisplayName("storage.backend=local forces the local backend even when Supabase IS configured")
+    void localBackendOverrideBeatsSupabaseCredentials() {
+        StorageService service = new StorageService();
+        // Exactly the local-profile situation: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY come from the
+        // environment and win over application-local.properties, so the credentials really are present.
+        ReflectionTestUtils.setField(service, "supabaseUrl", "https://example.supabase.co");
+        ReflectionTestUtils.setField(service, "serviceRoleKey", "service-role-key");
+        assertThat(service.usesSupabase()).as("auto: credentials present → Supabase").isTrue();
+
+        ReflectionTestUtils.setField(service, "storageBackend", "local");
+        assertThat(service.usesSupabase()).as("pinned to local → never Supabase").isFalse();
+
+        // Case- and whitespace-tolerant, so a stray " Local" in a properties file still works.
+        ReflectionTestUtils.setField(service, "storageBackend", " LOCAL ");
+        assertThat(service.usesSupabase()).isFalse();
+    }
+
+    @Test
+    @DisplayName("storage.backend=auto (or unset) leaves credential-based selection untouched")
+    void autoBackendKeepsProductionBehaviour() {
+        StorageService service = new StorageService();
+        ReflectionTestUtils.setField(service, "supabaseUrl", "https://example.supabase.co");
+        ReflectionTestUtils.setField(service, "serviceRoleKey", "service-role-key");
+
+        // Unset (production never sets the key, so @Value's default applies)…
+        assertThat(service.usesSupabase()).isTrue();
+        // …and the explicit default value behaves identically.
+        ReflectionTestUtils.setField(service, "storageBackend", "auto");
+        assertThat(service.usesSupabase()).isTrue();
+    }
+
+    @Test
+    @DisplayName("upload() with storage.backend=local writes to disk instead of the production bucket")
+    void localBackendOverrideWritesToDisk(@TempDir Path dir) throws Exception {
+        StorageService service = new StorageService();
+        ReflectionTestUtils.setField(service, "localDir", dir.toString());
+        ReflectionTestUtils.setField(service, "supabaseUrl", "https://example.supabase.co");
+        ReflectionTestUtils.setField(service, "serviceRoleKey", "service-role-key");
+        ReflectionTestUtils.setField(service, "storageBackend", "local");
+
+        byte[] pdf = "%PDF-1.4 fake".getBytes(StandardCharsets.UTF_8);
+        String url = service.upload("materials", "student-1/notes.pdf", pdf, "application/pdf");
+
+        // No network call was attempted and the URL is the local serving path, not a Supabase URL.
+        assertThat(url).isEqualTo("/api/files/materials/student-1/notes.pdf");
+        assertThat(url).doesNotContain("supabase");
+        Path written = dir.resolve("materials").resolve("student-1").resolve("notes.pdf");
+        assertThat(Files.readAllBytes(written)).isEqualTo(pdf);
+    }
+
+    @Test
     @DisplayName("upload() writes bytes to disk and returns the /api/files serving URL")
     void uploadWritesLocallyAndReturnsServingUrl(@TempDir Path dir) throws Exception {
         StorageService service = withLocalDir(dir);
