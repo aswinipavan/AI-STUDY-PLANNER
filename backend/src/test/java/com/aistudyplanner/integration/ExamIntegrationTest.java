@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
@@ -46,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * the database rather than merely echoed by the request handler.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")
 @DisplayName("Exam creation integration — difficulty & notes round-trip (HTTP 500 regression)")
 class ExamIntegrationTest {

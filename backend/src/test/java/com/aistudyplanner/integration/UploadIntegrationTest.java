@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -50,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * mirroring the local profile where Supabase is not configured.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")
 @DisplayName("Upload chain integration (materials + avatar) — local filesystem storage")
 class UploadIntegrationTest {

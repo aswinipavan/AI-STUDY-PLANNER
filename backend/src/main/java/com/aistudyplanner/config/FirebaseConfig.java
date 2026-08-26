@@ -7,13 +7,25 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Real Firebase Admin SDK wiring. Deliberately fails fast when the credentials are missing
+ * or malformed, so a misconfigured deployment cannot start up and silently accept traffic
+ * it can never authenticate.
+ *
+ * <p>Excluded from the {@code test} profile: a service-account private key is a production
+ * secret and is not available to CI. {@code TestFirebaseConfig} supplies stubbed
+ * {@link FirebaseApp}/{@link FirebaseAuth} beans there instead. The fail-fast contract below
+ * is untouched and still applies to every non-test profile, local included.
+ */
 @Configuration
+@Profile("!test")
 public class FirebaseConfig {
 
     @Value("${firebase.project-id}")
