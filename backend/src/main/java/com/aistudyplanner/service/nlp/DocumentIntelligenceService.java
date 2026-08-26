@@ -7,6 +7,7 @@ import com.aistudyplanner.repository.ExamRepository;
 import com.aistudyplanner.repository.MarksRepository;
 import com.aistudyplanner.repository.MaterialRepository;
 import com.aistudyplanner.service.GroqService;
+import com.aistudyplanner.service.StorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -42,6 +45,7 @@ import java.util.zip.ZipInputStream;
 public class DocumentIntelligenceService {
 
     private final MaterialRepository materialRepository;
+    private final StorageService storageService;
     private final MarksRepository marksRepository;
     private final ExamRepository examRepository;
     private final GroqService groqService;
@@ -190,7 +194,7 @@ public class DocumentIntelligenceService {
 
             if (isPdf || isDocx) {
                 try {
-                    byte[] documentBytes = downloadFileBytes(material.getFileUrl());
+                    byte[] documentBytes = loadFileBytes(material.getFileUrl());
                     if (documentBytes != null && documentBytes.length > 0) {
                         String documentText = isPdf
                                 ? extractTextFromPdfBytes(documentBytes)
@@ -257,6 +261,53 @@ public class DocumentIntelligenceService {
             log.warn("DOCX text extraction failed: {}", e.getMessage());
         }
         return "";
+    }
+
+    /** Prefix of URLs produced by the local filesystem storage backend. */
+    private static final String LOCAL_FILE_PREFIX = "/api/files/";
+
+    /**
+     * Load the stored bytes for a material.
+     *
+     * <p>Locally stored files get a root-relative URL ({@code /api/files/<bucket>/<objectPath>}),
+     * which has no scheme or host, so handing it to an {@link HttpClient} throws
+     * IllegalArgumentException and yields no bytes — the NLP pipeline then silently fell back to
+     * the material title, producing one placeholder topic named after the file instead of the real
+     * chapters. Local URLs are therefore read straight off disk through {@link StorageService},
+     * which also avoids an authenticated HTTP round-trip to ourselves. Absolute URLs (Supabase in
+     * production) still go over HTTP unchanged.
+     */
+    private byte[] loadFileBytes(String urlStr) {
+        if (urlStr == null || urlStr.isBlank()) {
+            return null;
+        }
+        if (urlStr.startsWith(LOCAL_FILE_PREFIX)) {
+            return readLocalBytes(urlStr);
+        }
+        return downloadFileBytes(urlStr);
+    }
+
+    /** Read a {@code /api/files/<bucket>/<objectPath>} URL from the local storage root. */
+    private byte[] readLocalBytes(String urlStr) {
+        try {
+            String rest = urlStr.substring(LOCAL_FILE_PREFIX.length());
+            int slash = rest.indexOf('/');
+            if (slash <= 0 || slash == rest.length() - 1) {
+                log.warn("Malformed local file URL: {}", urlStr);
+                return null;
+            }
+            String bucket = rest.substring(0, slash);
+            String objectPath = rest.substring(slash + 1);
+            Path file = storageService.resolveLocal(bucket, objectPath);
+            if (file == null) {
+                log.warn("Locally stored file is missing: {}", urlStr);
+                return null;
+            }
+            return Files.readAllBytes(file);
+        } catch (Exception e) {
+            log.warn("Could not read local file {}: {}", urlStr, e.getMessage());
+            return null;
+        }
     }
 
     private byte[] downloadFileBytes(String urlStr) {

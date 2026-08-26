@@ -25,14 +25,20 @@ export const subjectsApi = {
   },
 };
 
-interface BackendSubjectResponse {
+/**
+ * The backend's `SubjectResponse`. Note `subjectName` — the frontend `Subject`
+ * type calls it `name`, so every subject crossing the API boundary (including the
+ * ones *nested* inside timetable slots) has to go through the mapper below.
+ * `studentId` is absent on nested copies, hence optional.
+ */
+export interface BackendSubjectResponse {
   id: string;
   subjectName?: string;
   name?: string;
   color?: string;
   icon?: string;
   targetHours?: number;
-  studentId: string;
+  studentId?: string;
   nextExamDate?: string;
   daysUntilExam?: number;
 }
@@ -46,14 +52,14 @@ interface BackendSubjectRequest {
 }
 
 // Map backend SubjectResponse to frontend Subject type
-function mapSubjectFromBackend(backend: BackendSubjectResponse): Subject {
+export function mapSubjectFromBackend(backend: BackendSubjectResponse): Subject {
   return {
     id: backend.id,
     name: backend.subjectName || backend.name || '',
     color: backend.color,
     icon: backend.icon,
     targetHours: backend.targetHours,
-    studentId: backend.studentId,
+    studentId: backend.studentId ?? '',
     examDate: backend.nextExamDate, // Map backend's nextExamDate to frontend's examDate
     daysUntilExam: backend.daysUntilExam,
   };

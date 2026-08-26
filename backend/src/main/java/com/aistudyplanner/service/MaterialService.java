@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -109,10 +111,37 @@ public class MaterialService {
 
         material = materialRepository.save(material);
 
-        // Trigger comprehensive document intelligence pipeline asynchronously.
-        documentIntelligenceService.processMaterialAsync(material.getId(), textPreview);
+        // Trigger comprehensive document intelligence pipeline once this upload is committed.
+        dispatchProcessingAfterCommit(material.getId(), textPreview);
 
         return toMaterialResponse(material);
+    }
+
+    /**
+     * Hand the material to the async NLP pipeline, but only once the surrounding write
+     * transaction has actually committed.
+     *
+     * <p>Previously each caller invoked {@code processMaterialAsync} inline. Because every
+     * caller is {@code @Transactional}, the {@code @Async} executor picked the task up on
+     * another thread while the inserting transaction was still open, so its own transaction
+     * could not see the new row: it logged "Material not found for processing" and returned,
+     * leaving {@code processingStatus} stuck on PENDING forever. Deferring the dispatch to
+     * {@code afterCommit} guarantees the row is visible to the worker thread.
+     *
+     * <p>When no transaction is active (direct service call, tests) there is nothing to wait
+     * for, so the task is dispatched immediately.
+     */
+    private void dispatchProcessingAfterCommit(UUID materialId, String textPreview) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    documentIntelligenceService.processMaterialAsync(materialId, textPreview);
+                }
+            });
+        } else {
+            documentIntelligenceService.processMaterialAsync(materialId, textPreview);
+        }
     }
 
     /** Derive a MaterialType from a MIME type / extension string. */
@@ -204,8 +233,8 @@ public class MaterialService {
 
         material = materialRepository.save(material);
 
-        // Trigger comprehensive document intelligence pipeline asynchronously
-        documentIntelligenceService.processMaterialAsync(material.getId(), request.getTextPreview());
+        // Trigger comprehensive document intelligence pipeline once this insert is committed.
+        dispatchProcessingAfterCommit(material.getId(), request.getTextPreview());
 
         return toMaterialResponse(material);
     }
@@ -239,7 +268,7 @@ public class MaterialService {
         material.setErrorMessage(null);
         material = materialRepository.save(material);
 
-        documentIntelligenceService.processMaterialAsync(materialId, null);
+        dispatchProcessingAfterCommit(materialId, null);
         return toMaterialResponse(material);
     }
 

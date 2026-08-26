@@ -2,17 +2,17 @@
   padding: 2rem;
   max-width: 1440px;
   margin: 0 auto;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--color-foreground);
 }
 
 .progressBlock {
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
   padding: 1.5rem;
   margin-bottom: 2rem;
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
 }
 
 .progressHeader {
@@ -29,7 +29,7 @@
 }
 
 .progressValue {
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-primary);
@@ -37,8 +37,8 @@
 
 .progressTrack {
   width: 100%;
-  background: rgba(255,255,255,0.05);
-  border-radius: 9999px;
+  background: var(--app-overlay);
+  border-radius: var(--app-radius-pill);
   height: 6px;
   overflow: hidden;
 }
@@ -46,17 +46,128 @@
 .progressFill {
   background: var(--color-primary);
   height: 100%;
-  border-radius: 9999px;
-  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: var(--app-radius-pill);
+  transition: width var(--app-duration-slower) var(--app-ease-spring);
+}
+
+/* ── Adaptive re-plan ───────────────────────────────────────────────────────
+   Explains what the planner would change and why, before it changes anything.
+   Same card shell as the progress and grid blocks so it reads as part of the
+   page rather than a bolted-on banner. */
+.adaptBlock {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
+  animation-delay: 0.05s;
+}
+
+.adaptRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.adaptIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--app-radius-md);
+  background: rgba(0, 229, 192, 0.1);
+  color: var(--color-primary);
+}
+
+.adaptIconAlert {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.adaptText {
+  /* Take the slack so the copy wraps instead of pushing the button off the row,
+     and shrink below the longest word on a phone. */
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.adaptTitle {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: var(--color-foreground);
+}
+
+.adaptSubtitle {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+/* The "why the plan changed" readout. */
+.planPanel {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--app-radius-sm);
+  background: rgba(0, 229, 192, 0.06);
+  border: 1px solid rgba(0, 229, 192, 0.2);
+  animation: fadeSlideUp var(--app-duration-slow) var(--app-ease-out) both;
+}
+
+/* Nothing moved — say so without the success colouring. */
+.planPanelQuiet {
+  background: var(--app-overlay-subtle);
+  border-color: var(--color-border);
+}
+
+.planHeading {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin: 0 0 0.5rem 0;
+}
+.planPanelQuiet .planHeading {
+  color: var(--color-muted-foreground);
+}
+
+.planSummary {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-foreground);
+  margin: 0;
+}
+
+.planChanges {
+  margin: 0.75rem 0 0 0;
+  padding-left: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+}
+
+.planMeta {
+  margin: 0.75rem 0 0 0;
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+  opacity: 0.85;
 }
 
 .gridBlock {
   background: var(--color-card);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
   padding: 1.5rem;
   overflow-x: auto;
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
   animation-delay: 0.1s;
 }
 
@@ -65,7 +176,7 @@
   grid-template-columns: repeat(7, minmax(140px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 0.75rem;
 }
 
@@ -108,10 +219,10 @@
 .slotCard {
   width: 100%;
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
   text-align: left;
   border: 1px solid transparent;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--app-duration-slow) var(--app-ease-spring);
   cursor: pointer;
   position: relative;
 }
@@ -122,13 +233,13 @@
 
 /* Status variants */
 .slotPending {
-  background: rgba(255,255,255,0.02);
-  border-color: rgba(255,255,255,0.05);
+  background: var(--app-overlay-subtle);
+  border-color: var(--color-border);
   color: var(--color-foreground);
 }
 .slotPending:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.1);
+  background: var(--app-overlay);
+  border-color: var(--color-border);
 }
 
 .slotCompleted {
@@ -142,12 +253,27 @@
 
 .slotSkipped {
   background: transparent;
-  border-color: rgba(255,255,255,0.05);
+  border-color: var(--color-border);
   color: var(--color-muted-foreground);
   opacity: 0.7;
 }
 .slotSkipped:hover {
   opacity: 1;
+}
+
+/* Pending, but its day has already passed. Previously indistinguishable from a
+   session still to come, which is exactly the one thing a student needs to see. */
+.slotMissed {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--color-foreground);
+}
+.slotMissed:hover {
+  background: rgba(245, 158, 11, 0.14);
+}
+.slotMissed .slotIcon {
+  opacity: 1;
+  color: #f59e0b;
 }
 
 .slotHeader {
@@ -161,7 +287,11 @@
   font-size: 0.75rem;
   font-weight: 600;
   margin: 0;
-  truncate: true;
+  /* `truncate: true` was here — not a CSS property, so long subject names simply
+     overflowed the card. These three lines are what that was reaching for. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .slotTopic {
@@ -179,7 +309,7 @@
 
 .slotIcon {
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--app-duration-base);
   flex-shrink: 0;
   margin-left: 0.25rem;
 }
@@ -194,7 +324,7 @@
 
 .slotTime {
   font-size: 0.75rem;
-  font-family: var(--font-outfit), sans-serif;
+  font-family: var(--font-display), sans-serif;
   opacity: 0.8;
   margin: 0;
 }
@@ -202,4 +332,38 @@
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────
+   The week grid keeps its horizontal scroll on a phone (a seven-day grid does
+   not usefully compress), but the chrome around it should not eat the viewport:
+   2rem of page padding plus 1.5rem of card padding left ~44% of a 375px screen
+   for the schedule itself. */
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .progressBlock,
+  .adaptBlock,
+  .gridBlock {
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .gridHeaders,
+  .gridColumns {
+    grid-template-columns: repeat(7, minmax(128px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .adaptRow > button {
+    /* Full-width once the row has stacked — a lone right-aligned button under
+       wrapped copy reads as unrelated to it. */
+    width: 100%;
+  }
+
+  .planPanel {
+    padding: 0.875rem 1rem;
+  }
 }

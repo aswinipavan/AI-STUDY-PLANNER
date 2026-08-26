@@ -62,7 +62,8 @@ public class TimetableServiceScenarioTest {
         objectMapper = new ObjectMapper();
         timetableService = new TimetableService(
                 timetableRepository, timetableSlotRepository, subjectRepository, marksRepository,
-                examRepository, studentRepository, materialRepository, groqService, objectMapper);
+                examRepository, studentRepository,
+                new MaterialTopicReader(materialRepository, objectMapper), groqService);
     }
 
     @Test

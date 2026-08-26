@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
@@ -95,6 +96,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException ex) {
         log.warn("No handler for resource: {}", ex.getResourcePath());
         return buildErrorResponse("The requested resource was not found.", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Same reasoning as above for the sibling case: a path that exists but was called with the
+     * wrong HTTP method is a client error (405), not an internal fault. Letting it reach the
+     * generic handler logged a full stack trace and told the caller "internal server error",
+     * which hides the actual mistake.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        log.warn("Unsupported method {} — supported: {}", ex.getMethod(), ex.getSupportedHttpMethods());
+        return buildErrorResponse(
+                "HTTP method " + ex.getMethod() + " is not supported for this endpoint.",
+                HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(Exception.class)

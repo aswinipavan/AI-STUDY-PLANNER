@@ -8,19 +8,16 @@ import com.aistudyplanner.model.dto.response.SlotResponse;
 import com.aistudyplanner.model.dto.response.TimetableResponse;
 import com.aistudyplanner.model.StudyTimeWindow;
 import com.aistudyplanner.model.entity.Exam;
-import com.aistudyplanner.model.entity.Material;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.model.entity.Subject;
 import com.aistudyplanner.model.entity.Timetable;
 import com.aistudyplanner.model.entity.TimetableSlot;
 import com.aistudyplanner.repository.ExamRepository;
 import com.aistudyplanner.repository.MarksRepository;
-import com.aistudyplanner.repository.MaterialRepository;
 import com.aistudyplanner.repository.StudentRepository;
 import com.aistudyplanner.repository.SubjectRepository;
 import com.aistudyplanner.repository.TimetableRepository;
 import com.aistudyplanner.repository.TimetableSlotRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,9 +47,8 @@ public class TimetableService {
     private final MarksRepository marksRepository;
     private final ExamRepository examRepository;
     private final StudentRepository studentRepository;
-    private final MaterialRepository materialRepository;
+    private final MaterialTopicReader materialTopicReader;
     private final GroqService groqService;
-    private final ObjectMapper objectMapper;
 
     @Transactional
     public TimetableResponse generateAiTimetable(UUID studentId, GenerateTimetableRequest request) {
@@ -122,7 +118,7 @@ public class TimetableService {
         log.info("Generating timetable from {} to {} ({} days)", startDate, endDate, actualDurationDays);
 
         // Subject weights: weaker performance + higher difficulty + nearer exams => more sessions.
-        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects, upcomingExams);
+        Map<UUID, Double> subjectWeights = calculateSubjectWeights(studentId, subjects, upcomingExams, startDate);
 
         // Revision-before-each-exam: for any exam that falls INSIDE the plan (before the last study
         // day) reserve the day before it as revision for that subject. The final exam (at the horizon
@@ -201,8 +197,12 @@ public class TimetableService {
      * Calculate weight for each subject based on performance, difficulty and exam urgency. The exam
      * list is the already-resolved upcoming exams for the selected subjects (no fixed look-ahead cap),
      * so an exam far in the future is still considered — it simply carries no urgency bonus yet.
+     *
+     * @param referenceDate the day the plan starts; exam urgency is measured from here rather than
+     *                      from "now", so a plan that starts next week weights its exams correctly
      */
-    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects, List<Exam> upcomingExams) {
+    private Map<UUID, Double> calculateSubjectWeights(UUID studentId, List<Subject> subjects,
+                                                      List<Exam> upcomingExams, LocalDate referenceDate) {
         Map<UUID, Double> subjectAverages = new HashMap<>();
         List<Object[]> avgData = marksRepository.findAveragePercentageBySubject(studentId);
         for (Object[] row : avgData) {
@@ -211,7 +211,7 @@ public class TimetableService {
 
         Map<UUID, Double> subjectWeights = new HashMap<>();
         for (Subject subject : subjects) {
-            double weight = calculateIndividualWeight(subject, subjectAverages, upcomingExams);
+            double weight = calculateIndividualWeight(subject, subjectAverages, upcomingExams, referenceDate);
             subjectWeights.put(subject.getId(), weight);
             log.debug("Subject {} weight: {}", subject.getSubjectName(), weight);
         }
@@ -223,7 +223,8 @@ public class TimetableService {
      * weight; a near exam adds an urgency bonus. There is no maximum look-ahead — a distant exam just
      * produces a large day count and therefore no bonus.
      */
-    private double calculateIndividualWeight(Subject subject, Map<UUID, Double> subjectAverages, List<Exam> upcomingExams) {
+    private double calculateIndividualWeight(Subject subject, Map<UUID, Double> subjectAverages,
+                                             List<Exam> upcomingExams, LocalDate referenceDate) {
         double avg = subjectAverages.getOrDefault(subject.getId(), 50.0);
         double diffLevel = subject.getDifficultyLevel() != null ? subject.getDifficultyLevel() : com.aistudyplanner.util.Constants.DEFAULT_SUBJECT_DIFFICULTY;
         double weight = (100 - avg) + (diffLevel * 10);
@@ -231,7 +232,7 @@ public class TimetableService {
         long minDaysToExam = Long.MAX_VALUE;
         for (Exam exam : upcomingExams) {
             if (exam.getSubject() != null && exam.getSubject().getId().equals(subject.getId()) && exam.getExamDate() != null) {
-                long days = ChronoUnit.DAYS.between(LocalDate.now(), exam.getExamDate());
+                long days = ChronoUnit.DAYS.between(referenceDate, exam.getExamDate());
                 if (days < minDaysToExam) minDaysToExam = days;
             }
         }
@@ -396,38 +397,15 @@ public class TimetableService {
 
     /**
      * Read a subject's extracted material topics in their natural document order (chapter/topic
-     * sequence preserved) and format them as "Chapter - Topic" (or just the topic name). Returns an
-     * empty list when the subject has no processed material, so the caller can fall back cleanly.
+     * sequence preserved), formatted as "Chapter - Topic". Returns an empty list when the subject has
+     * no processed material, so the caller can fall back cleanly.
+     *
+     * <p>Delegates to {@link MaterialTopicReader} so the initial generator and the adaptive
+     * re-planner produce identical labels — adaptive planning matches candidate topics against the
+     * topics on completed slots, which only works while both paths format them the same way.</p>
      */
     private List<String> getOrderedTopicsForSubject(UUID studentId, UUID subjectId) {
-        List<Material> materials = materialRepository.findAllByStudentIdAndSubjectId(studentId, subjectId);
-        if (materials.isEmpty()) return Collections.emptyList();
-
-        List<String> topics = new ArrayList<>();
-        for (Material material : materials) {
-            String topicsJson = material.getExtractedTopics();
-            if (topicsJson == null || topicsJson.isBlank() || topicsJson.equals("[]")) continue;
-            try {
-                List<Map<String, Object>> parsed = objectMapper.readValue(
-                        topicsJson, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
-                for (Map<String, Object> t : parsed) {
-                    String name = t.get("name") instanceof String ? ((String) t.get("name")).trim() : null;
-                    if (name == null || name.isBlank()) continue;
-                    String chapter = t.get("chapter") instanceof String ? ((String) t.get("chapter")).trim() : null;
-                    String label;
-                    if (chapter != null && !chapter.isBlank()
-                            && !chapter.equalsIgnoreCase(name) && !chapter.equalsIgnoreCase("General")) {
-                        label = chapter + " - " + name;
-                    } else {
-                        label = name;
-                    }
-                    topics.add(label.length() > 200 ? label.substring(0, 200) : label);
-                }
-            } catch (Exception e) {
-                log.debug("Could not parse extractedTopics JSON for material {}: {}", material.getId(), e.getMessage());
-            }
-        }
-        return topics;
+        return materialTopicReader.orderedTopics(studentId, subjectId);
     }
 
     /**

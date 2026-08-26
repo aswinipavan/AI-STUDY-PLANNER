@@ -55,9 +55,8 @@ public class TimetableServiceNlpTest {
                 marksRepository,
                 examRepository,
                 studentRepository,
-                materialRepository,
-                groqService,
-                objectMapper
+                new MaterialTopicReader(materialRepository, objectMapper),
+                groqService
         );
     }
 

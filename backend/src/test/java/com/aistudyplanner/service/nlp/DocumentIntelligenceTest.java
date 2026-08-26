@@ -8,6 +8,7 @@ import com.aistudyplanner.repository.ExamRepository;
 import com.aistudyplanner.repository.MarksRepository;
 import com.aistudyplanner.repository.MaterialRepository;
 import com.aistudyplanner.service.GroqService;
+import com.aistudyplanner.service.StorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -22,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +50,8 @@ public class DocumentIntelligenceTest {
     private ExamRepository examRepository;
     @Mock
     private GroqService groqService;
+    @Mock
+    private StorageService storageService;
 
     private DocumentIntelligenceService documentIntelligenceService;
     private ObjectMapper objectMapper;
@@ -61,6 +66,7 @@ public class DocumentIntelligenceTest {
 
         documentIntelligenceService = new DocumentIntelligenceService(
                 materialRepository,
+                storageService,
                 marksRepository,
                 examRepository,
                 groqService,
@@ -183,5 +189,65 @@ public class DocumentIntelligenceTest {
         assertNotNull(material.getOverallDifficulty());
         assertTrue(material.getAiSummary().contains("Document Analysis")); // Deterministic summary fallback
         verify(materialRepository, atLeastOnce()).save(material);
+    }
+
+    /**
+     * A locally stored material carries a root-relative URL. Feeding that to an HttpClient throws,
+     * so extraction used to fall back to the material title and produce a single placeholder topic
+     * named after the file. The bytes must instead be read off disk via StorageService.
+     */
+    @Test
+    void testExtractDocumentText_ReadsLocallyStoredPdfFromDisk(@org.junit.jupiter.api.io.TempDir Path tempDir)
+            throws IOException {
+        byte[] pdfBytes;
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = new PDPage();
+            doc.addPage(page);
+            try (PDPageContentStream stream = new PDPageContentStream(doc, page)) {
+                stream.beginText();
+                stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                stream.newLineAtOffset(50, 700);
+                stream.showText("Chapter 3: Deadlock Detection and Recovery");
+                stream.endText();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            doc.save(baos);
+            pdfBytes = baos.toByteArray();
+        }
+
+        Path stored = tempDir.resolve("os-unit1-notes.pdf");
+        Files.write(stored, pdfBytes);
+
+        String objectPath = "student-uuid/1787583931496_os-unit1-notes.pdf";
+        Material material = Material.builder()
+                .id(UUID.randomUUID())
+                .title("OS Unit 1 Notes")
+                .fileName("os-unit1-notes.pdf")
+                .fileType("application/pdf")
+                .fileUrl("/api/files/materials/" + objectPath)
+                .build();
+
+        when(storageService.resolveLocal("materials", objectPath)).thenReturn(stored);
+
+        String extracted = documentIntelligenceService.extractDocumentText(material, null);
+
+        assertTrue(extracted.contains("Deadlock Detection"),
+                "expected real PDF text from disk, got: " + extracted);
+        assertNotEquals("OS Unit 1 Notes", extracted.trim(), "must not fall back to the title");
+    }
+
+    /** A local URL whose file has vanished must degrade to the fallback, not blow up. */
+    @Test
+    void testExtractDocumentText_MissingLocalFileFallsBack() {
+        Material material = Material.builder()
+                .id(UUID.randomUUID())
+                .title("Gone Notes")
+                .fileType("application/pdf")
+                .fileUrl("/api/files/materials/student-uuid/missing.pdf")
+                .build();
+
+        when(storageService.resolveLocal("materials", "student-uuid/missing.pdf")).thenReturn(null);
+
+        assertEquals("preview text", documentIntelligenceService.extractDocumentText(material, "preview text"));
     }
 }

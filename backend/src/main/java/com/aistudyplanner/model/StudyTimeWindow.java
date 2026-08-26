@@ -39,6 +39,12 @@ public enum StudyTimeWindow {
         return (int) Duration.between(startTime, endTime).toMinutes();
     }
 
+    /** Human-readable name for use in explanations shown to the student, e.g. {@code "Late night"}. */
+    public String getLabel() {
+        String lower = name().toLowerCase().replace('_', ' ');
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+    }
+
     /**
      * Resolve a stored preference into a window. Accepts either the enum name ("EVENING") that the
      * Settings UI now persists, or the older human label ("Evening (5 PM - 9 PM)") for resilience.
