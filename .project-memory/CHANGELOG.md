@@ -515,3 +515,19 @@
 - **Reason**: To remove backend-only secrets from frontend files and consolidate API base URL configuration to match actual source code usage.
 - **Summary**: Removed JWT_SECRET, API_BASE_URL, and NEXT_PUBLIC_API_BASE_URL from frontend environment files. Ensured NEXT_PUBLIC_BACKEND_URL is correctly configured as the sole backend connection URL.
 - **Impact**: Better security by moving secrets purely to backend configuration. Cleaned up obsolete variable clutter from frontend environments.
+
+## [2026-08-27] Study Planner Preferences & Timetable Period Timing Consistency (CRITICAL FIX)
+- **Files Modified/Created:**
+  - `frontend/src/utils/studyPeriodUtils.ts` [NEW]: Canonical calculation deriving actual study period (start time + daily target study duration = end time), with uppercase AM/PM normalization, midnight-crossing detection, and enum ↔ label mappings (`WINDOW_START_TIMES`, `WINDOW_START_LABELS`, `calcStudyPeriod`, `formatTime`).
+  - `frontend/src/__tests__/utils/studyPeriodUtils.test.ts` [NEW]: Unit test suite covering requirements A–D (1h/2h/3h/4h + EVENING), other windows (MORNING, AFTERNOON, LATE_NIGHT), midnight crossings, and backward-compat fallback (21/21 passing).
+  - `frontend/src/app/(dashboard)/settings/page.tsx` [MODIFIED]: Replaced misleading broad-range labels ("Evening (5 PM - 9 PM)") with clean start-time-only labels ("5:00 PM"). Sourced mappings directly from `studyPeriodUtils`. Added live reactive preview banner (`5:00 PM – 6:00 PM`) that updates immediately on change without needing save.
+  - `frontend/src/app/(dashboard)/settings/settings.module.css` [MODIFIED]: Added `.studyPeriodPreview`, `.studyPeriodPreviewIcon`, `.studyPeriodPreviewLabel`, `.studyPeriodPreviewValue`, and `.studyPeriodMidnightWarning` styles.
+  - `frontend/src/app/(dashboard)/timetable/generate/page.tsx` [MODIFIED]: Imported `useAuthStore` and `calcStudyPeriod`. Defaulted slider to student's saved preference. Added live study period preview under Step 2 (Hours slider) and added "Daily study window" row in Step 5 (Review).
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED]: Added daily study window banner linking to Settings when timetable is active.
+  - `frontend/src/__tests__/e2e/settings.spec.ts` [MODIFIED]: Added Playwright E2E tests for requirements A–D, start-time-only label assertions, and live preview updates without save (15/15 passing).
+  - `backend/src/test/java/com/aistudyplanner/model/StudyTimeWindowTest.java` [NEW]: Unit test suite guarding canonical start times and backward-compatible `fromSetting()` resolution for legacy labels (17/17 passing).
+  - `backend/src/test/java/com/aistudyplanner/service/TimetableStudyPeriodTest.java` [NEW]: Regression tests verifying requirements A–M (1h/2h/3h/4h start/end times, session style durations, no hard-coded 18:00, backward compatibility, and mathematical budget packing) (14/14 passing).
+- **Reason:** Resolve user ambiguity where Settings displayed "Evening (5 PM - 9 PM)" even when 1 hour/day was selected, misleading users about their actual study window. Ensure end-to-end consistency across Settings, Timetable Generator, Timetable Dashboard, and Backend scheduling.
+- **Summary:** Aligned frontend display labels and live preview with backend slot generation semantics. Verified full test suite (241 backend tests, 120 frontend tests, 15 Playwright E2E tests, Next.js build 24/24 routes).
+- **Impact:** 100% timing consistency across all surfaces with zero breaking changes to existing data models or APIs.
+

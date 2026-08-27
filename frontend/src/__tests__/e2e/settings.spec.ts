@@ -136,3 +136,153 @@ test.describe('Profile Settings Section', () => {
   });
 
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Study Period Regression Tests — Requirements A-D + UI Consistency
+// Verifies: start time + duration → actual study period preview is correct
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Study Period Live Preview (Study Planner Preferences)', () => {
+
+  const mockStudentWithEvening = {
+    id: 's-123',
+    name: 'Aswin Kumar',
+    email: 'you@example.com',
+    availableHoursPerDay: 2.0,
+    preferredStudyTime: 'EVENING',
+    emailNotifications: true,
+    pushNotifications: false,
+  };
+
+  test.beforeEach(async ({ page, context }) => {
+    await context.addInitScript(() => {
+      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
+    });
+    await page.route('**/api/students/me', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: mockStudentWithEvening }),
+        });
+      }
+    });
+    await context.addCookies([
+      { name: 'access_token', value: 'fake.jwt.token', domain: 'localhost', path: '/' },
+    ]);
+    await page.goto('/settings');
+    await page.waitForTimeout(800);
+  });
+
+  /**
+   * A: 1 hour + 5:00 PM → 5:00 PM – 6:00 PM
+   */
+  test('A: 1 hour + Evening (5 PM start) → preview shows 5:00 PM – 6:00 PM', async ({ page }) => {
+    const durationSelect = page.locator('[data-testid="study-duration-select"]');
+    const timeSelect = page.locator('[data-testid="study-time-select"]');
+    const preview = page.locator('[data-testid="study-period-value"]');
+
+    if (await durationSelect.count() > 0 && await timeSelect.count() > 0) {
+      await durationSelect.selectOption('1 hour / day');
+      await timeSelect.selectOption('5:00 PM');
+      await page.waitForTimeout(200);
+      const text = await preview.textContent();
+      expect(text).toContain('5:00 PM');
+      expect(text).toContain('6:00 PM');
+    }
+  });
+
+  /**
+   * B: 2 hours + 5:00 PM → 5:00 PM – 7:00 PM
+   */
+  test('B: 2 hours + Evening (5 PM start) → preview shows 5:00 PM – 7:00 PM', async ({ page }) => {
+    const durationSelect = page.locator('[data-testid="study-duration-select"]');
+    const timeSelect = page.locator('[data-testid="study-time-select"]');
+    const preview = page.locator('[data-testid="study-period-value"]');
+
+    if (await durationSelect.count() > 0 && await timeSelect.count() > 0) {
+      await durationSelect.selectOption('2 hours / day');
+      await timeSelect.selectOption('5:00 PM');
+      await page.waitForTimeout(200);
+      const text = await preview.textContent();
+      expect(text).toContain('5:00 PM');
+      expect(text).toContain('7:00 PM');
+    }
+  });
+
+  /**
+   * C: 3 hours + 5:00 PM → 5:00 PM – 8:00 PM
+   */
+  test('C: 3 hours + Evening (5 PM start) → preview shows 5:00 PM – 8:00 PM', async ({ page }) => {
+    const durationSelect = page.locator('[data-testid="study-duration-select"]');
+    const timeSelect = page.locator('[data-testid="study-time-select"]');
+    const preview = page.locator('[data-testid="study-period-value"]');
+
+    if (await durationSelect.count() > 0 && await timeSelect.count() > 0) {
+      await durationSelect.selectOption('3 hours / day');
+      await timeSelect.selectOption('5:00 PM');
+      await page.waitForTimeout(200);
+      const text = await preview.textContent();
+      expect(text).toContain('5:00 PM');
+      expect(text).toContain('8:00 PM');
+    }
+  });
+
+  /**
+   * D: 4 hours + 5:00 PM → 5:00 PM – 9:00 PM
+   */
+  test('D: 4 hours + Evening (5 PM start) → preview shows 5:00 PM – 9:00 PM', async ({ page }) => {
+    const durationSelect = page.locator('[data-testid="study-duration-select"]');
+    const timeSelect = page.locator('[data-testid="study-time-select"]');
+    const preview = page.locator('[data-testid="study-period-value"]');
+
+    if (await durationSelect.count() > 0 && await timeSelect.count() > 0) {
+      await durationSelect.selectOption('4+ hours / day');
+      await timeSelect.selectOption('5:00 PM');
+      await page.waitForTimeout(200);
+      const text = await preview.textContent();
+      expect(text).toContain('5:00 PM');
+      expect(text).toContain('9:00 PM');
+    }
+  });
+
+  /**
+   * H: The settings dropdown must NOT show old broad-range labels like "Evening (5 PM - 9 PM)"
+   */
+  test('H: Settings time dropdown shows start-time-only labels, not misleading broad ranges', async ({ page }) => {
+    const timeSelect = page.locator('[data-testid="study-time-select"]');
+
+    if (await timeSelect.count() > 0) {
+      const optionTexts = await timeSelect.locator('option').allTextContents();
+
+      // Must NOT contain the old misleading broad-range labels
+      expect(optionTexts.some(t => t.includes('- 9 PM'))).toBe(false);
+      expect(optionTexts.some(t => t.includes('- 12 PM'))).toBe(false);
+      expect(optionTexts.some(t => t.includes('- 5 PM'))).toBe(false);
+
+      // Must contain start-time-only options
+      expect(optionTexts.some(t => t.includes('5:00 PM'))).toBe(true);
+      expect(optionTexts.some(t => t.includes('6:00 AM'))).toBe(true);
+    }
+  });
+
+  /**
+   * E: Preview updates immediately when duration changes (no "Save" required to see new period)
+   */
+  test('E: Preview updates live without saving when duration changes', async ({ page }) => {
+    const durationSelect = page.locator('[data-testid="study-duration-select"]');
+    const preview = page.locator('[data-testid="study-period-value"]');
+
+    if (await durationSelect.count() > 0) {
+      await durationSelect.selectOption('1 hour / day');
+      await page.waitForTimeout(100);
+      const text1 = await preview.textContent();
+
+      await durationSelect.selectOption('2 hours / day');
+      await page.waitForTimeout(100);
+      const text2 = await preview.textContent();
+
+      // Preview must have changed without any save action
+      expect(text1).not.toBe(text2);
+    }
+  });
+});

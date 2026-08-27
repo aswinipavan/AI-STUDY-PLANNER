@@ -13,6 +13,8 @@ import {
   Zap, Clock, Calendar, BarChart2, Eye
 } from 'lucide-react';
 import styles from './generate.module.css';
+import { useAuthStore } from '@/stores/authStore';
+import { calcStudyPeriod, ENUM_TO_LABEL } from '@/utils/studyPeriodUtils';
 
 const STEPS = [
   { id: 1, title: 'Subjects', icon: CheckSquare },
@@ -57,10 +59,17 @@ const DURATION_DAYS: Record<string, number> = {
 export default function GenerateTimetablePage() {
   const router = useRouter();
   const { data: subjects = [] } = useSubjects();
+  const { user } = useAuthStore();
+
+  // Derive the user's saved study period so we can show it in the wizard.
+  // This mirrors how the backend TimetableService computes slot start/end times.
+  const savedWindowEnum = user?.preferredStudyTime ?? 'EVENING';
+  const savedStartLabel = ENUM_TO_LABEL[savedWindowEnum] ?? '5:00 PM';
+  const savedHoursDefault = user?.availableHoursPerDay ?? 2;
 
   const [step, setStep] = useState(1);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [hoursPerDay, setHoursPerDay] = useState(4);
+  const [hoursPerDay, setHoursPerDay] = useState(Math.round(savedHoursDefault));
   const [studyStyle, setStudyStyle] = useState('balanced');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [duration, setDuration] = useState('2 weeks');
@@ -236,6 +245,40 @@ export default function GenerateTimetablePage() {
             <div className={styles.rangeLabels}>
               <span>1h (light)</span><span>6h (standard)</span><span>12h (max)</span>
             </div>
+            {/* Study period preview — shows the actual window the timetable generator will use */}
+            {(() => {
+              const period = calcStudyPeriod(savedWindowEnum, hoursPerDay);
+              return (
+                <div style={{
+                  marginTop: '1.25rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  background: 'rgba(0, 229, 192, 0.06)',
+                  border: '1px solid rgba(0, 229, 192, 0.25)',
+                  borderLeft: '3px solid var(--color-primary)',
+                  fontSize: '0.875rem',
+                  lineHeight: 1.5,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.5rem',
+                }}
+                  data-testid="wizard-study-period-preview"
+                >
+                  <Clock size={15} style={{ marginTop: 2, flexShrink: 0, color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <span>
+                    <span style={{ color: 'var(--color-muted-foreground)' }}>
+                      Based on your saved start-time preference ({savedStartLabel}), your daily study window will be:{' '}
+                    </span>
+                    <strong data-testid="wizard-study-period-value">{period.label}</strong>
+                    {period.crossesMidnight && (
+                      <p style={{ margin: '0.375rem 0 0', fontSize: '0.8125rem', color: '#d97706' }}>
+                        ⚠ This extends past midnight. Change your start time in Settings or reduce the hours.
+                      </p>
+                    )}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -358,6 +401,13 @@ export default function GenerateTimetablePage() {
               {[
                 { label: 'Subjects', value: subjects.filter(s => selectedSubjects.includes(s.id)).map(s => s.name).join(', ') || '—' },
                 { label: 'Daily Study', value: `${hoursPerDay} hours/day` },
+                {
+                  label: 'Daily study window',
+                  value: (() => {
+                    const period = calcStudyPeriod(savedWindowEnum, hoursPerDay);
+                    return period.label + (period.crossesMidnight ? ' ⚠ crosses midnight' : '');
+                  })(),
+                },
                 { label: 'Study Style', value: studyStyle.charAt(0).toUpperCase() + studyStyle.slice(1) },
                 { label: 'Start Date', value: new Date(startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) },
                 { label: 'Plan covers', value: planHorizon.short },

@@ -1447,3 +1447,31 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - Added 429 backoff retry in `GroqService.callGroq`.
   - Verified complete flow across 13 stages with 100% passing tests.
 - **Next Recommended Task:** Deploy updated production artifacts to Vercel and Render.
+
+## 2026-08-27 (Session 20 - Study Planner Preferences & Timetable Period Timing Consistency)
+- **Task Started:** Fix Study Planner Preferences + Timetable integration timing consistency. Ensure user-selected Daily Target Study Duration and Preferred Start Time explicitly define the actual daily study period (e.g. 1 hour/day + 5 PM start -> 5:00 PM – 6:00 PM, not a broad 5 PM – 9 PM range).
+- **Task Completed:**
+  - Resolved UI ambiguity by replacing misleading broad fixed-range labels with canonical start times ("5:00 PM").
+  - Built `studyPeriodUtils.ts` containing the canonical formula: start time + daily duration = actual end time, with uppercase AM/PM formatting and midnight-crossing detection.
+  - Added live reactive study period preview banner in Settings with amber warning on midnight-crossing.
+  - Integrated study period preview in Timetable Generator Wizard (Step 2 slider & Step 5 review) and Timetable Dashboard header banner.
+  - Implemented 14 backend regression tests (`TimetableStudyPeriodTest.java`), 17 backend enum tests (`StudyTimeWindowTest.java`), 21 frontend unit tests (`studyPeriodUtils.test.ts`), and 15 Playwright E2E tests (`settings.spec.ts`).
+  - Verified all 241 backend tests and all 120 frontend tests pass with 0 failures, 0 TypeScript errors, 0 ESLint errors, and clean Next.js 24/24 route compilation.
+- **Files Modified/Created:**
+  - `frontend/src/utils/studyPeriodUtils.ts` [NEW]
+  - `frontend/src/__tests__/utils/studyPeriodUtils.test.ts` [NEW]
+  - `frontend/src/app/(dashboard)/settings/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/settings/settings.module.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/generate/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED]
+  - `frontend/src/__tests__/e2e/settings.spec.ts` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/model/StudyTimeWindowTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/service/TimetableStudyPeriodTest.java` [NEW]
+- **Problems Found:**
+  - Settings UI displayed "Evening (5 PM - 9 PM)" even when 1 hour/day duration was selected, causing user confusion.
+  - No surface in Settings or Timetable generation computed or surfaced the derived study window to the user.
+- **Solutions:**
+  - Separated the concept of preferred start time from duration in the UI while preserving the backend's existing accurate scheduling math.
+  - Created a single source-of-truth utility (`studyPeriodUtils.ts`) shared across all client pages.
+  - Added comprehensive automated regression tests across requirements A–M.
+- **Next Recommended Task:** Commit working tree and deploy updated web and backend builds.

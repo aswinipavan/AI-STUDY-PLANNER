@@ -58,6 +58,13 @@
 - [2026-08-22] Master Repair & Production Hardening:
   - Resolved 100% of ESLint errors (15 -> 0). Fixed React purity in `Topbar.tsx` (removed impure `Date.now()`) and ref access in `cloud-shader.tsx`.
   - Replaced untyped `any` annotations across `ai.api.ts`, `chat.api.ts`, `subjects.api.ts`, `FirebaseDebugPanel.tsx` with strongly-typed interfaces.
+- [2026-08-27] Study Planner Preferences & Timetable Period Timing Consistency (CRITICAL FIX):
+  - Fixed misleading Settings UI dropdown labels: replaced broad fixed-window ranges ("Evening (5 PM - 9 PM)") with canonical start times ("5:00 PM").
+  - Created `studyPeriodUtils.ts` as the canonical utility computing: start time + daily target study duration = actual daily study period.
+  - Added live reactive preview banner in Settings (`5:00 PM – 6:00 PM` for 1h/day, `5:00 PM – 7:00 PM` for 2h/day, etc.) with midnight-crossing warnings.
+  - Enhanced Timetable Generator Wizard: live study period preview in Step 2 (Hours slider) and Step 5 (Review summary).
+  - Enhanced Timetable Dashboard: added study window banner linking to Settings.
+  - Added comprehensive automated regression test suite: 14 backend `TimetableStudyPeriodTest` tests (requirements A–M), 17 backend `StudyTimeWindowTest` unit tests, 21 frontend `studyPeriodUtils.test.ts` unit tests, and 15 Playwright E2E tests in `settings.spec.ts`. All 100% passing.
   - Verified 110/110 Spring Boot backend tests passing (`mvnw test`, 0 failures, 0 errors).
   - Verified 77/77 Jest frontend tests passing (11 suites).
   - Verified Next.js 16 production build passing cleanly (24/24 routes generated, 0 type errors).

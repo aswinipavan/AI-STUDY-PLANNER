@@ -8,11 +8,11 @@
 | `/subjects` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Add/Edit/Delete with modal. Empty state shown. |
 | `/exams` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Add/Delete. Countdown timer. Empty state. |
 | `/materials` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Upload zone (drag&drop), subject filter, preview. User must upload data — correct. |
-| `/timetable` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Slot toggle (pending/completed/skipped). Optimistic updates. |
-| `/timetable/generate` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | 5-step wizard. Warns if no subjects. |
+| `/timetable` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | Slot toggle (pending/completed/skipped). Optimistic updates. Daily study window banner. |
+| `/timetable/generate` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 5-step wizard. Step 2 & 5 live study window preview. Warns if no subjects. |
 | `/performance` | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Charts from real API data. Radial, Bar, Line, Scatter charts. |
 | `/chat` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | AI study coach via Groq with PDF/Image attachment upload, local thumbnail preview, NLP document intelligence, and session history. |
-| `/settings` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Profile edit, theme toggle, notifications, + Replay Onboarding. |
+| `/settings` | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | Profile edit, theme toggle, notifications, start-time dropdown + live study period preview banner, + Replay Onboarding. |
 | Onboarding (BookOnboarding) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | 5-page 3D book-flip, particles, progress dots, skip, localStorage gate, keyboard nav. |
 | `/priority` | 80% | ✅ | ✅ | ✅ | ⭐⭐⭐ | From performance API. |
 | `/subscription` | 70% | ✅ | ✅ | ✅ | ⭐⭐⭐ | Razorpay integration. |

@@ -21,6 +21,11 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 import AvatarImage from '@/components/common/AvatarImage';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import {
+  calcStudyPeriod,
+  ENUM_TO_LABEL,
+  LABEL_TO_ENUM,
+} from '@/utils/studyPeriodUtils';
 
 const SEMESTERS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Other'];
 const DEPARTMENTS = [
@@ -30,22 +35,14 @@ const DEPARTMENTS = [
 ];
 
 const STUDY_DURATIONS = ['1 hour / day', '2 hours / day', '3 hours / day', '4+ hours / day'];
-const STUDY_TIMES = ['Morning (6 AM - 12 PM)', 'Afternoon (12 PM - 5 PM)', 'Evening (5 PM - 9 PM)', 'Late Night (9 PM - 12 AM)'];
 
-// The backend timetable generator reads these as the source of truth for WHEN to schedule study
-// sessions, so the settings labels must map cleanly to the StudyTimeWindow enum and an hours number.
-const STUDY_TIME_TO_ENUM: Record<string, string> = {
-  'Morning (6 AM - 12 PM)': 'MORNING',
-  'Afternoon (12 PM - 5 PM)': 'AFTERNOON',
-  'Evening (5 PM - 9 PM)': 'EVENING',
-  'Late Night (9 PM - 12 AM)': 'LATE_NIGHT',
-};
-const ENUM_TO_STUDY_TIME: Record<string, string> = {
-  MORNING: 'Morning (6 AM - 12 PM)',
-  AFTERNOON: 'Afternoon (12 PM - 5 PM)',
-  EVENING: 'Evening (5 PM - 9 PM)',
-  LATE_NIGHT: 'Late Night (9 PM - 12 AM)',
-};
+// Start-time-only labels — these replace the old misleading broad-range labels
+// ("Evening (5 PM - 9 PM)") with just the preferred start time ("5:00 PM").
+// The actual end time is derived live from: start + daily duration = end.
+// ENUM_TO_LABEL and LABEL_TO_ENUM are sourced from studyPeriodUtils so there is
+// ONE canonical place in the codebase that maps enums ↔ times.
+const STUDY_TIMES = Object.values(ENUM_TO_LABEL); // ['6:00 AM', '12:00 PM', '5:00 PM', '9:00 PM']
+
 const DURATION_TO_HOURS: Record<string, number> = {
   '1 hour / day': 1,
   '2 hours / day': 2,
@@ -105,8 +102,10 @@ export default function SettingsPage() {
   const [pwdResetMsg, setPwdResetMsg] = useState<{ text: string; error?: boolean } | null>(null);
 
   // Student study preferences state
+  // studyTime holds the canonical START-TIME label (e.g. "5:00 PM"), not a broad-range label.
+  // Together with studyDuration it defines: actual end = start + duration.
   const [studyDuration, setStudyDuration] = useState('2 hours / day');
-  const [studyTime, setStudyTime] = useState('Evening (5 PM - 9 PM)');
+  const [studyTime, setStudyTime] = useState('5:00 PM');
   const [prefSaved, setPrefSaved] = useState(false);
 
   // Danger Zone state
@@ -173,9 +172,10 @@ export default function SettingsPage() {
   }, [user]);
 
   // Load saved study preferences so the dropdowns reflect what the timetable generator will actually use.
+  // studyTime is now the start-time label ("5:00 PM") not the old broad-range ("Evening (5 PM - 9 PM)").
   useEffect(() => {
     if (user) {
-      setStudyTime(ENUM_TO_STUDY_TIME[user.preferredStudyTime ?? ''] ?? 'Evening (5 PM - 9 PM)');
+      setStudyTime(ENUM_TO_LABEL[user.preferredStudyTime ?? ''] ?? '5:00 PM');
       setStudyDuration(hoursToDurationLabel(user.availableHoursPerDay));
     }
   }, [user]);
@@ -236,10 +236,12 @@ export default function SettingsPage() {
   };
 
   // Persist study preferences to the backend. These drive automated timetable generation:
-  // preferredStudyTime = WHEN sessions are scheduled (StudyTimeWindow), availableHoursPerDay = daily budget.
+  // preferredStudyTime = WHEN sessions are scheduled (StudyTimeWindow enum name, e.g. "EVENING")
+  // availableHoursPerDay = daily study budget.
+  // Together they define the ACTUAL study period: start time + duration → end time.
   const { mutate: savePreferences, isPending: isPrefPending } = useMutation({
     mutationFn: () => authApi.updateMe({
-      preferredStudyTime: STUDY_TIME_TO_ENUM[studyTime] ?? 'EVENING',
+      preferredStudyTime: LABEL_TO_ENUM[studyTime] ?? 'EVENING',
       availableHoursPerDay: DURATION_TO_HOURS[studyDuration] ?? 2,
     }),
     onSuccess: (updated) => {
@@ -526,6 +528,7 @@ export default function SettingsPage() {
                 value={studyDuration}
                 onChange={(e) => setStudyDuration(e.target.value)}
                 className={styles.select}
+                data-testid="study-duration-select"
               >
                 {STUDY_DURATIONS.map((d) => (
                   <option key={d} value={d}>{d}</option>
@@ -534,17 +537,49 @@ export default function SettingsPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Preferred Study Time of Day</label>
+              <label className={styles.label}>Preferred Start Time</label>
               <select
                 value={studyTime}
                 onChange={(e) => setStudyTime(e.target.value)}
                 className={styles.select}
+                data-testid="study-time-select"
               >
                 {STUDY_TIMES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
             </div>
+
+            {/* ── Live study period preview ── */}
+            {(() => {
+              const windowEnum = LABEL_TO_ENUM[studyTime] ?? 'EVENING';
+              const hours = DURATION_TO_HOURS[studyDuration] ?? 2;
+              const period = calcStudyPeriod(windowEnum, hours);
+              return (
+                <div className={styles.studyPeriodPreview} data-testid="study-period-preview">
+                  <div className={styles.studyPeriodPreviewIcon}>
+                    <Clock size={16} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <span className={styles.studyPeriodPreviewLabel}>
+                      Actual daily study period:
+                    </span>
+                    {' '}
+                    <strong
+                      className={styles.studyPeriodPreviewValue}
+                      data-testid="study-period-value"
+                    >
+                      {period.label}
+                    </strong>
+                    {period.crossesMidnight && (
+                      <p className={styles.studyPeriodMidnightWarning}>
+                        ⚠ This window extends past midnight. Consider choosing an earlier start time or a shorter duration.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="pt-2">
               <AppButton
