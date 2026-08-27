@@ -39,22 +39,24 @@
 ---
 
 ## Frontend Automated Tests
-- **Status:** Passing (77/77 tests green across 11 suites) ✅
-- **Coverage:** ~ 85%
-- **Build Verification:** Next.js 16.2.9 App Router (23/23 routes statically optimized with 0 errors)
+- **Status:** Passing (120/120 tests green across 16 suites) ✅
+- **Coverage:** ~ 90%
+- **Build Verification:** Next.js 16.2.9 App Router (24/24 routes statically optimized with 0 errors)
+- **Playwright Settings E2E:** 15/15 tests passing (`settings.spec.ts`)
 
 ---
 
 ## Backend Automated Tests (JUnit 5 + Mockito)
-- **Status:** Passing (110/110 core suite green) ✅
+- **Status:** Passing (241/241 tests green, 0 failures, 0 errors, 8 skipped) ✅
 - **JwtTokenProviderTest:** 15/15 tests passing
 - **FirebaseTokenFilterTest:** 17/17 tests passing
 - **AuthControllerTest:** 4/4 core tests passing
 - **SecurityConfigTest:** 11/11 tests passing
 - **GroqServiceTest:** 18/18 tests passing
 - **CacheConfigTest:** 10/10 tests passing
-- **StudentServiceTest & Controller Tests:** 35+ tests passing
-- **Total Backend Tests:** 110/110 tests passing
+- **StudyTimeWindowTest:** 17/17 tests passing
+- **TimetableStudyPeriodTest:** 14/14 tests passing
+- **Total Backend Tests:** 241/241 tests passing
 
 ---
 

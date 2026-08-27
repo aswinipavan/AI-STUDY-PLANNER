@@ -28,3 +28,4 @@
 | BUG-019 | Low | Login test empty form submission failed in JSDOM due to HTML5 required attribute preventing button click | `src/__tests__/app/auth/login.test.tsx` | Fixed | Yes |
 | BUG-020 | High | Metaspace OutOfMemoryError in production under load due to repeated FirebaseAuth.getInstance() calls | `FirebaseConfig.java`, `AuthService.java`, `FirebaseTokenFilter.java` | Fixed | Yes |
 | BUG-021 | Critical | All production API endpoints (notifications, ai/chat, performance, exams) timeout with ERR_ABORTED after 45-60s due to Render free-tier cold starts | `useBackendHealth.ts`, all hooks, `keep-alive.yml`, `NotificationService.java` | Fixed | Yes |
+| BUG-022 | High | Study Planner Settings displayed misleading broad-range labels ("Evening 5 PM - 9 PM") rather than actual study period defined by duration + start time | `settings/page.tsx`, `timetable/generate/page.tsx`, `timetable/page.tsx`, `studyPeriodUtils.ts` | **Fixed 2026-08-27** | Yes |

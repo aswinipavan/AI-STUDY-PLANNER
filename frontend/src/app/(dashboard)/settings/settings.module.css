@@ -533,3 +533,40 @@ input:checked + .slider:before {
   }
 }
 
+/* ── Study period live preview banner ──────────────────────────────────────── */
+.studyPeriodPreview {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 229, 192, 0.06);
+  border: 1px solid rgba(0, 229, 192, 0.25);
+  border-left: 3px solid var(--color-primary, #00e5c0);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-foreground);
+}
+
+.studyPeriodPreviewIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-primary, #00e5c0);
+}
+
+.studyPeriodPreviewLabel {
+  color: var(--color-muted-foreground);
+}
+
+.studyPeriodPreviewValue {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.studyPeriodMidnightWarning {
+  margin: 0.375rem 0 0;
+  font-size: 0.8125rem;
+  color: #d97706; /* amber-600 */
+}

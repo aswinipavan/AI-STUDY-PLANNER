@@ -1,23 +1,24 @@
 # Next Task
 
-**Updated:** 2026-08-23
-**Current Status:** Local Data Persistence Fix verified — local H2 is now file-based (`jdbc:h2:file:./data/studyplanner`) and survives backend restarts; students re-attach by their real Firebase UID. Backend 128/0/0 (5 skipped), Frontend 77/77. Production Supabase/PostgreSQL and Firebase auth unchanged.
+**Updated:** 2026-08-27
+**Current Status:** Study Planner Preferences & Timetable Period Timing Consistency (CRITICAL FIX) fully implemented and verified end-to-end. Settings UI, Timetable Generator Wizard, Timetable Dashboard, and backend regression tests are completely synchronized. Backend 241/241 tests passed (0 failures, 8 skipped), Frontend 120/120 tests passed (16 suites), Playwright Settings E2E 15/15 passed, Next.js build 24/24 routes cleanly compiled.
 
 ---
 
 ## Current Status Summary
 
-- **Current Module:** Master Production Repair & AI Intelligence Integration
-- **Current Status:** ✅ 100% Repaired & Production Verified
-- **Backend Build:** ✅ Spring Boot 3.2.4 — `mvnw test` (110/110 passed, 0 failures, 0 errors)
-- **Frontend Build:** ✅ Next.js 16 (Turbopack) — 24/24 routes compiled with 0 errors, `npm test` (77/77 passed), `npm run lint` (0 errors)
-- **Last Completed:** ✅ Resolved React render purity and ref access issues, eliminated all ESLint errors, added strict type contracts across API layer, hardened Dockerfile Metaspace memory, added GitHub Actions Frontend & Backend CI jobs.
+- **Current Module:** Study Planner Preferences & Timetable Timing Integration
+- **Current Status:** ✅ 100% Implemented & Regression Verified
+- **Backend Build:** ✅ Spring Boot 3.2.4 — `mvnw test` (241/241 passed, 0 failures, 0 errors, 8 skipped)
+- **Frontend Build:** ✅ Next.js 16 (Turbopack) — 24/24 routes compiled with 0 errors, `npm test` (120/120 passed), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors)
+- **Last Completed:** ✅ Replaced misleading Settings broad-range labels with canonical start times, added live study period preview banner (`start + duration -> actual end`), enhanced Timetable Generator Wizard & Timetable Dashboard, added 52 new automated tests across backend/frontend/E2E.
 
 ---
 
 ## Next Recommended Action
 
-1. **Next Action:** Review and commit the uncommitted working tree (local-persistence fix + StorageService/FileController, V4–V6 migrations, timetable date-based scheduling, new integration tests) — the branch is currently 0 commits ahead of origin/main. Then push and monitor GitHub Actions CI (`master-test-suite.yml`), and deploy to Render/Vercel.
-2. **After That:** Optionally implement SSE streaming for `/api/ai/chat` for real-time token-by-token streaming in the UI.
-3. **Priority:** High — ready for production release.
+1. **Next Action:** Review and commit the uncommitted working tree (study period timing consistency fix, updated tests, and project memory), then push to origin/main for CI validation.
+2. **After That:** Monitor GitHub Actions CI and deploy to Vercel/Render.
+3. **Priority:** High — production ready.
 4. **Blockers:** None. All automated tests, linters, TypeScript type checks, and production builds pass cleanly.
+

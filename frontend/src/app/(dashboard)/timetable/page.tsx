@@ -26,6 +26,8 @@ import { useAdaptTimetable } from '@/hooks/useTimetable';
 import { useSoundPreference } from '@/hooks/useSoundPreference';
 import { parseSlotDate, dayLabel, dayKey, slotDayKey, mondayBasedIndex } from '@/utils/dateHelpers';
 import styles from './timetable.module.css';
+import { useAuthStore } from '@/stores/authStore';
+import { calcStudyPeriod, ENUM_TO_LABEL } from '@/utils/studyPeriodUtils';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -171,6 +173,7 @@ export default function TimetablePage() {
   const { play } = useSoundPreference();
   const adapt = useAdaptTimetable();
   const [plan, setPlan] = useState<AdaptationResult | null>(null);
+  const { user } = useAuthStore();
 
   const { data: timetable, isLoading, error, refetch } = useQuery({
     queryKey: QK.timetable,
@@ -264,6 +267,48 @@ export default function TimetablePage() {
           </AppButton>
         }
       />
+
+      {/* Daily study window banner — shows the ACTUAL period the timetable uses.
+          Consistent with Settings and the Generate wizard. Only shown when a timetable exists. */}
+      {timetable && user && (() => {
+        const windowEnum = user.preferredStudyTime ?? 'EVENING';
+        const hours = user.availableHoursPerDay ?? 2;
+        const period = calcStudyPeriod(windowEnum, hours);
+        const startLabel = ENUM_TO_LABEL[windowEnum] ?? '5:00 PM';
+        return (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.625rem 1rem',
+              borderRadius: '0.5rem',
+              background: 'rgba(0, 229, 192, 0.05)',
+              border: '1px solid rgba(0, 229, 192, 0.2)',
+              borderLeft: '3px solid var(--color-primary)',
+              fontSize: '0.8125rem',
+              color: 'var(--color-muted-foreground)',
+              marginBottom: '0.5rem',
+            }}
+            data-testid="timetable-study-window-banner"
+          >
+            <Clock size={14} style={{ flexShrink: 0, color: 'var(--color-primary)' }} aria-hidden="true" />
+            <span>
+              {`Your daily study window: `}
+              <strong style={{ color: 'var(--color-foreground)' }} data-testid="timetable-study-window-value">
+                {period.label}
+              </strong>
+              {` · Based on your saved preferences (${startLabel} start, ${hours}h/day). `}
+              <a
+                href="/settings"
+                style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
+              >
+                Edit in Settings
+              </a>
+            </span>
+          </div>
+        );
+      })()}
 
       {!timetable || !optimisticSlots.length ? (
         <EmptyState
