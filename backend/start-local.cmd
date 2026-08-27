@@ -17,7 +17,7 @@ echo  ====================================
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$envContent = Get-Content '.env' | Where-Object { $_ -match '^[^#\s]' -and $_ -match '=' }; foreach ($line in $envContent) { $parts = ($line -replace \"`r\",'') -split '=', 2; if ($parts.Count -eq 2) { [System.Environment]::SetEnvironmentVariable($parts[0].Trim(), $parts[1].Trim(), 'Process') } }; [System.Environment]::SetEnvironmentVariable('SPRING_PROFILES_ACTIVE', 'local', 'Process'); & '.\mvnw.cmd' 'spring-boot:run'"
+  "$portProc = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique; if ($portProc) { Write-Host 'Port 8080 is in use by PID '$portProc'. Stopping stale process...' -ForegroundColor Yellow; Stop-Process -Id $portProc -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 1 }; if (Test-Path '.env') { Get-Content '.env' | Where-Object { $_ -match '^[A-Za-z0-9_]+=' } | ForEach-Object { $p = $_.Split('=', 2); [System.Environment]::SetEnvironmentVariable($p[0].Trim(), $p[1].Trim(), 'Process') } }; [System.Environment]::SetEnvironmentVariable('SPRING_PROFILES_ACTIVE', 'local', 'Process'); & '.\mvnw.cmd' 'spring-boot:run'"
 
 echo.
 echo Backend stopped.

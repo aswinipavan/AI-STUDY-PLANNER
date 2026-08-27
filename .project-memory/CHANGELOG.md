@@ -531,3 +531,9 @@
 - **Summary:** Aligned frontend display labels and live preview with backend slot generation semantics. Verified full test suite (241 backend tests, 120 frontend tests, 15 Playwright E2E tests, Next.js build 24/24 routes).
 - **Impact:** 100% timing consistency across all surfaces with zero breaking changes to existing data models or APIs.
 
+## [2026-08-27] Local H2 Database Multi-Process Fix & start-local.cmd Hardening
+- **Files Modified:**
+  - `backend/src/main/resources/application-local.properties`: Added `;AUTO_SERVER=TRUE` and removed `DB_CLOSE_ON_EXIT=false` to eliminate `MVStoreException: The file is locked: studyplanner.mv.db` errors during backend restarts or concurrent tool access.
+  - `backend/start-local.cmd`: Added automated stale process check on port 8080 to cleanly release the port before booting Spring Boot, and robust `.env` parsing.
+- **Reason:** Prevent backend boot crashes when restarting the local dev server or when an existing process holds the port.
+- **Summary:** Verified local backend boots cleanly (`Started AiStudyPlannerApplication in 14.511 seconds`) and health check returns `UP`.
