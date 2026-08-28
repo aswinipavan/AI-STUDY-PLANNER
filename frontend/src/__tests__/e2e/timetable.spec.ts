@@ -52,6 +52,7 @@ test.describe('Timetable Section', () => {
         }),
       });
     });
+  });
 
   test('SEL-091: Active study slots calendar loaded list rendering', async ({ page }) => {
     await page.goto('/timetable');
@@ -306,5 +307,4 @@ test.describe('Timetable Section', () => {
     }
   });
 
-});
 });

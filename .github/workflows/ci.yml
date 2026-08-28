@@ -83,8 +83,10 @@ jobs:
 
       - name: Execute Playwright E2E Test Suite
         working-directory: ./frontend
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-results.json
         run: |
-          npx playwright test src/__tests__/e2e/ai_chat_scroll.spec.ts src/__tests__/e2e/material_subject_filter.spec.ts src/__tests__/e2e/profile_persistence.spec.ts src/__tests__/e2e/timetable_master_fix.spec.ts src/__tests__/e2e/materials.spec.ts src/__tests__/e2e/settings.spec.ts src/__tests__/e2e/timetable.spec.ts --reporter=json > playwright-results.json
+          npx playwright test src/__tests__/e2e/ai_chat_scroll.spec.ts src/__tests__/e2e/material_subject_filter.spec.ts src/__tests__/e2e/profile_persistence.spec.ts src/__tests__/e2e/timetable_master_fix.spec.ts src/__tests__/e2e/materials.spec.ts src/__tests__/e2e/settings.spec.ts src/__tests__/e2e/timetable.spec.ts --reporter=json,list
 
       - name: Execute Python Selenium E2E Suite
         run: python testing/selenium_e2e_suite.py

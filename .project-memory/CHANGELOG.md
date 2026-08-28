@@ -2,7 +2,8 @@
 
 ## 2026-08-28 (Session 29 - Master Task: Redesign GitHub Actions CI Workflow to Match Reference Graph)
 - **Files created/changed:**
-  - `.github/workflows/ci.yml` [MODIFIED] — Re-orchestrated `selenium-e2e` job: unified backend and frontend service startup under `nohup` with `testing/scripts/wait_for_health.py` polling for HTTP readiness, ensuring no subshell process termination or `wait-on` HEAD method incompatibility causes CI failure.
+  - `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED] — Fixed missing closing brace `});` on `test.beforeEach` block which previously caused Playwright to fail test loading because 25 tests were improperly nested inside `beforeEach`.
+  - `.github/workflows/ci.yml` [MODIFIED] — Configured `PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-results.json` and `--reporter=json,list` so Playwright streams real-time test progress directly to CI logs while saving machine-readable results to disk.
   - `testing/scripts/wait_for_health.py` [NEW] — Robust Python HTTP GET health check poller with automatic server log dumping on timeout.
   - `backend/src/main/resources/application.properties` & `application-local.properties` [MODIFIED] — Provided fallback defaults for `firebase.project-id`, `razorpay.key-id`, `razorpay.key-secret`, `jwt.secret`, `spring.datasource.url` ensuring Spring Boot placeholder resolution never crashes in clean CI runners without `.env`.
   - `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED] — Added mock fallback initialization when `FIREBASE_SERVICE_ACCOUNT_JSON` is not supplied, allowing local profile and CI E2E jobs to boot instantly without production credentials.
