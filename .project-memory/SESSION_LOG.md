@@ -4,15 +4,16 @@
 - **Task Started:** Redesign GitHub Actions CI workflow to match reference graph: 5 parallel fan-out jobs (`🌐 Selenium E2E Web Suite`, `📱 Appium Mobile Suite (300+ Cases)`, `⚡ Load & Performance Suite`, `🎨 Frontend UI Suite (300+ Cases)`, `⚙️ Backend API & DB Suite (405+ Cases)`) converging into `🏆 Master Execution Summary`.
 - **Task Completed:**
   - Created `.github/workflows/ci.yml` with the exact 5-to-1 dependency graph matching user's visual reference.
-  - Resolved mobile TypeScript test compiler issue: added `@types/jest` and `@types/node` into `mobile/package.json` devDependencies and added explicit Jest imports in `mobileApp.test.ts`. Verified `npm run tsc` passes with 0 errors and all 8 tests pass.
+  - Resolved mobile TypeScript test compiler issue: added `@types/jest` and `@types/node` into `mobile/package.json` devDependencies and added explicit Jest imports in `mobileApp.test.ts`.
+  - Resolved Spring Boot local profile startup in CI: provided safe property placeholder defaults in `application.properties` and `application-local.properties`, and added local mock fallback in `FirebaseConfig.java` when `FIREBASE_SERVICE_ACCOUNT_JSON` is absent in CI runners.
   - Built `testing/scripts/generate_ci_summary.py` to aggregate real execution data across all 5 layers into `testing/reports/ci/Master_Execution_Summary.md`, `Master_Execution_Summary.html`, and dynamic `$GITHUB_STEP_SUMMARY`.
   - Configured each job to upload real test artifacts: `selenium-e2e-report`, `appium-mobile-report`, `load-performance-report`, `frontend-uiux-report`, `backend-api-db-report`, and `master-execution-summary`.
   - Configured Master Execution Summary with `needs: [selenium-e2e, appium-mobile, load-performance, frontend-uiux, backend-api-db]` and `if: always()`.
   - Cleaned up obsolete redundant workflow files (`master-test-suite.yml`, `selenium-e2e.yml`, `appium-e2e.yml`, `load-tests.yml`, `ui-ux-tests.yml`).
   - Validated YAML syntax with PyYAML.
-- **Files Modified:** `.github/workflows/ci.yml` [NEW], `mobile/package.json` [MODIFIED], `mobile/package-lock.json` [MODIFIED], `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED], `testing/scripts/generate_ci_summary.py` [NEW], `.github/workflows/*.yml` [DELETED].
-- **Problems Found:** CI TypeScript compiler in mobile failed on missing Jest type definitions (`TS2593: Cannot find name 'describe'`).
-- **Solutions:** Installed `@types/jest` and `@types/node` in `mobile/package.json` and added explicit `@jest/globals` import in `mobileApp.test.ts`.
+- **Files Modified:** `.github/workflows/ci.yml` [NEW], `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED], `backend/src/main/resources/application*.properties` [MODIFIED], `mobile/package.json` [MODIFIED], `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED], `testing/scripts/generate_ci_summary.py` [NEW].
+- **Problems Found:** Spring Boot failed startup in Selenium E2E CI job because `application.properties` placeholder `${FIREBASE_PROJECT_ID}` lacked default and `FIREBASE_SERVICE_ACCOUNT_JSON` was required by `FirebaseConfig`.
+- **Solutions:** Added safe defaults for all property placeholders and added mock `FirebaseApp` fallback in `FirebaseConfig.java` when running without external service account credentials.
 - **Next Recommended Task:** Deploy frontend to Vercel; redeploy backend to Render with production Supabase connection.
 
 ## 2026-08-28 (Session 28 - Master Task: Expand to 300 Test Cases Per Sheet in testing/reports)

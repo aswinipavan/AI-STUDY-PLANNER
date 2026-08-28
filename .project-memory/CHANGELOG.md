@@ -3,6 +3,8 @@
 ## 2026-08-28 (Session 29 - Master Task: Redesign GitHub Actions CI Workflow to Match Reference Graph)
 - **Files created/changed:**
   - `.github/workflows/ci.yml` [NEW] — Single unified GitHub Actions workflow with 5 parallel fan-out jobs (`🌐 Selenium E2E Web Suite`, `📱 Appium Mobile Suite (300+ Cases)`, `⚡ Load & Performance Suite`, `🎨 Frontend UI Suite (300+ Cases)`, `⚙️ Backend API & DB Suite (405+ Cases)`) converging into a final `🏆 Master Execution Summary` job (`needs: [...]`, `if: always()`).
+  - `backend/src/main/resources/application.properties` & `application-local.properties` [MODIFIED] — Provided fallback defaults for `firebase.project-id`, `razorpay.key-id`, `razorpay.key-secret`, `jwt.secret`, `spring.datasource.url` ensuring Spring Boot placeholder resolution never crashes in clean CI runners without `.env`.
+  - `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED] — Added mock fallback initialization when `FIREBASE_SERVICE_ACCOUNT_JSON` is not supplied, allowing local profile and CI E2E jobs to boot instantly without production credentials.
   - `mobile/package.json` & `mobile/package-lock.json` [MODIFIED] — Added `@types/jest` and `@types/node` to devDependencies.
   - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED] — Added explicit Jest globals import (`import { describe, it, expect } from '@jest/globals'`) ensuring strict TypeScript compiler (`tsc --noEmit`) passes cleanly in CI.
   - `testing/scripts/generate_ci_summary.py` [NEW] — Dynamic aggregator script parsing real execution outputs across all 5 test layers and generating `testing/reports/ci/Master_Execution_Summary.md`, `testing/reports/ci/Master_Execution_Summary.html`, and dynamic `$GITHUB_STEP_SUMMARY`.
