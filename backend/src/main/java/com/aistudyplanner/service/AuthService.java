@@ -39,15 +39,25 @@ public class AuthService {
 
             if (student == null) {
                 isNewUser = true;
+                if (phoneNumber != null) {
+                    phoneNumber = phoneNumber.trim();
+                    if (phoneNumber.isEmpty() || studentRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+                        phoneNumber = null;
+                    }
+                }
                 student = Student.builder()
                         .firebaseUid(uid)
                         .phoneNumber(phoneNumber)
                         .email(firebaseToken.getEmail())
                         .fullName(firebaseToken.getName())
+                        .profilePictureUrl(firebaseToken.getPicture())
                         .lastActiveDate(LocalDate.now())
                         .build();
                 student = studentRepository.save(student);
             } else {
+                if (student.getProfilePictureUrl() == null && firebaseToken.getPicture() != null && !firebaseToken.getPicture().trim().isEmpty()) {
+                    student.setProfilePictureUrl(firebaseToken.getPicture().trim());
+                }
                 studyStreakLogic(student);
                 student = studentRepository.save(student);
             }

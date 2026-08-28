@@ -181,6 +181,22 @@ class MaterialControllerTest {
                 .andExpect(jsonPath("$.data", hasSize(0)));
     }
 
+    @Test
+    @DisplayName("Should retrieve materials filtered by subjectId query parameter")
+    void testGetMaterialsWithSubjectIdQueryParam() throws Exception {
+        List<MaterialResponse> subjectMaterials = Arrays.asList(testMaterial);
+        when(materialService.getMaterialsBySubject(any(UUID.class), any(UUID.class)))
+                .thenReturn(subjectMaterials);
+
+        mockMvc.perform(get("/api/materials?subjectId=" + subjectId).with(studentAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].title", equalTo("Calculus Chapter 5")));
+
+        verify(materialService, times(1))
+                .getMaterialsBySubject(eq(studentId), eq(subjectId));
+    }
+
     // ─── GET /api/materials/upload-url ────────────────────────────────────────
 
     @Test

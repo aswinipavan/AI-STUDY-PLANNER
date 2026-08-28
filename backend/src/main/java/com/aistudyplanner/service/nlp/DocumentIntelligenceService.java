@@ -192,20 +192,23 @@ public class DocumentIntelligenceService {
             boolean isPdf = fileType.contains("pdf") || material.getFileUrl().toLowerCase().endsWith(".pdf");
             boolean isDocx = fileType.contains("docx") || material.getFileUrl().toLowerCase().endsWith(".docx");
 
-            if (isPdf || isDocx) {
-                try {
-                    byte[] documentBytes = loadFileBytes(material.getFileUrl());
-                    if (documentBytes != null && documentBytes.length > 0) {
-                        String documentText = isPdf
-                                ? extractTextFromPdfBytes(documentBytes)
-                                : extractTextFromDocxBytes(documentBytes);
-                        if (documentText != null && !documentText.isBlank()) {
-                            return documentText;
-                        }
+            try {
+                byte[] documentBytes = loadFileBytes(material.getFileUrl());
+                if (documentBytes != null && documentBytes.length > 0) {
+                    String documentText;
+                    if (isPdf) {
+                        documentText = extractTextFromPdfBytes(documentBytes);
+                    } else if (isDocx) {
+                        documentText = extractTextFromDocxBytes(documentBytes);
+                    } else {
+                        documentText = extractTextUsingTika(documentBytes);
                     }
-                } catch (Exception e) {
-                    log.warn("Could not extract text from material {}: {}", material.getId(), e.getMessage());
+                    if (documentText != null && !documentText.isBlank()) {
+                        return documentText;
+                    }
                 }
+            } catch (Exception e) {
+                log.warn("Could not extract text from material {}: {}", material.getId(), e.getMessage());
             }
         }
 
@@ -261,6 +264,24 @@ public class DocumentIntelligenceService {
             log.warn("DOCX text extraction failed: {}", e.getMessage());
         }
         return "";
+    }
+
+    /**
+     * Universal document parser fallback using Apache Tika for TXT, MD, PPTX, EPUB, RTF.
+     */
+    public String extractTextUsingTika(byte[] documentBytes) {
+        if (documentBytes == null || documentBytes.length == 0) return "";
+        try {
+            String direct = new String(documentBytes, StandardCharsets.UTF_8).trim();
+            if (!direct.isBlank() && !direct.contains("\u0000")) {
+                return direct;
+            }
+            org.apache.tika.Tika tika = new org.apache.tika.Tika();
+            return tika.parseToString(new ByteArrayInputStream(documentBytes)).trim();
+        } catch (Exception e) {
+            log.warn("Tika text extraction fallback failed: {}", e.getMessage());
+            return new String(documentBytes, StandardCharsets.UTF_8).trim();
+        }
     }
 
     /** Prefix of URLs produced by the local filesystem storage backend. */

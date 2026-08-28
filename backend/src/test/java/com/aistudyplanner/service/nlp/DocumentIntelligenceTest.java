@@ -250,4 +250,20 @@ public class DocumentIntelligenceTest {
 
         assertEquals("preview text", documentIntelligenceService.extractDocumentText(material, "preview text"));
     }
+
+    @Test
+    void testExtractTextUsingTika_PlainTextAndMarkdown() {
+        String sampleNotes = "# Linear Algebra Study Notes\n\nEigenvalues and eigenvectors are fundamental to matrix diagonalization.";
+        byte[] bytes = sampleNotes.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        String extracted = documentIntelligenceService.extractTextUsingTika(bytes);
+        assertNotNull(extracted);
+        assertTrue(extracted.contains("Eigenvalues and eigenvectors"), "Tika should extract text from Markdown/Text bytes");
+    }
+
+    @Test
+    void testExtractTextUsingTika_NullAndEmptyBytes() {
+        assertEquals("", documentIntelligenceService.extractTextUsingTika(null));
+        assertEquals("", documentIntelligenceService.extractTextUsingTika(new byte[0]));
+    }
 }

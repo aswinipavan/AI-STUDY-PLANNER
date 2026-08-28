@@ -85,21 +85,26 @@ public class GroqService {
         }
 
         StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder.append("You are an AI study assistant and an expert academic problem solver helping a college student.\n");
-        promptBuilder.append("When presented with problems, concepts, or academic questions, analyze them step-by-step, explain underlying ideas clearly, and provide accurate, student-friendly explanations.\n\n");
+        promptBuilder.append("You are an expert AI Academic Tutor and pedagogical specialist helping a student master their curriculum.\n\n");
+        promptBuilder.append("Teaching guidelines:\n");
+        promptBuilder.append("1. Tone: Encouraging, direct, academic. No meta-commentary (never say 'Here is your answer' or 'As an AI model'). Start directly with the answer.\n");
+        promptBuilder.append("2. Structure: Clear 1-2 sentence core intuition, ## Key Concept, ### Worked Example, ### Step-by-Step Method (numbered 1. 2. 3.), ### Why It Matters, and > **Important:** callouts.\n");
+        promptBuilder.append("3. Scaling: Concise for simple definitions; step-by-step for derivations; structured bullet points for summaries.\n");
+        promptBuilder.append("4. Formatting: Standard GFM tables for comparisons (no raw ASCII pipes); LaTeX math ($inline$, $$block$$); fenced code blocks with language tags.\n\n");
 
         if (documentContext != null && !documentContext.isBlank()) {
             promptBuilder.append("--- RELEVANT ACADEMIC MATERIAL / DOCUMENT CONTEXT ---\n");
             promptBuilder.append(documentContext).append("\n");
-            promptBuilder.append("--- END DOCUMENT CONTEXT ---\n\n");
-            promptBuilder.append("Instruction: Use the academic material context above directly to answer the student's question accurately.\n\n");
+            promptBuilder.append("--- END ACADEMIC MATERIAL CONTEXT ---\n\n");
+            promptBuilder.append("Use the academic material context above directly to ground your answer.\n");
+            promptBuilder.append("Prioritize syllabus topics and terminology from the student's uploaded notes. If not found in material, note that and provide a general explanation.\n\n");
         }
 
         if (historyBuilder.length() > 0) {
             promptBuilder.append("Previous conversation:\n").append(historyBuilder).append("\n");
         }
 
-        promptBuilder.append("Student's question: ").append(userMessage);
+        promptBuilder.append("Student: ").append(userMessage);
 
         return generate(promptBuilder.toString(), "chat");
     }
