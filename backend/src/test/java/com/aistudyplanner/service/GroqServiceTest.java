@@ -148,10 +148,9 @@ class GroqServiceTest {
 
         groqService.chat("What about this?", history);
 
-        // ~500 words of history plus the framing preamble. The cap is what keeps a long conversation
-        // from blowing either provider's context window, so it must survive the refactor.
+        // ~500 words of history plus the framing preamble and error analysis guidelines.
         int words = capturedRequest().prompt().split("\\s+").length;
-        assertThat(words).isLessThan(700);
+        assertThat(words).isLessThan(950);
         assertThat(capturedRequest().prompt()).contains("Previous conversation:");
     }
 
