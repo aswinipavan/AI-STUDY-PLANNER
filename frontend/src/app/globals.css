@@ -9,6 +9,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
 
 /* Tailwind v4 does not pick up tailwind.config.ts on its own — it has to be
    pointed at it. Without this line the config was inert, which cost two things

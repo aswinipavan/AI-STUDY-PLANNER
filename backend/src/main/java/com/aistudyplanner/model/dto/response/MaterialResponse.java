@@ -13,6 +13,8 @@ import java.util.UUID;
 public class MaterialResponse {
 
     private UUID id;
+    private UUID subjectId;
+    private String subjectName;
     private SubjectResponse subject;
     private String title;
     private String fileName;
@@ -31,4 +33,14 @@ public class MaterialResponse {
     private String difficultyReason;
     private String errorMessage;
     private OffsetDateTime uploadedAt;
+
+    public UUID getSubjectId() {
+        if (subjectId != null) return subjectId;
+        return subject != null ? subject.getId() : null;
+    }
+
+    public String getSubjectName() {
+        if (subjectName != null && !subjectName.isBlank()) return subjectName;
+        return subject != null ? subject.getSubjectName() : null;
+    }
 }

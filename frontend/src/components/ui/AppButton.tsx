@@ -8,6 +8,7 @@ type Variant = 'primary' | 'outline' | 'ghost' | 'danger';
 
 interface AppButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -27,6 +28,6 @@ const VARIANT_MAP: Record<Variant, NonNullable<ButtonProps['variant']>> = {
   danger: 'destructive',
 };
 
-export function AppButton({ variant = 'primary', ...props }: AppButtonProps) {
-  return <Button variant={VARIANT_MAP[variant]} {...props} />;
+export function AppButton({ variant = 'primary', size, ...props }: AppButtonProps) {
+  return <Button variant={VARIANT_MAP[variant]} size={size} {...props} />;
 }

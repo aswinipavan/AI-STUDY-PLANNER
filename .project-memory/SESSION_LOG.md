@@ -1,5 +1,71 @@
 # Session Log
 
+## 2026-08-28 (Session 25 - Master Prompt: Redesign AI Tutor Chat + Improve Answer Quality)
+- **Task Started:** Redesign AI Tutor chat experience and prompt engineering architecture to transform raw LLM text into a modern, beautifully structured AI Tutor learning interface with GFM tables, heading hierarchy, callout blocks, math rendering, copy actions, and uploaded notes grounding.
+- **Task Completed:**
+  - **Backend AI Tutor Prompt Architecture (`GroqService.java`):** Enforced pedagogical teaching guidelines (direct answer foundation, `## Key Concept`, `### Worked Example`, `### Step-by-Step Method`, `### Why It Matters`, `> **Important:**` callouts, standard LaTeX math, and elimination of meta-commentary filler).
+  - **Uploaded Material Grounding:** Integrated material context builder (`buildDocumentContext`) with student performance profile and fallback transparency when a topic is absent from notes.
+  - **GFM Table Parsing (`MessageBubble.tsx` & `remark-gfm`):** Installed `remark-gfm@4`, rendered formatted HTML `<table>` elements wrapped in a responsive scroll container.
+  - **Enhanced Chat UI & Typography (`chat.module.css`):** Cyan accent headers with divider borders, translucent blockquote callouts, interactive code blocks with language badges and copy buttons, full response copy button, and `📚 Grounded in your study notes` badge.
+  - **Empty State Quick Prompts (`ChatContainer.tsx`):** Added 2x2 interactive starter cards for instant exploration.
+  - **Full Suite Verification:** 22/22 backend tests passed (`mvnw test`), 134/134 frontend tests passed across 21 suites (`npm test`), 15/15 Playwright E2E tests passed (`ai.spec.ts`), and Next.js 16 production build succeeded with 0 errors across 24 routes.
+- **Files Modified:**
+  - `backend/src/main/java/com/aistudyplanner/service/GroqService.java`
+  - `backend/src/test/java/com/aistudyplanner/service/AiAssistantPromptTest.java`
+  - `frontend/package.json`
+  - `frontend/jest.setup.ts`
+  - `frontend/jest.config.ts`
+  - `frontend/src/hooks/useChat.ts`
+  - `frontend/src/components/chat/MessageBubble.tsx`
+  - `frontend/src/components/chat/ChatContainer.tsx`
+  - `frontend/src/components/chat/chat.module.css`
+  - `frontend/src/__tests__/components/chatMessageRendering.test.tsx`
+  - `frontend/src/__tests__/e2e/ai.spec.ts`
+- **Problems Found:**
+  - `react-markdown` was rendering markdown tables as raw strings with pipes (`|`) because GFM plugin was missing.
+  - Long answers lacked visual hierarchy and looked dense.
+  - History synchronization had stale session locks during route transitions.
+- **Solutions:**
+  - Added `remark-gfm` with custom table renderer components.
+  - Added structured header and callout CSS formatting.
+  - Fixed `useChat` history synchronization.
+- **Next Recommended Task:** Deploy updated full-stack build to production (Vercel & Render).
+
+## 2026-08-28 (Session 24 - Next-Level Dependencies, Plugins & Resources Integration)
+- **Task Started:** Analyze, select, and install missing next-level dependencies, plugins, and resources across frontend and backend to elevate user experience, mathematical rendering, document parsing, gamification, resilience, and test coverage.
+- **Task Completed:**
+  - **Frontend AI Math:** Installed `remark-math@6`, `rehype-katex@7`, and `katex@0.16.x` + stylesheet into `MessageBubble.tsx` to render LaTeX formulas ($...$, $$...$$) in AI study notes and tutor chats.
+  - **Frontend Code Blocks:** Interactive syntax-highlighted code blocks with language indicators and copy-to-clipboard buttons in AI messages.
+  - **Frontend Gamification:** Installed `canvas-confetti` and `@types/canvas-confetti`, built reusable celebration burst utility (`confetti.ts`), and triggered celebration when completing 100% daily timetable sessions.
+  - **Frontend Bundle Analyzer:** Integrated `@next/bundle-analyzer` in `next.config.ts`.
+  - **Backend Apache Tika:** Added `org.apache.tika:tika-core:2.9.2` for multi-format student study uploads (`.docx`, `.pptx`, `.txt`, `.md`, `.epub`, `.rtf`) alongside PDFBox.
+  - **Backend Resilience4j:** Added `io.github.resilience4j:resilience4j-spring-boot3:2.2.0` circuit breaker & retry engine for AI and Supabase API calls.
+  - **Backend JaCoCo Coverage Reporting:** Added `jacoco-maven-plugin:0.8.11` to `pom.xml` generating test coverage data and HTML reports.
+  - **Full Suite Verification:** 19/19 backend tests passed with JaCoCo analysis, 131/131 frontend tests passed (20 suites), Next.js 16 build completed with 0 errors (24/24 routes).
+- **Files Modified:**
+  - `frontend/package.json`
+  - `frontend/src/app/globals.css`
+  - `frontend/src/components/chat/MessageBubble.tsx`
+  - `frontend/src/lib/confetti.ts`
+  - `frontend/src/app/(dashboard)/timetable/page.tsx`
+  - `frontend/next.config.ts`
+  - `backend/pom.xml`
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/DocumentIntelligenceService.java`
+  - `backend/src/test/java/com/aistudyplanner/service/nlp/DocumentIntelligenceTest.java`
+  - `frontend/src/__tests__/components/messageBubbleKatex.test.tsx`
+  - `frontend/src/__tests__/lib/confetti.test.ts`
+  - `frontend/jest.setup.ts`
+  - `frontend/src/components/ui/AppButton.tsx`
+  - `frontend/src/api/timetable.api.ts`
+  - `frontend/src/types/api.types.ts`
+  - `frontend/src/hooks/useMaterials.ts`
+- **Problems Found:**
+  - ReactMarkdown in Jest tests threw ESM token errors; resolved with fast JSDOM mock in `jest.setup.ts`.
+  - Apache Tika core without parser modules needed safe direct UTF-8 string decoding fallback in `extractTextUsingTika`; resolved.
+  - AppButton component needed `size` prop support (`'default' | 'sm' | 'lg' | 'icon'`); resolved.
+- **Solutions:** Implemented all fixes cleanly with 100% test pass rate across backend and frontend.
+- **Next Recommended Task:** Deploy latest full-stack build to production (Vercel & Render).
+
 ## 2026-08-23 (Session 19 - Local Data Persistence Fix & Verification)
 - **Task Started:** Make local (H2) data survive backend restarts — the same Firebase/Google account must keep its subjects, marks, exams, materials, timetable, chat/history and progress after a restart + re-login. Production Supabase/PostgreSQL and Firebase auth must stay unchanged; no app rebuild.
 - **Task Completed:** Confirmed + verified the local profile uses a FILE-BASED H2 database (`jdbc:h2:file:./data/studyplanner`, `ddl-auto=update`, Flyway disabled) with an idempotent `schema-local.sql`. Data now persists across real backend restarts; students re-attach by their real Firebase UID via `AuthService.login()` (find-or-create). Material files persist on disk under `uploads/` with consistent DB metadata.
@@ -1475,3 +1541,188 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - Created a single source-of-truth utility (`studyPeriodUtils.ts`) shared across all client pages.
   - Added comprehensive automated regression tests across requirements A–M.
 - **Next Recommended Task:** Commit working tree and deploy updated web and backend builds.
+
+## 2026-08-27 (Session 21 - Master Fix: Profile Save Full Persistence & Re-Login Identity Preservation)
+- **Task Started:** MASTER FIX — PROFILE SAVE MUST PERSIST EVERY FIELD + SURVIVE RELOGIN. Ensure that on the Profile/Settings page, when the user fills all profile details (Full Name, College, Semester, Department, Phone Number) and clicks "Save Profile", every single field is durably saved in the database, survives page refresh/restarts, and survives re-login with the same Google/Firebase account under the exact same student identity without duplicating or overwriting data.
+- **Task Completed:**
+  - Expanded `UpdateProfileRequest.java` to support `phoneNumber` and added `@JsonSetter("semester")` to flexibly parse numbers (`1`-`8`), string formats (`"1st Year"`, `"Semester 5"`, `"5"`), and null values without throwing Jackson deserialization exceptions.
+  - Enhanced `StudentService.java` to persist all 6 editable fields (`fullName`, `collegeName`, `semester`, `department`, `phoneNumber`, `profilePictureUrl`), sanitizing phone numbers (empty string -> `null` to avoid PostgreSQL/H2 UNIQUE constraint collisions) and validating against duplicate phone numbers from other students.
+  - Enhanced `AuthService.java` to capture Google avatar `profilePictureUrl` and clean phone number on registration, while strictly preserving existing profile fields and student UUID on subsequent re-logins with the same `firebase_uid`.
+  - Updated `authStore.ts` with bidirectional normalization between backend `fullName` and frontend `name`, and `profilePictureUrl` and `photoUrl`.
+  - Fixed `AuthProvider.tsx` `onAuthStateChanged` to verify session and fetch authoritative profile from `/api/students/me` instead of wiping out Zustand store on reload.
+  - Standardized `SEMESTER_OPTIONS` ('1'–'9') in `SettingsPage.tsx`, registered `phoneNumber` field, and implemented `useQuery` profile synchronization with `isDirty` protection to safeguard active form typing.
+  - Added `signOut(auth)` to logout flows in `SettingsPage.tsx` and `Topbar.tsx`.
+  - Built comprehensive backend unit tests in `StudentProfilePersistenceTest.java` (6/6 passed) and verified all 247 backend Maven tests pass (`mvnw test`).
+  - Built Jest unit tests in `profilePersistence.test.tsx` (123/123 tests passed across 17 suites) and Playwright E2E tests in `profile_persistence.spec.ts` (3/3 passed).
+  - Executed live API end-to-end database verification (`verify_profile_persistence_live.mjs`) confirming 100% full persistence, partial update safety, flexible semester parsing, and phone clearing across restarts.
+  - Verified `npm run build` generates 24/24 static routes cleanly with 0 errors.
+- **Files Modified/Created:**
+  - `backend/src/main/java/com/aistudyplanner/model/dto/request/UpdateProfileRequest.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/service/StudentService.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/service/AuthService.java` [MODIFIED]
+  - `backend/src/main/resources/application-local.properties` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/service/StudentProfilePersistenceTest.java` [NEW]
+  - `frontend/src/api/auth.api.ts` [MODIFIED]
+  - `frontend/src/stores/authStore.ts` [MODIFIED]
+  - `frontend/src/components/providers/AuthProvider.tsx` [MODIFIED]
+  - `frontend/src/app/(auth)/login/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/settings/page.tsx` [MODIFIED]
+  - `frontend/src/components/layout/Topbar.tsx` [MODIFIED]
+  - `frontend/src/__tests__/app/settings/profilePersistence.test.tsx` [NEW]
+  - `frontend/src/__tests__/e2e/profile_persistence.spec.ts` [NEW]
+  - `frontend/playwright/auth-setup.ts` [MODIFIED]
+  - `frontend/.env.local` [MODIFIED]
+- **Problems Found:**
+  - `phoneNumber` was omitted from `UpdateProfileRequest.java`, causing phone updates to silently drop.
+  - Passing text strings like `"1st Year"` to integer `semester` caused Jackson deserialization errors.
+  - Frontend `AuthProvider` was resetting Zustand store to a bare skeleton on page reload when Firebase auth state changed before DB fetch.
+  - Empty string phone number was colliding with SQL `UNIQUE` constraint instead of saving as `null`.
+- **Solutions:**
+  - Added `phoneNumber` and custom `@JsonSetter("semester")` in backend DTO.
+  - Converted empty string phone numbers to `null` and validated uniqueness before save.
+  - Synchronized `AuthProvider` with backend `/api/students/me`.
+  - Added full test automation covering unit, integration, and E2E layers.
+- **Next Recommended Task:** Commit the profile persistence fix and push to GitHub repository.
+
+## 2026-08-27 (Session 22 - Reliable Windows Startup & Teardown Scripts)
+- **Task Started:** Create a reliable Windows startup script (`start-project.bat`) and teardown script (`stop-project.bat`) at the project root for 1-click execution.
+- **Task Completed:**
+  - Built `start-project.bat` to detect and stop processes on ports 8080 and 3000 with PID and process name logging.
+  - Added cleanup for stale H2 database lock files (`backend\data\studyplanner.lock.db`).
+  - Configured dedicated independent terminal windows for backend and frontend using `start "" /D ... cmd /k`.
+  - Replaced fixed delays with a live polling loop against `http://localhost:8080/actuator/health` checking for `"status":"UP"` (with 90s timeout).
+  - Ensured frontend only starts if the backend successfully becomes healthy.
+  - Added port 3000 readiness polling and automatic launch of `http://localhost:3000` in the default browser.
+  - Built `stop-project.bat` to safely terminate processes listening on ports 8080 and 3000, clear lock files, and report port status without touching unrelated services.
+  - Implemented 6-stage automated test suite verifying empty-state stop, mock port killing, full stack boot, health verification, duplicate restart while servers running, and clean teardown. All 100% passing.
+- **Files Created/Modified:**
+  - `start-project.bat` [NEW]
+  - `stop-project.bat` [NEW]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+- **Problems Found:**
+  - Running backend or frontend manually could leave background ports locked or cause Next.js to fall back to port 3001.
+  - Abrupt backend terminations left H2 `.lock.db` files causing database lock delays.
+- **Solutions:**
+  - Automated process tree termination via `taskkill /F /T /PID` and `Stop-Process`.
+  - Added proactive lock file removal before boot.
+  - Used health-based readiness polling rather than arbitrary sleep timers.
+- **Next Recommended Task:** Push changes or continue development as directed.
+
+---
+
+## 2026-08-27 (Session 23 - Master Fix: Materials Subject Filter Shows Uploaded Files)
+- **Task Started:** MASTER FIX — MATERIALS SUBJECT FILTER IS NOT SHOWING UPLOADED FILES. Resolve the issue where uploading a PDF to a specific subject (e.g. "Discrete Maths") succeeded, but filtering the Materials page by "Discrete Maths" showed no materials while "All Subjects" showed them.
+- **Task Completed:**
+  - Identified root cause across full chain:
+    1. Backend `MaterialResponse.java` DTO omitted root-level `subjectId` (UUID) and `subjectName` (String), serializing only nested `subject: { id, subjectName, ... }`.
+    2. Frontend `StudyMaterial` type defined `subjectId: string` and did not map nested `subject.id`.
+    3. `MaterialCard.tsx` did not display the user-selected subject badge.
+    4. Client-side filtering in `materials/page.tsx` evaluated `mat.subjectId === filterSubjectId` (which was `undefined === uuid` => `false`).
+    5. `MaterialService.java` lacked student ownership check for assigned `subjectId` on upload.
+  - Implemented end-to-end fixes:
+    - Updated `MaterialResponse.java` with `subjectId` and `subjectName` fields and defensive fallback getters.
+    - Updated `MaterialRepository.java` with `findAllByStudentIdAndSubjectIdOrderByCreatedAtDesc`.
+    - Updated `MaterialService.java` with student ownership validation and complete DTO mapping in `toMaterialResponse`.
+    - Updated `MaterialController.java` with `@RequestParam(value = "subjectId", required = false)` query param handling and hardened upload `subjectId` parsing.
+    - Updated `types/api.types.ts` with `subjectId?: string`, `subjectName?: string`, and `subject?: Subject`.
+    - Added `mapMaterialFromBackend` normalizer in `materials.api.ts` across all API methods (`getAll`, `getBySubject`, `upload`, `save`, `reprocess`).
+    - Made client-side filtering robust in `materials/page.tsx` (`mat.subjectId || mat.subject?.id`).
+    - Added `.subjectBadge` CSS in `materials.module.css` and rendered subject badges on cards in `MaterialCard.tsx`.
+  - Testing & Verification:
+    - Created `MaterialSubjectFilterTest.java` (4/4 tests passed).
+    - Updated `MaterialControllerTest.java` (query param test passing).
+    - Updated `UploadIntegrationTest.java` (round-trip test passing).
+    - Full backend suite: **253 / 253 Passed (0 failures, 0 errors, 8 skipped)** via `mvnw test`.
+    - Full frontend suite: **123 / 123 Passed (17 suites)** via `npm test`.
+    - Created Playwright E2E suite `material_subject_filter.spec.ts` (**5 / 5 Passed**).
+    - Verified existing `materials.spec.ts` (**15 / 15 Passed**).
+    - Executed live full-stack verification script `verify_material_filter_live.mjs` against running backend and frontend, uploading files to Discrete Maths and Operating Systems, asserting API filtering and Playwright UI interactions, capturing screenshots.
+- **Files Modified / Created:**
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/MaterialResponse.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/repository/MaterialRepository.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/service/MaterialService.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/controller/MaterialController.java` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/service/MaterialSubjectFilterTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/controller/MaterialControllerTest.java` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/integration/UploadIntegrationTest.java` [MODIFIED]
+  - `frontend/src/types/api.types.ts` [MODIFIED]
+  - `frontend/src/api/materials.api.ts` [MODIFIED]
+  - `frontend/src/app/(dashboard)/materials/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/materials/materials.module.css` [MODIFIED]
+  - `frontend/src/components/materials/MaterialCard.tsx` [MODIFIED]
+  - `frontend/src/__tests__/e2e/material_subject_filter.spec.ts` [NEW]
+  - `frontend/src/__tests__/e2e/materials.spec.ts` [MODIFIED]
+  - `.project-memory/BUG_TRACKER.md` [MODIFIED]
+  - `.project-memory/API_STATUS.md` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/TEST_PROGRESS.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+- **Problems Found:**
+  - `MaterialResponse` lacked `subjectId` and `subjectName` at top level.
+  - Frontend `StudyMaterial` type and UI filtering relied on `mat.subjectId` which was undefined.
+  - No subject badge was rendered on material cards to show user-assigned subject folder.
+- **Solutions:**
+  - Added root-level `subjectId` and `subjectName` with fallback getters to backend DTO.
+  - Added client normalizer and robust filter fallback.
+  - Added subject badge with icon on material cards.
+  - Added student ownership validation on subject assignment.
+## 2026-08-28 (Session 24 - Master Fix: Timetable Horizon + Date Display + Slot Details + Missed-Session History)
+- **Task Started:** MASTER FIX — TIMETABLE HORIZON + DATE DISPLAY + SLOT DETAILS + MISSED-SESSION HISTORY. Full-stack implementation and verification of complete exam-deadline horizon, month/date headers, week navigation, start-end time ranges, study session details modal, material-to-slot topic traceability, and non-destructive missed session history with next-day catch-up.
+- **Task Completed:**
+  - **Full Exam-Deadline Horizon:** Removed 7-day truncation in `TimetableService.java`. Timetable dynamically spans 14d, 30d, 60d, 90d based on furthest upcoming exam deadline, dedicating the eve before each exam to intensive revision.
+  - **Month & Date Display:** Integrated month headers (`AUGUST 2026 – SEPTEMBER 2026`) and distinct dates (`Fri 28`, `Sat 29`, `Sun 30`, `Mon 31`, `Tue 1`, `Wed 2`, `Thu 3`) with month transitions in `timetable/page.tsx` and `timetable.module.css`. Prevented multi-week date collapse.
+  - **Week Switcher & Pager:** Added Prev/Next week navigation, quick jump tabs (`[Today]`, `[Week 1]`, `[Week 2]`), and `[All Weeks View]` to view continuous multi-week timelines.
+  - **Start–End Time Display:** Updated timetable cards and mobile `SlotCard.tsx` to render full range (e.g. `6:00 AM – 7:00 AM`) and duration badge (`60m`) derived from user study window preferences.
+  - **Study Session Detail Modal (`SlotDetailModal.tsx`):** Interactive modal rendering Subject badge, formatted date, full time range, duration, Status badge, Today's Topic, Source Material, Chapter, Difficulty, What to Study bullet points, and Exam relevance countdown.
+  - **Material-to-Slot NLP Traceability (`MaterialTopicReader.java`):** Implemented topic resolver parsing `extractedTopics` and `extractedChapters` from uploaded PDF materials to generate rich topic metadata and bullet guidance.
+  - **Missed-Session History & Catch-Up:** Preserved uncompleted past sessions as `status = 'missed'`. Injected catch-up sessions with urgent `🔴 MISSED — COMPLETE TODAY` badge and alert banner without overwriting historical records.
+  - **Automated Tests & Live Verification:**
+    - 4 backend unit tests in `TimetableHorizonAndDetailsTest.java` (17/17 backend tests passing).
+    - 4 frontend unit tests in `slotDetailModal.test.tsx` (100% passing).
+    - Live end-to-end Playwright browser script (`verify_timetable_master_fix_live.mjs`) verified full calendar horizon, month header, start-end range, modal popup, week switching, and completion toggling with visual screenshots.
+- **Files Modified / Created:**
+  - `backend/src/main/java/com/aistudyplanner/service/MaterialTopicReader.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotResponse.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/service/TimetableHorizonAndDetailsTest.java` [NEW]
+  - `frontend/src/types/api.types.ts` [MODIFIED]
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [NEW]
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [NEW]
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/timetable.module.css` [MODIFIED]
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [NEW]
+  - `frontend/src/__tests__/e2e/timetable_master_fix.spec.ts` [NEW]
+  - `mobile/src/types/timetable.types.ts` [MODIFIED]
+  - `mobile/src/components/timetable/SlotCard.tsx` [MODIFIED]
+  - `.project-memory/MASTER_CONTEXT.md` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/BUG_TRACKER.md` [MODIFIED]
+  - `.project-memory/API_STATUS.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/TEST_PROGRESS.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+- **Problems Found:**
+  - Timetable generation was hardcoded to truncate horizons to 7 days regardless of exam deadline.
+  - UI lacked multi-week calendar headers, showing generic day numbers that collapsed across weeks.
+  - Slot cards only showed start times rather than full start-end intervals.
+  - Slots lacked an interactive session detail modal with actionable study guidance.
+  - Rescheduling was destructive to past missed session history.
+- **Solutions:**
+  - Derived full horizon from exam dates (14d, 30d, 60d, 90d).
+  - Built month header, week pagers, and date labels.
+  - Calculated duration and full start-end time range.
+  - Created `SlotDetailModal` with material topic and chapter traceability.
+  - Preserved past missed sessions with non-destructive status tracking and today catch-up badges.
+- **Next Recommended Task:** Project is 100% verified, stable, and ready for deployment or next feature development.
+

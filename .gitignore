@@ -69,3 +69,6 @@ Thumbs.db
 # Scratch output from `npm run lint > …`. Regenerate it, don't commit it.
 frontend/lint_results.txt
 
+# Scratch scripts
+scratch/
+

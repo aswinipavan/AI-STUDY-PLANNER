@@ -37,14 +37,48 @@ public class StudentService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        if (request.getFullName() != null) student.setFullName(request.getFullName());
-        if (request.getEmail() != null) student.setEmail(request.getEmail());
-        if (request.getCollegeName() != null) student.setCollegeName(request.getCollegeName());
-        if (request.getSemester() != null) student.setSemester(request.getSemester());
-        if (request.getDepartment() != null) student.setDepartment(request.getDepartment());
-        if (request.getAvailableHoursPerDay() != null) student.setAvailableHoursPerDay(request.getAvailableHoursPerDay());
-        if (request.getPreferredStudyTime() != null) student.setPreferredStudyTime(request.getPreferredStudyTime());
-        if (request.getProfilePictureUrl() != null) student.setProfilePictureUrl(request.getProfilePictureUrl());
+        if (request.getFullName() != null) {
+            String name = request.getFullName().trim();
+            if (!name.isEmpty()) {
+                student.setFullName(name);
+            }
+        }
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            student.setEmail(request.getEmail().trim());
+        }
+        if (request.getCollegeName() != null) {
+            String college = request.getCollegeName().trim();
+            student.setCollegeName(college.isEmpty() ? null : college);
+        }
+        if (request.getSemester() != null) {
+            student.setSemester(request.getSemester());
+        }
+        if (request.getDepartment() != null) {
+            String dept = request.getDepartment().trim();
+            student.setDepartment(dept.isEmpty() ? null : dept);
+        }
+        if (request.getPhoneNumber() != null) {
+            String phone = request.getPhoneNumber().trim();
+            if (phone.isEmpty()) {
+                student.setPhoneNumber(null);
+            } else {
+                studentRepository.findByPhoneNumber(phone).ifPresent(existing -> {
+                    if (!existing.getId().equals(studentId)) {
+                        throw new IllegalArgumentException("Phone number is already associated with another account");
+                    }
+                });
+                student.setPhoneNumber(phone);
+            }
+        }
+        if (request.getAvailableHoursPerDay() != null) {
+            student.setAvailableHoursPerDay(request.getAvailableHoursPerDay());
+        }
+        if (request.getPreferredStudyTime() != null && !request.getPreferredStudyTime().trim().isEmpty()) {
+            student.setPreferredStudyTime(request.getPreferredStudyTime().trim());
+        }
+        if (request.getProfilePictureUrl() != null && !request.getProfilePictureUrl().trim().isEmpty()) {
+            student.setProfilePictureUrl(request.getProfilePictureUrl().trim());
+        }
 
         student = studentRepository.save(student);
         return StudentMapper.toStudentResponse(student);

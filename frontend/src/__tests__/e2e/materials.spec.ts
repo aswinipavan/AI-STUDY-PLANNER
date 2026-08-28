@@ -1,52 +1,83 @@
 import { test, expect } from '@playwright/test';
+import { setupAuthenticatedContext } from '../../../playwright/auth-setup';
 
 // Group 6: Study Materials Library (SEL-116 to SEL-130)
 test.describe('Materials Section', () => {
+  const mockStudent = {
+    id: 's-123',
+    firebaseUid: 'mock-uid-materials-spec',
+    fullName: 'Dashboard Student',
+    name: 'Dashboard Student',
+    email: 'student@example.com',
+    collegeName: 'University',
+    semester: 4,
+    department: 'CS',
+    isPremium: false,
+  };
 
-  test.beforeEach(async ({ context }) => {
-    // Skip onboarding for all tests
-    await context.addInitScript(() => {
-      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
-    });
+  test.beforeEach(async ({ page, context }) => {
+    await setupAuthenticatedContext(context, mockStudent);
 
-    // Set authentication cookie BEFORE setting up routes
-    await context.addCookies([
-      { name: 'access_token', value: 'fake.jwt.token', domain: 'localhost', path: '/' }
-    ]);
+    await page.addInitScript((student) => {
+      localStorage.setItem('auth-store', JSON.stringify({
+        state: {
+          user: student,
+          isAuthenticated: true,
+          isPremium: false,
+        },
+        version: 0,
+      }));
+    }, mockStudent);
 
     // Set up routes at CONTEXT level BEFORE navigation to avoid race conditions with React Query
     // Intercept auth checks
-    await context.route('**/api/students/me', async (route) => {
+    await page.route('**/api/students/me', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ data: { id: 's-123', name: 'Dashboard Student' } }),
+        body: JSON.stringify({ success: true, message: 'OK', data: mockStudent }),
       });
     });
 
-    await context.route('**/api/students/me/subjects', async (route) => {
+    await page.route('**/api/students/me/subjects', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
+          success: true,
+          message: 'OK',
           data: [
-            { id: 'sub-1', name: 'Data Structures' },
-            { id: 'sub-2', name: 'Computer Architecture' }
+            { id: 'sub-1', name: 'Data Structures', subjectName: 'Data Structures' },
+            { id: 'sub-2', name: 'Computer Architecture', subjectName: 'Computer Architecture' }
           ]
         }),
       });
     });
 
-    await context.route('**/api/materials', async (route) => {
+    await page.route('**/api/materials**', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
+          success: true,
+          message: 'OK',
           data: [
-            { id: 'mat-1', title: 'Lecture Notes 1', fileName: 'notes1.pdf', fileSize: '1.2 MB', fileType: 'pdf', subject: { name: 'Data Structures' }, aiSummary: '1. Introduction to Trees\n2. Binary Heap implementation', createdDate: '2026-08-10' }
+            { id: 'mat-1', title: 'Lecture Notes 1', fileName: 'notes1.pdf', fileSize: '1.2 MB', fileType: 'pdf', subjectId: 'sub-1', subject: { id: 'sub-1', name: 'Data Structures', subjectName: 'Data Structures' }, aiSummary: '1. Introduction to Trees\n2. Binary Heap implementation', createdDate: '2026-08-10' }
           ]
         }),
       });
+    });
+
+    await page.route('**/api/wake', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'awake' }) });
+    });
+
+    await page.route('**/api/notifications**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/timetable/active', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: null }) });
     });
   });
 

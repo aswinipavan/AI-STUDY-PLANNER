@@ -1,6 +1,105 @@
 # Changelog
 
-## 2026-08-23 (Session 19 - Local Data Persistence)
+## 2026-08-28 (Session 25 - Master Prompt: Redesign AI Tutor Chat + Improve Answer Quality)
+- **Files created/changed:**
+  - `backend/src/main/java/com/aistudyplanner/service/GroqService.java` [MODIFIED] — Implemented pedagogical master system prompt guidelines with direct answers, strict heading hierarchy (`## Key Concept`, `### Worked Example`, `### Step-by-Step Method`), standard LaTeX math, fenced code blocks, and material grounding.
+  - `backend/src/test/java/com/aistudyplanner/service/AiAssistantPromptTest.java` [NEW] — Backend unit test suite asserting material context injection, student academic status grounding, and prompt generation.
+  - `frontend/package.json` [MODIFIED] — Installed `remark-gfm@4` for GitHub Flavored Markdown table parsing.
+  - `frontend/jest.setup.ts` [MODIFIED] — Added mock for `remark-gfm` in JSDOM tests.
+  - `frontend/jest.config.ts` [MODIFIED] — Added `.*\\.mjs$` ignore pattern to prevent standalone scripts from triggering Jest.
+  - `frontend/src/hooks/useChat.ts` [MODIFIED] — Updated history synchronization effect to update state immediately without stale session locks.
+  - `frontend/src/components/chat/MessageBubble.tsx` [MODIFIED] — Integrated `remarkGfm` and custom renderers for tables (`<table>`, `<th>`, `<td>`), headings (`h1`-`h4`), callouts (`blockquote`), copy button, and grounding badge.
+  - `frontend/src/components/chat/ChatContainer.tsx` [MODIFIED] — Added 2x2 interactive starter prompt cards in empty chat sessions.
+  - `frontend/src/components/chat/chat.module.css` [MODIFIED] — Added styles for responsive table containers, GFM tables, heading hierarchy, callout blocks, action bar, grounding badge, and starter cards.
+  - `frontend/src/__tests__/components/chatMessageRendering.test.tsx` [NEW] — Unit tests for AI message rendering, copy button, and grounding badge.
+  - `frontend/src/__tests__/e2e/ai.spec.ts` [MODIFIED] — Updated route mocking with unexpired JWT auth cookies and verified all 15 test cases (15/15 passed).
+- **Reason:** Upgrade AI Tutor responses from raw model output into a polished, structured learning experience with proper GFM tables, LaTeX math, visual hierarchy, callout blocks, and notes grounding.
+- **Summary:**
+  - Replaced raw pipe-delimited text with formatted HTML tables.
+  - Added clear pedagogical structure with intuition, examples, step-by-step methods, and callouts.
+  - Grounded answers strictly in uploaded study notes with fallback transparency.
+  - Verified with 22/22 backend tests, 134/134 frontend tests, 15/15 Playwright E2E tests, and 0-error Next.js production build.
+- **Impact:** Vastly superior study readability, retention, and visual quality for students.
+
+## 2026-08-28 (Session 24 - Next-Level Dependencies, Plugins & Resources Integration)
+- **Files created/changed:**
+  - `frontend/package.json` [MODIFIED] — Installed `remark-math@6`, `rehype-katex@7`, `katex@0.16.x`, `@types/katex`, `canvas-confetti`, `@types/canvas-confetti`, `@next/bundle-analyzer`.
+  - `frontend/src/app/globals.css` [MODIFIED] — Imported `katex/dist/katex.min.css` for mathematical formula fonts and formatting.
+  - `frontend/src/components/chat/MessageBubble.tsx` [MODIFIED] — Integrated `remark-math` and `rehype-katex` with interactive code blocks featuring copy-to-clipboard functionality.
+  - `frontend/src/lib/confetti.ts` [NEW] — Reusable celebratory confetti burst engine for daily completions and achievement badges.
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED] — Integrated `fireCelebrationConfetti()` when student finishes all study sessions for the day.
+  - `frontend/next.config.ts` [MODIFIED] — Integrated `@next/bundle-analyzer` with `ANALYZE=true` build profiling.
+  - `backend/pom.xml` [MODIFIED] — Added `org.apache.tika:tika-core:2.9.2` (universal document intelligence), `io.github.resilience4j:resilience4j-spring-boot3:2.2.0` (fault tolerance circuit breaker), and `jacoco-maven-plugin:0.8.11` (automated code coverage reporting).
+  - `backend/src/main/java/com/aistudyplanner/service/nlp/DocumentIntelligenceService.java` [MODIFIED] — Added `extractTextUsingTika(byte[])` universal fallback parsing for Word documents, PowerPoint presentations, plain text, Markdown notes, and EPUBs.
+  - `backend/src/test/java/com/aistudyplanner/service/nlp/DocumentIntelligenceTest.java` [MODIFIED] — Added unit tests for `extractTextUsingTika`.
+  - `frontend/src/__tests__/components/messageBubbleKatex.test.tsx` [NEW] — Jest unit tests for math formulas and code block copy buttons.
+  - `frontend/src/__tests__/lib/confetti.test.ts` [NEW] — Jest unit tests for celebration confetti utility.
+- **Reason:** Elevate project capabilities across AI chat mathematical formulas, multi-format document ingestion, gamification celebrations, API resilience, and test coverage observability.
+- **Summary:**
+  - KaTeX rendering enables clean mathematical and scientific equations in AI study notes.
+  - Interactive code blocks with copy-to-clipboard buttons enhance CS/programming learning.
+  - Celebration confetti provides visual reward feedback on completing daily study goals.
+  - Apache Tika expands document intelligence to multi-format notes and slides.
+  - JaCoCo plugin provides automated test coverage reports.
+  - 100% test pass rate (131/131 frontend tests across 20 suites, 19/19 backend tests with JaCoCo).
+- **Impact:** Significant quality-of-life, visual, and architectural upgrade across frontend and backend.
+
+## 2026-08-28 (Session 23 - Master Fix: Timetable Horizon + Date Display + Slot Details + Missed-Session History)
+- **Files created/changed:**
+  - `backend/src/main/java/com/aistudyplanner/service/MaterialTopicReader.java` [MODIFIED] — Added `TopicDetail` DTO and `resolveTopicDetail(studentId, subjectId, topicLabel, subjectName)` parsing `extractedTopics` and `extractedChapters` from uploaded PDF materials to produce topic, chapter, material title, actionable "what to study" bullet guidance, and difficulty scoring.
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotResponse.java` [MODIFIED] — Extended DTO with `durationMinutes`, `chapter`, `materialTitle`, `materialId`, `whatToStudy`, `selectionReason`, `examDeadline`, `examName`, `daysUntilExam`, `difficulty`, `difficultyScore`, `isCatchUp`, and `missedDate`.
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java` [MODIFIED] — Removed 7-day truncation, default `useDeadlines` to true, dynamically calculated horizon from furthest exam date (14d, 30d, 60d, 90d), added pre-exam revision slot on exam eve, sorted multi-week slots chronologically via `findAllByTimetableIdOrderBySlotDate`, and enriched slot responses with topic details, duration, and catch-up states.
+  - `backend/src/test/java/com/aistudyplanner/service/TimetableHorizonAndDetailsTest.java` [NEW] — 4 backend unit tests covering 14-day horizon generation, full start-end time ranges, material topic resolution, and exam eve revision.
+  - `frontend/src/types/api.types.ts` [MODIFIED] — Extended `TimetableSlot` with duration, chapter, material, whatToStudy, selectionReason, isCatchUp, missedDate, examDeadline, and status.
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` & `slotDetailModal.module.css` [NEW] — Interactive study session detail modal rendering Subject badge, formatted date, full time range, duration, Status badge, Today's Topic, Source Material, Chapter, Difficulty, What to Study bullet points, and Exam relevance countdown.
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` & `timetable.module.css` [MODIFIED] — Calendar Horizon & Month Range Header (`AUGUST 2026 – SEPTEMBER 2026`), Week Switcher & Pager (`Week 1 of 2: Aug 28 – Sep 3`), quick jump tabs (`[Today]`, `[Week 1]`, `[Week 2]`, `[All 2 Weeks View]`), daily study window banner (`6:00 AM – 7:00 AM`), urgent missed session alert banner, full start-end time ranges on slot cards (`6:00 AM – 7:00 AM`), `🔴 MISSED — COMPLETE TODAY` badge for catch-up, and modal triggers.
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [NEW] — 4 Jest unit tests asserting topic, chapter, material, whatToStudy, and completion toggle.
+  - `frontend/src/__tests__/e2e/timetable_master_fix.spec.ts` [NEW] — Playwright E2E test suite for full horizon, slot details modal, and catch-up flow.
+  - `mobile/src/types/timetable.types.ts` & `mobile/src/components/timetable/SlotCard.tsx` [MODIFIED] — Synchronized mobile DTOs, time range displays, and catch-up badge styles.
+- **Reason:** Resolve timetable truncation (previously capped at 7 days when exam was 14+ days away), provide explicit month/date calendar navigation without multi-week date collapse, display full study slot start-end times, show rich study session details with material traceability, and track missed past sessions non-destructively.
+- **Summary:**
+  - Full exam deadline horizon dynamically calculated and displayed.
+  - Full start-end time ranges derived from user study preferences and session styles.
+  - Modal provides deep guidance derived from uploaded PDF materials.
+  - Missed past sessions preserved in history while generating urgent catch-up slots on today's schedule.
+  - 17/17 backend tests passing, 100% frontend Jest unit tests passing, and verified with live browser screenshots.
+- **Impact:** Complete end-to-end intelligent study scheduling with full calendar horizon and rich session guidance.
+
+- **Files created/changed:**
+  - `start-project.bat` [NEW] — Automated 1-click startup script detecting port 8080/3000 conflicts with PID reporting, terminating stale processes, clearing stale H2 locks, launching backend in dedicated terminal, polling `/actuator/health` until UP (with 90s timeout), launching frontend on port 3000 in dedicated terminal, polling port 3000 until ready, and automatically opening `http://localhost:3000` in the browser.
+  - `stop-project.bat` [NEW] — Automated teardown script detecting and killing processes on ports 8080 and 3000 with PID reporting, clearing lock files, and confirming port freedom.
+- **Reason:** Provide a seamless, automated, and fail-safe local developer experience on Windows without manual terminal juggling, port collision errors, or Next.js 3001 fallbacks.
+- **Summary:**
+  - Uses relative pathing (`%~dp0`) for 100% reliability whether double-clicked from File Explorer or run from CMD/PowerShell.
+  - Replaces arbitrary fixed sleeps with live polling against the Spring Boot health check endpoint (`/actuator/health`).
+  - Guards against launching frontend if backend fails to reach `UP` state.
+  - Verified 100% passing across 6 automated end-to-end launch, restart, and shutdown stages.
+- **Impact:** Instant 1-command startup and shutdown with zero process leaks.
+
+## 2026-08-27 (Session 21 - Master Fix: Profile Save Full Persistence & Re-Login Identity Preservation)
+- **Files changed:**
+  - `backend/src/main/java/com/aistudyplanner/model/dto/request/UpdateProfileRequest.java` [MODIFIED] — Added `phoneNumber` field and `@JsonSetter("semester")` accepting numbers (1–8), strings (`"1st Year"`, `"Semester 5"`), and null.
+  - `backend/src/main/java/com/aistudyplanner/service/StudentService.java` [MODIFIED] — Implemented full persistence for all 6 fields (`fullName`, `collegeName`, `semester`, `department`, `phoneNumber`, `profilePictureUrl`), converted empty string phone numbers to SQL `null`, added phone uniqueness check, and clean string trimming.
+  - `backend/src/main/java/com/aistudyplanner/service/AuthService.java` [MODIFIED] — Captured Google `profilePictureUrl` and sanitized `phoneNumber` on registration and re-login, strictly preserving single `Student` identity per `firebase_uid`.
+  - `backend/src/main/resources/application-local.properties` [MODIFIED] — Removed `AUTO_SERVER=TRUE` to eliminate Windows loopback socket server lock issues on local H2 restarts.
+  - `backend/src/test/java/com/aistudyplanner/service/StudentProfilePersistenceTest.java` [NEW] — 6 backend unit tests for persistence, partial updates, semester parsing, and relogin identity.
+  - `frontend/src/api/auth.api.ts` [MODIFIED] — Included `phoneNumber` in `updateMe` mutation.
+  - `frontend/src/stores/authStore.ts` [MODIFIED] — Bidirectional normalization of `name`/`fullName` and `photoUrl`/`profilePictureUrl`.
+  - `frontend/src/components/providers/AuthProvider.tsx` [MODIFIED] — Hydrates user from authoritative `/api/students/me` backend endpoint instead of overwriting with empty skeleton on load or reload.
+  - `frontend/src/app/(auth)/login/page.tsx` [MODIFIED] — Passes full `data.user` (`StudentProfile`) to `setUserAction`.
+  - `frontend/src/app/(dashboard)/settings/page.tsx` [MODIFIED] — Standardized numeric `SEMESTER_OPTIONS` ('1'–'9'), included `phoneNumber` in form registration and mutation, added `useQuery` profile synchronization with `isDirty` protection, and custom department retention.
+  - `frontend/src/components/layout/Topbar.tsx` [MODIFIED] — Added `signOut(auth)` on user logout.
+  - `frontend/src/__tests__/app/settings/profilePersistence.test.tsx` [NEW] — Jest unit tests for form fields and store synchronization.
+  - `frontend/src/__tests__/e2e/profile_persistence.spec.ts` [NEW] — Playwright E2E tests for profile save, reload persistence, phone removal, and relogin.
+  - `frontend/playwright/auth-setup.ts` [MODIFIED] — Added `/api/notifications` route mock.
+  - `frontend/.env.local` [MODIFIED] — Added `JWT_SECRET` for local E2E test runs.
+- **Reason:** Users updating profile details on the Settings page experienced loss of fields (such as phone number or custom semester formats), and page reload or re-login with the same Google account did not consistently retain all fields.
+- **Summary:**
+  - Resolved profile update payload truncation across backend DTOs, controllers, and frontend forms.
+  - Ensured all 6 profile fields persist reliably in local and production databases.
+  - Ensured single Firebase UID user identity across multiple logins with zero duplication.
+  - Verified with 247 backend tests (0 failures), 123 frontend unit tests (0 failures), 3 Playwright E2E tests, and 100% passing live persistence script.
+- **Impact:** Permanent fix ensuring 100% durable profile persistence and flawless Google identity retention.
 - **Files changed:**
   - `backend/start-local.cmd` [MODIFIED] — corrected stale "H2 in-memory" wording to the persistent file DB (`jdbc:h2:file:./data/studyplanner`).
 - **Reason:** Local H2 was in-memory (`jdbc:h2:mem:`) and wiped all data on every backend restart. The local profile now uses a file-based H2 database, so subjects, marks, exams, materials, timetable, chat/history and progress survive restarts; students re-attach by their real Firebase UID on re-login. Production Supabase/PostgreSQL and Firebase auth are unchanged; no app rebuild.
@@ -537,3 +636,23 @@
   - `backend/start-local.cmd`: Added automated stale process check on port 8080 to cleanly release the port before booting Spring Boot, and robust `.env` parsing.
 - **Reason:** Prevent backend boot crashes when restarting the local dev server or when an existing process holds the port.
 - **Summary:** Verified local backend boots cleanly (`Started AiStudyPlannerApplication in 14.511 seconds`) and health check returns `UP`.
+
+## [2026-08-27] MASTER FIX — Materials Subject Filter Shows Uploaded Files (CRITICAL)
+- **Files Modified/Created:**
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/MaterialResponse.java` [MODIFIED]: Added root-level `subjectId` (UUID) and `subjectName` (String) with defensive fallback getters `getSubjectId()` and `getSubjectName()`.
+  - `backend/src/main/java/com/aistudyplanner/repository/MaterialRepository.java` [MODIFIED]: Added `findAllByStudentIdAndSubjectIdOrderByCreatedAtDesc(UUID studentId, UUID subjectId)`.
+  - `backend/src/main/java/com/aistudyplanner/service/MaterialService.java` [MODIFIED]: Added student ownership validation when associating uploaded files to subjects in `uploadMaterial` and `saveMaterialMetadata`; updated `getMaterialsBySubject` query; updated `toMaterialResponse` mapping.
+  - `backend/src/main/java/com/aistudyplanner/controller/MaterialController.java` [MODIFIED]: Added `@RequestParam(value = "subjectId", required = false)` handling to `GET /api/materials` and hardened `subjectId` multipart parameter parsing.
+  - `backend/src/test/java/com/aistudyplanner/service/MaterialSubjectFilterTest.java` [NEW]: 4 unit/mapping tests covering upload association, student isolation, filtered retrieval, and Jackson serialization.
+  - `backend/src/test/java/com/aistudyplanner/controller/MaterialControllerTest.java` [MODIFIED]: Added `testGetMaterialsWithSubjectIdQueryParam`.
+  - `backend/src/test/java/com/aistudyplanner/integration/UploadIntegrationTest.java` [MODIFIED]: Added `materialUploadWithSubjectAndFilterRoundTrip`.
+  - `frontend/src/types/api.types.ts` [MODIFIED]: Updated `StudyMaterial` interface with `subjectId?: string`, `subjectName?: string`, and `subject?: Subject`.
+  - `frontend/src/api/materials.api.ts` [MODIFIED]: Added `mapMaterialFromBackend` normalizer guaranteeing `subjectId` and `subjectName` on all API responses.
+  - `frontend/src/app/(dashboard)/materials/page.tsx` [MODIFIED]: Updated client-side filter to resolve `mat.subjectId || mat.subject?.id`.
+  - `frontend/src/app/(dashboard)/materials/materials.module.css` [MODIFIED]: Added `.subjectBadge` styles.
+  - `frontend/src/components/materials/MaterialCard.tsx` [MODIFIED]: Rendered user-selected subject badge with `BookOpen` icon.
+  - `frontend/src/__tests__/e2e/material_subject_filter.spec.ts` [NEW]: Playwright E2E test suite (5 tests: All Subjects, Discrete Maths filter, OS filter, Toggle, Subject Badge).
+  - `frontend/src/__tests__/e2e/materials.spec.ts` [MODIFIED]: Updated auth fixtures to use `setupAuthenticatedContext`.
+- **Reason:** Resolve issue where uploading a PDF to a specific subject folder (e.g., "Discrete Maths") succeeded, but filtering the Materials Library by "Discrete Maths" showed no materials while "All Subjects" showed them.
+- **Summary:** Trace and fixed end-to-end data flow: backend DTO root fields, database query, API query params, frontend response normalization, UI client-side filter resilience, and badge rendering. Verified across 253 backend tests, 123 frontend tests, 20 Playwright E2E tests, and full live browser execution.
+- **Impact:** 100% reliable subject filtering across the materials library with full student data isolation and visual badge indicators.

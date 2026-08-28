@@ -95,13 +95,15 @@ public class TimetableService {
                 .max(Comparator.naturalOrder())
                 .orElse(null);
 
+        boolean useDeadlines = request.getUseDeadlines() == null || Boolean.TRUE.equals(request.getUseDeadlines());
+
         if (request.getTargetDeadlineDate() != null) {
             endDate = request.getTargetDeadlineDate();
             actualDurationDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
             if (actualDurationDays < 1) {
                 throw new IllegalArgumentException("Target deadline must be after start date");
             }
-        } else if (latestExamDate != null && latestExamDate.isAfter(startDate)) {
+        } else if (useDeadlines && latestExamDate != null && latestExamDate.isAfter(startDate)) {
             // Dynamic horizon: span every day from the start up to the last exam.
             endDate = latestExamDate;
             actualDurationDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
@@ -503,8 +505,8 @@ public class TimetableService {
         Timetable timetable = timetableRepository.findByStudentIdAndIsActiveTrue(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("No active timetable found"));
 
-        // Use JOIN FETCH to avoid N+1 query problem
-        List<TimetableSlot> slots = timetableSlotRepository.findAllByTimetableIdWithSubjectFetch(timetable.getId());
+        // Use true chronological ordering by concrete slotDate
+        List<TimetableSlot> slots = timetableSlotRepository.findAllByTimetableIdOrderBySlotDate(timetable.getId());
         List<SlotResponse> slotResponses = slots.stream()
                 .map(slot -> toSlotResponse(slot, timetable.getWeekStartDate()))
                 .collect(Collectors.toList());
@@ -639,12 +641,86 @@ public class TimetableService {
             slotDate = weekStartDate.plusDays(slot.getDayOfWeek());
         }
         
-        // Map isCompleted to status string
+        LocalDate today = LocalDate.now();
         String status = "pending";
-        if (slot.getIsCompleted() != null) {
-            status = slot.getIsCompleted() ? "completed" : "pending";
+        if (Boolean.TRUE.equals(slot.getIsCompleted())) {
+            status = "completed";
+        } else if (slotDate != null && slotDate.isBefore(today)) {
+            status = "missed";
         }
-        
+
+        Integer durationMinutes = null;
+        if (slot.getStartTime() != null && slot.getEndTime() != null) {
+            durationMinutes = (int) ChronoUnit.MINUTES.between(slot.getStartTime(), slot.getEndTime());
+        }
+
+        String notes = slot.getNotes();
+        boolean isCatchUp = false;
+        LocalDate missedDate = null;
+        if (notes != null) {
+            String lowerNotes = notes.toLowerCase();
+            if (lowerNotes.contains("rescheduled from") || lowerNotes.contains("missed session caught up") || lowerNotes.contains("catch-up")) {
+                isCatchUp = true;
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d{4}-\\d{2}-\\d{2})").matcher(notes);
+                if (m.find()) {
+                    try {
+                        missedDate = LocalDate.parse(m.group(1));
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
+
+        // Topic metadata from MaterialTopicReader
+        UUID studentId = (slot.getTimetable() != null && slot.getTimetable().getStudent() != null)
+                ? slot.getTimetable().getStudent().getId()
+                : (slot.getSubject() != null && slot.getSubject().getStudent() != null ? slot.getSubject().getStudent().getId() : null);
+        UUID subjectId = slot.getSubject() != null ? slot.getSubject().getId() : null;
+        String subjectName = slot.getSubject() != null ? slot.getSubject().getSubjectName() : null;
+
+        MaterialTopicReader.TopicDetail topicDetail = materialTopicReader.resolveTopicDetail(
+                studentId, subjectId, slot.getTopic(), subjectName);
+
+        // Find nearest upcoming exam for this subject if available
+        LocalDate examDeadline = null;
+        String examName = null;
+        Long daysUntilExam = null;
+        if (studentId != null && subjectId != null) {
+            List<Exam> exams = examRepository.findUpcomingExams(studentId, today);
+            if (exams != null) {
+                for (Exam exam : exams) {
+                    if (exam.getSubject() != null && exam.getSubject().getId().equals(subjectId) && exam.getExamDate() != null) {
+                        examDeadline = exam.getExamDate();
+                        examName = exam.getExamName();
+                        daysUntilExam = slotDate != null
+                                ? ChronoUnit.DAYS.between(slotDate, examDeadline)
+                                : ChronoUnit.DAYS.between(today, examDeadline);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Reason for selection
+        String selectionReason;
+        if (isCatchUp) {
+            selectionReason = "🔴 Overdue Catch-up: Missed session from " + (missedDate != null ? missedDate : "previous date")
+                    + " carried forward to stay on schedule before exams.";
+        } else if (slot.getTopic() != null && slot.getTopic().startsWith("Final revision:")) {
+            selectionReason = "Final dedicated revision on the eve of your " + (examName != null ? examName : "upcoming") + " exam.";
+        } else if (slot.getTopic() != null && slot.getTopic().startsWith("Revision:")) {
+            selectionReason = "Spaced repetition revision to reinforce core concepts before the exam.";
+        } else if (slot.getTopic() != null && slot.getTopic().startsWith("Practice:")) {
+            selectionReason = "Active problem-solving and applied exercises to build speed and accuracy.";
+        } else if (slot.getTopic() != null && slot.getTopic().startsWith("Weak-area drill:")) {
+            selectionReason = "Targeted drill session focused on strengthening lower-scoring topics.";
+        } else if (daysUntilExam != null && daysUntilExam <= 7) {
+            selectionReason = "High-priority preparation: upcoming " + (examName != null ? examName : "exam") + " in " + daysUntilExam + " day(s).";
+        } else if (topicDetail.getMaterialTitle() != null) {
+            selectionReason = "Progressive curriculum sequence from uploaded material: " + topicDetail.getMaterialTitle();
+        } else {
+            selectionReason = "Standard syllabus allocation based on subject difficulty and available study hours.";
+        }
+
         return SlotResponse.builder()
                 .id(slot.getId())
                 .subject(StudentMapper.toSubjectResponse(slot.getSubject()))
@@ -652,9 +728,22 @@ public class TimetableService {
                 .date(slotDate)
                 .startTime(slot.getStartTime())
                 .endTime(slot.getEndTime())
+                .durationMinutes(durationMinutes)
                 .topic(slot.getTopic())
+                .chapter(topicDetail.getChapter())
+                .materialTitle(topicDetail.getMaterialTitle())
+                .materialId(topicDetail.getMaterialId())
+                .whatToStudy(topicDetail.getWhatToStudy())
+                .selectionReason(selectionReason)
+                .examDeadline(examDeadline)
+                .examName(examName)
+                .daysUntilExam(daysUntilExam)
+                .difficulty(topicDetail.getDifficulty())
+                .difficultyScore(topicDetail.getDifficultyScore())
                 .isCompleted(slot.getIsCompleted())
                 .status(status)
+                .isCatchUp(isCatchUp)
+                .missedDate(missedDate)
                 .notes(slot.getNotes())
                 .build();
     }

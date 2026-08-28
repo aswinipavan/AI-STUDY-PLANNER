@@ -33,10 +33,14 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @GetMapping({"", "/"})
-    @Operation(summary = "Get all materials")
-    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getMaterials(@CurrentStudent Student student) {
-        log.info("Fetching all materials for student: {}", student.getId());
-        List<MaterialResponse> responses = materialService.getMaterials(student.getId());
+    @Operation(summary = "Get all materials with optional subject filtering")
+    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getMaterials(
+            @CurrentStudent Student student,
+            @RequestParam(value = "subjectId", required = false) UUID subjectId) {
+        log.info("Fetching materials for student: {}, subjectId: {}", student.getId(), subjectId);
+        List<MaterialResponse> responses = (subjectId != null)
+                ? materialService.getMaterialsBySubject(student.getId(), subjectId)
+                : materialService.getMaterials(student.getId());
         return ResponseEntity.ok(ApiResponse.success(responses, "Materials fetched successfully"));
     }
 
@@ -84,7 +88,14 @@ public class MaterialController {
             @RequestParam(value = "textPreview", required = false) String textPreview) {
         log.info("Uploading material '{}' for student: {} ({} bytes)", title, student.getId(),
                 file != null ? file.getSize() : 0);
-        UUID subjectUuid = (subjectId != null && !subjectId.isBlank()) ? UUID.fromString(subjectId) : null;
+        UUID subjectUuid = null;
+        if (subjectId != null && !subjectId.isBlank() && !"null".equalsIgnoreCase(subjectId) && !"undefined".equalsIgnoreCase(subjectId)) {
+            try {
+                subjectUuid = UUID.fromString(subjectId.trim());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid subjectId format passed to uploadMaterial: {}", subjectId);
+            }
+        }
         MaterialResponse response = materialService.uploadMaterial(student.getId(), file, title, subjectUuid, textPreview);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Material uploaded successfully"));
     }

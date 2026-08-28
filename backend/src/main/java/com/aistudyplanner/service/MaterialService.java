@@ -3,6 +3,7 @@ package com.aistudyplanner.service;
 import com.aistudyplanner.exception.ResourceNotFoundException;
 import com.aistudyplanner.model.dto.request.MaterialUploadRequest;
 import com.aistudyplanner.model.dto.response.MaterialResponse;
+import com.aistudyplanner.model.dto.response.SubjectResponse;
 import com.aistudyplanner.model.entity.Material;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.model.entity.Subject;
@@ -82,6 +83,10 @@ public class MaterialService {
         Subject subject = null;
         if (subjectId != null) {
             subject = subjectRepository.findById(subjectId).orElse(null);
+            if (subject != null && !subject.getStudent().getId().equals(studentId)) {
+                log.warn("Subject {} does not belong to student {}", subjectId, studentId);
+                subject = null;
+            }
         }
 
         // Store the bytes and get a persistable URL.
@@ -202,6 +207,10 @@ public class MaterialService {
         Subject subject = null;
         if (request.getSubjectId() != null) {
             subject = subjectRepository.findById(request.getSubjectId()).orElse(null);
+            if (subject != null && !subject.getStudent().getId().equals(studentId)) {
+                log.warn("Subject {} does not belong to student {}", request.getSubjectId(), studentId);
+                subject = null;
+            }
         }
 
         // Resolve MaterialType if not explicitly provided
@@ -346,7 +355,7 @@ public class MaterialService {
 
     @Transactional(readOnly = true)
     public List<MaterialResponse> getMaterialsBySubject(UUID studentId, UUID subjectId) {
-        return materialRepository.findAllByStudentIdAndSubjectId(studentId, subjectId).stream()
+        return materialRepository.findAllByStudentIdAndSubjectIdOrderByCreatedAtDesc(studentId, subjectId).stream()
                 .map(this::toMaterialResponse).collect(Collectors.toList());
     }
 
@@ -363,9 +372,15 @@ public class MaterialService {
     }
 
     private MaterialResponse toMaterialResponse(Material material) {
+        UUID subjectId = material.getSubject() != null ? material.getSubject().getId() : null;
+        String subjectName = material.getSubject() != null ? material.getSubject().getSubjectName() : null;
+        SubjectResponse subjectResponse = StudentMapper.toSubjectResponse(material.getSubject());
+
         return MaterialResponse.builder()
                 .id(material.getId())
-                .subject(StudentMapper.toSubjectResponse(material.getSubject()))
+                .subjectId(subjectId)
+                .subjectName(subjectName)
+                .subject(subjectResponse)
                 .title(material.getTitle())
                 .fileName(material.getFileName())
                 .fileUrl(material.getFileUrl())

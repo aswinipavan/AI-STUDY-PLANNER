@@ -1,6 +1,23 @@
 import { apiClient } from '@/lib/apiClient';
 import { StudyMaterial } from '@/types/api.types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mapMaterialFromBackend(raw: any): StudyMaterial {
+  if (!raw) return raw;
+  const subjectId = raw.subjectId || raw.subject?.id || undefined;
+  const subjectName = raw.subjectName || raw.subject?.subjectName || raw.subject?.name || undefined;
+  return {
+    ...raw,
+    subjectId,
+    subjectName,
+    subject: raw.subject ? {
+      id: raw.subject.id,
+      name: raw.subject.subjectName || raw.subject.name || '',
+      studentId: raw.subject.studentId || '',
+    } : undefined,
+  };
+}
+
 export const materialsApi = {
   /**
    * Upload a file and persist its metadata in a single multipart request.
@@ -35,7 +52,7 @@ export const materialsApi = {
       throw new Error(message);
     }
     const data = await res.json();
-    return data.data ?? data;
+    return mapMaterialFromBackend(data.data ?? data);
   },
 
   getUploadUrl: async (filename: string, fileType: string): Promise<{ uploadUrl: string; fileUrl: string }> => {
@@ -68,19 +85,23 @@ export const materialsApi = {
       }
     );
     // Backend returns ApiResponse<MaterialResponse>
-    return response.data.data || response.data;
+    return mapMaterialFromBackend(response.data.data || response.data);
   },
 
-  getAll: async (): Promise<StudyMaterial[]> => {
-    const response = await apiClient.get('/api/materials/');
+  getAll: async (subjectId?: string): Promise<StudyMaterial[]> => {
+    const response = await apiClient.get('/api/materials/', {
+      params: subjectId ? { subjectId } : undefined,
+    });
     // Backend returns ApiResponse<List<MaterialResponse>>
-    return response.data.data || response.data;
+    const rawList = response.data.data || response.data;
+    return Array.isArray(rawList) ? rawList.map(mapMaterialFromBackend) : [];
   },
 
   getBySubject: async (id: string): Promise<StudyMaterial[]> => {
     const response = await apiClient.get(`/api/materials/subject/${id}`);
     // Backend returns ApiResponse<List<MaterialResponse>>
-    return response.data.data || response.data;
+    const rawList = response.data.data || response.data;
+    return Array.isArray(rawList) ? rawList.map(mapMaterialFromBackend) : [];
   },
 
   remove: async (id: string): Promise<void> => {
@@ -89,6 +110,6 @@ export const materialsApi = {
 
   reprocess: async (id: string): Promise<StudyMaterial> => {
     const response = await apiClient.post(`/api/materials/${id}/process`);
-    return response.data.data || response.data;
+    return mapMaterialFromBackend(response.data.data || response.data);
   },
 };

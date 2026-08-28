@@ -5,7 +5,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppInput } from '@/components/ui/AppInput';
@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import AvatarImage from '@/components/common/AvatarImage';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import {
   calcStudyPeriod,
@@ -27,7 +27,17 @@ import {
   LABEL_TO_ENUM,
 } from '@/utils/studyPeriodUtils';
 
-const SEMESTERS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Other'];
+const SEMESTER_OPTIONS = [
+  { value: '1', label: '1st Year (Semester 1)' },
+  { value: '2', label: '1st Year (Semester 2)' },
+  { value: '3', label: '2nd Year (Semester 3)' },
+  { value: '4', label: '2nd Year (Semester 4)' },
+  { value: '5', label: '3rd Year (Semester 5)' },
+  { value: '6', label: '3rd Year (Semester 6)' },
+  { value: '7', label: '4th Year (Semester 7)' },
+  { value: '8', label: '4th Year (Semester 8)' },
+  { value: '9', label: '5th Year / Other' },
+];
 const DEPARTMENTS = [
   'Computer Science', 'Information Technology', 'Electronics', 'Electrical',
   'Mechanical', 'Civil', 'Chemical', 'Biomedical', 'Mathematics', 'Physics',
@@ -91,6 +101,19 @@ export default function SettingsPage() {
   const router = useRouter();
   const { replayOnboarding } = useOnboarding();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
+  const { data: fetchedProfile } = useQuery({
+    queryKey: ['studentProfile'],
+    queryFn: () => authApi.getMe(),
+    staleTime: 1000 * 30,
+  });
+
+  const activeUser = fetchedProfile || user;
+
+  const departmentOptions = activeUser?.department && !DEPARTMENTS.includes(activeUser.department)
+    ? [activeUser.department, ...DEPARTMENTS]
+    : DEPARTMENTS;
 
   // Avatar upload state
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -147,6 +170,7 @@ export default function SettingsPage() {
       const updatedProfile = await authApi.uploadAvatar(file);
       setAvatarProgress(100);
       setUser(updatedProfile);
+      queryClient.setQueryData(['studentProfile'], updatedProfile);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
       setAvatarError(message);
@@ -158,64 +182,83 @@ export default function SettingsPage() {
   };
 
   // Notification preferences
-  const [emailNotifs, setEmailNotifs] = useState<boolean>(user?.emailNotifications ?? true);
-  const [pushNotifs, setPushNotifs] = useState<boolean>(user?.pushNotifications ?? false);
+  const [emailNotifs, setEmailNotifs] = useState<boolean>(activeUser?.emailNotifications ?? true);
+  const [pushNotifs, setPushNotifs] = useState<boolean>(activeUser?.pushNotifications ?? false);
   const [examReminders, setExamReminders] = useState<boolean>(true);
   const [nlpAlerts, setNlpAlerts] = useState<boolean>(true);
   const [notifSaved, setNotifSaved] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setEmailNotifs(user.emailNotifications ?? true);
-      setPushNotifs(user.pushNotifications ?? false);
+    if (activeUser) {
+      setEmailNotifs(activeUser.emailNotifications ?? true);
+      setPushNotifs(activeUser.pushNotifications ?? false);
     }
-  }, [user]);
+  }, [activeUser]);
 
   // Load saved study preferences so the dropdowns reflect what the timetable generator will actually use.
   // studyTime is now the start-time label ("5:00 PM") not the old broad-range ("Evening (5 PM - 9 PM)").
   useEffect(() => {
-    if (user) {
-      setStudyTime(ENUM_TO_LABEL[user.preferredStudyTime ?? ''] ?? '5:00 PM');
-      setStudyDuration(hoursToDurationLabel(user.availableHoursPerDay));
+    if (activeUser) {
+      setStudyTime(ENUM_TO_LABEL[activeUser.preferredStudyTime ?? ''] ?? '5:00 PM');
+      setStudyDuration(hoursToDurationLabel(activeUser.availableHoursPerDay));
     }
-  }, [user]);
+  }, [activeUser]);
+
+  const initializedRef = useRef(false);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || user?.fullName || '',
-      collegeName: user?.collegeName || '',
-      semester: user?.semester ? `${user.semester}` : '',
-      department: user?.department || '',
-      phoneNumber: user?.phoneNumber || '',
+      name: activeUser?.fullName || activeUser?.name || '',
+      collegeName: activeUser?.collegeName || '',
+      semester: activeUser?.semester != null ? String(activeUser.semester) : '',
+      department: activeUser?.department || '',
+      phoneNumber: activeUser?.phoneNumber || '',
     },
   });
 
   useEffect(() => {
-    if (user) {
+    if (fetchedProfile) {
+      if (!user || user.id !== fetchedProfile.id || user.fullName !== fetchedProfile.fullName || user.collegeName !== fetchedProfile.collegeName || user.semester !== fetchedProfile.semester || user.department !== fetchedProfile.department || user.phoneNumber !== fetchedProfile.phoneNumber) {
+        setUser(fetchedProfile);
+      }
+      if (!initializedRef.current || !isDirty) {
+        reset({
+          name: fetchedProfile.fullName || fetchedProfile.name || '',
+          collegeName: fetchedProfile.collegeName || '',
+          semester: fetchedProfile.semester != null ? String(fetchedProfile.semester) : '',
+          department: fetchedProfile.department || '',
+          phoneNumber: fetchedProfile.phoneNumber || '',
+        });
+        initializedRef.current = true;
+      }
+    } else if (user && !initializedRef.current) {
       reset({
-        name: user.name || user.fullName || '',
+        name: user.fullName || user.name || '',
         collegeName: user.collegeName || '',
-        semester: user.semester ? String(user.semester) : '',
+        semester: user.semester != null ? String(user.semester) : '',
         department: user.department || '',
         phoneNumber: user.phoneNumber || '',
       });
+      initializedRef.current = true;
     }
-  }, [user, reset]);
+  }, [fetchedProfile, user, isDirty, reset, setUser]);
 
   const { mutate: saveProfile, isPending, isSuccess } = useMutation({
     mutationFn: (data: ProfileFormData) => authApi.updateMe({
-      name: data.name,
-      collegeName: data.collegeName,
-      semester: data.semester ? Number(data.semester) : undefined,
-      department: data.department,
+      name: data.name.trim(),
+      collegeName: data.collegeName?.trim() ?? '',
+      semester: data.semester ? parseInt(data.semester, 10) : undefined,
+      department: data.department?.trim() ?? '',
+      phoneNumber: data.phoneNumber?.trim() ?? '',
     }),
     onSuccess: (updated) => {
       setUser(updated);
+      queryClient.setQueryData(['studentProfile'], updated);
       reset({
-        name: updated.name || updated.fullName || '',
+        name: updated.fullName || updated.name || '',
         collegeName: updated.collegeName || '',
-        semester: updated.semester ? String(updated.semester) : '',
+        semester: updated.semester != null ? String(updated.semester) : '',
         department: updated.department || '',
         phoneNumber: updated.phoneNumber || '',
       });
@@ -290,6 +333,11 @@ export default function SettingsPage() {
   };
 
   const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore
+    }
     await fetch('/api/auth/logout', { method: 'POST' });
     clearAuth();
     router.push('/login');
@@ -312,7 +360,7 @@ export default function SettingsPage() {
             </div>
             <div>
               <h3 className={styles.cardTitle}>Student Profile</h3>
-              <p className={styles.cardSubtitle}>{user?.email}</p>
+              <p className={styles.cardSubtitle}>{activeUser?.email}</p>
             </div>
           </div>
 
@@ -340,22 +388,22 @@ export default function SettingsPage() {
               aria-label="Change profile picture"
               onKeyDown={(e) => e.key === 'Enter' && handleAvatarClick()}
             >
-              {user?.photoUrl || user?.profilePictureUrl ? (
+              {activeUser?.photoUrl || activeUser?.profilePictureUrl ? (
                 <AvatarImage
-                  src={(user.photoUrl || user.profilePictureUrl)!}
+                  src={(activeUser.photoUrl || activeUser.profilePictureUrl)!}
                   alt="Profile"
                   width={72}
                   height={72}
                   className={styles.avatarImg}
                   fallback={
                     <div className={styles.avatarFallback}>
-                      {(user?.name || 'U').charAt(0).toUpperCase()}
+                      {(activeUser?.name || 'U').charAt(0).toUpperCase()}
                     </div>
                   }
                 />
               ) : (
                 <div className={styles.avatarFallback}>
-                  {(user?.name || 'U').charAt(0).toUpperCase()}
+                  {(activeUser?.name || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
               <div className={styles.avatarOverlay}>
@@ -407,10 +455,10 @@ export default function SettingsPage() {
               <label className={styles.label}>
                 <GraduationCap size={14} className="inline mr-1" />Academic Year / Semester
               </label>
-              <select {...register('semester')} className={styles.select}>
-                <option value="">Select year...</option>
-                {SEMESTERS.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+              <select {...register('semester')} className={styles.select} data-testid="settings-semester-select">
+                <option value="">Select year / semester...</option>
+                {SEMESTER_OPTIONS.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>
             </div>
@@ -418,9 +466,9 @@ export default function SettingsPage() {
             {/* Department */}
             <div className={styles.formGroup}>
               <label className={styles.label}>Department / Major</label>
-              <select {...register('department')} className={styles.select}>
+              <select {...register('department')} className={styles.select} data-testid="settings-department-select">
                 <option value="">Select department...</option>
-                {DEPARTMENTS.map((d) => (
+                {departmentOptions.map((d) => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
@@ -434,6 +482,7 @@ export default function SettingsPage() {
               <AppInput
                 placeholder="+91 9876543210"
                 error={errors.phoneNumber?.message}
+                data-testid="settings-phone-input"
                 {...register('phoneNumber')}
               />
             </div>

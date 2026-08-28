@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const MOCK_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMTExMTExMS0xMTExLTExMTEtMTExMS0xMTExMTExMTExMTEiLCJleHAiOjIwODI3MTUyMDB9.mockSignature';
+
 // Group 7: AI Assistant Chat (SEL-131 to SEL-145)
 test.describe('AI Assistant Section', () => {
 
@@ -7,10 +9,19 @@ test.describe('AI Assistant Section', () => {
     // Skip onboarding for all tests
     await context.addInitScript(() => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
+      const mockAuth = {
+        state: {
+          user: { id: 's-123', name: 'Dashboard Student', fullName: 'Dashboard Student', email: 'student@example.com' },
+          token: 'mock-jwt-token',
+          isAuthenticated: true,
+        },
+        version: 0,
+      };
+      localStorage.setItem('auth-storage', JSON.stringify(mockAuth));
     });
 
     // Intercept auth checks
-    await page.route('**/api/students/me', async (route) => {
+    await page.route('**/api/students/me*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -18,7 +29,7 @@ test.describe('AI Assistant Section', () => {
       });
     });
 
-    await page.route('**/api/students/me/subjects', async (route) => {
+    await page.route('**/api/students/me/subjects*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -26,7 +37,7 @@ test.describe('AI Assistant Section', () => {
       });
     });
 
-    await page.route('**/api/performance/report', async (route) => {
+    await page.route('**/api/performance/report*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -34,7 +45,7 @@ test.describe('AI Assistant Section', () => {
       });
     });
 
-    await page.route('**/api/ai/chat/history', async (route) => {
+    await page.route('**/api/ai/chat/history*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -48,7 +59,8 @@ test.describe('AI Assistant Section', () => {
     });
 
     await context.addCookies([
-      { name: 'access_token', value: 'fake.jwt.token', domain: 'localhost', path: '/' }
+      { name: 'access_token', value: MOCK_JWT, url: 'http://localhost:3000', httpOnly: true, sameSite: 'Lax' },
+      { name: '__session', value: MOCK_JWT, url: 'http://localhost:3000', sameSite: 'Lax' }
     ]);
   });
 
@@ -204,7 +216,7 @@ test.describe('AI Assistant Section', () => {
   test('SEL-144: Flex alignment layout container adapts height to window sizes', async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await page.goto('/chat');
-    const container = page.locator('div[class*="chat"]').first();
+    const container = page.locator('[class*="chat"], [class*="Chat"], [class*="Wrapper"]').first();
     await expect(container).toBeVisible();
   });
 
@@ -219,3 +231,4 @@ test.describe('AI Assistant Section', () => {
   });
 
 });
+

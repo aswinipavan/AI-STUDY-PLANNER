@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import { Menu, Moon, Sun, Bell, Settings, LogOut, User, CalendarDays, AlertCircle, Users, Sparkles } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBackendHealth } from '@/hooks/useBackendHealth';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 /**
  * Topbar — fixed for Issues 2, 3:
@@ -50,6 +52,11 @@ export function Topbar() {
 
   const handleLogout = async () => {
     setShowAvatar(false);
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore
+    }
     await fetch('/api/auth/logout', { method: 'POST' });
     clearAuth();
     router.push('/login');

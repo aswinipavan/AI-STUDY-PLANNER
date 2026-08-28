@@ -93,6 +93,9 @@ class UploadIntegrationTest {
     private StudentRepository studentRepository;
 
     @Autowired
+    private com.aistudyplanner.repository.SubjectRepository subjectRepository;
+
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -175,6 +178,112 @@ class UploadIntegrationTest {
         assertThat(fetched.getStatusCode().value()).as("file fetch status").isEqualTo(200);
         assertThat(fetched.getBody()).as("served bytes match uploaded bytes").isEqualTo(pdfBytes);
         assertThat(fetched.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_PDF);
+    }
+
+    @Test
+    @DisplayName("Uploads PDF with subjectId, verifies subjectId in response and subject filtering endpoints")
+    void materialUploadWithSubjectAndFilterRoundTrip() {
+        Student student = authenticatedStudent();
+
+        com.aistudyplanner.model.entity.Subject subjectMath = subjectRepository.save(
+                com.aistudyplanner.model.entity.Subject.builder()
+                        .student(student)
+                        .subjectName("Discrete Maths")
+                        .subjectCode("CS201")
+                        .credits(4)
+                        .difficultyLevel(3)
+                        .build()
+        );
+
+        com.aistudyplanner.model.entity.Subject subjectOS = subjectRepository.save(
+                com.aistudyplanner.model.entity.Subject.builder()
+                        .student(student)
+                        .subjectName("Operating Systems")
+                        .subjectCode("CS301")
+                        .credits(3)
+                        .difficultyLevel(3)
+                        .build()
+        );
+
+        byte[] pdfBytes = "%PDF-1.4 sample math content".getBytes(StandardCharsets.UTF_8);
+        ByteArrayResource fileResource = new ByteArrayResource(pdfBytes) {
+            @Override
+            public String getFilename() {
+                return "discrete_maths_notes.pdf";
+            }
+        };
+
+        HttpHeaders partHeaders = new HttpHeaders();
+        partHeaders.setContentType(MediaType.APPLICATION_PDF);
+        HttpEntity<ByteArrayResource> filePart = new HttpEntity<>(fileResource, partHeaders);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", filePart);
+        body.add("title", "Discrete Maths Notes");
+        body.add("subjectId", subjectMath.getId().toString());
+
+        HttpHeaders headers = bearer(student);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        ResponseEntity<String> upload = restTemplate.postForEntity(
+                "/api/materials/upload", new HttpEntity<>(body, headers), String.class);
+
+        assertThat(upload.getStatusCode().value()).isEqualTo(201);
+        JsonNode uploadData = readData(upload.getBody());
+        assertThat(uploadData.path("subjectId").asText()).isEqualTo(subjectMath.getId().toString());
+        assertThat(uploadData.path("subjectName").asText()).isEqualTo("Discrete Maths");
+        assertThat(uploadData.path("subject").path("id").asText()).isEqualTo(subjectMath.getId().toString());
+        assertThat(uploadData.path("subject").path("subjectName").asText()).isEqualTo("Discrete Maths");
+
+        // Test 1: Query GET /api/materials?subjectId={mathId}
+        ResponseEntity<String> filteredRes = restTemplate.exchange(
+                "/api/materials?subjectId=" + subjectMath.getId(),
+                HttpMethod.GET,
+                new HttpEntity<>(bearer(student)),
+                String.class
+        );
+        assertThat(filteredRes.getStatusCode().value()).isEqualTo(200);
+        JsonNode filteredData = readData(filteredRes.getBody());
+        assertThat(filteredData.isArray()).isTrue();
+        assertThat(filteredData.size()).isEqualTo(1);
+        assertThat(filteredData.get(0).path("subjectId").asText()).isEqualTo(subjectMath.getId().toString());
+        assertThat(filteredData.get(0).path("subjectName").asText()).isEqualTo("Discrete Maths");
+
+        // Test 2: Query GET /api/materials?subjectId={osId} -> should return empty list
+        ResponseEntity<String> emptyFilteredRes = restTemplate.exchange(
+                "/api/materials?subjectId=" + subjectOS.getId(),
+                HttpMethod.GET,
+                new HttpEntity<>(bearer(student)),
+                String.class
+        );
+        assertThat(emptyFilteredRes.getStatusCode().value()).isEqualTo(200);
+        JsonNode emptyData = readData(emptyFilteredRes.getBody());
+        assertThat(emptyData.isArray()).isTrue();
+        assertThat(emptyData.size()).isEqualTo(0);
+
+        // Test 3: Query GET /api/materials/subject/{mathId}
+        ResponseEntity<String> pathFilteredRes = restTemplate.exchange(
+                "/api/materials/subject/" + subjectMath.getId(),
+                HttpMethod.GET,
+                new HttpEntity<>(bearer(student)),
+                String.class
+        );
+        assertThat(pathFilteredRes.getStatusCode().value()).isEqualTo(200);
+        JsonNode pathData = readData(pathFilteredRes.getBody());
+        assertThat(pathData.isArray()).isTrue();
+        assertThat(pathData.size()).isEqualTo(1);
+
+        // Test 4: Query GET /api/materials (All Subjects) -> returns the material
+        ResponseEntity<String> allRes = restTemplate.exchange(
+                "/api/materials",
+                HttpMethod.GET,
+                new HttpEntity<>(bearer(student)),
+                String.class
+        );
+        assertThat(allRes.getStatusCode().value()).isEqualTo(200);
+        JsonNode allData = readData(allRes.getBody());
+        assertThat(allData.isArray()).isTrue();
+        assertThat(allData.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test

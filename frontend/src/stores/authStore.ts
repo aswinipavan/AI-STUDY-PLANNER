@@ -22,8 +22,10 @@ export const useAuthStore = create<AuthState>()(
           ...user,
           // Backend returns 'fullName', frontend reads '.name'
           name: user.name || user.fullName || '',
+          fullName: user.fullName || user.name || '',
           // Backend returns 'profilePictureUrl', frontend reads '.photoUrl'
           photoUrl: user.photoUrl || user.profilePictureUrl || undefined,
+          profilePictureUrl: user.profilePictureUrl || user.photoUrl || undefined,
         };
         set({ 
           user: normalized, 

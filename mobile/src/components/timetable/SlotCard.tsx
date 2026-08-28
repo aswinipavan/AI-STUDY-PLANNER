@@ -17,7 +17,21 @@ export function SlotCard({slot, onToggle, isToggling}: SlotCardProps) {
 
   return (
     <Card
-      style={[styles.card, slot.isCompleted ? styles.completedCard : undefined]}>
+      style={[
+        styles.card,
+        slot.isCompleted
+          ? styles.completedCard
+          : slot.isCatchUp
+          ? styles.catchUpCard
+          : slot.status === 'missed'
+          ? styles.missedCard
+          : undefined,
+      ]}>
+      {slot.isCatchUp && !slot.isCompleted && (
+        <View style={styles.catchUpTag}>
+          <Text style={styles.catchUpTagText}>🔴 MISSED — COMPLETE TODAY</Text>
+        </View>
+      )}
       <View style={styles.row}>
         {/* Completion toggle */}
         <TouchableOpacity
@@ -123,5 +137,28 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: COLORS.PRIMARY_LIGHT,
+  },
+  catchUpCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#f59e0b',
+  },
+  missedCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#ef4444',
+  },
+  catchUpTag: {
+    backgroundColor: '#ef444422',
+    borderWidth: 1,
+    borderColor: '#ef444466',
+    borderRadius: RADIUS.FULL,
+    paddingHorizontal: SPACING.SM,
+    paddingVertical: 2,
+    alignSelf: 'flex-start',
+    marginBottom: SPACING.XS,
+  },
+  catchUpTagText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#ef4444',
   },
 });

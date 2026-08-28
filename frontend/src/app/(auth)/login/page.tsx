@@ -130,16 +130,7 @@ export default function LoginPage() {
       throw new Error(data.error || `Server error (${res.status})`);
     }
     if (data.user) {
-      const u = data.user;
-      setUserAction({
-        id: u.id || u.uid || '',
-        firebaseUid: u.firebaseUid || u.uid || '',
-        name: u.fullName || u.displayName || u.name || '',
-        email: u.email || '',
-        photoUrl: u.photoUrl || u.photoURL || '',
-        isPremium: u.isPremium ?? false,
-        createdAt: u.createdAt || new Date().toISOString(),
-      } as StudentProfile);
+      setUserAction(data.user as StudentProfile);
     }
     router.push('/dashboard');
   }

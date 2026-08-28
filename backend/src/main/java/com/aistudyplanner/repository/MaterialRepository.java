@@ -19,5 +19,6 @@ public interface MaterialRepository extends JpaRepository<Material, UUID> {
     java.util.Optional<Material> findByIdAndStudentId(UUID id, UUID studentId);
 
     List<Material> findAllByStudentIdAndSubjectId(UUID studentId, UUID subjectId);
+    List<Material> findAllByStudentIdAndSubjectIdOrderByCreatedAtDesc(UUID studentId, UUID subjectId);
     Page<Material> findAllByStudentIdAndSubjectId(UUID studentId, UUID subjectId, Pageable pageable);
 }
