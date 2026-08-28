@@ -65,6 +65,9 @@ public class GroqService {
     }
 
     public String chat(String userMessage, List<ChatHistory> history, String documentContext) {
+        // Redact any sensitive tokens or credentials from the user input
+        String sanitizedUserMessage = com.aistudyplanner.util.AiErrorSanitizer.redactSensitiveData(userMessage);
+
         // Limit context window to avoid exceeding provider token limits
         // Estimate: ~4 tokens per word, max 2000 tokens for context = ~500 words
         final int MAX_CONTEXT_WORDS = 500;
@@ -92,6 +95,19 @@ public class GroqService {
         promptBuilder.append("3. Scaling: Concise for simple definitions; step-by-step for derivations; structured bullet points for summaries.\n");
         promptBuilder.append("4. Formatting: Standard GFM tables for comparisons (no raw ASCII pipes); LaTeX math ($inline$, $$block$$); fenced code blocks with language tags.\n\n");
 
+        promptBuilder.append("Technical Error & Diagnostic Analysis Protocol:\n");
+        promptBuilder.append("When the student provides technical errors, browser console logs, network requests/responses, stack traces, GitHub Actions failures, SQL errors, JSON API errors, or screenshots:\n");
+        promptBuilder.append("- DO NOT dump or echo raw noisy debug data (headers, cookies, User-Agents, request metadata, multi-page stack traces).\n");
+        promptBuilder.append("- Extract the essential evidence (HTTP status, endpoint, root exception 'Caused by', failing line, or failing step).\n");
+        promptBuilder.append("- Structure your response with these exact markdown sections:\n");
+        promptBuilder.append("  ## What happened\n  (1-2 clear sentences explaining the failure in student-friendly terms)\n");
+        promptBuilder.append("  ## Root cause\n  (The primary technical or logic cause, clearly identified)\n");
+        promptBuilder.append("  ## What to do\n  (Actionable, proportional, step-by-step instructions to fix the issue; never recommend deleting databases or disabling security)\n");
+        promptBuilder.append("  ## Verify\n  (Concrete test command, curl request, or action to confirm the fix)\n");
+        promptBuilder.append("- Clearly distinguish confirmed facts (e.g. 'Confirmed: The server returned HTTP 400 with message...') from inferences (e.g. 'Likely: This indicates a uniqueness validation rejection', 'Possible: ...'). Never state an inference as a confirmed fact.\n");
+        promptBuilder.append("- Security & Privacy: Never expose or echo sensitive credentials, tokens, cookies, Authorization headers, or JWTs. Redact any sensitive tokens with `[redacted]`.\n");
+        promptBuilder.append("- Academic & Code Errors: Apply the same structured problem analysis (What happened, Root cause, What to do, Verify) for compiler errors, syntax bugs, or mathematical reasoning mistakes.\n\n");
+
         if (documentContext != null && !documentContext.isBlank()) {
             promptBuilder.append("--- RELEVANT ACADEMIC MATERIAL / DOCUMENT CONTEXT ---\n");
             promptBuilder.append(documentContext).append("\n");
@@ -104,7 +120,7 @@ public class GroqService {
             promptBuilder.append("Previous conversation:\n").append(historyBuilder).append("\n");
         }
 
-        promptBuilder.append("Student: ").append(userMessage);
+        promptBuilder.append("Student: ").append(sanitizedUserMessage);
 
         return generate(promptBuilder.toString(), "chat");
     }

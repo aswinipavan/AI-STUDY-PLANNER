@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-08-28 (Session 30 - Master Improvement: AI Tutor Error & Diagnostic Analysis Protocol)
+- **Files created/changed:**
+  - `backend/src/main/java/com/aistudyplanner/util/AiErrorSanitizer.java` [NEW] — Created utility for automatic regex-based credential redaction (JWTs, Authorization headers, Cookie headers, secret keys, passwords) and diagnostic/error input detection.
+  - `backend/src/main/java/com/aistudyplanner/service/GroqService.java` [MODIFIED] — Integrated `AiErrorSanitizer` in `chat(...)` and enhanced system prompt with the Technical Error & Diagnostic Analysis Protocol (`## What happened`, `## Root cause`, `## What to do`, `## Verify`, fact vs inference distinction, and noise suppression).
+  - `backend/src/test/java/com/aistudyplanner/service/AiErrorAnalysisTest.java` [NEW] — Added 9 comprehensive unit test cases covering HTTP 400 errors, stack traces, GitHub Actions CI failures, JSON API errors, screenshot OCR, sensitive token redaction, inference labeling, noise suppression, and sanitizer regex verification.
+  - `backend/src/test/java/com/aistudyplanner/service/GroqServiceTest.java` [MODIFIED] — Updated prompt word count assertions to accommodate the expanded pedagogical and error analysis system instructions.
+- **Reason:** Empower AI Tutor to analyze pasted errors, stack traces, CI logs, and screenshots into student-friendly, actionable diagnoses without echoing raw debug noise or exposing credentials.
+- **Summary:**
+  - Enforced structured 4-part markdown output: What happened, Root cause, What to do, Verify.
+  - Ensured sensitive tokens and secrets are automatically redacted to `[redacted]`.
+  - Distinguishes confirmed facts from inferences.
+  - All 31 backend AI unit tests passing (0 failures, 0 errors).
+- **Impact:** Production-grade error analysis for students and developers with strict security and zero credential leakage.
+
 ## 2026-08-28 (Session 29 - Master Task: Redesign GitHub Actions CI Workflow to Match Reference Graph)
 - **Files created/changed:**
   - `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED] — Pre-registered all required API mocks (`wake`, `notifications`, `materials`, `exams/upcoming`, `performance/report`, `timetable/active`, `students/me/subjects`) BEFORE navigation (`page.goto`) in `test.beforeEach` and test overrides, eliminating network race conditions on dashboard navigation.
