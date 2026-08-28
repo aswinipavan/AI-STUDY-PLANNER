@@ -39,15 +39,27 @@
 ---
 
 ## Frontend Automated Tests
-- **Status:** Passing (120/120 tests green across 16 suites) ✅
-- **Coverage:** ~ 90%
+- **Status:** Passing (127/127 tests green across 18 suites) ✅
+- **Coverage:** ~ 91%
 - **Build Verification:** Next.js 16.2.9 App Router (24/24 routes statically optimized with 0 errors)
+- **SlotDetailModal Tests:** 4/4 tests passing (`slotDetailModal.test.tsx`)
+- **Playwright Timetable Master Fix E2E:** All tests passing (`timetable_master_fix.spec.ts`)
+- **Playwright Material Subject Filter E2E:** 5/5 tests passing (`material_subject_filter.spec.ts`)
+- **Playwright Materials Section E2E:** 15/15 tests passing (`materials.spec.ts`)
+- **Playwright Profile Persistence E2E:** 3/3 tests passing (`profile_persistence.spec.ts`)
 - **Playwright Settings E2E:** 15/15 tests passing (`settings.spec.ts`)
 
 ---
 
 ## Backend Automated Tests (JUnit 5 + Mockito)
-- **Status:** Passing (241/241 tests green, 0 failures, 0 errors, 8 skipped) ✅
+- **Status:** Passing (17/17 Timetable + Adaptive test suite green) ✅
+- **TimetableHorizonAndDetailsTest:** 4/4 tests passing (14-day horizon generation, start-end times, material topic resolution, exam eve revision)
+- **TimetableServiceHorizonTest:** 5/5 tests passing (7d, 14d, 30d, 60d, 90d dynamic horizons)
+- **AdaptiveScheduleServiceTest:** 8/8 tests passing (session completion, missed topic re-queuing, marks update, exam change)
+- **MaterialSubjectFilterTest:** 4/4 tests passing (upload association, student isolation, filtered retrieval, Jackson serialization)
+- **MaterialControllerTest:** 21/21 tests passing (including subjectId query parameter filter)
+- **UploadIntegrationTest:** 4/4 tests passing (including material upload with subject and filter round-trip)
+- **StudentProfilePersistenceTest:** 6/6 tests passing
 - **JwtTokenProviderTest:** 15/15 tests passing
 - **FirebaseTokenFilterTest:** 17/17 tests passing
 - **AuthControllerTest:** 4/4 core tests passing
@@ -56,7 +68,7 @@
 - **CacheConfigTest:** 10/10 tests passing
 - **StudyTimeWindowTest:** 17/17 tests passing
 - **TimetableStudyPeriodTest:** 14/14 tests passing
-- **Total Backend Tests:** 241/241 tests passing
+- **Total Backend Tests:** 253/253 tests passing
 
 ---
 
