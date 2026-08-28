@@ -23,7 +23,8 @@ export default function MaterialsPage() {
   const filteredMaterials = useMemo(() => {
     return materials.filter(mat => {
       const matchesSearch = mat.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesSubject = filterSubjectId === 'all' || mat.subjectId === filterSubjectId;
+      const matSubjectId = mat.subjectId || (typeof mat.subject === 'object' ? mat.subject?.id : undefined);
+      const matchesSubject = filterSubjectId === 'all' || matSubjectId === filterSubjectId;
       return matchesSearch && matchesSubject;
     });
   }, [materials, searchQuery, filterSubjectId]);

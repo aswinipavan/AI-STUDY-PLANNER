@@ -57,9 +57,50 @@
 .emptySubtitle {
   color: var(--color-muted-foreground);
   font-size: 0.875rem;
-  max-width: 400px;
-  margin: 0;
+  max-width: 440px;
+  margin: 0 0 2rem 0;
   line-height: 1.5;
+}
+
+.promptSuggestionsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 600px;
+}
+@media (min-width: 640px) {
+  .promptSuggestionsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.promptSuggestionCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--app-duration-base) ease;
+  color: var(--color-foreground);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.promptSuggestionCard:hover {
+  background: rgba(0, 229, 192, 0.08);
+  border-color: rgba(0, 229, 192, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 229, 192, 0.15);
+}
+
+.suggestionIcon {
+  flex-shrink: 0;
+  color: var(--color-primary);
 }
 
 /* Chat Input */
@@ -434,17 +475,277 @@
   white-space: pre-wrap;
 }
 
+/* Material Grounding Badge */
+.materialGroundingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(0, 229, 192, 0.1);
+  border: 1px solid rgba(0, 229, 192, 0.25);
+  border-radius: var(--app-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+.groundingIcon {
+  color: var(--color-primary);
+}
+
+/* Bubble Prose & Educational Typography */
 .bubbleProse {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-foreground);
+}
+
+.proseP {
+  margin: 0 0 0.85em 0;
+}
+.proseP:last-child {
+  margin-bottom: 0;
+}
+
+/* Headings with clear visual hierarchy */
+.proseH1 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 1.25rem 0 0.5rem 0;
+  line-height: 1.35;
+}
+.proseH1:first-child {
+  margin-top: 0;
+}
+
+.proseH2 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+  margin: 1.15rem 0 0.45rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1.35;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.3rem;
+}
+.proseH2:first-child {
+  margin-top: 0;
+}
+
+.proseH3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+  margin: 1rem 0 0.35rem 0;
+  line-height: 1.4;
+}
+
+.proseH4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+  margin: 0.85rem 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Lists */
+.proseUl {
+  margin: 0 0 0.85em 0;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+.proseOl {
+  margin: 0 0 0.85em 0;
+  padding-left: 1.25rem;
+  list-style-type: decimal;
+}
+.proseLi {
+  margin-bottom: 0.35em;
+  line-height: 1.6;
+}
+.proseLi::marker {
+  color: var(--color-primary);
+}
+
+/* Educational Callout Blockquotes */
+.proseBlockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3.5px solid var(--color-primary);
+  background: rgba(0, 229, 192, 0.06);
+  border-radius: 0 var(--app-radius-md) var(--app-radius-md) 0;
   font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-foreground);
+}
+.proseBlockquote p {
+  margin: 0;
+}
+
+/* Horizontal Rule */
+.proseHr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 1.25rem 0;
+}
+
+/* Links */
+.proseLink {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity var(--app-duration-base);
+}
+.proseLink:hover {
+  opacity: 0.8;
+}
+
+/* Inline Code & Code Block */
+.inlineCode {
+  background: var(--app-overlay);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--app-radius-xs);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8125rem;
+}
+
+.codeBlockWrapper {
+  margin: 0.85rem 0;
+  border-radius: var(--app-radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #090d16;
+  color: #f1f5f9;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8125rem;
+}
+
+.codeBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.85rem;
+  background: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--app-radius-xs);
+  transition: all var(--app-duration-base) ease;
+}
+.copyBtn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.codeContent {
+  margin: 0;
+  padding: 0.85rem;
+  overflow-x: auto;
+  line-height: 1.5;
+  scrollbar-width: thin;
+}
+
+/* GitHub Flavored Markdown Tables */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: var(--app-radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.gfmTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
-.bubbleProse p { margin: 0 0 0.5em 0; }
-.bubbleProse p:last-child { margin: 0; }
-.bubbleProse pre {
-  background: rgba(0,0,0,0.2);
-  padding: 0.5rem;
-  border-radius: var(--app-radius-xs);
-  overflow-x: auto;
+
+.gfmThead {
+  background: var(--app-overlay);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.gfmTh {
+  padding: 0.6rem 0.85rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+.gfmTbody .gfmTr {
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--app-duration-base);
+}
+.gfmTbody .gfmTr:last-child {
+  border-bottom: none;
+}
+.gfmTbody .gfmTr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+.gfmTbody .gfmTr:hover {
+  background: rgba(0, 229, 192, 0.04);
+}
+
+.gfmTd {
+  padding: 0.6rem 0.85rem;
+  color: var(--color-foreground);
+}
+
+/* Bot Action Bar */
+.botActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--app-hairline);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--app-radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-muted-foreground);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--app-duration-base) ease;
+}
+.actionBtn:hover {
+  background: var(--app-overlay);
+  border-color: var(--color-border);
+  color: var(--color-foreground);
 }
 
 .timestamp {

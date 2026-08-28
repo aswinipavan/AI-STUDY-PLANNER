@@ -5,12 +5,35 @@ import MessageBubble from '@/components/chat/MessageBubble';
 import TypingIndicator from '@/components/chat/TypingIndicator';
 import ChatInput from '@/components/chat/ChatInput';
 import { useChat } from '@/hooks/useChat';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, BookOpen, Target, HelpCircle, FileText } from 'lucide-react';
 import styles from './chat.module.css';
 
 interface Props {
   initialSessionId: string | null;
 }
+
+const PROMPT_SUGGESTIONS = [
+  {
+    icon: <BookOpen size={16} />,
+    title: 'Explain a Concept',
+    prompt: 'Explain a key concept from my syllabus with a clear intuition, worked example, and key takeaways.',
+  },
+  {
+    icon: <Target size={16} />,
+    title: 'Study Priority Today',
+    prompt: 'Based on my upcoming exams and current performance, what should I prioritize studying today?',
+  },
+  {
+    icon: <HelpCircle size={16} />,
+    title: 'Quick Practice Quiz',
+    prompt: 'Give me 3 conceptual practice questions with step-by-step solutions to test my understanding.',
+  },
+  {
+    icon: <FileText size={16} />,
+    title: 'Summarize Notes',
+    prompt: 'Summarize the core formulas, definitions, and exam topics from my latest uploaded study materials.',
+  },
+];
 
 export default function ChatContainer({ initialSessionId }: Props) {
   const {
@@ -38,6 +61,10 @@ export default function ChatContainer({ initialSessionId }: Props) {
     }
   }, [messages, isThinking]);
 
+  const handleSelectSuggestion = (prompt: string) => {
+    setInputText(prompt);
+  };
+
   return (
     <div className={styles.chatWrapper}>
       <div 
@@ -51,10 +78,25 @@ export default function ChatContainer({ initialSessionId }: Props) {
               <div className={styles.sparkleWrap}>
                 <Sparkles size={32} />
               </div>
-              <h2 className={styles.emptyTitle}>Ask me anything about your studies!</h2>
+              <h2 className={styles.emptyTitle}>Ask your AI Academic Tutor anything!</h2>
               <p className={styles.emptySubtitle}>
-                I can help you review your materials, suggest study strategies, or test your knowledge before exams.
+                Get structured explanations, worked examples, practice problems, and insights grounded in your study materials.
               </p>
+
+              <div className={styles.promptSuggestionsGrid}>
+                {PROMPT_SUGGESTIONS.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(item.prompt)}
+                    className={styles.promptSuggestionCard}
+                    data-testid={`prompt-suggestion-${idx}`}
+                  >
+                    <span className={styles.suggestionIcon}>{item.icon}</span>
+                    <span>{item.title}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <>
@@ -78,4 +120,3 @@ export default function ChatContainer({ initialSessionId }: Props) {
     </div>
   );
 }
-

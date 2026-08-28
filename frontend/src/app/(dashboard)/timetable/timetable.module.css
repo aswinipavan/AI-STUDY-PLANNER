@@ -6,12 +6,157 @@
   color: var(--color-foreground);
 }
 
+/* ── Calendar Horizon & Month Range Header ─────────────────────────────── */
+.horizonHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-md);
+  margin-bottom: 1.5rem;
+  animation: fadeSlideUp 0.4s var(--app-ease-out) both;
+}
+
+.horizonInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.horizonMonths {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.horizonDates {
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.horizonStats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(0, 229, 192, 0.08);
+  color: var(--color-primary);
+  border: 1px solid rgba(0, 229, 192, 0.25);
+}
+
+/* ── Week Switcher & Pager ─────────────────────────────────────────────── */
+.weekNavBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.weekPager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.weekTitle {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  padding: 0.375rem 0.75rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--app-radius-xs);
+  min-width: 13rem;
+  text-align: center;
+}
+
+.quickJumpTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.quickTab {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--app-radius-xs);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quickTab:hover {
+  background: var(--app-overlay);
+  color: var(--color-foreground);
+}
+
+.quickTabActive {
+  background: rgba(0, 229, 192, 0.15);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Missed Sessions Urgent Alert Banner ───────────────────────────────── */
+.missedAlertBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  border-radius: var(--app-radius-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-left: 4px solid #ef4444;
+  margin-bottom: 1.5rem;
+  animation: fadeSlideUp 0.35s ease-out both;
+}
+
+.missedAlertContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-foreground);
+  font-size: 0.875rem;
+}
+
+.missedAlertIcon {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
 .progressBlock {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--app-radius-md);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
   animation: fadeSlideUp 0.4s var(--app-ease-out) both;
 }
 
@@ -31,7 +176,7 @@
 .progressValue {
   font-family: var(--font-display), sans-serif;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-primary);
 }
 
@@ -50,18 +195,14 @@
   transition: width var(--app-duration-slower) var(--app-ease-spring);
 }
 
-/* ── Adaptive re-plan ───────────────────────────────────────────────────────
-   Explains what the planner would change and why, before it changes anything.
-   Same card shell as the progress and grid blocks so it reads as part of the
-   page rather than a bolted-on banner. */
+/* ── Adaptive re-plan block ─────────────────────────────────────────────── */
 .adaptBlock {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--app-radius-md);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
   animation: fadeSlideUp 0.4s var(--app-ease-out) both;
-  animation-delay: 0.05s;
 }
 
 .adaptRow {
@@ -84,13 +225,11 @@
 }
 
 .adaptIconAlert {
-  background: rgba(245, 158, 11, 0.12);
-  color: #f59e0b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .adaptText {
-  /* Take the slack so the copy wraps instead of pushing the button off the row,
-     and shrink below the longest word on a phone. */
   flex: 1 1 18rem;
   min-width: 0;
 }
@@ -110,7 +249,6 @@
   margin: 0;
 }
 
-/* The "why the plan changed" readout. */
 .planPanel {
   margin-top: 1.25rem;
   padding: 1rem 1.25rem;
@@ -120,7 +258,6 @@
   animation: fadeSlideUp var(--app-duration-slow) var(--app-ease-out) both;
 }
 
-/* Nothing moved — say so without the success colouring. */
 .planPanelQuiet {
   background: var(--app-overlay-subtle);
   border-color: var(--color-border);
@@ -161,6 +298,7 @@
   opacity: 0.85;
 }
 
+/* ── Grid Container ─────────────────────────────────────────────────────── */
 .gridBlock {
   background: var(--color-card);
   border: 1px solid var(--color-border);
@@ -168,44 +306,77 @@
   padding: 1.5rem;
   overflow-x: auto;
   animation: fadeSlideUp 0.4s var(--app-ease-out) both;
-  animation-delay: 0.1s;
 }
 
 .gridHeaders {
   display: grid;
-  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid var(--color-border);
   padding-bottom: 0.75rem;
 }
 
 .dayHeader {
   text-align: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.5rem;
+  border-radius: var(--app-radius-xs);
+  transition: background 0.15s ease;
+}
+
+.dayHeaderMonthTag {
+  font-size: 0.625rem;
+  font-weight: 800;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: rgba(0, 229, 192, 0.1);
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  margin-bottom: 0.1rem;
+}
+
+.dayHeaderWeekday {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--color-muted-foreground);
-  position: relative;
+}
+
+.dayHeaderDate {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-foreground);
 }
 
 .dayHeaderActive {
+  background: rgba(0, 229, 192, 0.08);
+  border: 1px solid rgba(0, 229, 192, 0.3);
+}
+
+.dayHeaderActive .dayHeaderWeekday,
+.dayHeaderActive .dayHeaderDate {
   color: var(--color-primary);
 }
 
 .todayDot {
-  display: block;
-  width: 4px;
-  height: 4px;
+  display: inline-block;
+  width: 5px;
+  height: 5px;
   background: var(--color-primary);
   border-radius: 50%;
-  margin: 4px auto 0;
+  box-shadow: 0 0 8px var(--color-primary);
 }
 
 .gridColumns {
   display: grid;
-  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
   gap: 1rem;
 }
 
@@ -213,22 +384,37 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  min-height: 100px;
+  min-height: 120px;
 }
 
+.emptyDayText {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--app-radius-xs);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+/* ── Slot Card ──────────────────────────────────────────────────────────── */
 .slotCard {
   width: 100%;
-  padding: 0.75rem;
-  border-radius: var(--app-radius-xs);
+  padding: 0.875rem;
+  border-radius: var(--app-radius-sm);
   text-align: left;
-  border: 1px solid transparent;
+  border: 1px solid var(--color-border);
   transition: all var(--app-duration-slow) var(--app-ease-spring);
   cursor: pointer;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
 }
 
 .slotCard:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Status variants */
@@ -239,16 +425,16 @@
 }
 .slotPending:hover {
   background: var(--app-overlay);
-  border-color: var(--color-border);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .slotCompleted {
-  background: rgba(0, 229, 192, 0.1); /* Teal tinted */
-  border-color: rgba(0, 229, 192, 0.2);
-  color: var(--color-primary);
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
 }
 .slotCompleted:hover {
-  background: rgba(0, 229, 192, 0.15);
+  background: rgba(16, 185, 129, 0.14);
 }
 
 .slotSkipped {
@@ -257,49 +443,80 @@
   color: var(--color-muted-foreground);
   opacity: 0.7;
 }
-.slotSkipped:hover {
-  opacity: 1;
-}
 
-/* Pending, but its day has already passed. Previously indistinguishable from a
-   session still to come, which is exactly the one thing a student needs to see. */
 .slotMissed {
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.35);
+  border-left: 3px solid #ef4444;
   color: var(--color-foreground);
 }
 .slotMissed:hover {
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.slotCatchUp {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.4);
+  border-left: 3px solid #f59e0b;
+  color: var(--color-foreground);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+}
+.slotCatchUp:hover {
   background: rgba(245, 158, 11, 0.14);
 }
-.slotMissed .slotIcon {
-  opacity: 1;
-  color: #f59e0b;
+
+/* Badge tags on SlotCard */
+.catchUpBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 0.15rem 0.4rem;
+  border-radius: 9999px;
+  width: fit-content;
+}
+
+.missedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  padding: 0.15rem 0.4rem;
+  border-radius: 9999px;
+  width: fit-content;
 }
 
 .slotHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.25rem;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .slotSubject {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 700;
   margin: 0;
-  /* `truncate: true` was here — not a CSS property, so long subject names simply
-     overflowed the card. These three lines are what that was reaching for. */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .slotTopic {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--color-foreground);
-  opacity: 0.85;
-  margin: 0.2rem 0 0.3rem 0;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -307,26 +524,46 @@
   -webkit-box-orient: vertical;
 }
 
-.slotIcon {
-  opacity: 0;
-  transition: opacity var(--app-duration-base);
-  flex-shrink: 0;
-  margin-left: 0.25rem;
+.slotFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--color-muted-foreground);
 }
 
-.slotCard:hover .slotIcon {
-  opacity: 1;
-}
-
-.slotCompleted .slotIcon {
-  opacity: 1;
-}
-
-.slotTime {
-  font-size: 0.75rem;
+.slotTimeRange {
   font-family: var(--font-display), sans-serif;
-  opacity: 0.8;
-  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.quickToggleBtn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  color: var(--color-muted-foreground);
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quickToggleBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(0, 229, 192, 0.1);
+}
+
+.quickToggleDone {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
 }
 
 @keyframes fadeSlideUp {
@@ -334,16 +571,13 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Responsive ─────────────────────────────────────────────────────────────
-   The week grid keeps its horizontal scroll on a phone (a seven-day grid does
-   not usefully compress), but the chrome around it should not eat the viewport:
-   2rem of page padding plus 1.5rem of card padding left ~44% of a 375px screen
-   for the schedule itself. */
+/* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .container {
     padding: 1rem;
   }
 
+  .horizonHeader,
   .progressBlock,
   .adaptBlock,
   .gridBlock {
@@ -353,17 +587,21 @@
 
   .gridHeaders,
   .gridColumns {
-    grid-template-columns: repeat(7, minmax(128px, 1fr));
+    grid-template-columns: repeat(7, minmax(130px, 1fr));
     gap: 0.75rem;
   }
 
-  .adaptRow > button {
-    /* Full-width once the row has stacked — a lone right-aligned button under
-       wrapped copy reads as unrelated to it. */
-    width: 100%;
+  .weekNavBlock {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .planPanel {
-    padding: 0.875rem 1rem;
+  .weekPager {
+    justify-content: space-between;
+  }
+
+  .weekTitle {
+    min-width: 0;
+    flex: 1;
   }
 }

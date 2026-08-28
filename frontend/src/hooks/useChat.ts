@@ -71,9 +71,8 @@ export const useChat = (initialSessionId: string | null) => {
   // Sync initial history when loaded
   const { data: history } = useChatHistory(sessionId);
   
-  // FIXED: Reset messages when sessionId changes so history always loads correctly.
   useEffect(() => {
-    if (history && sessionId && loadedSessionRef.current !== sessionId) {
+    if (history && sessionId) {
       setMessages(history);
       loadedSessionRef.current = sessionId;
     }

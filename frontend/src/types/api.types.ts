@@ -53,10 +53,25 @@ export interface TimetableSlot {
   subject?: Subject;
   startTime: string; 
   endTime: string; 
+  durationMinutes?: number;
   date?: string;
   dayOfWeek?: number;
   topic?: string;
-  status: 'pending' | 'completed' | 'skipped'; 
+  chapter?: string;
+  materialTitle?: string;
+  materialId?: string;
+  whatToStudy?: string[];
+  selectionReason?: string;
+  examDeadline?: string;
+  examName?: string;
+  daysUntilExam?: number;
+  difficulty?: string;
+  difficultyScore?: number;
+  isCompleted?: boolean;
+  status: 'pending' | 'completed' | 'missed' | 'skipped'; 
+  isCatchUp?: boolean;
+  missedDate?: string;
+  notes?: string;
   timetableId?: string;
 }
 
@@ -66,6 +81,7 @@ export interface Timetable {
   slots: TimetableSlot[];
   generatedAt: string; 
   isActive: boolean;
+  weekStartDate?: string;
 }
 
 export interface MaterialTopic {
@@ -89,7 +105,9 @@ export interface StudyMaterial {
   title: string; 
   fileUrl: string;
   fileType: 'pdf' | 'image' | 'video' | 'doc'; 
-  subjectId: string; 
+  subjectId?: string;
+  subjectName?: string;
+  subject?: Subject | { id: string; subjectName?: string; name?: string; studentId?: string };
   uploadedAt: string;
   aiSummary?: string;
   aiCategorizedSubject?: string;

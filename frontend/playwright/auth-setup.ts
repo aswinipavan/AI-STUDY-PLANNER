@@ -166,6 +166,15 @@ export async function mockAuthenticatedApiRoutes(
     });
   });
 
+  // Mock /api/notifications - returns empty notifications list
+  await page.route('**/api/notifications**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: [] })
+    });
+  });
+
   // Block Firestore API calls (we're testing with backend APIs only)
   await page.route('**/firestore.googleapis.com/**', async (route) => {
     await route.abort('blockedbyclient');

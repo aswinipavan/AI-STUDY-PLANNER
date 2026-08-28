@@ -8,10 +8,25 @@ export interface SlotResponse {
   id: string; // UUID
   subject: SubjectResponse;
   dayOfWeek: number; // 0-6
+  date?: string; // "YYYY-MM-DD"
   startTime: string; // "HH:mm:ss"
   endTime: string; // "HH:mm:ss"
+  durationMinutes?: number;
   topic: string | null;
+  chapter?: string;
+  materialTitle?: string;
+  materialId?: string;
+  whatToStudy?: string[];
+  selectionReason?: string;
+  examDeadline?: string;
+  examName?: string;
+  daysUntilExam?: number;
+  difficulty?: string;
+  difficultyScore?: number;
   isCompleted: boolean;
+  status?: 'pending' | 'completed' | 'missed' | 'skipped';
+  isCatchUp?: boolean;
+  missedDate?: string;
   notes: string | null;
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useOptimistic, useState, useTransition } from 'react';
+import React, { useOptimistic, useState, useTransition, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { timetableApi } from '@/api/timetable.api';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -13,11 +13,12 @@ import {
   CalendarDays,
   Zap,
   CheckCircle2,
-  XCircle,
   Clock,
   AlertTriangle,
   RefreshCw,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AdaptationResult, AdaptationTrigger, TimetableSlot } from '@/types/api.types';
@@ -25,17 +26,26 @@ import { QK } from '@/constants/queryKeys';
 import { useAdaptTimetable } from '@/hooks/useTimetable';
 import { useSoundPreference } from '@/hooks/useSoundPreference';
 import { parseSlotDate, dayLabel, dayKey, slotDayKey, mondayBasedIndex } from '@/utils/dateHelpers';
+import { SlotDetailModal } from '@/components/timetable/SlotDetailModal';
 import styles from './timetable.module.css';
 import { useAuthStore } from '@/stores/authStore';
 import { calcStudyPeriod, ENUM_TO_LABEL } from '@/utils/studyPeriodUtils';
-
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+import { fireCelebrationConfetti } from '@/lib/confetti';
 
 function formatTime(value: string): string {
-  return new Date(`1970-01-01T${value}`).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  try {
+    return new Date(`1970-01-01T${value}`).toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return value;
+  }
+}
+
+function formatTimeRange(start: string, end: string): string {
+  return `${formatTime(start)} – ${formatTime(end)}`;
 }
 
 function formatDay(value?: string): string | null {
@@ -50,10 +60,12 @@ function DayProgressBar({ slots }: { slots: TimetableSlot[] }) {
   const pct = total ? Math.round((completed / total) * 100) : 0;
 
   return (
-    <div className={styles.progressBlock}>
+    <div className={styles.progressBlock} data-testid="today-progress-block">
       <div className={styles.progressHeader}>
         <p className={styles.progressLabel}>Today&apos;s Progress</p>
-        <p className={styles.progressValue}>{completed}/{total} sessions</p>
+        <p className={styles.progressValue} data-testid="today-progress-value">
+          {completed}/{total} sessions completed
+        </p>
       </div>
       <div
         className={styles.progressTrack}
@@ -69,68 +81,94 @@ function DayProgressBar({ slots }: { slots: TimetableSlot[] }) {
   );
 }
 
-function SlotCard({
+function SlotCardItem({
   slot,
   isMissed,
+  isCatchUp,
   onToggle,
+  onOpenDetail,
 }: {
   slot: TimetableSlot;
   isMissed: boolean;
+  isCatchUp: boolean;
   onToggle: (id: string, status: TimetableSlot['status']) => void;
+  onOpenDetail: (slot: TimetableSlot) => void;
 }) {
   const nextStatus = (current: TimetableSlot['status']): TimetableSlot['status'] =>
-    current === 'pending' ? 'completed' : current === 'completed' ? 'skipped' : 'pending';
+    current === 'pending' ? 'completed' : current === 'completed' ? 'pending' : 'completed';
 
   let statusClass = styles.slotPending;
   if (slot.status === 'completed') statusClass = styles.slotCompleted;
   else if (slot.status === 'skipped') statusClass = styles.slotSkipped;
-  else if (isMissed) statusClass = styles.slotMissed;
-
+  else if (isCatchUp) statusClass = styles.slotCatchUp;
+  const subject = slot.subject?.name || (slot.subject as { name?: string; subjectName?: string })?.subjectName || 'Study';
+  const duration = slot.durationMinutes || 60;
   const next = nextStatus(slot.status);
-  const subject = slot.subject?.name ?? 'Study';
 
   return (
-    <button
-      onClick={() => onToggle(slot.id, next)}
+    <div
       className={`${styles.slotCard} ${statusClass}`}
-      title={`Click to mark as ${next}`}
-      aria-label={
-        `${subject}${slot.topic ? `, ${slot.topic}` : ''} at ${formatTime(slot.startTime)} — ` +
-        `${isMissed ? 'missed' : slot.status}. Activate to mark as ${next}.`
-      }
+      onClick={() => onOpenDetail(slot)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpenDetail(slot);
+        }
+      }}
+      data-testid={`slot-card-${slot.id}`}
+      aria-label={`${subject}, ${slot.topic || 'Session'} from ${formatTimeRange(slot.startTime, slot.endTime)}. Status: ${isMissed ? 'missed' : slot.status}. Click for details.`}
     >
-      <div className={styles.slotHeader}>
-        <p className={styles.slotSubject}>{subject}</p>
-        <span className={styles.slotIcon} aria-hidden="true">
-          {slot.status === 'completed' ? (
-            <CheckCircle2 size={14} />
-          ) : slot.status === 'skipped' ? (
-            <XCircle size={14} />
-          ) : isMissed ? (
-            <AlertTriangle size={14} />
-          ) : (
-            <Clock size={14} />
-          )}
+      {/* Catch-up urgent indicator */}
+      {isCatchUp && slot.status !== 'completed' && (
+        <span className={styles.catchUpBadge} data-testid="catchup-badge">
+          🔴 MISSED — COMPLETE TODAY
         </span>
+      )}
+
+      {/* Historical missed badge */}
+      {isMissed && slot.status !== 'completed' && !isCatchUp && (
+        <span className={styles.missedBadge} data-testid="missed-badge">
+          🔴 MISSED
+        </span>
+      )}
+
+      <div className={styles.slotHeader}>
+        <p className={styles.slotSubject} title={subject}>
+          {subject}
+        </p>
+        <button
+          type="button"
+          onClick={e => {
+            e.stopPropagation();
+            onToggle(slot.id, next);
+          }}
+          className={`${styles.quickToggleBtn} ${slot.status === 'completed' ? styles.quickToggleDone : ''}`}
+          title={`Click to mark as ${next}`}
+          aria-label={`Mark session as ${next}`}
+          data-testid={`quick-toggle-${slot.id}`}
+        >
+          {slot.status === 'completed' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
+        </button>
       </div>
+
       {slot.topic && (
-        <p className={styles.slotTopic} title={slot.topic}>
-          {slot.topic}
+        <p className={styles.slotTopic} title={slot.topic} data-testid={`slot-topic-${slot.id}`}>
+          📖 {slot.topic}
         </p>
       )}
-      <p className={styles.slotTime}>{formatTime(slot.startTime)}</p>
-    </button>
+
+      <div className={styles.slotFooter}>
+        <span className={styles.slotTimeRange} data-testid={`slot-time-${slot.id}`}>
+          {formatTimeRange(slot.startTime, slot.endTime)}
+        </span>
+        <span style={{ opacity: 0.7 }}>{duration}m</span>
+      </div>
+    </div>
   );
 }
 
-/**
- * The "why the plan changed" panel (§ adaptive AI).
- *
- * The reasons are the backend's own `changes[]`, rendered verbatim — the service
- * knows which subject moved and why (exam pulled closer, coverage complete, a
- * missed session pushed forward), so restating it in the client would only give
- * the two places a chance to disagree.
- */
 function AdaptationSummary({ result }: { result: AdaptationResult }) {
   const changes = result.changes ?? [];
   const horizon =
@@ -173,6 +211,10 @@ export default function TimetablePage() {
   const { play } = useSoundPreference();
   const adapt = useAdaptTimetable();
   const [plan, setPlan] = useState<AdaptationResult | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<TimetableSlot | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(0);
+  const [viewAllWeeks, setViewAllWeeks] = useState<boolean>(false);
   const { user } = useAuthStore();
 
   const { data: timetable, isLoading, error, refetch } = useQuery({
@@ -186,55 +228,139 @@ export default function TimetablePage() {
       current.map(s => (s.id === id ? { ...s, status } : s))
   );
 
-  const today = new Date();
-  const todayKey = dayLabel(today);
-  const todayIso = dayKey(today);
-  const todayIndex = mondayBasedIndex(today);
+  const today = useMemo(() => new Date(), []);
+  const todayIso = useMemo(() => dayKey(today), [today]);
 
   const slotDay = (slot: TimetableSlot): string | null => slotDayKey(slot.date);
 
+  // Derive distinct calendar days in the active timetable
+  const calendarDays = useMemo(() => {
+    if (!optimisticSlots.length) return [];
+    const dateSet = new Set<string>();
+    optimisticSlots.forEach(s => {
+      const d = slotDay(s);
+      if (d) dateSet.add(d);
+    });
+
+    const sorted = Array.from(dateSet).sort();
+    if (sorted.length === 0 && timetable?.weekStartDate) {
+      // Fallback: 7 days starting from weekStartDate
+      const start = parseSlotDate(timetable.weekStartDate) || today;
+      return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        return dayKey(d);
+      });
+    }
+
+    // Ensure contiguous range from first date to last date
+    if (sorted.length > 0) {
+      const first = parseSlotDate(sorted[0]) || today;
+      const last = parseSlotDate(sorted[sorted.length - 1]) || today;
+      const totalDays = Math.max(1, Math.round((last.getTime() - first.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+      
+      const contiguous: string[] = [];
+      for (let i = 0; i < totalDays; i++) {
+        const curr = new Date(first);
+        curr.setDate(first.getDate() + i);
+        contiguous.push(dayKey(curr));
+      }
+      return contiguous;
+    }
+    return sorted;
+  }, [optimisticSlots, timetable, today]);
+
+  // Group days into 7-day calendar weeks
+  const weeks = useMemo(() => {
+    if (!calendarDays.length) return [];
+    const chunks: string[][] = [];
+    for (let i = 0; i < calendarDays.length; i += 7) {
+      chunks.push(calendarDays.slice(i, i + 7));
+    }
+    return chunks;
+  }, [calendarDays]);
+
+  // Determine current active week index
+  const activeWeekIndex = useMemo(() => {
+    if (!weeks.length) return 0;
+    const idx = weeks.findIndex(w => w.includes(todayIso));
+    return idx >= 0 ? idx : 0;
+  }, [weeks, todayIso]);
+
+  // Horizon range info
+  const horizonInfo = useMemo(() => {
+    if (!calendarDays.length) return null;
+    const firstDate = parseSlotDate(calendarDays[0]);
+    const lastDate = parseSlotDate(calendarDays[calendarDays.length - 1]);
+    if (!firstDate || !lastDate) return null;
+
+    const startMonth = firstDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const endMonth = lastDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const monthsLabel = startMonth === endMonth ? startMonth : `${startMonth} – ${endMonth}`;
+
+    const startDateStr = firstDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endDateStr = lastDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const rangeLabel = `${startDateStr} – ${endDateStr}`;
+
+    return {
+      months: monthsLabel.toUpperCase(),
+      range: rangeLabel,
+      totalDays: calendarDays.length,
+      totalSessions: optimisticSlots.length,
+    };
+  }, [calendarDays, optimisticSlots]);
+
   const todaySlots = optimisticSlots.filter(s => {
     const iso = slotDay(s);
-    return iso ? iso === todayIso : s.dayOfWeek === todayIndex;
+    return iso ? iso === todayIso : s.dayOfWeek === mondayBasedIndex(today);
   });
 
-  /** Still pending on a day that has already passed — nothing else can mean this. */
+  /** Missed sessions: past slots not marked completed */
   const missedSlots = optimisticSlots.filter(s => {
-    if (s.status !== 'pending') return false;
+    if (s.status === 'completed') return false;
     const iso = slotDay(s);
-    return iso !== null && iso < todayIso;
+    return (s.status === 'missed') || (iso !== null && iso < todayIso);
   });
   const missedIds = new Set(missedSlots.map(s => s.id));
 
   const handleToggle = (id: string, status: TimetableSlot['status']) => {
-    // Clearing the last open session of the day is the one genuine milestone the
-    // existing data can prove, so it gets the achievement cue instead of the
-    // per-session one. Computed before the await so it describes this click.
     const finishesToday =
       status === 'completed' &&
-      todaySlots.length > 1 &&
-      todaySlots.every(s => s.id === id || s.status !== 'pending');
+      todaySlots.length > 0 &&
+      todaySlots.every(s => s.id === id || s.status === 'completed');
 
     startTransition(async () => {
       updateOptimistic({ id, status });
+      if (selectedSlot && selectedSlot.id === id) {
+        setSelectedSlot(prev => (prev ? { ...prev, status } : null));
+      }
+      if (finishesToday) {
+        fireCelebrationConfetti();
+      }
       try {
         await timetableApi.updateSlotStatus(id, status);
         if (status === 'completed') play(finishesToday ? 'achievement' : 'sessionComplete');
         qc.invalidateQueries({ queryKey: QK.timetable });
-        // Finishing (or skipping) a session moves coverage, consistency and
-        // therefore priority. Refresh those reads rather than silently re-planning
-        // the schedule the student is currently looking at — re-planning stays an
-        // explicit action.
         qc.invalidateQueries({ queryKey: QK.timetableInsights });
         qc.invalidateQueries({ queryKey: QK.priority });
         qc.invalidateQueries({ queryKey: QK.readiness });
       } catch (err) {
-        // BUG-006 Fixed: show visible error toast instead of swallowing silently
         console.error('[Timetable] Error updating slot status:', err);
         toast.error('Could not update session status. Please try again.');
-        qc.invalidateQueries({ queryKey: QK.timetable }); // revert optimistic update
+        qc.invalidateQueries({ queryKey: QK.timetable });
       }
     });
+  };
+
+  const handleOpenDetail = (slot: TimetableSlot) => {
+    const isMissed = missedIds.has(slot.id);
+    const isCatchUp = Boolean(slot.isCatchUp);
+    setSelectedSlot({
+      ...slot,
+      status: slot.status === 'completed' ? 'completed' : isMissed ? 'missed' : slot.status,
+      isCatchUp,
+    });
+    setIsModalOpen(true);
   };
 
   const handleReplan = () => {
@@ -255,11 +381,13 @@ export default function TimetablePage() {
   if (isLoading) return <div className="p-6"><TimetableGridSkeleton /></div>;
   if (error) return <div className="p-6"><ErrorState message="Could not load timetable." onRetry={refetch} /></div>;
 
+  const currentWeekDays = weeks[selectedWeekIndex] || calendarDays.slice(0, 7);
+
   return (
     <div className={styles.container}>
       <PageHeader
         title="My Timetable"
-        subtitle="Your AI-generated weekly study schedule. Click any slot to mark it done."
+        subtitle="Your AI-generated multi-week study schedule. Click any slot to view study topics and guidance."
         breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Timetable' }]}
         action={
           <AppButton leftIcon={<Zap size={16} />} onClick={() => router.push('/timetable/generate')}>
@@ -268,8 +396,30 @@ export default function TimetablePage() {
         }
       />
 
-      {/* Daily study window banner — shows the ACTUAL period the timetable uses.
-          Consistent with Settings and the Generate wizard. Only shown when a timetable exists. */}
+      {/* Calendar Horizon & Month Range Header */}
+      {horizonInfo && (
+        <div className={styles.horizonHeader} data-testid="calendar-horizon-header">
+          <div className={styles.horizonInfo}>
+            <h2 className={styles.horizonMonths} data-testid="horizon-months-label">
+              <CalendarDays size={20} style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+              {horizonInfo.months}
+            </h2>
+            <p className={styles.horizonDates} data-testid="horizon-dates-label">
+              {horizonInfo.range}
+            </p>
+          </div>
+          <div className={styles.horizonStats}>
+            <span className={styles.statPill}>
+              {horizonInfo.totalDays} Days Preparation Plan
+            </span>
+            <span className={styles.statPill}>
+              {horizonInfo.totalSessions} Total Sessions
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Daily study window banner based on user's saved preferences */}
       {timetable && user && (() => {
         const windowEnum = user.preferredStudyTime ?? 'EVENING';
         const hours = user.availableHoursPerDay ?? 2;
@@ -288,7 +438,7 @@ export default function TimetablePage() {
               borderLeft: '3px solid var(--color-primary)',
               fontSize: '0.8125rem',
               color: 'var(--color-muted-foreground)',
-              marginBottom: '0.5rem',
+              marginBottom: '1rem',
             }}
             data-testid="timetable-study-window-banner"
           >
@@ -318,8 +468,33 @@ export default function TimetablePage() {
         />
       ) : (
         <>
+          {/* Missed Sessions Urgent Alert Banner */}
+          {missedSlots.length > 0 && (
+            <div className={styles.missedAlertBanner} data-testid="missed-sessions-alert-banner">
+              <div className={styles.missedAlertContent}>
+                <AlertTriangle size={20} className={styles.missedAlertIcon} aria-hidden="true" />
+                <div>
+                  <strong style={{ color: '#ef4444' }}>🔴 MISSED SESSIONS REQUIRE ATTENTION:</strong>{' '}
+                  You have {missedSlots.length} session{missedSlots.length === 1 ? '' : 's'} from past days that were not completed.
+                  Catch-up has been prioritized for today.
+                </div>
+              </div>
+              <AppButton
+                size="sm"
+                variant="primary"
+                leftIcon={<RefreshCw size={14} />}
+                loading={adapt.isPending}
+                onClick={handleReplan}
+                data-testid="replan-missed-btn"
+              >
+                Re-plan with Adaptive AI
+              </AppButton>
+            </div>
+          )}
+
           {todaySlots.length > 0 && <DayProgressBar slots={todaySlots} />}
 
+          {/* Adaptive Plan Section */}
           <section className={styles.adaptBlock} aria-labelledby="timetable-adapt-heading">
             <div className={styles.adaptRow}>
               <span
@@ -343,6 +518,7 @@ export default function TimetablePage() {
                 leftIcon={<RefreshCw size={16} />}
                 loading={adapt.isPending}
                 onClick={handleReplan}
+                data-testid="replan-main-btn"
               >
                 {adapt.isPending ? 'Re-planning…' : 'Re-plan upcoming days'}
               </AppButton>
@@ -351,48 +527,159 @@ export default function TimetablePage() {
             {plan && <AdaptationSummary result={plan} />}
           </section>
 
-          <div className={styles.gridBlock}>
-            <div className={styles.gridHeaders}>
-              {DAYS.map(day => (
-                <div
-                  key={day}
-                  className={`${styles.dayHeader} ${day === todayKey ? styles.dayHeaderActive : ''}`}
+          {/* Week Switcher & Multi-Week Controls */}
+          {weeks.length > 1 && (
+            <div className={styles.weekNavBlock} data-testid="week-navigation-block">
+              <div className={styles.weekPager}>
+                <AppButton
+                  size="sm"
+                  variant="outline"
+                  leftIcon={<ChevronLeft size={14} />}
+                  disabled={selectedWeekIndex === 0 || viewAllWeeks}
+                  onClick={() => setSelectedWeekIndex(prev => Math.max(0, prev - 1))}
+                  data-testid="prev-week-btn"
                 >
-                  {day}
-                  {day === todayKey && <span className={styles.todayDot} />}
-                </div>
-              ))}
-            </div>
+                  Prev
+                </AppButton>
 
-            <div className={styles.gridColumns}>
-              {DAYS.map((day, dayIndex) => {
-                const daySlots = optimisticSlots.filter(s => {
-                  if (s.date) {
-                    const parsed = parseSlotDate(s.date);
-                    return parsed ? dayLabel(parsed) === day : false;
-                  }
-                  if (s.dayOfWeek !== undefined && s.dayOfWeek !== null) {
-                    return s.dayOfWeek === dayIndex;
-                  }
-                  return false;
-                });
-                return (
-                  <div key={day} className={styles.dayColumn}>
-                    {daySlots.map(slot => (
-                      <SlotCard
-                        key={slot.id}
-                        slot={slot}
-                        isMissed={missedIds.has(slot.id)}
-                        onToggle={handleToggle}
-                      />
-                    ))}
-                  </div>
-                );
-              })}
+                <div className={styles.weekTitle} data-testid="current-week-title">
+                  {viewAllWeeks
+                    ? `All ${weeks.length} Weeks View`
+                    : `Week ${selectedWeekIndex + 1} of ${weeks.length} (${formatDay(currentWeekDays[0])} – ${formatDay(currentWeekDays[currentWeekDays.length - 1])})`}
+                </div>
+
+                <AppButton
+                  size="sm"
+                  variant="outline"
+                  rightIcon={<ChevronRight size={14} />}
+                  disabled={selectedWeekIndex === weeks.length - 1 || viewAllWeeks}
+                  onClick={() => setSelectedWeekIndex(prev => Math.min(weeks.length - 1, prev + 1))}
+                  data-testid="next-week-btn"
+                >
+                  Next
+                </AppButton>
+              </div>
+
+              {/* Quick Jump Tabs */}
+              <div className={styles.quickJumpTabs}>
+                <button
+                  type="button"
+                  className={`${styles.quickTab} ${!viewAllWeeks && selectedWeekIndex === activeWeekIndex ? styles.quickTabActive : ''}`}
+                  onClick={() => {
+                    setViewAllWeeks(false);
+                    setSelectedWeekIndex(activeWeekIndex);
+                  }}
+                  data-testid="quick-jump-today"
+                >
+                  Today
+                </button>
+                {weeks.map((_, wIdx) => (
+                  <button
+                    key={wIdx}
+                    type="button"
+                    className={`${styles.quickTab} ${!viewAllWeeks && selectedWeekIndex === wIdx ? styles.quickTabActive : ''}`}
+                    onClick={() => {
+                      setViewAllWeeks(false);
+                      setSelectedWeekIndex(wIdx);
+                    }}
+                    data-testid={`quick-jump-week-${wIdx + 1}`}
+                  >
+                    Week {wIdx + 1}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={`${styles.quickTab} ${viewAllWeeks ? styles.quickTabActive : ''}`}
+                  onClick={() => setViewAllWeeks(prev => !prev)}
+                  data-testid="quick-jump-all-weeks"
+                >
+                  {viewAllWeeks ? 'Single Week View' : 'All Weeks View'}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Calendar Grid Rendering */}
+          {(viewAllWeeks ? weeks : [currentWeekDays]).map((weekDaysList, wIndex) => {
+            const firstDayParsed = parseSlotDate(weekDaysList[0]);
+            const weekMonth = firstDayParsed ? firstDayParsed.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase() : '';
+
+            return (
+              <div key={wIndex} className={styles.gridBlock} style={{ marginBottom: '1.5rem' }}>
+                {viewAllWeeks && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
+                      Week {wIndex + 1} · {weekMonth}
+                    </h3>
+                    <span style={{ fontSize: '0.8125rem', color: 'var(--color-muted-foreground)' }}>
+                      {formatDay(weekDaysList[0])} – {formatDay(weekDaysList[weekDaysList.length - 1])}
+                    </span>
+                  </div>
+                )}
+
+                <div className={styles.gridHeaders}>
+                  {weekDaysList.map((dayIsoStr, dIdx) => {
+                    const parsedDate = parseSlotDate(dayIsoStr);
+                    const isToday = dayIsoStr === todayIso;
+                    const weekday = parsedDate ? dayLabel(parsedDate) : `Day ${dIdx + 1}`;
+                    const dayNum = parsedDate ? parsedDate.getDate() : dIdx + 1;
+                    const monthShort = parsedDate ? parsedDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : '';
+
+                    return (
+                      <div
+                        key={dayIsoStr}
+                        className={`${styles.dayHeader} ${isToday ? styles.dayHeaderActive : ''}`}
+                        data-testid={`day-header-${dayIsoStr}`}
+                      >
+                        <span className={styles.dayHeaderMonthTag}>{monthShort}</span>
+                        <span className={styles.dayHeaderWeekday}>{weekday}</span>
+                        <span className={styles.dayHeaderDate}>{dayNum}</span>
+                        {isToday && <span className={styles.todayDot} title="Today" />}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className={styles.gridColumns}>
+                  {weekDaysList.map(dayIsoStr => {
+                    const daySlots = optimisticSlots.filter(s => {
+                      const d = slotDay(s);
+                      return d ? d === dayIsoStr : false;
+                    });
+
+                    return (
+                      <div key={dayIsoStr} className={styles.dayColumn} data-testid={`day-column-${dayIsoStr}`}>
+                        {daySlots.length === 0 ? (
+                          <div className={styles.emptyDayText}>Rest / Review</div>
+                        ) : (
+                          daySlots.map(slot => (
+                            <SlotCardItem
+                              key={slot.id}
+                              slot={slot}
+                              isMissed={missedIds.has(slot.id)}
+                              isCatchUp={Boolean(slot.isCatchUp)}
+                              onToggle={handleToggle}
+                              onOpenDetail={handleOpenDetail}
+                            />
+                          ))
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </>
       )}
+
+      {/* Study Session Detail Modal */}
+      <SlotDetailModal
+        slot={selectedSlot}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onToggleStatus={handleToggle}
+      />
     </div>
   );
 }

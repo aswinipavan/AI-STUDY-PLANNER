@@ -12,9 +12,9 @@ interface UploadPayload {
 
 export const useMaterials = () => {
   const { isReady } = useBackendHealth();
-  return useQuery({
+  return useQuery<StudyMaterial[]>({
     queryKey: QK.materials,
-    queryFn: materialsApi.getAll,
+    queryFn: () => materialsApi.getAll(),
     enabled: isReady,
     retry: 2,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),

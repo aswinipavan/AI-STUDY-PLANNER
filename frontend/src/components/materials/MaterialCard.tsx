@@ -144,6 +144,14 @@ export default function MaterialCard({ material }: Props) {
           </span>
         </div>
 
+        {/* User-selected Subject Badge */}
+        {(material.subjectName || (typeof material.subject === 'object' && (material.subject?.name || (material.subject as { subjectName?: string })?.subjectName))) && (
+          <div className={styles.subjectBadge}>
+            <BookOpen size={10} />
+            <span>{material.subjectName || (typeof material.subject === 'object' ? (material.subject?.name || (material.subject as { subjectName?: string })?.subjectName) : '')}</span>
+          </div>
+        )}
+
         {/* AI Category badge */}
         {material.aiCategorizedSubject && (
           <div className={styles.aiCategoryBadge}>

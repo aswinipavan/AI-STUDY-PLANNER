@@ -33,11 +33,12 @@ export const authApi = {
   updateMe: async (data: Partial<StudentProfile>): Promise<StudentProfile> => {
     // Map frontend field names to backend field names
     const payload: Record<string, unknown> = {
-      fullName: data.name || data.fullName, // backend expects 'fullName'
+      fullName: data.name !== undefined ? data.name : data.fullName,
       email: data.email,
       collegeName: data.collegeName,
       semester: data.semester,
       department: data.department,
+      phoneNumber: data.phoneNumber,
       availableHoursPerDay: data.availableHoursPerDay,
       preferredStudyTime: data.preferredStudyTime,
       profilePictureUrl: data.profilePictureUrl || data.photoUrl,

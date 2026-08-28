@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import React from 'react';
 import '@testing-library/jest-dom';
 
 // Mock global fetch and Response FIRST - before any other imports
@@ -50,5 +51,28 @@ jest.mock('next/navigation', () => ({
   useSearchParams() {
     return new URLSearchParams();
   }
+}));
+
+// Mock react-markdown, remark-math, and rehype-katex for JSDOM
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: any) => {
+    return React.createElement('div', { 'data-testid': 'markdown-content' }, children);
+  },
+}));
+
+jest.mock('remark-math', () => ({
+  __esModule: true,
+  default: () => () => {},
+}));
+
+jest.mock('remark-gfm', () => ({
+  __esModule: true,
+  default: () => () => {},
+}));
+
+jest.mock('rehype-katex', () => ({
+  __esModule: true,
+  default: () => () => {},
 }));
 

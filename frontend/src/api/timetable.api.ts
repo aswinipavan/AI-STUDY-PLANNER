@@ -58,8 +58,8 @@ export const timetableApi = {
     return response.data.data ?? response.data;
   },
 
-  // Wrapper for frontend 3-state status - maps to backend's boolean isCompleted
-  updateSlotStatus: async (id: string, _status: 'pending' | 'completed' | 'skipped'): Promise<TimetableSlot> => {
+  // Wrapper for frontend status - maps to backend's boolean isCompleted
+  updateSlotStatus: async (id: string, _status: TimetableSlot['status']): Promise<TimetableSlot> => {
     // Backend only supports toggle, so we check current state
     // If setting to 'completed' and not already complete, toggle
     // If setting to 'pending' or 'skipped' and currently complete, toggle
