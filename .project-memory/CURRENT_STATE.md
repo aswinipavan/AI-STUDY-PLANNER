@@ -1,10 +1,11 @@
 # Current State
 
 ## Current Build Status
+- **Active Pull Request:** [#7](https://github.com/aswinipavan/AI-STUDY-PLANNER/pull/7) created from `feat/master-ai-tutor-and-timetable-overhaul` into `main`. Ready for review (unmerged).
 - **Automated Test Suite & Quality Gate:** 100% genuine executable tests across all layers (456 total tests, 448 passed, 0 failures, 8 skipped in offline profile). Zero hardcoded or simulated test results.
 - **Excel Test-Case Documentation Portfolio:** 7 professional OpenPyXL workbooks in `testing/reports/` with **1,905 total test cases (300+ per sheet)** with 100% traceability to source files, runnable commands, defect tracking, and regression matrix.
-- **Frontend:** Next.js 16.2.9 (App Router) + Turbopack + React 19. Fully builds with 0 errors (`npm run build`, 24/24 routes generated cleanly), 0 ESLint errors (`npm run lint`), 0 TypeScript errors (`npx tsc --noEmit`), 134/134 Jest tests passed (`npm test`), and 51/51 Playwright core E2E tests passed.
-- **Backend:** Spring Boot 3.2.4 (Java 17). Builds and tests with 0 errors (263 tests total across 31 suites, 255 passed, 0 failures, 0 errors, 8 skipped via `mvnw test`).
+- **Frontend:** Next.js 16.2.9 (App Router) + Turbopack + React 19. Fully builds with 0 errors (`npm run build`, 24/24 routes generated cleanly), 0 ESLint errors (`npm run lint`), 0 TypeScript errors (`npx tsc --noEmit`), 134/134 Jest tests passed (`npm test`), and 76/76 Playwright E2E tests passed.
+- **Backend:** Spring Boot 3.2.4 (Java 17). Builds and tests with 0 errors (31 test suites, 264 passed, 0 failures, 0 errors, 8 skipped via `mvnw test`).
 - **Mobile (Android):** React Native 0.75.5 with TypeScript (`npm run tsc` passes with 0 errors), ESLint (0 errors), and 8/8 Jest unit tests passing.
 - **Database:** Supabase PostgreSQL connected and stable with Flyway migrations `V1`, `V2`, `V3`, `V5` (15 tables) and `ddl-auto=validate`. Local H2 file persistence at `./data/studyplanner.mv.db`.
 - **Storage:** Local filesystem storage active for local development and offline mode (`/api/files/...`); Supabase Storage configured with anon key for cloud deployments (`materials/` and `avatars/` buckets).
