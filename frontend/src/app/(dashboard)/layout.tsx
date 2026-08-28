@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { ViewTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
 import { useFirebaseAuth } from '@/components/providers/AuthProvider';
@@ -12,6 +12,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { firebaseUser, loading } = useFirebaseAuth();
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
+  const pathname = usePathname();
+  const isChatRoute = pathname?.startsWith('/chat');
 
   useEffect(() => {
     if (!loading && !firebaseUser && !user) {
@@ -45,7 +47,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Topbar />
 
         {/* Scrollable Page Content */}
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-4 lg:p-8">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className={
+            isChatRoute
+              ? "flex-1 flex flex-col min-h-0 overflow-hidden p-0"
+              : "flex-1 overflow-y-auto p-4 lg:p-8"
+          }
+        >
           {/*
             Only the page body animates between routes — the sidebar and topbar
             are anchored in globals.css so navigation never reads as a reload.
@@ -53,7 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             runs JS per frame.
           */}
           <ViewTransition default="page-body">
-            <div className="mx-auto max-w-7xl">
+            <div className={isChatRoute ? "flex-1 flex flex-col min-h-0 h-full w-full" : "mx-auto max-w-7xl"}>
               {children}
             </div>
           </ViewTransition>

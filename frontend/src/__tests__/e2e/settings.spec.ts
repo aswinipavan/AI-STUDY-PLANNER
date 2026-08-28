@@ -1,13 +1,38 @@
 import { test, expect } from '@playwright/test';
+import { setupAuthenticatedContext } from '../../../playwright/auth-setup';
 
 // Group 9: Profile and Notification Settings (SEL-155 to SEL-163)
 test.describe('Profile Settings Section', () => {
+  const mockStudent = {
+    id: 's-123',
+    firebaseUid: 'mock-uid-settings-spec',
+    name: 'Aswin Kumar',
+    fullName: 'Aswin Kumar',
+    email: 'you@example.com',
+    collegeName: 'IIT Madras',
+    department: 'Computer Science',
+    semester: 5,
+    availableHoursPerDay: 4.0,
+    preferredStudyTime: 'EVENING',
+    emailNotifications: true,
+    pushNotifications: false,
+    isPremium: false,
+  };
 
   test.beforeEach(async ({ page, context }) => {
-    // Skip onboarding for all tests
-    await context.addInitScript(() => {
+    await setupAuthenticatedContext(context, mockStudent);
+
+    await page.addInitScript((student) => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
-    });
+      localStorage.setItem('auth-store', JSON.stringify({
+        state: {
+          user: student,
+          isAuthenticated: true,
+          isPremium: false,
+        },
+        version: 0,
+      }));
+    }, mockStudent);
 
     // Intercept auth checks
     await page.route('**/api/students/me', async (route) => {
@@ -15,24 +40,12 @@ test.describe('Profile Settings Section', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          data: {
-            id: 's-123',
-            name: 'Aswin Kumar',
-            email: 'you@example.com',
-            collegeName: 'IIT Madras',
-            department: 'Computer Science',
-            semester: 5,
-            availableHoursPerDay: 4.0,
-            emailNotifications: true,
-            pushNotifications: false,
-          }
+          success: true,
+          message: 'OK',
+          data: mockStudent,
         }),
       });
     });
-
-    await context.addCookies([
-      { name: 'access_token', value: 'fake.jwt.token', domain: 'localhost', path: '/' }
-    ]);
   });
 
   test('SEL-155: Save profile update valid parameters input fields details', async ({ page }) => {

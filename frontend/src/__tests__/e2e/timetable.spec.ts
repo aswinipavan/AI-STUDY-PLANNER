@@ -1,18 +1,39 @@
 import { test, expect } from '@playwright/test';
+import { setupAuthenticatedContext } from '../../../playwright/auth-setup';
 
 // Group 5: Timetable Generator and Slots (SEL-091 to SEL-115)
 test.describe('Timetable Section', () => {
+  const mockStudent = {
+    id: 's-123',
+    firebaseUid: 'mock-uid-tt-spec',
+    fullName: 'Dashboard Student',
+    name: 'Dashboard Student',
+    email: 'student@example.com',
+    collegeName: 'University',
+    semester: 4,
+    department: 'CS',
+    preferredStudyTime: 'EVENING',
+    availableHoursPerDay: 2,
+    isPremium: false,
+  };
+
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
 
   test.beforeEach(async ({ page, context }) => {
-    // Skip onboarding for all tests
-    await context.addInitScript(() => {
-      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
-    });
+    await setupAuthenticatedContext(context, mockStudent);
 
-    // Set authentication cookie BEFORE setting up routes to avoid race conditions
-    await context.addCookies([
-      { name: 'access_token', value: 'fake.jwt.token', domain: 'localhost', path: '/' }
-    ]);
+    await page.addInitScript((student) => {
+      localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
+      localStorage.setItem('auth-store', JSON.stringify({
+        state: {
+          user: student,
+          isAuthenticated: true,
+          isPremium: false,
+        },
+        version: 0,
+      }));
+    }, mockStudent);
 
     // Set up routes BEFORE navigation to avoid race conditions with React Query
     // Intercept auth checks
@@ -20,7 +41,7 @@ test.describe('Timetable Section', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ data: { id: 's-123', name: 'Dashboard Student' } }),
+        body: JSON.stringify({ success: true, message: 'OK', data: mockStudent }),
       });
     });
 
@@ -29,9 +50,11 @@ test.describe('Timetable Section', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
+          success: true,
+          message: 'OK',
           data: [
-            { id: 'sub-1', name: 'Data Structures' },
-            { id: 'sub-2', name: 'Computer Architecture' }
+            { id: 'sub-1', name: 'Data Structures', subjectName: 'Data Structures' },
+            { id: 'sub-2', name: 'Computer Architecture', subjectName: 'Computer Architecture' }
           ]
         }),
       });
@@ -42,21 +65,87 @@ test.describe('Timetable Section', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
+          success: true,
+          message: 'OK',
           data: {
             id: 't-123',
+            weekStartDate: todayStr,
             slots: [
-              { id: 'slot-1', subjectId: 'sub-1', subject: { id: 'sub-1', name: 'Data Structures' }, dayOfWeek: 0, startTime: '18:00', endTime: '19:30', isCompleted: false, topic: 'Binary Search Trees' },
-              { id: 'slot-2', subjectId: 'sub-2', subject: { id: 'sub-2', name: 'Computer Architecture' }, dayOfWeek: 1, startTime: '19:30', endTime: '21:00', isCompleted: true, topic: 'Instruction Pipeling' }
+              {
+                id: 'slot-1',
+                subjectId: 'sub-1',
+                subject: { id: 'sub-1', name: 'Data Structures', subjectName: 'Data Structures' },
+                date: todayStr,
+                dayOfWeek: today.getDay(),
+                startTime: '18:00:00',
+                endTime: '19:30:00',
+                durationMinutes: 90,
+                isCompleted: false,
+                status: 'pending',
+                topic: 'Binary Search Trees',
+                chapter: 'Trees',
+              },
+              {
+                id: 'slot-2',
+                subjectId: 'sub-2',
+                subject: { id: 'sub-2', name: 'Computer Architecture', subjectName: 'Computer Architecture' },
+                date: todayStr,
+                dayOfWeek: today.getDay(),
+                startTime: '19:30:00',
+                endTime: '21:00:00',
+                durationMinutes: 90,
+                isCompleted: true,
+                status: 'completed',
+                topic: 'Instruction Pipelining',
+                chapter: 'CPU Architecture',
+              }
             ]
           }
         }),
       });
     });
 
+    await page.route('**/api/wake', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'awake' }) });
+    });
+
+    await page.route('**/api/notifications**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/materials**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/exams/upcoming', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/performance/report', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            overallAverage: 0,
+            studyHoursThisWeek: 0,
+            completedTasks: 0,
+            upcomingExamsCount: 0,
+            subjectPerformanceList: []
+          }
+        })
+      });
+    });
+
+    await page.route('**/firestore.googleapis.com/**', async (route) => {
+      await route.abort('blockedbyclient');
+    });
+  });
+
   test('SEL-091: Active study slots calendar loaded list rendering', async ({ page }) => {
     await page.goto('/timetable');
     // Check for slot content in page body
-    await expect(page.locator('body')).toContainText(/Binary Search Trees|Instruction Pipeling/i, { timeout: 5000 });
+    await expect(page.locator('body')).toContainText(/Binary Search Trees|Instruction Pipelining/i, { timeout: 5000 });
   });
 
   test('SEL-092: Empty active timetable layout fallback banner triggers', async ({ page }) => {
@@ -70,7 +159,7 @@ test.describe('Timetable Section', () => {
 
   test('SEL-093: Navigation to timetable generator steps wizard page', async ({ page }) => {
     await page.goto('/timetable');
-    const genBtn = page.locator('a[href="/timetable/generate"], button:has-text("Generate Timetable")').first();
+    const genBtn = page.locator('a[href="/timetable/generate"], button:has-text("Generate New"), button:has-text("Generate Timetable")').first();
     await genBtn.click();
     await expect(page).toHaveURL(/\/timetable\/generate/);
   });
@@ -306,5 +395,4 @@ test.describe('Timetable Section', () => {
     }
   });
 
-});
 });

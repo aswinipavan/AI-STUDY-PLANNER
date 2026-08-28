@@ -1,144 +1,51 @@
-# Test Progress - AI Study Planner
+﻿# Test Progress — AI Study Planner
 
-## Master Quality Assurance & Test Suite Summary
-- **Total Known Automated Test Cases:** 1,192 / 1,192 Passed (100.0% Pass Rate) ✅
-- **Testing Dimensions:** UI/UX (300) + Selenium Web (320) + Load Testing (312) + Appium Mobile (260) = 1,192 Real Tests
-- **Deployable Gate Sign-off Criteria:** 1,192 / 1,192 Met ✅
-- **Master Excel File:** [`testing/reports/AI_Study_Planner_MASTER_Test_Report.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_MASTER_Test_Report.xlsx) (8 Dedicated Sheets, 129 KB)
-- **Domain Excel Workbooks in `testing/reports/`:**
-  - [`AI_Study_Planner_UI_UX_Test.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_UI_UX_Test.xlsx) (300 UI/UX Tests)
-  - [`AI_Study_Planner_Selenium_E2E.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_Selenium_E2E.xlsx) (320 Selenium Tests)
-  - [`AI_Study_Planner_Load_Test.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_Load_Test.xlsx) (312 Load Scenarios)
-  - [`AI_Study_Planner_Appium_E2E.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_Appium_E2E.xlsx) (260 Appium Mobile Tests)
-- **Overall Status:** APPROVED FOR PRODUCTION RELEASE 🚀
-
----
-
-## Breakdown by Automated Test Dimension
-
-| Testing Domain / Suite | Framework & Engine | Total Test Cases | Passed | Failed / Pending | Pass Rate (%) | Deployable Gate Status |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| **UI/UX & Design System Testing** | Playwright + WCAG AA Contrast Engine | **300** | 300 | 0 | 100.0% | **READY FOR DEPLOYMENT** |
-| **Selenium Web End-to-End Testing** | Selenium WebDriver 4.47 + Chrome Headless | **320** | 320 | 0 | 100.0% | **READY FOR DEPLOYMENT** |
-| **Load & High-Concurrency Testing** | Async Pooled HTTP Engine (100 VUs) | **312** | 312 | 0 | 100.0% | **READY FOR DEPLOYMENT** |
-| **Appium Mobile End-to-End Testing** | Appium 3.6 + UiAutomator2 (Pixel 8 / API 34) | **260** | 260 | 0 | 100.0% | **READY FOR DEPLOYMENT** |
-| **TOTAL CONSOLIDATED MASTER SUITE** | **Integrated Multi-Domain Test Suite** | **1,192** | **1,192** | **0** | **100.0%** | **PASSED — APPROVED FOR PRODUCTION** |
+## Master Quality Assurance & Genuine Executable Test Suite Summary
+- **Execution Architecture:** 100% dynamically parsed from real test runners (Surefire JUnit 5 XML, Jest JSON, Playwright JSON, Mobile Jest). Zero simulated or hardcoded results.
+- **Total Executable Automated Tests:** **456**
+- **Passing Tests:** **448** (0 Failures, 8 Skipped in offline test profile)
+- **Overall Suite Pass Rate:** **98.25%** (100% Green on active tests)
+- **Cumulative Execution Duration:** **207.31s**
+- **Git Commit SHA:** `15a41330e8dd8ea719281580c67806b18f9fb710` (Branch: `feat/master-ai-tutor-and-timetable-overhaul`)
+- **Master Report:** `testing/reports/MASTER_TEST_REPORT.md`
+- **Machine Ledger:** `testing/reports/summary/TEST_EXECUTION_SUMMARY.json`
+- **Legacy Simulation Archive:** Preserved in `testing/reports/legacy_archive/`
 
 ---
 
-## GitHub Actions CI/CD Pipeline Integration
-- **Master Pipeline Workflow:** [`.github/workflows/master-test-suite.yml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/.github/workflows/master-test-suite.yml)
-- **Modular CI Workflows:**
-  - UI/UX Suite: [`.github/workflows/ui-ux-tests.yml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/.github/workflows/ui-ux-tests.yml)
-  - Selenium Web E2E: [`.github/workflows/selenium-e2e.yml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/.github/workflows/selenium-e2e.yml)
-  - Baseline Load Testing: [`.github/workflows/load-tests.yml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/.github/workflows/load-tests.yml)
-  - Appium Mobile E2E: [`.github/workflows/appium-e2e.yml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/.github/workflows/appium-e2e.yml)
-- **Artifact Uploads:** Automated publishing of all 5 Excel workbooks, CSV ledgers, HTML dashboards, JSON summaries, and JUnit XML files.
+## Layer-by-Layer Verification Matrix
 
-
----
-
-## Frontend Automated Tests
-- **Status:** Passing (127/127 tests green across 18 suites) ✅
-- **Coverage:** ~ 91%
-- **Build Verification:** Next.js 16.2.9 App Router (24/24 routes statically optimized with 0 errors)
-- **SlotDetailModal Tests:** 4/4 tests passing (`slotDetailModal.test.tsx`)
-- **Playwright Timetable Master Fix E2E:** All tests passing (`timetable_master_fix.spec.ts`)
-- **Playwright Material Subject Filter E2E:** 5/5 tests passing (`material_subject_filter.spec.ts`)
-- **Playwright Materials Section E2E:** 15/15 tests passing (`materials.spec.ts`)
-- **Playwright Profile Persistence E2E:** 3/3 tests passing (`profile_persistence.spec.ts`)
-- **Playwright Settings E2E:** 15/15 tests passing (`settings.spec.ts`)
+| Layer | Framework & Runner | Total Tests | Passed | Failed | Skipped | Pass Rate | Duration | Detailed Report |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Backend Service & API** | JUnit 5 / Spring Boot Test / MockMvc | **263** | 255 | 0 | 8 | 96.96% | 85.9s | `testing/reports/backend/BACKEND_TEST_REPORT.md` |
+| **Frontend Unit & Component** | Jest / React Testing Library | **134** | 134 | 0 | 0 | 100.0% | 61.03s | `testing/reports/frontend/FRONTEND_TEST_REPORT.md` |
+| **Frontend End-to-End** | Playwright (Chromium) | **51** | 51 | 0 | 0 | 100.0% | 59.96s | `testing/reports/e2e/E2E_PLAYWRIGHT_REPORT.md` |
+| **Mobile React Native** | Jest / React Native | **8** | 8 | 0 | 0 | 100.0% | 0.42s | `testing/reports/mobile/MOBILE_TEST_REPORT.md` |
+| **TOTAL CONSOLIDATED** | **All 4 Test Frameworks** | **456** | **448** | **0** | **8** | **98.25%** | **207.31s** | `testing/reports/summary/TEST_EXECUTION_SUMMARY.json` |
 
 ---
 
-## Backend Automated Tests (JUnit 5 + Mockito)
-- **Status:** Passing (17/17 Timetable + Adaptive test suite green) ✅
-- **TimetableHorizonAndDetailsTest:** 4/4 tests passing (14-day horizon generation, start-end times, material topic resolution, exam eve revision)
-- **TimetableServiceHorizonTest:** 5/5 tests passing (7d, 14d, 30d, 60d, 90d dynamic horizons)
-- **AdaptiveScheduleServiceTest:** 8/8 tests passing (session completion, missed topic re-queuing, marks update, exam change)
-- **MaterialSubjectFilterTest:** 4/4 tests passing (upload association, student isolation, filtered retrieval, Jackson serialization)
-- **MaterialControllerTest:** 21/21 tests passing (including subjectId query parameter filter)
-- **UploadIntegrationTest:** 4/4 tests passing (including material upload with subject and filter round-trip)
-- **StudentProfilePersistenceTest:** 6/6 tests passing
-- **JwtTokenProviderTest:** 15/15 tests passing
-- **FirebaseTokenFilterTest:** 17/17 tests passing
-- **AuthControllerTest:** 4/4 core tests passing
-- **SecurityConfigTest:** 11/11 tests passing
-- **GroqServiceTest:** 18/18 tests passing
-- **CacheConfigTest:** 10/10 tests passing
-- **StudyTimeWindowTest:** 17/17 tests passing
-- **TimetableStudyPeriodTest:** 14/14 tests passing
-- **Total Backend Tests:** 253/253 tests passing
+## Expanded Excel Test-Case Portfolio (1,905 Total Cases — 300 Per Sheet)
+
+| Workbook | Domain | Total Cases | Automated | Executed (PASSED) | Not Yet Executed | Blocked |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| `Selenium_Test_Cases.xlsx` | Browser E2E (Playwright / Selenium) | **300** | 300 | 51 | 249 | 0 |
+| `Appium_Test_Cases.xlsx` | Mobile (RN Jest / Appium 3.x) | **300** | 300 | 8 | 292 | 0 |
+| `Validation_Test_Cases.xlsx` | Functional Product Validation | **300** | 300 | 25 | 275 | 0 |
+| `Unit_Test_Cases.xlsx` | Unit & Component (JUnit / Jest / RN) | **405** | 405 | 397 | 0 | 0 |
+| `Load_Test_Cases.xlsx` | Load & Performance Concurrency | **300** | 300 | 0 | 300 | 0 |
+| `UI_UX_Test_Cases.xlsx` | UI/UX, Design System, WCAG A11y | **300** | 300 | 20 | 280 | 0 |
+| `MASTER_Test_Cases.xlsx` | Master Portfolio (Summary + 6 + Defects + Reg) | **1,905** | **1,905** | **501** | **1,396** | **0** |
+
+- **Generator Scripts:** `python testing/scripts/generate_300_workbooks.py` and `python testing/scripts/generate_excel_test_cases.py`
+- **20 Standard Traceability Columns:** Test Case ID, Test Area, Feature, Scenario, Objective, Priority, Preconditions, Test Data, Steps, Expected Result, Actual Result, Framework, Automation Type, Executable Source, Execution Command, Environment, Evidence, Status, Defect ID, Notes.
+- **100% Traceability:** 0 missing IDs, 0 missing source file paths, 0 missing commands across all 1,905 rows.
 
 ---
 
-## Browser End-to-End Automation (Selenium WebDriver & Playwright)
-- **Selenium Master E2E Suite:** 320 / 320 Real Tests Passed (100.0% Pass Rate) ✅
-  - `MOD-01`: Authentication & Access Control (40/40 Tests Passed)
-  - `MOD-02`: Student Profile & Settings (32/32 Tests Passed)
-  - `MOD-03`: Header, Navigation & 3D Onboarding (28/28 Tests Passed)
-  - `MOD-04`: Dashboard & Study Overview (36/36 Tests Passed)
-  - `MOD-05`: Subjects & Academic Performance (36/36 Tests Passed)
-  - `MOD-06`: Exams Management & Countdown (32/32 Tests Passed)
-  - `MOD-07`: AI Timetable & Study Planner (40/40 Tests Passed)
-  - `MOD-08`: Academic Materials & PDFBox NLP (32/32 Tests Passed)
-  - `MOD-09`: Groq AI Coach & Chat Attachments (28/28 Tests Passed)
-  - `MOD-10`: Academic Analytics & Subscriptions (16/16 Tests Passed)
-  - **Runner:** [`testing/selenium_e2e_suite.py`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/selenium_e2e_suite.py)
-  - **CSV Report:** [`testing/reports/selenium_e2e_results.csv`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/selenium_e2e_results.csv)
-- **HTML Dashboard:** [`testing/reports/selenium_e2e_report.html`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/selenium_e2e_report.html)
-- **JUnit XML:** [`testing/reports/junit_results.xml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/junit_results.xml)
-- **CI Workflow:** [`.github/workflows/selenium-e2e.yml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/.github/workflows/selenium-e2e.yml)
-
----
-
-## Load & Performance Testing (100 Concurrent VUs @ 1 Minute Baseline)
-- **Status:** 312 / 312 Scenarios Executed & Passed (100.0% Pass Rate) ✅
-- **Total Requests Processed:** 4,801,680 Requests
-- **Average Throughput (RPS):** 256 req/s
-- **Average Latency (Avg):** 152 ms
-- **95th Percentile Latency (P95):** 244 ms
-- **99th Percentile Latency (P99):** 368 ms
-- **Global Error Rate:** 0.00% (Zero Failed Requests)
-- **SLA Release Verdict:** PASSED - API RESPONSE TIMES STAY FAST UNDER NORMAL LOAD
-- **Master Excel File:** [`testing/reports/AI_Study_Planner_Load_Test.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_Load_Test.xlsx) (2 Sheets: `Load Test Dashboard` + `All 300+ Load Test Cases`)
-- **CSV Ledger:** [`testing/reports/load_test_results.csv`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/load_test_results.csv)
-- **JSON Summary:** [`testing/reports/load_test_summary.json`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/load_test_summary.json)
-- **HTML Report:** [`testing/reports/load_test_report.html`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/load_test_report.html)
-- **Architecture:** 10 Dedicated Module Sub-Files in `testing/load/` with Master Runner [`testing/load/load_test_runner.py`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/load/load_test_runner.py)
-- **Playwright E2E Suite:** 7/7 verification sections passing (`final_production_verification.spec.ts`) ✅
-  - **Sections:** Authentication, Navigation, Dashboard KPIs, Subject CRUD, Exam Scheduling, Timetable Toggle, Groq AI Chat.
-
----
-
-## Mobile Appium End-to-End Automation (React Native Android)
-- **Status:** 260 / 260 Real Mobile Tests Executed & Passed (100.0% Pass Rate) ✅
-- **Pattern:** 4-State Testing Pattern (`[Portrait Mode]`, `[Landscape Mode]`, `[Low Network Latency]`, `[Background Resume]`)
-- **Device Target:** `Android Pixel 8 (API 34)`
-- **Total Execution Time:** 9.88 seconds
-- **Deployment Status:** APPROVED FOR PRODUCTION RELEASE 🚀
-- **Breakdown by Module (260 Tests):**
-  - `MOD-01`: Mobile Auth & App Launch (36/36 Tests Passed: `ASP-AP-E2E-001` - `036`)
-  - `MOD-02`: Student Profile & Setup (28/28 Tests Passed: `ASP-AP-E2E-037` - `064`)
-  - `MOD-03`: Dashboard & Mobile Navigation (28/28 Tests Passed: `ASP-AP-E2E-065` - `092`)
-  - `MOD-04`: AI Study Agent / AI Chat (24/24 Tests Passed: `ASP-AP-E2E-093` - `116`)
-  - `MOD-05`: Subjects & Academic Performance (28/28 Tests Passed: `ASP-AP-E2E-117` - `144`)
-  - `MOD-06`: Exams Management & Countdown (28/28 Tests Passed: `ASP-AP-E2E-145` - `172`)
-  - `MOD-07`: AI Timetable & Study Planner (24/24 Tests Passed: `ASP-AP-E2E-173` - `196`)
-  - `MOD-08`: Academic Materials & NLP (24/24 Tests Passed: `ASP-AP-E2E-197` - `220`)
-  - `MOD-09`: Analytics & Performance (16/16 Tests Passed: `ASP-AP-E2E-221` - `236`)
-  - `MOD-10`: Settings, Subscriptions & Push (24/24 Tests Passed: `ASP-AP-E2E-237` - `260`)
-- **Master Excel File:** [`testing/reports/AI_Study_Planner_Appium_E2E.xlsx`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/AI_Study_Planner_Appium_E2E.xlsx) (2 Sheets: `Mobile E2E Dashboard` + `Appium Mobile Test Cases`)
-- **CSV Report:** [`testing/reports/appium_e2e_results.csv`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/appium_e2e_results.csv)
-- **HTML Report:** [`testing/reports/appium_e2e_report.html`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/appium_e2e_report.html)
-- **JUnit XML:** [`testing/reports/appium_junit_results.xml`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/appium_junit_results.xml)
-- **JSON Summary:** [`testing/reports/appium_e2e_summary.json`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/reports/appium_e2e_summary.json)
-- **Architecture:** 10 Dedicated Module Sub-Files in `testing/appium/` with Master Runner [`testing/appium/appium_e2e_runner.py`](file:///c:/Users/aswin/Downloads/AI-Study-Planner/testing/appium/appium_e2e_runner.py)
-
-
----
-
-## Live Cloud Deployment Verifications
-- **Render Backend:** `GET /actuator/health` -> HTTP 200 `{"status":"UP"}` ✅
-- **Vercel Frontend:** `https://ai-study-planner-jhh9.vercel.app/` -> HTTP 200 OK ✅
-- **Database:** Supabase PostgreSQL with HikariCP pooler stable ✅
+## Unified Test Runners
+- **Windows Unified Runner**: `.\testing\run-all-tests.bat`
+- **Linux / macOS Unified Runner**: `./testing/run-all-tests.sh`
+- **Dynamic Markdown Report Generator**: `python testing/scripts/generate_test_reports.py`
+- **Dynamic 300-Case Excel Workbook Generator**: `python testing/scripts/generate_excel_test_cases.py`
+- **GitHub Actions Master CI**: `.github/workflows/master-test-suite.yml`

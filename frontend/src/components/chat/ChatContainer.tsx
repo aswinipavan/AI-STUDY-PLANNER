@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import Link from 'next/link';
 import MessageBubble from '@/components/chat/MessageBubble';
 import TypingIndicator from '@/components/chat/TypingIndicator';
 import ChatInput from '@/components/chat/ChatInput';
+import ChatSidebar from '@/components/chat/ChatSidebar';
 import { useChat } from '@/hooks/useChat';
-import { Sparkles, BookOpen, Target, HelpCircle, FileText } from 'lucide-react';
+import { Sparkles, BookOpen, Target, HelpCircle, FileText, History, Plus, X, Bot } from 'lucide-react';
 import styles from './chat.module.css';
 
 interface Props {
@@ -47,6 +49,7 @@ export default function ChatContainer({ initialSessionId }: Props) {
   } = useChat(initialSessionId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -66,13 +69,82 @@ export default function ChatContainer({ initialSessionId }: Props) {
   };
 
   return (
-    <div className={styles.chatWrapper}>
+    <div className={styles.chatWrapper} data-testid="chat-wrapper">
+      {/* ── CHAT TOPBAR / HEADER ── */}
+      <div className={styles.chatHeader} data-testid="chat-header">
+        <div className={styles.headerLeft}>
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className={styles.mobileHistoryBtn}
+            aria-label="Open session history"
+            title="Chat History"
+            data-testid="mobile-history-toggle-btn"
+          >
+            <History size={18} />
+            <span>History</span>
+          </button>
+
+          <div className={styles.tutorIdentity}>
+            <div className={styles.tutorAvatar}>
+              <Bot size={18} />
+            </div>
+            <div className={styles.tutorInfo}>
+              <h1 className={styles.tutorName}>AI Academic Tutor</h1>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.headerRight}>
+          <Link
+            href="/chat"
+            className={styles.mobileNewChatBtn}
+            title="New Chat Session"
+            data-testid="mobile-new-chat-btn"
+          >
+            <Plus size={16} />
+            <span>New Chat</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── MOBILE SIDEBAR DRAWER OVERLAY ── */}
+      {mobileSidebarOpen && (
+        <div className={styles.mobileDrawerBackdrop} onClick={() => setMobileSidebarOpen(false)} data-testid="mobile-drawer-backdrop">
+          <div
+            className={styles.mobileDrawerContent}
+            onClick={e => e.stopPropagation()}
+            data-testid="mobile-drawer-content"
+          >
+            <div className={styles.drawerHeader}>
+              <span className="font-semibold text-sm">Chat History</span>
+              <button
+                type="button"
+                onClick={() => setMobileSidebarOpen(false)}
+                className={styles.drawerCloseBtn}
+                aria-label="Close history"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <ChatSidebar
+                onSelectSession={() => setMobileSidebarOpen(false)}
+                className="!flex !w-full !border-r-0 !h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── PRIMARY SCROLLABLE MESSAGE REGION ── */}
       <div 
         ref={scrollRef}
         onScroll={handleScroll}
         className={styles.scrollArea}
+        data-testid="chat-scroll-area"
       >
-        <div className={styles.messageList}>
+        <div className={styles.messageList} data-testid="chat-message-list">
           {messages.length === 0 ? (
             <div className={styles.emptyState}>
               <div className={styles.sparkleWrap}>
@@ -109,14 +181,17 @@ export default function ChatContainer({ initialSessionId }: Props) {
         </div>
       </div>
 
-      <ChatInput 
-        value={inputText}
-        onChange={setInputText}
-        onSend={sendMessage}
-        isThinking={isThinking}
-        attachedMaterial={attachedMaterial}
-        onAttachMaterial={setAttachedMaterial}
-      />
+      {/* ── STICKY ANCHORED COMPOSER (OUTSIDE SCROLL AREA) ── */}
+      <div className={styles.composerWrapper} data-testid="chat-composer-wrapper">
+        <ChatInput 
+          value={inputText}
+          onChange={setInputText}
+          onSend={sendMessage}
+          isThinking={isThinking}
+          attachedMaterial={attachedMaterial}
+          onAttachMaterial={setAttachedMaterial}
+        />
+      </div>
     </div>
   );
 }
