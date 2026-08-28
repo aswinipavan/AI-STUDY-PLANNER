@@ -29,6 +29,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'maven'
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -41,17 +42,26 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Make Maven Wrapper Executable
+        working-directory: ./backend
+        run: chmod +x mvnw
+
+      - name: Build Spring Boot Backend JAR
+        working-directory: ./backend
+        run: ./mvnw clean package -DskipTests
+
       - name: Start Spring Boot Backend in Local Profile
         working-directory: ./backend
         run: |
-          ./mvnw spring-boot:run -Dspring-boot.run.profiles=local &
-          npx wait-on http://localhost:8080/actuator/health --timeout 60000
+          java -jar target/ai-study-planner-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local > backend.log 2>&1 &
+          npx wait-on http://localhost:8080/actuator/health --timeout 90000 || (cat backend.log && exit 1)
 
       - name: Install Frontend Dependencies
         working-directory: ./frontend
@@ -314,16 +324,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'maven'
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install openpyxl
+
+      - name: Make Maven Wrapper Executable
+        working-directory: ./backend
+        run: chmod +x mvnw
 
       - name: Execute JUnit 5 & MockMvc Tests
         working-directory: ./backend
