@@ -329,7 +329,7 @@ export default function ChatInput({
                           attachedMaterial?.fileName?.toLowerCase().endsWith('.pdf');
 
   return (
-    <div className={styles.inputContainer}>
+    <div className={styles.inputContainer} data-testid="chat-input-container">
       <input
         ref={fileInputRef}
         type="file"

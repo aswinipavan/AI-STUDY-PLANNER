@@ -1,0 +1,2895 @@
+{
+  "timestamp_utc": "2026-08-28T11:43:32Z",
+  "timestamp_local": "2026-08-28T17:13:32.170996",
+  "git": {
+    "commit_sha": "15a41330e8dd8ea719281580c67806b18f9fb710",
+    "branch": "feat/master-ai-tutor-and-timetable-overhaul"
+  },
+  "system": {
+    "os": "Windows 11 (ARM64)",
+    "python_version": "3.13.7",
+    "node_version": "v24.16.0",
+    "java_version": "openjdk version \"17.0.19\" 2026-04-21"
+  },
+  "totals": {
+    "total_tests": 456,
+    "passed": 448,
+    "failed": 0,
+    "skipped": 8,
+    "duration_seconds": 207.31
+  },
+  "results": {
+    "backend": {
+      "framework": "JUnit 5 / Spring Boot Test / Maven Surefire",
+      "total_tests": 263,
+      "passed": 255,
+      "failed": 0,
+      "skipped": 8,
+      "duration_seconds": 85.9,
+      "suites": [
+        {
+          "suite_name": "com.aistudyplanner.config.CacheConfigTest",
+          "tests": 10,
+          "passed": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 5.072,
+          "cases": [
+            {
+              "name": "testCachePutAndGet",
+              "time": 2.586,
+              "status": "PASSED"
+            },
+            {
+              "name": "testClearCache",
+              "time": 0.015,
+              "status": "PASSED"
+            },
+            {
+              "name": "testExamScheduleCache",
+              "time": 0.044,
+              "status": "PASSED"
+            },
+            {
+              "name": "testStudentPerformanceCache",
+              "time": 0.011,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCacheManagerExists",
+              "time": 0.019,
+              "status": "PASSED"
+            },
+            {
+              "name": "testTopicSuggestionsCache",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCacheEviction",
+              "time": 0.013,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialSummaryCache",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMotivationalTipsCache",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMultipleCachesIndependence",
+              "time": 0.017,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.config.SecurityConfigTest",
+          "tests": 13,
+          "passed": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "time": 47.077,
+          "cases": [
+            {
+              "name": "testCaseSensitiveURLMatching",
+              "time": 0.0,
+              "status": "SKIPPED"
+            },
+            {
+              "name": "testAPIDocsAccessible",
+              "time": 0.201,
+              "status": "PASSED"
+            },
+            {
+              "name": "testProtectedDeleteBlocked",
+              "time": 0.0,
+              "status": "SKIPPED"
+            },
+            {
+              "name": "testLoginEndpointAccessible",
+              "time": 0.023,
+              "status": "PASSED"
+            },
+            {
+              "name": "testProtectedEndpointBlocked",
+              "time": 0.0,
+              "status": "SKIPPED"
+            },
+            {
+              "name": "testRefreshTokenEndpointAccessible",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCorsEnabled",
+              "time": 0.039,
+              "status": "PASSED"
+            },
+            {
+              "name": "testProtectedPostBlocked",
+              "time": 0.0,
+              "status": "SKIPPED"
+            },
+            {
+              "name": "testCORSPreflight",
+              "time": 0.019,
+              "status": "PASSED"
+            },
+            {
+              "name": "testHealthEndpointAccessible",
+              "time": 0.018,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCSRFDisabled",
+              "time": 0.043,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSecurityHeadersPresent",
+              "time": 0.024,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSwaggerUIAccessible",
+              "time": 0.027,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.controller.AuthControllerTest",
+          "tests": 5,
+          "passed": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 2.622,
+          "cases": [
+            {
+              "name": "testRefreshMissingHeaderIsBadRequest",
+              "time": 0.265,
+              "status": "PASSED"
+            },
+            {
+              "name": "testLoginSuccess",
+              "time": 0.211,
+              "status": "PASSED"
+            },
+            {
+              "name": "testLoginRateLimiting",
+              "time": 0.023,
+              "status": "PASSED"
+            },
+            {
+              "name": "testLoginWithEmptyToken",
+              "time": 0.039,
+              "status": "PASSED"
+            },
+            {
+              "name": "testRefreshTokenSuccess",
+              "time": 0.03,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.controller.MaterialControllerTest",
+          "tests": 21,
+          "passed": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 1.843,
+          "cases": [
+            {
+              "name": "testDeleteMaterialNotFound",
+              "time": 0.208,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSaveMaterialInvalidFileType",
+              "time": 0.079,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetAllMaterials",
+              "time": 0.07,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialWithAISummary",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialMultipleFileTypes",
+              "time": 0.083,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSaveMaterialMetadata",
+              "time": 0.025,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSaveMaterialFileSizeExceedsLimit",
+              "time": 0.026,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetMaterialsBySubjectEmpty",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialsSortedByDate",
+              "time": 0.021,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialSubjectRelationship",
+              "time": 0.021,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetEmptyMaterialsList",
+              "time": 0.011,
+              "status": "PASSED"
+            },
+            {
+              "name": "testDeleteMaterialUnauthorized",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSaveMaterialValidationError",
+              "time": 0.032,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetUploadUrlOptionalParams",
+              "time": 0.021,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetMaterialsBySubject",
+              "time": 0.019,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetMaterialsWithSubjectIdQueryParam",
+              "time": 0.02,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialResponseStructure",
+              "time": 0.019,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMultipleMaterialsResponse",
+              "time": 0.022,
+              "status": "PASSED"
+            },
+            {
+              "name": "testDeleteMaterial",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSaveMaterialMissingRequiredParams",
+              "time": 0.022,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetStorageUploadUrl",
+              "time": 0.017,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.integration.BackendFullFlowIntegrationTest",
+          "tests": 2,
+          "passed": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 9.321,
+          "cases": [
+            {
+              "name": "testTimetableHorizonAndExactSlotTimes",
+              "time": 1.674,
+              "status": "PASSED"
+            },
+            {
+              "name": "testProfileFullLifecyclePersistence",
+              "time": 0.2,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.integration.ExamIntegrationTest",
+          "tests": 2,
+          "passed": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.294,
+          "cases": [
+            {
+              "name": "createExamRoundTripsDifficultyAndNotes",
+              "time": 0.208,
+              "status": "PASSED"
+            },
+            {
+              "name": "createExamRequiresAuthentication",
+              "time": 0.059,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.integration.UploadIntegrationTest",
+          "tests": 4,
+          "passed": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 6.737,
+          "cases": [
+            {
+              "name": "materialUploadRoundTrip",
+              "time": 0.322,
+              "status": "PASSED"
+            },
+            {
+              "name": "uploadRequiresAuthentication",
+              "time": 0.065,
+              "status": "PASSED"
+            },
+            {
+              "name": "materialUploadWithSubjectAndFilterRoundTrip",
+              "time": 0.515,
+              "status": "PASSED"
+            },
+            {
+              "name": "avatarUploadRoundTrip",
+              "time": 0.148,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.LocalPersistenceVerificationTest",
+          "tests": 1,
+          "passed": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 1.051,
+          "cases": [
+            {
+              "name": "localData_survivesBackendRestart_andReattachesByFirebaseUid",
+              "time": 1.048,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.ManualTokenGenTest",
+          "tests": 1,
+          "passed": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "time": 0.0,
+          "cases": [
+            {
+              "name": "generateToken",
+              "time": 0.0,
+              "status": "SKIPPED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.migration.FlywayPostgresMigrationTest",
+          "tests": 3,
+          "passed": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 3,
+          "time": 0.001,
+          "cases": [
+            {
+              "name": "repeatedRerunsRemainIdempotent",
+              "time": 0.0,
+              "status": "SKIPPED"
+            },
+            {
+              "name": "freshDatabaseAppliesEveryMigration",
+              "time": 0.0,
+              "status": "SKIPPED"
+            },
+            {
+              "name": "v3SucceedsWhenPoliciesAlreadyExist",
+              "time": 0.0,
+              "status": "SKIPPED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.security.FirebaseTokenFilterTest",
+          "tests": 16,
+          "passed": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 1.043,
+          "cases": [
+            {
+              "name": "shouldMatchSkipUrlsCorrectlyWithWildcards",
+              "time": 0.728,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldHandleBearerTokenWithExtraSpaces",
+              "time": 0.032,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldSkipFilterForHealthCheckEndpoint",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldNotAuthenticateWithFirebaseTokenForNonExistentUser",
+              "time": 0.107,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldHandleFirebaseTokenVerificationFailure",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldNotAuthenticateWithValidJWTButNoStudent",
+              "time": 0.015,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldHandleExceptionGracefully",
+              "time": 0.013,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldAuthenticateWithValidInternalJWT",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldProcessRequestWithoutAuthorizationHeader",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldProcessRequestWithInvalidBearerFormat",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldExtractTokenCorrectlyFromBearerHeader",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldSkipFilterForLoginEndpoint",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldSkipFilterForSwaggerUI",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldSetAuthenticationDetailsFromRequest",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldProcessRequestWithEmptyAuthorizationHeader",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldFallbackToFirebaseTokenVerification",
+              "time": 0.012,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.security.JwtTokenProviderTest",
+          "tests": 15,
+          "passed": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 1.276,
+          "cases": [
+            {
+              "name": "shouldRejectTokenWithWrongSignature",
+              "time": 0.038,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldRejectNullToken",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldExtractCorrectStudentId",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldGenerateValidToken",
+              "time": 0.017,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldRejectExpiredToken",
+              "time": 0.021,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldExtractCorrectFirebaseUid",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "generatedTokenShouldContainRequiredClaims",
+              "time": 0.015,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldThrowExceptionWhenExtractingFromInvalidToken",
+              "time": 0.011,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldGenerateDifferentTokensForDifferentStudentIds",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldGenerateDifferentTokensAtDifferentTimes",
+              "time": 1.108,
+              "status": "PASSED"
+            },
+            {
+              "name": "tokenExpirationShouldBeCorrectlySet",
+              "time": 0.011,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldValidateCorrectToken",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldHandleSpecialCharactersInFirebaseUid",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldRejectEmptyToken",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "shouldRejectMalformedToken",
+              "time": 0.003,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.AdaptiveScheduleServiceTest",
+          "tests": 8,
+          "passed": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 1.272,
+          "cases": [
+            {
+              "name": "adapt_preservesCompletedUpcomingSessionsAndSchedulesAroundThem",
+              "time": 1.099,
+              "status": "PASSED"
+            },
+            {
+              "name": "adapt_makesTheDayBeforeAnExamRevisionAndKeepsNewMaterialBeforeIt",
+              "time": 0.047,
+              "status": "PASSED"
+            },
+            {
+              "name": "adapt_keepsSessionsInsideSavedWindowAndDailyHourBudget",
+              "time": 0.025,
+              "status": "PASSED"
+            },
+            {
+              "name": "adapt_catchesUpMissedTopicsFirst_andNeverReschedulesCoveredOnes",
+              "time": 0.034,
+              "status": "PASSED"
+            },
+            {
+              "name": "readiness_derivesRecommendedStudyTimeFromTheStudentsOwnAvailableHours",
+              "time": 0.016,
+              "status": "PASSED"
+            },
+            {
+              "name": "formatMinutes_rendersHoursAndMinutesWithoutHardCodedText",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "adapt_givesTheWeakUrgentSubjectMoreSessionsThanTheStrongOne",
+              "time": 0.014,
+              "status": "PASSED"
+            },
+            {
+              "name": "adapt_switchesToReinforcementWhenAllMaterialIsCovered",
+              "time": 0.014,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.ai.AiProviderGatewayTest$FallbackTriggers",
+          "tests": 18,
+          "passed": 18,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.063,
+          "cases": [
+            {
+              "name": "unconfiguredPrimaryIsSkipped",
+              "time": 0.091,
+              "status": "PASSED"
+            },
+            {
+              "name": "agentRouterIsAlwaysAttemptedFirst",
+              "time": 0.022,
+              "status": "PASSED"
+            },
+            {
+              "name": "bothProvidersFailProducesOneCleanError",
+              "time": 0.012,
+              "status": "PASSED"
+            },
+            {
+              "name": "reportsConfigurationState",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "agentRouterSuccessDoesNotTouchFallback",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "applicationBugDoesNotFallBack",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "fallbackReceivesIdenticalRequest",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "noProviderConfigured",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "allRateLimitedKeepsTooManyRequests",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "blankPromptNeverReachesAProvider",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "timeout",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "serverError",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "clientError",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "malformedResponse",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "emptyResponse",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "networkFailure",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "unknownModelIsIndistinguishableFromOutage",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "rateLimited",
+              "time": 0.009,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.ai.AiProviderGatewayTest",
+          "tests": 0,
+          "passed": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.244,
+          "cases": []
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.ai.provider.AgentRouterProviderTest",
+          "tests": 22,
+          "passed": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.355,
+          "cases": [
+            {
+              "name": "concatenatesTextBlocks",
+              "time": 0.212,
+              "status": "PASSED"
+            },
+            {
+              "name": "buildsMessagesBody",
+              "time": 0.027,
+              "status": "PASSED"
+            },
+            {
+              "name": "blankKeyIsNotConfigured",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "emptyBody",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "ignoresThinkingBlocks",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "sendsConfiguredUserAgent",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "classifiesServerError",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "missingContentArray",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "normalisesTrailingSlashInBaseUrl",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "classifiesTooManyRequests",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "sendsAnthropicStyleAuthHeaders",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "classifiesTimeout",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "thinkingOnlyResponseIsEmpty",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "classifiesUnauthorized",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "enabledFlagGatesTheProvider",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "parsesTextBlock",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "unparseableJson",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "errorEnvelopeOnSuccessStatus",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "classifiesDnsFailure",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "postsToMessagesEndpoint",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "classifiesUnknownModelAsServerError",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "unconfiguredCallMakesNoRequest",
+              "time": 0.003,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.ai.provider.GroqProviderTest",
+          "tests": 18,
+          "passed": 18,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 5.17,
+          "cases": [
+            {
+              "name": "buildsOpenAiStyleBody",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "blankKeyIsNotConfigured",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "emptyBody",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "timeout",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "parsesLegacyCandidatesShape",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "keepsContentWhenStripLeavesNothing",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "parsesChoices",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "retrySucceeds",
+              "time": 2.51,
+              "status": "PASSED"
+            },
+            {
+              "name": "unauthorized",
+              "time": 0.011,
+              "status": "PASSED"
+            },
+            {
+              "name": "malformedResponse",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "retriesOnceOnRateLimitThenGivesUp",
+              "time": 2.513,
+              "status": "PASSED"
+            },
+            {
+              "name": "stripsThinkTags",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "unparseableJson",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "blankModelFallsBackToDefault",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "serverErrorIsNotRetried",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "postsToGroqEndpointWithBearerAuth",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "localRateLimitStillEnforced",
+              "time": 0.027,
+              "status": "PASSED"
+            },
+            {
+              "name": "unconfiguredCallMakesNoRequest",
+              "time": 0.003,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.AiAssistantPromptTest",
+          "tests": 2,
+          "passed": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.225,
+          "cases": [
+            {
+              "name": "testChat_WithStudyAdvice_InjectsStudentAcademicProfile",
+              "time": 0.213,
+              "status": "PASSED"
+            },
+            {
+              "name": "testChat_WithUploadedMaterial_InjectsMaterialContextAndGrounding",
+              "time": 0.009,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.AuthServiceTest",
+          "tests": 6,
+          "passed": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.043,
+          "cases": [
+            {
+              "name": "testLogin_NewUser",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "testRefreshToken_Success",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "testLogin_ExistingUser_MissedDay",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "testLogin_InvalidToken",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "testLogin_ExistingUser_ConsecutiveDay",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "testRefreshToken_UserNotFound",
+              "time": 0.004,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.GroqServiceTest",
+          "tests": 20,
+          "passed": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.175,
+          "cases": [
+            {
+              "name": "testExtractTopicTruncatesSummaries",
+              "time": 0.084,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGenerateTopicSuggestion",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetMotivationalTip",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCategorizeMaterialFailure",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGenerateExamPlan",
+              "time": 0.019,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCategorizeMaterial",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testChatIncludesDocumentContext",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "testAnalyzeMarksEmptySubjects",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "testChatSuccess",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "testChatContextLimiting",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSummarizeMaterialTruncatesLongContent",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testRateLimitPropagates",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "testAnalyzeMarksSuccess",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSummarizeMaterial",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "doesNotLeakProviderIdentityToCallers",
+              "time": 0.002,
+              "status": "PASSED"
+            },
+            {
+              "name": "testChatAiFailure",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testAnalyzeMarksAiFailure",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "testChatEmptyHistory",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testCategorizeMaterialTruncatesPreview",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSummarizeMaterialFailure",
+              "time": 0.002,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.MaterialSubjectFilterTest",
+          "tests": 4,
+          "passed": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.168,
+          "cases": [
+            {
+              "name": "testUploadMaterialWithSubject",
+              "time": 0.086,
+              "status": "PASSED"
+            },
+            {
+              "name": "testUploadMaterialWithForeignSubject",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "testGetMaterialsBySubject",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "testMaterialResponseJsonSerialization",
+              "time": 0.037,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.nlp.DocumentIntelligenceTest",
+          "tests": 10,
+          "passed": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 1.063,
+          "cases": [
+            {
+              "name": "testChapterDetection_NumberedAndPrefixPatterns",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "testExtractDocumentText_ReadsLocallyStoredPdfFromDisk(Path)",
+              "time": 0.887,
+              "status": "PASSED"
+            },
+            {
+              "name": "testPdfTextExtraction_ValidPdf",
+              "time": 0.077,
+              "status": "PASSED"
+            },
+            {
+              "name": "testExtractTextUsingTika_PlainTextAndMarkdown",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "testDifficultyCalculation_WeakStudentAndNearExam",
+              "time": 0.013,
+              "status": "PASSED"
+            },
+            {
+              "name": "testTopicAndKeywordExtraction",
+              "time": 0.016,
+              "status": "PASSED"
+            },
+            {
+              "name": "testProcessMaterialAsync_NoGroqFallback",
+              "time": 0.021,
+              "status": "PASSED"
+            },
+            {
+              "name": "testExtractTextUsingTika_NullAndEmptyBytes",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "testExtractDocumentText_MissingLocalFileFallsBack",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "testEmptyPdfExtraction_GracefulHandling",
+              "time": 0.003,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.PerformanceServiceTest",
+          "tests": 6,
+          "passed": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.303,
+          "cases": [
+            {
+              "name": "priority_withoutAPlanFallsBackToTheStudentsOwnHoursCappedByTheirWindow",
+              "time": 0.243,
+              "status": "PASSED"
+            },
+            {
+              "name": "aiAnalysis_doesNotClaimAThirtyDayExamWindowThatIsNeverQueried",
+              "time": 0.011,
+              "status": "PASSED"
+            },
+            {
+              "name": "readiness_beforeAnySubjectExistsReportsZeroCoverageAndTheRealStreak",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "readiness_pillarsAreMeasuredFromCoverageAttendanceAndExamPace",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "priority_recommendedStudyTimeComesFromAdaptiveSignals_notAFixedLadder",
+              "time": 0.004,
+              "status": "PASSED"
+            },
+            {
+              "name": "weeklySnapshot_recordsSessionsActuallyCompletedAndTheHoursTheyTook",
+              "time": 0.018,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.StorageServiceTest",
+          "tests": 8,
+          "passed": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.099,
+          "cases": [
+            {
+              "name": "traversalIsNeutralised(Path)",
+              "time": 0.02,
+              "status": "PASSED"
+            },
+            {
+              "name": "leadingSlashesAreStripped(Path)",
+              "time": 0.023,
+              "status": "PASSED"
+            },
+            {
+              "name": "backendSelection",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "localBackendOverrideWritesToDisk(Path)",
+              "time": 0.016,
+              "status": "PASSED"
+            },
+            {
+              "name": "localBackendOverrideBeatsSupabaseCredentials",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "uploadWritesLocallyAndReturnsServingUrl(Path)",
+              "time": 0.015,
+              "status": "PASSED"
+            },
+            {
+              "name": "resolveLocalRoundTrip(Path)",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "autoBackendKeepsProductionBehaviour",
+              "time": 0.003,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.StudentProfilePersistenceTest",
+          "tests": 6,
+          "passed": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.055,
+          "cases": [
+            {
+              "name": "testFullProfileUpdate_PersistsAllFields",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "testPartialProfileUpdate_PreservesUntouchedFields",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "testPhoneNumber_DuplicateThrowsException",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "testPhoneNumber_EmptyStringSetsNull",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSemesterFlexibleDeserialization",
+              "time": 0.013,
+              "status": "PASSED"
+            },
+            {
+              "name": "testSameFirebaseUid_RestoresSameStudent",
+              "time": 0.007,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.StudyTimeWindowTest",
+          "tests": 17,
+          "passed": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.022,
+          "cases": [
+            {
+              "name": "fromSettingEnumNameMorning",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingNullFallback",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingEnumNameAfternoon",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingOldLabelMorning",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingOldLabelAfternoon",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "lateNightStartsAt2100",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "morningWindowMinutes",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "afternoonStartsAt1200",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingEnumNameEvening",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingEnumNameLateNight",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingOldLabelEvening",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingOldLabelLateNight",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingUnknownFallback",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "eveningStartsAt1700",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "eveningWindowMinutes",
+              "time": 0.001,
+              "status": "PASSED"
+            },
+            {
+              "name": "fromSettingBlankFallback",
+              "time": 0.0,
+              "status": "PASSED"
+            },
+            {
+              "name": "morningStartsAt0600",
+              "time": 0.0,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.TimetableHorizonAndDetailsTest",
+          "tests": 4,
+          "passed": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.057,
+          "cases": [
+            {
+              "name": "slotDetails_resolvedFromUploadedMaterial",
+              "time": 0.018,
+              "status": "PASSED"
+            },
+            {
+              "name": "slotTime_derivesFullStartEndRange",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "missedAndCatchUpSession_statesArePreserved",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "fourteenDayExam_createsFourteenDayPlan",
+              "time": 0.018,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.TimetableServiceHorizonTest",
+          "tests": 5,
+          "passed": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.072,
+          "cases": [
+            {
+              "name": "examSixtyDaysAway_producesSixtyDayPlan_neverTruncatedToThirtyOrTheDurationPicker",
+              "time": 0.012,
+              "status": "PASSED"
+            },
+            {
+              "name": "multipleExams_spanToLatestDeadline_andReviseOnTheEveOfEachInteriorExam",
+              "time": 0.015,
+              "status": "PASSED"
+            },
+            {
+              "name": "examSevenDaysAway_producesSevenDayPlan",
+              "time": 0.012,
+              "status": "PASSED"
+            },
+            {
+              "name": "examThirtyDaysAway_producesThirtyDayPlan",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "ninetyDaysAway_producesNinetyDayPlan",
+              "time": 0.014,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.TimetableServiceNlpTest",
+          "tests": 1,
+          "passed": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.026,
+          "cases": [
+            {
+              "name": "testTimetableGeneration_UsesExtractedMaterialTopics",
+              "time": 0.024,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.TimetableServiceScenarioTest",
+          "tests": 1,
+          "passed": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.026,
+          "cases": [
+            {
+              "name": "realScenario_usesSettingsForTime_materialsForTopics_prioritisesWeakUrgentSubject",
+              "time": 0.024,
+              "status": "PASSED"
+            }
+          ]
+        },
+        {
+          "suite_name": "com.aistudyplanner.service.TimetableStudyPeriodTest",
+          "tests": 14,
+          "passed": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "time": 0.121,
+          "cases": [
+            {
+              "name": "sessionStyleIntense_90min",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "noHardCoded1800Start_morningPreference",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "requirementD_4hours_Evening_17to21",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "noHardCoded1800Start_afternoonPreference",
+              "time": 0.006,
+              "status": "PASSED"
+            },
+            {
+              "name": "dailyBudget_3hours_balanced_2SessionsPerDay",
+              "time": 0.008,
+              "status": "PASSED"
+            },
+            {
+              "name": "backwardCompatOldLabelMorning",
+              "time": 0.003,
+              "status": "PASSED"
+            },
+            {
+              "name": "sessionStyleBalanced_60min",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "requirementA_1hour_Evening_17to18",
+              "time": 0.009,
+              "status": "PASSED"
+            },
+            {
+              "name": "sessionStyleRelaxed_45min",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "requirementB_2hours_Evening_17to19",
+              "time": 0.007,
+              "status": "PASSED"
+            },
+            {
+              "name": "dailyBudget_2hours_relaxed_2SessionsPerDay",
+              "time": 0.005,
+              "status": "PASSED"
+            },
+            {
+              "name": "dailyBudget_1hour_1SessionPerDay",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "backwardCompatOldLabelEvening",
+              "time": 0.01,
+              "status": "PASSED"
+            },
+            {
+              "name": "requirementC_3hours_Evening_17to20",
+              "time": 0.008,
+              "status": "PASSED"
+            }
+          ]
+        }
+      ]
+    },
+    "frontend": {
+      "framework": "Jest / React Testing Library",
+      "total_tests": 134,
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 61.03,
+      "suites": [
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\materials.test.tsx",
+          "status": "passed",
+          "duration": 6.58,
+          "tests_count": 8,
+          "assertions": [
+            {
+              "title": "should render material list and filter by category",
+              "status": "passed",
+              "duration": 28
+            },
+            {
+              "title": "should filter materials when category is selected",
+              "status": "passed",
+              "duration": 4
+            },
+            {
+              "title": "should handle file upload via file input",
+              "status": "passed",
+              "duration": 86
+            },
+            {
+              "title": "should validate file type before upload",
+              "status": "passed",
+              "duration": 4
+            },
+            {
+              "title": "should show delete confirmation and remove material on confirm",
+              "status": "passed",
+              "duration": 67
+            },
+            {
+              "title": "should cancel deletion when user clicks cancel",
+              "status": "passed",
+              "duration": 26
+            },
+            {
+              "title": "should display material metadata correctly",
+              "status": "passed",
+              "duration": 4
+            },
+            {
+              "title": "should format file size appropriately",
+              "status": "passed",
+              "duration": 4
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\security\\aiProviderSecrets.test.ts",
+          "status": "passed",
+          "duration": 6.75,
+          "tests_count": 7,
+          "assertions": [
+            {
+              "title": "scans a non-trivial number of client files",
+              "status": "passed",
+              "duration": 13
+            },
+            {
+              "title": "never exposes an AI key through a build-time public variable",
+              "status": "passed",
+              "duration": 212
+            },
+            {
+              "title": "never names a provider API key variable in client code at all",
+              "status": "passed",
+              "duration": 120
+            },
+            {
+              "title": "contains no literal provider key material",
+              "status": "passed",
+              "duration": 220
+            },
+            {
+              "title": "does not stash a provider key in localStorage, sessionStorage or a cookie",
+              "status": "passed",
+              "duration": 101
+            },
+            {
+              "title": "talks to AI only through our own backend endpoints",
+              "status": "passed",
+              "duration": 90
+            },
+            {
+              "title": "positive control: the backend is the side that reads both keys",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\floating-dock.test.tsx",
+          "status": "passed",
+          "duration": 7.02,
+          "tests_count": 3,
+          "assertions": [
+            {
+              "title": "renders all dock items and icons",
+              "status": "passed",
+              "duration": 80
+            },
+            {
+              "title": "toggles mobile menu on button click",
+              "status": "passed",
+              "duration": 23
+            },
+            {
+              "title": "renders FloatingDockDemo without crashing",
+              "status": "passed",
+              "duration": 13
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\messageBubbleKatex.test.tsx",
+          "status": "passed",
+          "duration": 0.51,
+          "tests_count": 2,
+          "assertions": [
+            {
+              "title": "renders user message cleanly",
+              "status": "passed",
+              "duration": 8
+            },
+            {
+              "title": "renders assistant message with math equation and code block content",
+              "status": "passed",
+              "duration": 12
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\slotDetailModal.test.tsx",
+          "status": "passed",
+          "duration": 0.39,
+          "tests_count": 4,
+          "assertions": [
+            {
+              "title": "renders slot details correctly with topic, source material, chapter, and what to study",
+              "status": "passed",
+              "duration": 83
+            },
+            {
+              "title": "handles completion toggle when clicking Mark Complete button",
+              "status": "passed",
+              "duration": 14
+            },
+            {
+              "title": "renders catch-up required status for catch-up slot",
+              "status": "passed",
+              "duration": 19
+            },
+            {
+              "title": "does not render when isOpen is false",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\images-badge.test.tsx",
+          "status": "passed",
+          "duration": 0.19,
+          "tests_count": 6,
+          "assertions": [
+            {
+              "title": "renders badge text and images correctly",
+              "status": "passed",
+              "duration": 38
+            },
+            {
+              "title": "renders as a link when href is provided",
+              "status": "passed",
+              "duration": 7
+            },
+            {
+              "title": "renders as div when href is omitted",
+              "status": "passed",
+              "duration": 6
+            },
+            {
+              "title": "limits to at most 3 images",
+              "status": "passed",
+              "duration": 8
+            },
+            {
+              "title": "handles mouse enter and mouse leave hover events cleanly",
+              "status": "passed",
+              "duration": 12
+            },
+            {
+              "title": "renders ImagesBadgeDemo without crashing",
+              "status": "passed",
+              "duration": 3
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\chat-input.test.tsx",
+          "status": "passed",
+          "duration": 0.21,
+          "tests_count": 3,
+          "assertions": [
+            {
+              "title": "renders textarea with animated placeholder and send button",
+              "status": "passed",
+              "duration": 25
+            },
+            {
+              "title": "triggers onSend when clicking send with text",
+              "status": "passed",
+              "duration": 8
+            },
+            {
+              "title": "renders attached material card and quick actions",
+              "status": "passed",
+              "duration": 13
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\placeholders-and-vanish-input.test.tsx",
+          "status": "passed",
+          "duration": 0.24,
+          "tests_count": 3,
+          "assertions": [
+            {
+              "title": "renders input, submit button, and rotating placeholder",
+              "status": "passed",
+              "duration": 57
+            },
+            {
+              "title": "calls onChange and onSubmit callbacks",
+              "status": "passed",
+              "duration": 28
+            },
+            {
+              "title": "renders PlaceholdersAndVanishInputDemo without crashing",
+              "status": "passed",
+              "duration": 9
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\chatMessageRendering.test.tsx",
+          "status": "passed",
+          "duration": 0.18,
+          "tests_count": 3,
+          "assertions": [
+            {
+              "title": "renders user message cleanly without bot action bar",
+              "status": "passed",
+              "duration": 22
+            },
+            {
+              "title": "renders assistant message with full response copy button and markdown content",
+              "status": "passed",
+              "duration": 10
+            },
+            {
+              "title": "detects material grounding and displays grounding badge",
+              "status": "passed",
+              "duration": 6
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\timetable.test.tsx",
+          "status": "passed",
+          "duration": 0.17,
+          "tests_count": 9,
+          "assertions": [
+            {
+              "title": "should render all days of the week with scheduled subjects",
+              "status": "passed",
+              "duration": 5
+            },
+            {
+              "title": "should display topics for each scheduled subject",
+              "status": "passed",
+              "duration": 5
+            },
+            {
+              "title": "should show empty state when no classes are scheduled for a day",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "should open form to add new schedule entry",
+              "status": "passed",
+              "duration": 10
+            },
+            {
+              "title": "should add new schedule entry with form submission",
+              "status": "passed",
+              "duration": 16
+            },
+            {
+              "title": "should edit existing schedule entry",
+              "status": "passed",
+              "duration": 11
+            },
+            {
+              "title": "should calculate total weekly study hours",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "should show study time by subject",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "should track completion status of study sessions",
+              "status": "passed",
+              "duration": 9
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\cloud-shader.test.tsx",
+          "status": "passed",
+          "duration": 0.14,
+          "tests_count": 4,
+          "assertions": [
+            {
+              "title": "renders canvas element and container cleanly",
+              "status": "passed",
+              "duration": 8
+            },
+            {
+              "title": "renders children over the cloud canvas when provided",
+              "status": "passed",
+              "duration": 3
+            },
+            {
+              "title": "accepts custom shader parameters without throwing",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "renders CloudShaderDemo without crashing",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\api\\timetable.api.test.ts",
+          "status": "passed",
+          "duration": 0.18,
+          "tests_count": 5,
+          "assertions": [
+            {
+              "title": "exposes the real subject as `name` on getActive",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "maps the exam date so the slot keeps its urgency signals",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "normalizes the timetable returned by adapt()",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "leaves a slot without a subject alone instead of throwing",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "returns null (empty state) when there is no active timetable \u2014 a 404",
+              "status": "passed",
+              "duration": 0
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\utils\\studyPeriodUtils.test.ts",
+          "status": "passed",
+          "duration": 0.15,
+          "tests_count": 21,
+          "assertions": [
+            {
+              "title": "formats 17:00 as 5:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "formats 06:00 as 6:00 AM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "formats 12:00 as 12:00 PM",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "formats 21:00 as 9:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "MORNING starts at 06:00",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "AFTERNOON starts at 12:00",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "EVENING starts at 17:00",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "LATE_NIGHT starts at 21:00",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "EVENING \u2192 \"5:00 PM\" \u2192 EVENING",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "MORNING \u2192 \"6:00 AM\" \u2192 MORNING",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "A: 1 hour + EVENING \u2192 5:00 PM \u2013 6:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "B: 2 hours + EVENING \u2192 5:00 PM \u2013 7:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "C: 3 hours + EVENING \u2192 5:00 PM \u2013 8:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "D: 4 hours + EVENING \u2192 5:00 PM \u2013 9:00 PM",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "1 hour + MORNING \u2192 6:00 AM \u2013 7:00 AM",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "2 hours + AFTERNOON \u2192 12:00 PM \u2013 2:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "1 hour + LATE_NIGHT \u2192 9:00 PM \u2013 10:00 PM",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "3 hours + LATE_NIGHT (21:00) \u2192 crosses midnight, flag set",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "2 hours + LATE_NIGHT (21:00) \u2192 9:00 PM \u2013 11:00 PM, does NOT cross midnight",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "unknown enum \u2192 EVENING start (5:00 PM)",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "empty string \u2192 EVENING start (5:00 PM)",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\lib\\confetti.test.ts",
+          "status": "passed",
+          "duration": 0.14,
+          "tests_count": 2,
+          "assertions": [
+            {
+              "title": "triggers fireCelebrationConfetti burst sequences without errors",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "triggers fireBadgeConfetti with custom coordinates",
+              "status": "passed",
+              "duration": 0
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\types\\adaptationTrigger.contract.test.ts",
+          "status": "passed",
+          "duration": 0.11,
+          "tests_count": 3,
+          "assertions": [
+            {
+              "title": "has a readable backend source to compare against",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "declares exactly the triggers the backend recognises",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "is the set the summary switch actually branches on",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\utils\\dateHelpers.test.ts",
+          "status": "passed",
+          "duration": 0.12,
+          "tests_count": 7,
+          "assertions": [
+            {
+              "title": "parses a backend LocalDate as local midnight, not UTC midnight",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "tolerates a full timestamp and rejects junk",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "zero-pads to a string-comparable local calendar day",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "round-trips a slot date without shifting the day",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "returns null for a slot that carries no date",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "mondayBasedIndex maps Monday to 0 and Sunday to 6",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "only today's calendar date counts as today, not every same weekday",
+              "status": "passed",
+              "duration": 0
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\hooks\\hooks.test.ts",
+          "status": "passed",
+          "duration": 0.11,
+          "tests_count": 14,
+          "assertions": [
+            {
+              "title": "should validate API endpoint for chat messages",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "should handle chat API errors gracefully",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "should format chat messages with role and content",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should call materials API endpoint on fetch",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should validate material object structure",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should filter materials by category",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "should call exams API endpoint",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should separate upcoming and past exams by date",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "should calculate exam performance metrics",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should fetch subjects from API",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "should group subjects by category",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should fetch timetable from API",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "should organize timetable by day",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "should calculate total study hours",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\chat.test.tsx",
+          "status": "passed",
+          "duration": 8.47,
+          "tests_count": 9,
+          "assertions": [
+            {
+              "title": "should render user and AI messages with correct styling",
+              "status": "passed",
+              "duration": 55
+            },
+            {
+              "title": "should display timestamp for each message",
+              "status": "passed",
+              "duration": 9
+            },
+            {
+              "title": "should auto-scroll to latest message",
+              "status": "passed",
+              "duration": 15
+            },
+            {
+              "title": "should send user message and receive AI response",
+              "status": "passed",
+              "duration": 321
+            },
+            {
+              "title": "should show loading state while waiting for response",
+              "status": "passed",
+              "duration": 105
+            },
+            {
+              "title": "should disable send button when input is empty",
+              "status": "passed",
+              "duration": 90
+            },
+            {
+              "title": "should maintain chat history across multiple exchanges",
+              "status": "passed",
+              "duration": 5
+            },
+            {
+              "title": "should preserve context when sending follow-up questions",
+              "status": "passed",
+              "duration": 382
+            },
+            {
+              "title": "should clear chat history on user request",
+              "status": "passed",
+              "duration": 6
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\app\\settings\\profilePersistence.test.tsx",
+          "status": "passed",
+          "duration": 8.57,
+          "tests_count": 3,
+          "assertions": [
+            {
+              "title": "Renders all profile fields pre-populated from user store and backend query",
+              "status": "passed",
+              "duration": 134
+            },
+            {
+              "title": "Submitting form calls authApi.updateMe with all editable fields including phoneNumber and integer semester",
+              "status": "passed",
+              "duration": 147
+            },
+            {
+              "title": "authStore normalizes both name/fullName and photoUrl/profilePictureUrl",
+              "status": "passed",
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\components\\exam.test.tsx",
+          "status": "passed",
+          "duration": 8.77,
+          "tests_count": 10,
+          "assertions": [
+            {
+              "title": "should render upcoming exams with correct status",
+              "status": "passed",
+              "duration": 59
+            },
+            {
+              "title": "should separate upcoming and past exams",
+              "status": "passed",
+              "duration": 8
+            },
+            {
+              "title": "should display exam details including duration and total marks",
+              "status": "passed",
+              "duration": 14
+            },
+            {
+              "title": "should validate required fields when adding exam",
+              "status": "passed",
+              "duration": 103
+            },
+            {
+              "title": "should add new exam with valid form submission",
+              "status": "passed",
+              "duration": 873
+            },
+            {
+              "title": "should validate that exam date is in the future",
+              "status": "passed",
+              "duration": 216
+            },
+            {
+              "title": "should display exam performance metrics",
+              "status": "passed",
+              "duration": 4
+            },
+            {
+              "title": "should show study recommendations based on exam performance",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "should calculate average marks across exams",
+              "status": "passed",
+              "duration": 2
+            },
+            {
+              "title": "should show performance trend (improving/declining)",
+              "status": "passed",
+              "duration": 2
+            }
+          ]
+        },
+        {
+          "suite_file": "frontend\\src\\__tests__\\app\\auth\\login.test.tsx",
+          "status": "passed",
+          "duration": 12.03,
+          "tests_count": 8,
+          "assertions": [
+            {
+              "title": "should validate required fields and prevent submission when empty",
+              "status": "passed",
+              "duration": 104
+            },
+            {
+              "title": "should handle successful email sign in and exchange token with backend",
+              "status": "passed",
+              "duration": 469
+            },
+            {
+              "title": "should display error message on authentication failure",
+              "status": "passed",
+              "duration": 672
+            },
+            {
+              "title": "should validate registration fields and prevent submission with mismatched passwords",
+              "status": "passed",
+              "duration": 912
+            },
+            {
+              "title": "should validate password minimum length during registration",
+              "status": "passed",
+              "duration": 758
+            },
+            {
+              "title": "should handle successful registration with account creation and token exchange",
+              "status": "passed",
+              "duration": 1019
+            },
+            {
+              "title": "should handle Google OAuth flow and redirect to dashboard",
+              "status": "passed",
+              "duration": 48
+            },
+            {
+              "title": "should display error when Google OAuth popup is closed by user",
+              "status": "passed",
+              "duration": 40
+            }
+          ]
+        }
+      ]
+    },
+    "mobile": {
+      "framework": "Jest / React Native",
+      "total_tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.42,
+      "suites": [
+        {
+          "suite_file": "mobile\\src\\__tests__\\mobileApp.test.ts",
+          "status": "passed",
+          "duration": 0.42,
+          "tests_count": 8,
+          "assertions": [
+            {
+              "title": "formats ISO date strings correctly",
+              "status": "passed",
+              "duration": 3
+            },
+            {
+              "title": "formats HH:mm:ss strings to 12-hour AM/PM format",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "formats slot start and end time ranges correctly",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "maps dayOfWeek numbers to day labels correctly",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "extracts backend ApiError message if present",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "falls back to Error.message if standard Error",
+              "status": "passed",
+              "duration": 0
+            },
+            {
+              "title": "provides generic fallback string when error is unknown or null",
+              "status": "passed",
+              "duration": 1
+            },
+            {
+              "title": "correctly identifies network and timeout errors",
+              "status": "passed",
+              "duration": 0
+            }
+          ]
+        }
+      ]
+    },
+    "e2e": {
+      "framework": "Playwright E2E",
+      "total_tests": 51,
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 59.96,
+      "suites": [
+        {
+          "file": "ai_chat_scroll.spec.ts",
+          "specs_count": 7,
+          "specs": [
+            {
+              "title": "CHAT-SCROLL-01: Message container (.scrollArea) is the sole vertical scroll region with scrollHeight > clientHeight",
+              "status": "passed",
+              "duration_ms": 1677
+            },
+            {
+              "title": "CHAT-SCROLL-02: Scrolling message list increments messageContainer.scrollTop while document/body scrollTop remains 0",
+              "status": "passed",
+              "duration_ms": 1807
+            },
+            {
+              "title": "CHAT-SCROLL-03: Composer remains anchored at bottom of viewport and fully visible when user scrolls through messages",
+              "status": "passed",
+              "duration_ms": 2042
+            },
+            {
+              "title": "CHAT-SCROLL-04: Composer input is reachable, focusable, and accepts text without shifting page layout",
+              "status": "passed",
+              "duration_ms": 1748
+            },
+            {
+              "title": "CHAT-SCROLL-05: Sidebar session list scrolls independently with its own scroll container",
+              "status": "passed",
+              "duration_ms": 916
+            },
+            {
+              "title": "CHAT-SCROLL-06: Mobile viewport maintains sticky bottom composer, zero horizontal overflow, and mobile history drawer",
+              "status": "passed",
+              "duration_ms": 1775
+            },
+            {
+              "title": "CHAT-SCROLL-07: Non-chat routes (Settings, Timetable) preserve their standard document scroll container and padding",
+              "status": "passed",
+              "duration_ms": 874
+            }
+          ]
+        },
+        {
+          "file": "material_subject_filter.spec.ts",
+          "specs_count": 5,
+          "specs": [
+            {
+              "title": "Shows all materials when All Subjects filter is selected",
+              "status": "passed",
+              "duration_ms": 1559
+            },
+            {
+              "title": "Filters to show ONLY Discrete Maths when Discrete Maths is selected in filter dropdown",
+              "status": "passed",
+              "duration_ms": 1601
+            },
+            {
+              "title": "Filters to show ONLY Operating Systems when Operating Systems is selected",
+              "status": "passed",
+              "duration_ms": 1532
+            },
+            {
+              "title": "Returns to showing all materials when switched back to All Subjects",
+              "status": "passed",
+              "duration_ms": 1565
+            },
+            {
+              "title": "Displays subject badge on each material card",
+              "status": "passed",
+              "duration_ms": 1557
+            }
+          ]
+        },
+        {
+          "file": "materials.spec.ts",
+          "specs_count": 15,
+          "specs": [
+            {
+              "title": "SEL-116: Upload file via drop zone trigger file selector dialog",
+              "status": "passed",
+              "duration_ms": 603
+            },
+            {
+              "title": "SEL-117: PDF file upload parsing check",
+              "status": "passed",
+              "duration_ms": 542
+            },
+            {
+              "title": "SEL-118: Large file upload rejection validation (>10MB limits)",
+              "status": "passed",
+              "duration_ms": 547
+            },
+            {
+              "title": "SEL-119: Unsupported file formats rejection warning (.exe files check)",
+              "status": "passed",
+              "duration_ms": 579
+            },
+            {
+              "title": "SEL-120: Materials library page load lists metadata verify",
+              "status": "passed",
+              "duration_ms": 1549
+            },
+            {
+              "title": "SEL-121: Empty materials library list guidelines displays",
+              "status": "passed",
+              "duration_ms": 1578
+            },
+            {
+              "title": "SEL-122: Subject folder filter filters list view results",
+              "status": "passed",
+              "duration_ms": 660
+            },
+            {
+              "title": "SEL-123: Document preview drawer displays metadata cards",
+              "status": "passed",
+              "duration_ms": 656
+            },
+            {
+              "title": "SEL-124: AI summary text block formatting layout checks",
+              "status": "passed",
+              "duration_ms": 760
+            },
+            {
+              "title": "SEL-125: AI auto-categorized subject badge details displays",
+              "status": "passed",
+              "duration_ms": 688
+            },
+            {
+              "title": "SEL-126: Cancel delete study material leaves item active",
+              "status": "passed",
+              "duration_ms": 645
+            },
+            {
+              "title": "SEL-127: Confirm delete study material removes item from library",
+              "status": "passed",
+              "duration_ms": 607
+            },
+            {
+              "title": "SEL-128: Upload file progress indicator rendering",
+              "status": "passed",
+              "duration_ms": 503
+            },
+            {
+              "title": "SEL-129: Material save triggers validation block on empty file selection",
+              "status": "passed",
+              "duration_ms": 603
+            },
+            {
+              "title": "SEL-130: Materials list filters matches keywords queries search",
+              "status": "passed",
+              "duration_ms": 648
+            }
+          ]
+        },
+        {
+          "file": "profile_persistence.spec.ts",
+          "specs_count": 3,
+          "specs": [
+            {
+              "title": "PERSIST-001: All profile fields (Name, College, Semester, Department, Phone) save and persist across page reload",
+              "status": "passed",
+              "duration_ms": 1600
+            },
+            {
+              "title": "PERSIST-002: Phone number can be updated or removed without crashing",
+              "status": "passed",
+              "duration_ms": 1289
+            },
+            {
+              "title": "PERSIST-003: Logout and relogin preserves all previously saved profile fields",
+              "status": "passed",
+              "duration_ms": 877
+            }
+          ]
+        },
+        {
+          "file": "settings.spec.ts",
+          "specs_count": 15,
+          "specs": [
+            {
+              "title": "SEL-155: Save profile update valid parameters input fields details",
+              "status": "passed",
+              "duration_ms": 583
+            },
+            {
+              "title": "SEL-156: Submit profile update validation block on empty email value",
+              "status": "passed",
+              "duration_ms": 1704
+            },
+            {
+              "title": "SEL-157: Toggle notification preferences switches options check",
+              "status": "passed",
+              "duration_ms": 567
+            },
+            {
+              "title": "SEL-158: Replay onboarding resets layout indicators state redirects",
+              "status": "passed",
+              "duration_ms": 561
+            },
+            {
+              "title": "SEL-159: Toggle theme styles updates UI components colors values",
+              "status": "passed",
+              "duration_ms": 627
+            },
+            {
+              "title": "SEL-160: Profile image upload opens selector popup screen dialog",
+              "status": "passed",
+              "duration_ms": 523
+            },
+            {
+              "title": "SEL-161: Settings form elements responsiveness grid check",
+              "status": "passed",
+              "duration_ms": 516
+            },
+            {
+              "title": "SEL-162: Profile details persists on page manual reloads",
+              "status": "passed",
+              "duration_ms": 1043
+            },
+            {
+              "title": "SEL-163: Cancel modifications resets form fields back to database state",
+              "status": "passed",
+              "duration_ms": 606
+            },
+            {
+              "title": "A: 1 hour + Evening (5 PM start) \u0393\u00e5\u00c6 preview shows 5:00 PM \u0393\u00c7\u00f4 6:00 PM",
+              "status": "passed",
+              "duration_ms": 1336
+            },
+            {
+              "title": "B: 2 hours + Evening (5 PM start) \u0393\u00e5\u00c6 preview shows 5:00 PM \u0393\u00c7\u00f4 7:00 PM",
+              "status": "passed",
+              "duration_ms": 1330
+            },
+            {
+              "title": "C: 3 hours + Evening (5 PM start) \u0393\u00e5\u00c6 preview shows 5:00 PM \u0393\u00c7\u00f4 8:00 PM",
+              "status": "passed",
+              "duration_ms": 1319
+            },
+            {
+              "title": "D: 4 hours + Evening (5 PM start) \u0393\u00e5\u00c6 preview shows 5:00 PM \u0393\u00c7\u00f4 9:00 PM",
+              "status": "passed",
+              "duration_ms": 1340
+            },
+            {
+              "title": "H: Settings time dropdown shows start-time-only labels, not misleading broad ranges",
+              "status": "passed",
+              "duration_ms": 1342
+            },
+            {
+              "title": "E: Preview updates live without saving when duration changes",
+              "status": "passed",
+              "duration_ms": 1322
+            }
+          ]
+        },
+        {
+          "file": "timetable_master_fix.spec.ts",
+          "specs_count": 6,
+          "specs": [
+            {
+              "title": "TF-01: Displays full calendar horizon with Month headers and date badges",
+              "status": "passed",
+              "duration_ms": 1529
+            },
+            {
+              "title": "TF-02: Displays slot with full start-end time range (6:00 PM \u0393\u00c7\u00f4 7:00 PM)",
+              "status": "passed",
+              "duration_ms": 1553
+            },
+            {
+              "title": "TF-03: Clicking slot opens SlotDetailModal with source material, chapter, and what to study",
+              "status": "passed",
+              "duration_ms": 2095
+            },
+            {
+              "title": "TF-04: Missed session shows red missed indicator and alert banner",
+              "status": "passed",
+              "duration_ms": 1609
+            },
+            {
+              "title": "TF-05: Next-day catch-up slot shows \u2261\u0192\u00f6\u2524 MISSED \u0393\u00c7\u00f6 COMPLETE TODAY badge",
+              "status": "passed",
+              "duration_ms": 1527
+            },
+            {
+              "title": "TF-06: Switching to All Weeks view reveals Week 2 without date collision",
+              "status": "passed",
+              "duration_ms": 1696
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

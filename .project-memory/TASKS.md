@@ -38,106 +38,71 @@
   - Fixed Material Upload: Added `supabase.anon-key` config + header authentication in `useMaterials.ts`.
   - Verified: Backend `mvnw compile` BUILD SUCCESS (exit 0) & Next.js production `npm run build` (exit 0, 22 routes).
 - [2026-08-20] Phases 1-12 Execution, Stabilization, Integration & Verification:
-  - Phase 0: Complete Architecture Audit (`PROJECT_ARCHITECTURE_AUDIT.md`, `IMPLEMENTATION_PLAN.md`).
-  - Phase 1: Baseline Verification (Git checkpoint `1ad2ac7134735218d743f2603ba1b4061fdacfb2`).
-  - Phase 2: AI Chat Material Quick Actions (Summarize, MCQs, Topics, Flashcards, Plan, Explain).
-  - Phase 3: Connected Academic Intelligence Layer (`buildStudentAcademicContext` in `AiAssistantService`).
-  - Phase 4: AI Performance Analysis (`GET /api/performance/ai-analysis` & diagnostic card).
-  - Phase 5: Explainable Study Priority (`GET /api/performance/priority` & reason bullets).
-  - Phase 6: Academic Readiness Composite Metric (`GET /api/performance/readiness` & 4-pillar progress bars).
-  - Phase 7: Study Together Collaborative Rooms (Flyway `V3`, JPA entities, WebRTC camera/audio controls, synchronized timer, peer tiles, room chat, Room AI tutor).
-  - Phase 8: Smart Notifications (`GET /api/notifications` & `Topbar.tsx` bell dropdown).
-  - Phase 9: Gamification Enhancement (Milestone Badges in `dashboard/page.tsx`).
-  - Phase 10: Database & Test Data Audit (`DATABASE_DATA_AUDIT.md`).
-  - Phase 11: Comprehensive Test Suite (110/110 backend tests, 58/58 frontend tests, Next.js 23/23 routes build).
-  - Phase 12: Production Audit & Documentation (`FINAL_PRODUCTION_AUDIT.md`).
-- [2026-08-20] Integrated `ImagesBadge` and `ImagesBadgeDemo` components into `@/components/ui/images-badge.tsx` and `@/components/images-badge-demo.tsx`. Created unit test suite (`images-badge.test.tsx`, 6/6 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
-- [2026-08-20] Integrated `CloudShader` WebGL component and `CloudShaderDemo` into `@/components/ui/cloud-shader.tsx` and `@/components/cloud-shader-demo.tsx`. Created unit test suite (`cloud-shader.test.tsx`, 4/4 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
-- [2026-08-20] Integrated `FloatingDock` spring-physics component and `FloatingDockDemo` into `@/components/ui/floating-dock.tsx` and `@/components/floating-dock-demo.tsx`. Created unit test suite (`floating-dock.test.tsx`, 3/3 tests passing). Next.js 16 build passed with 0 errors (23/23 routes).
-- [2026-08-20] Integrated `PlaceholdersAndVanishInput` component (`@/components/ui/placeholders-and-vanish-input.tsx`), created `PlaceholdersAndVanishInputDemo`, and upgraded `ChatInput.tsx` with animated rotating study placeholders and canvas particle vanish effect. Created unit test suites (`placeholders-and-vanish-input.test.tsx`, `chat-input.test.tsx`, 77/77 tests passing across 11 suites). Next.js 16 build passed with 0 errors (23/23 routes).
-- [2026-08-22] Master Repair & Production Hardening:
-  - Resolved 100% of ESLint errors (15 -> 0). Fixed React purity in `Topbar.tsx` (removed impure `Date.now()`) and ref access in `cloud-shader.tsx`.
-  - Replaced untyped `any` annotations across `ai.api.ts`, `chat.api.ts`, `subjects.api.ts`, `FirebaseDebugPanel.tsx` with strongly-typed interfaces.
-- [2026-08-27] Created Reliable 1-Click Windows Full Stack Startup & Teardown Scripts (`start-project.bat` & `stop-project.bat`):
-  - `start-project.bat`: Detects and terminates stale processes on ports 8080 and 3000 with PID logging, removes stale H2 lock files, launches backend in dedicated terminal, polls `/actuator/health` until UP (no fixed sleep), launches frontend on port 3000 in dedicated terminal, waits for frontend ready, and opens default browser to `http://localhost:3000`.
-  - `stop-project.bat`: Identifies and terminates processes occupying port 8080 and 3000, removes H2 locks, and reports port freedom.
-  - Verified 100% passing across 6 automated end-to-end launch, restart, and shutdown test stages without modifying existing application code.
-- [2026-08-27] MASTER FIX — Profile Save Full Persistence & Re-Login Identity Preservation (CRITICAL):
-  - Fixed `UpdateProfileRequest.java` adding `phoneNumber` and `@JsonSetter("semester")` accepting both integer numbers (1-8) and custom string representations ("1st Year", "Semester 5", "5").
-  - Fixed `StudentService.java` to persist all 6 fields (`fullName`, `collegeName`, `semester`, `department`, `phoneNumber`, `profilePictureUrl`), sanitizing phone numbers to null on empty input and preventing duplicate collisions.
-  - Hardened `AuthService.java` to preserve student Google identity and profile picture without overwriting existing data or creating duplicate student records on re-login.
-  - Updated `authStore.ts` with bidirectional normalization between backend `fullName` and frontend `name`.
-  - Updated `AuthProvider.tsx` to query `/api/students/me` on hydration rather than discarding Zustand state with a skeleton object.
-  - Standardized numeric `SEMESTER_OPTIONS` in `SettingsPage.tsx`, added `useQuery` profile synchronization with `isDirty` protection, and custom department retention.
-  - Implemented 6 backend unit tests in `StudentProfilePersistenceTest.java` (6/6 passing).
-  - Implemented frontend unit tests in `profilePersistence.test.tsx` (123/123 tests passing across 17 suites).
-  - Implemented Playwright E2E tests in `profile_persistence.spec.ts` (3/3 passing: save and reload persistence, phone removal, relogin identity preservation).
-  - Verified live persistence end-to-end against the local database (`verify_profile_persistence_live.mjs` 100% passing).
-- [2026-08-27] MASTER FIX — Materials Subject Filter Shows Uploaded Files (CRITICAL FIX):
-  - Fixed `MaterialResponse.java` backend DTO to provide top-level `subjectId` (UUID) and `subjectName` (String) along with defensive fallback getters.
-  - Fixed `MaterialService.java` adding student ownership check for assigned `subjectId` on upload, ordered retrieval by creation timestamp, and full `toMaterialResponse` mapping.
-  - Added repository method `findAllByStudentIdAndSubjectIdOrderByCreatedAtDesc` to `MaterialRepository.java`.
-  - Added `@RequestParam(value = "subjectId", required = false)` handling to `MaterialController.java` `GET /api/materials` with safe parameter parsing in `/upload`.
-  - Updated frontend `StudyMaterial` interface in `api.types.ts` and created `mapMaterialFromBackend` normalizer in `materials.api.ts`.
-  - Hardened client-side filtering in `materials/page.tsx` with fallback matching (`mat.subjectId || mat.subject?.id`).
-  - Added user-selected subject badge rendering in `MaterialCard.tsx` with `.subjectBadge` styling.
-  - Added comprehensive backend tests in `MaterialSubjectFilterTest.java` (4 tests), `MaterialControllerTest.java` (query param test), and `UploadIntegrationTest.java` (upload + filter round-trip test). All 253 backend tests passing.
-  - Added Playwright E2E test suite in `material_subject_filter.spec.ts` (5/5 passing).
-  - Verified 15/15 passing in `materials.spec.ts` and 8/8 passing in Jest `materials.test.tsx`.
-  - Verified complete live functional flow (`verify_material_filter_live.mjs`) against running local backend and frontend with live browser screenshots.
-  - Fixed misleading Settings UI dropdown labels: replaced broad fixed-window ranges ("Evening (5 PM - 9 PM)") with canonical start times ("5:00 PM").
-  - Created `studyPeriodUtils.ts` as the canonical utility computing: start time + daily target study duration = actual daily study period.
-  - Added live reactive preview banner in Settings (`5:00 PM – 6:00 PM` for 1h/day, `5:00 PM – 7:00 PM` for 2h/day, etc.) with midnight-crossing warnings.
-  - Enhanced Timetable Generator Wizard: live study period preview in Step 2 (Hours slider) and Step 5 (Review summary).
-  - Enhanced Timetable Dashboard: added study window banner linking to Settings.
-  - Added comprehensive automated regression test suite: 14 backend `TimetableStudyPeriodTest` tests (requirements A–M), 17 backend `StudyTimeWindowTest` unit tests, 21 frontend `studyPeriodUtils.test.ts` unit tests, and 15 Playwright E2E tests in `settings.spec.ts`. All 100% passing.
-  - Verified 110/110 Spring Boot backend tests passing (`mvnw test`, 0 failures, 0 errors).
-  - Verified 77/77 Jest frontend tests passing (11 suites).
-- [2026-08-28] MASTER FIX — Timetable Horizon + Date Display + Slot Details + Missed-Session History (CRITICAL FULL-STACK MASTER FIX):
-  - **Full Exam-Deadline Horizon:** Removed 7-day truncation in `TimetableService.java`. Automatically derives 14d, 30d, 60d, 90d preparation window from furthest exam date with dedicated revision slot on exam eve.
-  - **Month & Date Display:** Integrated month headers (`AUGUST 2026 – SEPTEMBER 2026`) and concrete dates (`Fri 28`, `Sat 29`, `Sun 30`, `Mon 31`, `Tue 1`, `Wed 2`, `Thu 3`) with month pills across transitions in `timetable/page.tsx` and `timetable.module.css`. Prevented multi-week date collapse.
-  - **Week Switcher & Pager:** Implemented Prev/Next week navigation, quick jump tabs (`[Today]`, `[Week 1]`, `[Week 2]`), and `[All Weeks View]` to view complete multi-week timelines.
-  - **Start–End Time Display:** Updated timetable cards and mobile `SlotCard.tsx` to render full range (e.g. `6:00 AM – 7:00 AM`) and duration badge (`60m`) derived from user study window preferences.
-  - **Study Session Detail Modal:** Built `SlotDetailModal.tsx` & `slotDetailModal.module.css` displaying Subject, Date, Start-End, Duration, Status, Today's Topic, Chapter, Source Material, Difficulty/Score, What to Study (actionable bullet guidance), Selection Reason, and Countdown Exam Relevance.
-  - **Material-to-Slot NLP Traceability:** Implemented `MaterialTopicReader.java` parsing NLP-extracted topics, chapters, and keywords from uploaded PDF materials to generate rich topic metadata and bullet guidance.
-  - **Missed-Session History & Catch-Up:** Preserved uncompleted past sessions as `status = 'missed'`. Injected catch-up sessions with urgent `🔴 MISSED — COMPLETE TODAY` badge and alert banner without overwriting historical records.
-  - **Automated Tests & Live Verification:**
-    - 4 backend unit tests in `TimetableHorizonAndDetailsTest.java` (17/17 backend tests passing).
-    - 4 frontend unit tests in `slotDetailModal.test.tsx` (100% passing).
-    - Live end-to-end Playwright browser script (`verify_timetable_master_fix_live.mjs`) verified full calendar horizon, month header, start-end range, modal popup, week switching, and completion toggling with visual screenshots.
-- [2026-08-28] Next-Level Dependencies, Plugins & Resources Integration:
-  - **Frontend AI Math & Formula Rendering:** Integrated `remark-math@6`, `rehype-katex@7`, and `katex@0.16.x` into `MessageBubble.tsx` with KaTeX stylesheet in `globals.css` for rendering LaTeX equations in AI chat notes.
-  - **Frontend Interactive Code Blocks:** Added copy-to-clipboard code blocks with language indicators.
-  - **Frontend Gamification Celebration:** Added `canvas-confetti` + `@types/canvas-confetti` celebration burst utility (`confetti.ts`) triggered on 100% daily timetable completion.
-  - **Frontend Bundle Analyzer:** Integrated `@next/bundle-analyzer` in `next.config.ts` with `ANALYZE=true` profiling.
-  - **Backend Apache Tika Universal Document Intelligence:** Added `tika-core:2.9.2` for multi-format student study uploads (`.docx`, `.pptx`, `.txt`, `.md`, `.epub`, `.rtf`) alongside PDFBox.
-  - **Backend Resilience4j:** Added `resilience4j-spring-boot3:2.2.0` circuit breaker & retry engine for AI and Supabase API calls.
-  - **Backend JaCoCo Coverage Reporting:** Added `jacoco-maven-plugin:0.8.11` to `pom.xml` for automated code coverage reports.
-- [2026-08-28] MASTER PROMPT — Redesign AI Tutor Chat + Improve Answer Quality (100% COMPLETED & VERIFIED):
-  - **Pedagogical Master Prompt Architecture (`GroqService.java`):** Enforced structured teaching guidelines (1-2 sentence core intuition, `## Key Concept`, `### Worked Example`, `### Step-by-Step Method`, `### Why It Matters`, `> **Important:**` callouts, standard LaTeX math delimiters, fenced code blocks). Eliminated meta-commentary filler ("Here is your answer", "As an AI model").
-  - **Material Grounding & Fallback Transparency:** Context builder cross-references student's uploaded notes, syllabus chapters, and performance profile. Fallback transparency clearly alerts student when a topic is absent from notes before explaining.
-  - **GFM Markdown Table Parser (`MessageBubble.tsx` & `remark-gfm`):** Integrated `remark-gfm@4` to render structured GFM tables with styled headers, alternating row striping, and responsive horizontal scroll container instead of raw ASCII pipes.
-  - **Enhanced Chat UI & Typography (`chat.module.css`):** Cyan accent headers with divider borders, translucent blockquote callouts, interactive code blocks with language badge and copy buttons, full response copy button, and `📚 Grounded in your study notes` badge.
-  - **Empty State Interactive Starter Cards (`ChatContainer.tsx`):** Added 2x2 grid of starter prompts ("Explain Concept", "Study Priority Today", "Quick Practice Quiz", "Summarize Notes") populating the composer on click.
-  - **Automated Tests & Production Build:**
-    - 22/22 Backend JUnit tests passed (`AiAssistantPromptTest`, `GroqServiceTest`, `AiAssistantServiceTest`).
-    - 134/134 Frontend Jest tests passed across 21 suites (`npm test`).
-    - 15/15 Playwright E2E tests passed in `ai.spec.ts`.
-    - Next.js production build succeeded with 0 errors across 24 routes.
+  - Added Material Subject Filtering with canonical `subject_id` foreign key.
+  - Added Single Firebase UID Identity and Profile Persistence.
+  - Added Dynamic Multi-Week Timetable Horizons (14d, 30d, 60d, 90d) with exact start/end slot times and material-driven topic allocation.
+  - Added Adaptive Missed-Session Tracking with next-day catch-up rescheduling indicators.
+- [2026-08-28] MASTER FIX — AI Tutor Chat Scrolling & Sticky Composer (100% COMPLETED & VERIFIED):
+  - **App Shell & Main Layout Isolation (`(dashboard)/layout.tsx`):** Route-aware pathname detection (`isChatRoute`) isolating `/chat` with `overflow-hidden` and `p-0`.
+  - **Anchored Sticky Composer (`ChatContainer.tsx` & `.composerWrapper`):** Positioned outside scroll container with `flex-shrink: 0`, keeping input, attachment, and send button 100% visible and anchored.
+  - **Clean Header:** Removed technical provider subtitles.
+- [2026-08-28] MASTER TASK — REPLACE STATIC TEST REPORTS WITH REAL EXECUTABLE TESTS (100% COMPLETED & VERIFIED):
+  - **Legacy Archive:** Archived legacy simulated reports and static Excel sheets in `testing/reports/legacy_archive/` with dedicated `README.md`.
+  - **Automated Dynamic Report Generator (`testing/scripts/generate_test_reports.py`):** Parses genuine test output artifacts:
+    - Backend: Maven Surefire JUnit 5 XMLs (`backend/target/surefire-reports/TEST-*.xml`)
+    - Frontend Unit: Jest CI JSON (`frontend/test-results.json`)
+    - Frontend E2E: Playwright JSON (`frontend/playwright-results.json`)
+    - Mobile: React Native Jest JSON (`mobile/test-results.json`)
+  - **Generated Verified Reports:**
+    - `testing/reports/MASTER_TEST_REPORT.md` (456 total tests, 448 passed, 0 failures, 8 skipped, 98.25% pass rate)
+    - `testing/reports/backend/BACKEND_TEST_REPORT.md` (263 JUnit 5 tests, 255 passed, 0 failures)
+    - `testing/reports/frontend/FRONTEND_TEST_REPORT.md` (134 Jest tests, 134 passed, 100%)
+    - `testing/reports/e2e/E2E_PLAYWRIGHT_REPORT.md` (51 Playwright tests, 51 passed, 100%)
+    - `testing/reports/mobile/MOBILE_TEST_REPORT.md` (8 Jest tests, 8 passed, 100%)
+    - `testing/reports/summary/TEST_EXECUTION_SUMMARY.json` (Machine-readable consolidated JSON ledger)
+  - **Added Real Tests:**
+    - `backend/src/test/java/com/aistudyplanner/integration/BackendFullFlowIntegrationTest.java` (Profile persistence & timetable generation MockMvc flows)
+    - `mobile/src/__tests__/mobileApp.test.ts` (React Native date utilities & error handler parsing tests)
+    - `mobile/.eslintrc.js` (React Native ESLint configuration)
+  - **Unified Test Runners:**
+    - `testing/run-all-tests.bat` (Windows automated runner)
+    - `testing/run-all-tests.sh` (Linux / macOS automated runner)
+  - **CI Modernization:** Updated `.github/workflows/master-test-suite.yml` to execute all 4 real test layers and publish generated report artifacts.
+- [2026-08-28] MASTER TASK — EXPAND TO 300 TEST CASES PER SHEET IN testing/reports (100% COMPLETED & VERIFIED):
+  - **7 Professional Excel Workbooks Created in `testing/reports/` (1,905 Total Test Cases):**
+    1. `Selenium_Test_Cases.xlsx` (300 Browser E2E test cases mapped to Playwright specs across all web flows)
+    2. `Appium_Test_Cases.xlsx` (300 Mobile test cases mapped to React Native Jest, Appium 3.x runners, and device hardware flows)
+    3. `Validation_Test_Cases.xlsx` (300 Product Functional Validation test cases covering all 20 product pillars)
+    4. `Unit_Test_Cases.xlsx` (405 Unit & Component test cases: 263 backend JUnit 5 + 134 frontend Jest + 8 mobile RN Jest)
+    5. `Load_Test_Cases.xlsx` (300 Performance, load, spike, soak, and concurrency scenarios with strict SLA thresholds)
+    6. `UI_UX_Test_Cases.xlsx` (300 UI/UX, typography, design system, theme switching, and WCAG AA accessibility cases)
+    7. `MASTER_Test_Cases.xlsx` (Master consolidated workbook with Summary + 6 domain worksheets + Defects + Regression, 1,905 total cases)
+  - **20 Standard Traceability Columns:** Test Case ID, Test Area, Feature, Scenario, Objective, Priority, Preconditions, Test Data, Steps, Expected Result, Actual Result, Framework, Automation Type, Executable Source, Execution Command, Environment, Evidence, Status, Defect ID, Notes.
+  - **100% Codebase Traceability:** 0 missing IDs, 0 missing source file paths, 0 missing commands, 0 fabricated PASS/FAIL results.
+  - **Defects & Regression Matrix:** Master workbook includes dedicated `Defects` worksheet tracking 8 real historical/discovered defects and `Regression` worksheet with permanent regression guards.
+  - **Automated OpenPyXL Generators:** `testing/scripts/generate_300_workbooks.py` and `testing/scripts/generate_excel_test_cases.py`.
+  - **Integrated Runners:** Added generator to `testing/run-all-tests.bat` and `testing/run-all-tests.sh`.
+- [2026-08-28] MASTER TASK — REDESIGN GITHUB ACTIONS CI WORKFLOW TO MATCH REFERENCE GRAPH (100% COMPLETED & VERIFIED):
+  - **Single Unified Workflow Created:** `.github/workflows/ci.yml`
+  - **Exact 5-Parallel-to-1-Convergence Graph:**
+    1. `🌐 Selenium E2E Web Suite` (Playwright & Selenium WebDriver)
+    2. `📱 Appium Mobile Suite` (React Native Jest & Appium 3.x)
+    3. `⚡ Load & Performance Suite` (Locust & Concurrency Engine)
+    4. `🎨 Frontend UI/UX Suite` (Jest, RTL, TypeScript & A11y)
+    5. `⚙️ Backend API & DB Suite` (JUnit 5, Spring Boot & MockMvc)
+    $\rightarrow$ 6. `🏆 Master Execution Summary` (`needs: [selenium-e2e, appium-mobile, load-performance, frontend-uiux, backend-api-db]` with `if: always()`)
+  - **Report & Summary Artifacts Generated:** `testing/reports/ci/Master_Execution_Summary.md`, `testing/reports/ci/Master_Execution_Summary.html`, and dynamic `$GITHUB_STEP_SUMMARY`.
+  - **Legacy Workflows Cleaned Up:** Removed redundant `master-test-suite.yml`, `selenium-e2e.yml`, `appium-e2e.yml`, `load-tests.yml`, `ui-ux-tests.yml`.
 
 ## In Progress
 - (none)
 
-
 ## Blocked
-- (none — BUG-006 timetable toast is low priority, future improvement)
+- (none)
 
 ## Pending
 - **Deploy frontend to Vercel** — push code then connect Vercel project.
-- **Redeploy backend to Render** — BUG-007 requires new columns in Supabase DB (Hibernate ddl-auto=update will auto-add them on restart).
-- Add `spring-security-test` already in pom.xml → Run MaterialControllerTest on local backend.
+- **Redeploy backend to Render** — Supabase DB Flyway migrations active.
 
 ## Future Improvements
-- Add comprehensive JUnit/Mockito tests for backend services.
-- Performance page: Add marks entry form so users can record their own exam scores.
-- Playwright E2E automation tests.
+- Expanded mobile end-to-end device testing with real device cloud runner.
