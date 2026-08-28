@@ -57,12 +57,6 @@ jobs:
         working-directory: ./backend
         run: ./mvnw clean package -DskipTests
 
-      - name: Start Spring Boot Backend in Local Profile
-        working-directory: ./backend
-        run: |
-          java -jar target/ai-study-planner-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local > backend.log 2>&1 &
-          npx wait-on http://localhost:8080/actuator/health --timeout 90000 || (cat backend.log && exit 1)
-
       - name: Install Frontend Dependencies
         working-directory: ./frontend
         run: npm ci
@@ -75,11 +69,17 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      - name: Start Next.js Production Server
-        working-directory: ./frontend
+      - name: Start Backend & Frontend Test Servers
         run: |
-          npm run start &
-          npx wait-on http://localhost:3000 --timeout 60000
+          cd backend
+          nohup java -jar target/ai-study-planner-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local > backend.log 2>&1 &
+          cd ..
+          python testing/scripts/wait_for_health.py http://localhost:8080/actuator/health 60 backend/backend.log
+
+          cd frontend
+          nohup npm run start > frontend.log 2>&1 &
+          cd ..
+          python testing/scripts/wait_for_health.py http://localhost:3000/login 60 frontend/frontend.log
 
       - name: Execute Playwright E2E Test Suite
         working-directory: ./frontend
@@ -103,6 +103,8 @@ jobs:
             testing/reports/selenium_e2e_report.html
             testing/reports/selenium_e2e_results.csv
             testing/reports/junit_results.xml
+            backend/backend.log
+            frontend/frontend.log
             testing/reports/e2e/
           retention-days: 30
 

@@ -2,7 +2,8 @@
 
 ## 2026-08-28 (Session 29 - Master Task: Redesign GitHub Actions CI Workflow to Match Reference Graph)
 - **Files created/changed:**
-  - `.github/workflows/ci.yml` [NEW] — Single unified GitHub Actions workflow with 5 parallel fan-out jobs (`🌐 Selenium E2E Web Suite`, `📱 Appium Mobile Suite (300+ Cases)`, `⚡ Load & Performance Suite`, `🎨 Frontend UI Suite (300+ Cases)`, `⚙️ Backend API & DB Suite (405+ Cases)`) converging into a final `🏆 Master Execution Summary` job (`needs: [...]`, `if: always()`).
+  - `.github/workflows/ci.yml` [MODIFIED] — Re-orchestrated `selenium-e2e` job: unified backend and frontend service startup under `nohup` with `testing/scripts/wait_for_health.py` polling for HTTP readiness, ensuring no subshell process termination or `wait-on` HEAD method incompatibility causes CI failure.
+  - `testing/scripts/wait_for_health.py` [NEW] — Robust Python HTTP GET health check poller with automatic server log dumping on timeout.
   - `backend/src/main/resources/application.properties` & `application-local.properties` [MODIFIED] — Provided fallback defaults for `firebase.project-id`, `razorpay.key-id`, `razorpay.key-secret`, `jwt.secret`, `spring.datasource.url` ensuring Spring Boot placeholder resolution never crashes in clean CI runners without `.env`.
   - `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED] — Added mock fallback initialization when `FIREBASE_SERVICE_ACCOUNT_JSON` is not supplied, allowing local profile and CI E2E jobs to boot instantly without production credentials.
   - `mobile/package.json` & `mobile/package-lock.json` [MODIFIED] — Added `@types/jest` and `@types/node` to devDependencies.
