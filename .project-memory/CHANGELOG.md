@@ -2,8 +2,9 @@
 
 ## 2026-08-28 (Session 29 - Master Task: Redesign GitHub Actions CI Workflow to Match Reference Graph)
 - **Files created/changed:**
+  - `frontend/playwright/generate-test-jwt.ts` [MODIFIED] — Added fallback to dev/test JWT secret `vhcDmPCG4eWST4HzoysATzkmLoQNRdumIjeRdODY/w4=` matching backend local/test profile default, ensuring test runner authentication setup never crashes in clean CI environments.
+  - `.github/workflows/ci.yml` [MODIFIED] — Injected `JWT_SECRET: ${{ secrets.JWT_SECRET || 'vhcDmPCG4eWST4HzoysATzkmLoQNRdumIjeRdODY/w4=' }}` into the Playwright E2E step, and configured streaming logs with `PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-results.json` and `--reporter=json,list`.
   - `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED] — Fixed missing closing brace `});` on `test.beforeEach` block which previously caused Playwright to fail test loading because 25 tests were improperly nested inside `beforeEach`.
-  - `.github/workflows/ci.yml` [MODIFIED] — Configured `PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-results.json` and `--reporter=json,list` so Playwright streams real-time test progress directly to CI logs while saving machine-readable results to disk.
   - `testing/scripts/wait_for_health.py` [NEW] — Robust Python HTTP GET health check poller with automatic server log dumping on timeout.
   - `backend/src/main/resources/application.properties` & `application-local.properties` [MODIFIED] — Provided fallback defaults for `firebase.project-id`, `razorpay.key-id`, `razorpay.key-secret`, `jwt.secret`, `spring.datasource.url` ensuring Spring Boot placeholder resolution never crashes in clean CI runners without `.env`.
   - `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED] — Added mock fallback initialization when `FIREBASE_SERVICE_ACCOUNT_JSON` is not supplied, allowing local profile and CI E2E jobs to boot instantly without production credentials.

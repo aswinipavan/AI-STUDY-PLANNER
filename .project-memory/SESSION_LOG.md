@@ -8,14 +8,15 @@
   - Resolved Spring Boot local profile startup in CI: provided safe property placeholder defaults in `application.properties` and `application-local.properties`, and added local mock fallback in `FirebaseConfig.java` when `FIREBASE_SERVICE_ACCOUNT_JSON` is absent in CI runners.
   - Resolved Selenium E2E test server orchestration: replaced `npx wait-on` with `testing/scripts/wait_for_health.py` (which uses HTTP GET instead of wait-on's HEAD method that caused 405 errors) and wrapped background processes in `nohup`.
   - Resolved Playwright test loading error: fixed unclosed `test.beforeEach` block in `frontend/src/__tests__/e2e/timetable.spec.ts` (which previously prevented Playwright from registering tests) and enabled streaming console logging via `--reporter=json,list` with `PLAYWRIGHT_JSON_OUTPUT_NAME`.
+  - Resolved Playwright auth token generation: injected `JWT_SECRET` in `ci.yml` and added test secret fallback in `generate-test-jwt.ts`.
   - Built `testing/scripts/generate_ci_summary.py` to aggregate real execution data across all 5 layers into `testing/reports/ci/Master_Execution_Summary.md`, `Master_Execution_Summary.html`, and dynamic `$GITHUB_STEP_SUMMARY`.
   - Configured each job to upload real test artifacts: `selenium-e2e-report`, `appium-mobile-report`, `load-performance-report`, `frontend-uiux-report`, `backend-api-db-report`, and `master-execution-summary`.
   - Configured Master Execution Summary with `needs: [selenium-e2e, appium-mobile, load-performance, frontend-uiux, backend-api-db]` and `if: always()`.
   - Cleaned up obsolete redundant workflow files (`master-test-suite.yml`, `selenium-e2e.yml`, `appium-e2e.yml`, `load-tests.yml`, `ui-ux-tests.yml`).
   - Validated YAML syntax with PyYAML.
-- **Files Modified:** `.github/workflows/ci.yml` [NEW], `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED], `backend/src/main/resources/application*.properties` [MODIFIED], `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED], `mobile/package.json` [MODIFIED], `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED], `testing/scripts/generate_ci_summary.py` [NEW], `testing/scripts/wait_for_health.py` [NEW].
-- **Problems Found:** Playwright failed in CI during test suite execution because `timetable.spec.ts` was missing a closing brace on `test.beforeEach`, causing Playwright to throw `Playwright Test did not expect test() to be called inside beforeEach()` and register 0 tests.
-- **Solutions:** Closed `test.beforeEach` properly in `timetable.spec.ts` (76 total tests across 7 files now load and run) and configured standard Playwright reporters.
+- **Files Modified:** `.github/workflows/ci.yml` [NEW], `backend/src/main/java/com/aistudyplanner/config/FirebaseConfig.java` [MODIFIED], `backend/src/main/resources/application*.properties` [MODIFIED], `frontend/playwright/generate-test-jwt.ts` [MODIFIED], `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED], `mobile/package.json` [MODIFIED], `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED], `testing/scripts/generate_ci_summary.py` [NEW], `testing/scripts/wait_for_health.py` [NEW].
+- **Problems Found:** Playwright tests threw `JWT_SECRET environment variable is not set. Export it before running Playwright tests` during `setupAuthenticatedContext`.
+- **Solutions:** Injected `JWT_SECRET: ${{ secrets.JWT_SECRET || 'vhcDmPCG4eWST4HzoysATzkmLoQNRdumIjeRdODY/w4=' }}` in `ci.yml` and added default test fallback in `generate-test-jwt.ts`.
 - **Next Recommended Task:** Deploy frontend to Vercel; redeploy backend to Render with production Supabase connection.
 
 ## 2026-08-28 (Session 28 - Master Task: Expand to 300 Test Cases Per Sheet in testing/reports)
