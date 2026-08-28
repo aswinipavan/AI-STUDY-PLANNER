@@ -19,6 +19,8 @@ jobs:
     name: 🌐 Selenium E2E Web Suite
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET || 'vhcDmPCG4eWST4HzoysATzkmLoQNRdumIjeRdODY/w4=' }}
 
     steps:
       - name: Checkout Code
