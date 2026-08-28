@@ -2,7 +2,7 @@
 
 ## 2026-08-28 (Session 29 - Master Task: Redesign GitHub Actions CI Workflow to Match Reference Graph)
 - **Files created/changed:**
-  - `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED] — Updated mock responses for `**/api/timetable/active` to canonical API data structure including `weekStartDate`, `date`, `dayOfWeek`, `durationMinutes`, `status: 'pending'/'completed'`, and full topic names (`Binary Search Trees`, `Instruction Pipelining`).
+  - `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED] — Pre-registered all required API mocks (`wake`, `notifications`, `materials`, `exams/upcoming`, `performance/report`, `timetable/active`, `students/me/subjects`) BEFORE navigation (`page.goto`) in `test.beforeEach` and test overrides, eliminating network race conditions on dashboard navigation.
   - `frontend/src/__tests__/e2e/settings.spec.ts` [MODIFIED] — Standardized auth context setup using `setupAuthenticatedContext` and populated `auth-store` in localStorage to eliminate race conditions on initial page mount.
   - `.github/workflows/ci.yml` [MODIFIED] — Injected `JWT_SECRET: ${{ secrets.JWT_SECRET || 'vhcDmPCG4eWST4HzoysATzkmLoQNRdumIjeRdODY/w4=' }}` at both the job level and Playwright step level in `selenium-e2e`, ensuring Spring Boot backend and Playwright share the exact same JWT verification secret.
   - `frontend/playwright/generate-test-jwt.ts` [MODIFIED] — Added fallback to dev/test JWT secret `vhcDmPCG4eWST4HzoysATzkmLoQNRdumIjeRdODY/w4=` matching backend local/test profile default, ensuring test runner authentication setup never crashes in clean CI environments.

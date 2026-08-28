@@ -104,6 +104,42 @@ test.describe('Timetable Section', () => {
         }),
       });
     });
+
+    await page.route('**/api/wake', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'awake' }) });
+    });
+
+    await page.route('**/api/notifications**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/materials**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/exams/upcoming', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [] }) });
+    });
+
+    await page.route('**/api/performance/report', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            overallAverage: 0,
+            studyHoursThisWeek: 0,
+            completedTasks: 0,
+            upcomingExamsCount: 0,
+            subjectPerformanceList: []
+          }
+        })
+      });
+    });
+
+    await page.route('**/firestore.googleapis.com/**', async (route) => {
+      await route.abort('blockedbyclient');
+    });
   });
 
   test('SEL-091: Active study slots calendar loaded list rendering', async ({ page }) => {
