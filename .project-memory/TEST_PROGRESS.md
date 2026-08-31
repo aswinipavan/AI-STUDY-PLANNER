@@ -1,4 +1,4 @@
-﻿# Test Progress — AI Study Planner
+# Test Progress — AI Study Planner
 
 ## Master Quality Assurance & Genuine Executable Test Suite Summary
 - **Execution Architecture:** 100% dynamically parsed from real test runners (Surefire JUnit 5 XML, Jest JSON, Playwright JSON, Mobile Jest). Zero simulated or hardcoded results.
@@ -48,4 +48,4 @@
 - **Linux / macOS Unified Runner**: `./testing/run-all-tests.sh`
 - **Dynamic Markdown Report Generator**: `python testing/scripts/generate_test_reports.py`
 - **Dynamic 300-Case Excel Workbook Generator**: `python testing/scripts/generate_excel_test_cases.py`
-- **GitHub Actions Master CI**: `.github/workflows/master-test-suite.yml`
+- **GitHub Actions Master CI**: `.github/workflows/ci.yml`

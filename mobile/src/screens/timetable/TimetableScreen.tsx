@@ -8,7 +8,11 @@ import {
   Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useNavigation} from '@react-navigation/native';
+import {format} from 'date-fns';
 import {useActiveTimetable, useToggleSlot, useGenerateTimetable} from '@/hooks/useTimetable';
+import {useSubjects} from '@/hooks/useStudent';
+import {useAuthStore} from '@/stores/authStore';
 import {DaySelector} from '@/components/timetable/DaySelector';
 import {SlotCard} from '@/components/timetable/SlotCard';
 import {LoadingSpinner} from '@/components/common/LoadingSpinner';
@@ -21,8 +25,11 @@ import {COLORS} from '@/constants/colors';
 import {SPACING} from '@/constants/theme';
 import {getTodayDayOfWeek, getDayLabel} from '@/utils/dateUtils';
 import type {SlotResponse} from '@/types/timetable.types';
+import type {SubjectResponse} from '@/types/student.types';
 
 export function TimetableScreen() {
+  const navigation = useNavigation<any>();
+  const student = useAuthStore(s => s.student);
   const todayIndex = getTodayDayOfWeek();
   const [selectedDay, setSelectedDay] = useState(todayIndex);
 
@@ -33,12 +40,15 @@ export function TimetableScreen() {
     refetch,
   } = useActiveTimetable();
 
+  const {data: subjects = []} = useSubjects();
+
   const {mutate: toggleSlot, isPending: isToggling, variables: togglingSlotId} = useToggleSlot();
   const {mutate: generateTimetable, isPending: isGenerating} = useGenerateTimetable();
 
   // Days that have at least one slot
-  const activeDays: number[] = Array.from(new Set((timetable?.slots ?? []).map((s: SlotResponse) => s.dayOfWeek)));
-
+  const activeDays: number[] = Array.from(
+    new Set((timetable?.slots ?? []).map((s: SlotResponse) => s.dayOfWeek)),
+  );
 
   // Slots for selected day, sorted by start time
   const daySlots: SlotResponse[] = (timetable?.slots ?? [])
@@ -48,21 +58,46 @@ export function TimetableScreen() {
   const completedCount = daySlots.filter((s: SlotResponse) => s.isCompleted).length;
 
   const handleGenerate = () => {
+    if (subjects.length === 0) {
+      Alert.alert(
+        'No Subjects Found',
+        'Please add at least one subject in the Subjects tab before generating your AI timetable.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {
+            text: 'Add Subject',
+            onPress: () => navigation.navigate('Subjects'),
+          },
+        ],
+      );
+      return;
+    }
+
     Alert.alert(
       'Generate AI Timetable',
-      'This will create an AI-optimised timetable based on your subjects and study hours. Continue?',
+      `Create an AI-optimised schedule for ${subjects.length} subject(s) with ${student?.availableHoursPerDay ?? 4} daily study hours?`,
       [
         {text: 'Cancel', style: 'cancel'},
         {
           text: 'Generate',
           onPress: () =>
             generateTimetable(
-              {},
+              {
+                subjectIds: subjects.map((s: SubjectResponse) => s.id),
+                availableHoursPerDay: student?.availableHoursPerDay ?? 4,
+                style: 'balanced',
+                startDate: format(new Date(), 'yyyy-MM-dd'),
+                durationDays: 14,
+                useDeadlines: true,
+              },
               {
                 onSuccess: () =>
                   Alert.alert('✅ Done', 'Your AI timetable has been created!'),
-                onError: () =>
-                  Alert.alert('Error', 'Failed to generate timetable. Please try again.'),
+                onError: (err: any) =>
+                  Alert.alert(
+                    'Error',
+                    err?.response?.data?.message || 'Failed to generate timetable. Please try again.',
+                  ),
               },
             ),
         },

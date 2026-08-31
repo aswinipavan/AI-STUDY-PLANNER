@@ -155,7 +155,7 @@ public class ExamService {
 
     private ExamResponse toExamResponse(Exam exam) {
         long daysRemaining = 0;
-        if (exam.getExamDate() != null && !exam.getIsCompleted()) {
+        if (exam.getExamDate() != null && !Boolean.TRUE.equals(exam.getIsCompleted())) {
             daysRemaining = ChronoUnit.DAYS.between(LocalDate.now(), exam.getExamDate());
             if (daysRemaining < 0) daysRemaining = 0;
         }

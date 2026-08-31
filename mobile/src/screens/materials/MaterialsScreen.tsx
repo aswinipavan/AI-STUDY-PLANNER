@@ -44,7 +44,8 @@ export function MaterialsScreen() {
   const filteredMaterials: MaterialResponse[] = (materials ?? []).filter(
     (m: MaterialResponse) => {
       if (!selectedSubjectId) return true;
-      return m.subject?.id === selectedSubjectId;
+      const subId = m.subjectId || m.subject?.id;
+      return subId === selectedSubjectId;
     },
   );
 
@@ -149,7 +150,7 @@ export function MaterialsScreen() {
             item.materialType && item.materialType in MATERIAL_TYPE_ICONS
               ? MATERIAL_TYPE_ICONS[item.materialType as MaterialType]
               : '📁';
-
+          const subjectDisplayName = item.subjectName || item.subject?.subjectName;
 
           return (
             <Card style={styles.materialCard}>
@@ -159,9 +160,9 @@ export function MaterialsScreen() {
                   <Text style={styles.materialTitle} numberOfLines={1}>
                     {item.title}
                   </Text>
-                  {item.subject && (
+                  {subjectDisplayName && (
                     <Text style={styles.subjectTag}>
-                      {item.subject.subjectName}
+                      {subjectDisplayName}
                     </Text>
                   )}
                 </View>

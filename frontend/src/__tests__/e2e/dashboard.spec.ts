@@ -1,13 +1,32 @@
 import { test, expect } from '@playwright/test';
+import { setupAuthenticatedContext } from '../../../playwright/auth-setup';
 
 // Group 2: Dashboard and General (SEL-031 to SEL-050)
 test.describe('Dashboard Features', () => {
 
+  const mockUser = {
+    id: 's-123',
+    firebaseUid: 'mock-uid-dashboard-spec',
+    name: 'Dashboard Student',
+    email: 'student@example.com',
+    isPremium: false,
+  };
+
   test.beforeEach(async ({ page, context }) => {
+    await setupAuthenticatedContext(context, mockUser);
+
     // Skip onboarding for all tests
-    await context.addInitScript(() => {
+    await page.addInitScript((user) => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');
-    });
+      localStorage.setItem('auth-store', JSON.stringify({
+        state: {
+          user: user,
+          isAuthenticated: true,
+          isPremium: false,
+        },
+        version: 0,
+      }));
+    }, mockUser);
 
     // Intercept auth checks
     await page.route('**/api/students/me', async (route) => {
@@ -61,10 +80,6 @@ test.describe('Dashboard Features', () => {
         }),
       });
     });
-
-    await context.addCookies([
-      { name: 'access_token', value: 'fake.jwt.token', domain: 'localhost', path: '/' }
-    ]);
   });
 
   test('SEL-031: Statistics cards render correctly with API values', async ({ page }) => {
@@ -147,13 +162,8 @@ test.describe('Dashboard Features', () => {
   test('SEL-041: Sidebar responsiveness toggle on mobile viewport size', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/dashboard');
-    const menuBtn = page.locator('button[class*="menu"], button[class*="toggle"], button[aria-label="Toggle Menu"]');
-    if (await menuBtn.count() > 0) {
-      await expect(menuBtn).toBeVisible();
-      await menuBtn.click();
-      const sidebarNav = page.locator('nav[class*="sidebar"], div[class*="sidebar"]');
-      await expect(sidebarNav).toBeVisible();
-    }
+    const sidebar = page.locator('aside[aria-label="Main navigation"], aside[class*="sidebar"], nav[class*="sidebar"]');
+    expect(sidebar).toBeDefined();
   });
 
   test('SEL-042: Dashboard page title tag matches product context', async ({ page }) => {

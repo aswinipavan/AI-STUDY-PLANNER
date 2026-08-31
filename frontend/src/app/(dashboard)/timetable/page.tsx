@@ -19,16 +19,18 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
+  Lock,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AdaptationResult, AdaptationTrigger, TimetableSlot } from '@/types/api.types';
 import { QK } from '@/constants/queryKeys';
 import { useAdaptTimetable } from '@/hooks/useTimetable';
 import { useSoundPreference } from '@/hooks/useSoundPreference';
-import { parseSlotDate, dayLabel, dayKey, slotDayKey, mondayBasedIndex } from '@/utils/dateHelpers';
+import { parseSlotDate, dayLabel, dayKey, slotDayKey, mondayBasedIndex, isFutureSlot, formatFutureAvailability } from '@/utils/dateHelpers';
 import { SlotDetailModal } from '@/components/timetable/SlotDetailModal';
 import styles from './timetable.module.css';
 import { useAuthStore } from '@/stores/authStore';
+import { authApi } from '@/api/auth.api';
 import { calcStudyPeriod, ENUM_TO_LABEL } from '@/utils/studyPeriodUtils';
 import { fireCelebrationConfetti } from '@/lib/confetti';
 
@@ -85,12 +87,14 @@ function SlotCardItem({
   slot,
   isMissed,
   isCatchUp,
+  isFuture,
   onToggle,
   onOpenDetail,
 }: {
   slot: TimetableSlot;
   isMissed: boolean;
   isCatchUp: boolean;
+  isFuture?: boolean;
   onToggle: (id: string, status: TimetableSlot['status']) => void;
   onOpenDetail: (slot: TimetableSlot) => void;
 }) {
@@ -101,6 +105,7 @@ function SlotCardItem({
   if (slot.status === 'completed') statusClass = styles.slotCompleted;
   else if (slot.status === 'skipped') statusClass = styles.slotSkipped;
   else if (isCatchUp) statusClass = styles.slotCatchUp;
+  else if (isFuture) statusClass = styles.slotFuture;
   const subject = slot.subject?.name || (slot.subject as { name?: string; subjectName?: string })?.subjectName || 'Study';
   const duration = slot.durationMinutes || 60;
   const next = nextStatus(slot.status);
@@ -118,7 +123,7 @@ function SlotCardItem({
         }
       }}
       data-testid={`slot-card-${slot.id}`}
-      aria-label={`${subject}, ${slot.topic || 'Session'} from ${formatTimeRange(slot.startTime, slot.endTime)}. Status: ${isMissed ? 'missed' : slot.status}. Click for details.`}
+      aria-label={`${subject}, ${slot.topic || 'Session'} from ${formatTimeRange(slot.startTime, slot.endTime)}. Status: ${isFuture ? 'locked (future session)' : isMissed ? 'missed' : slot.status}. Click for details.`}
     >
       {/* Catch-up urgent indicator */}
       {isCatchUp && slot.status !== 'completed' && (
@@ -134,22 +139,31 @@ function SlotCardItem({
         </span>
       )}
 
+      {/* Future locked badge */}
+      {isFuture && slot.status !== 'completed' && (
+        <span className={styles.futureBadge} data-testid={`future-badge-${slot.id}`}>
+          <Lock size={10} style={{ marginRight: '0.2rem' }} aria-hidden="true" /> Locked · {formatFutureAvailability(slot.date)}
+        </span>
+      )}
+
       <div className={styles.slotHeader}>
         <p className={styles.slotSubject} title={subject}>
           {subject}
         </p>
         <button
           type="button"
+          disabled={isFuture}
           onClick={e => {
             e.stopPropagation();
+            if (isFuture) return;
             onToggle(slot.id, next);
           }}
-          className={`${styles.quickToggleBtn} ${slot.status === 'completed' ? styles.quickToggleDone : ''}`}
-          title={`Click to mark as ${next}`}
-          aria-label={`Mark session as ${next}`}
+          className={`${styles.quickToggleBtn} ${slot.status === 'completed' ? styles.quickToggleDone : ''} ${isFuture ? styles.quickToggleLocked : ''}`}
+          title={isFuture ? `Locked · ${formatFutureAvailability(slot.date)}` : `Click to mark as ${next}`}
+          aria-label={isFuture ? `Locked: future session` : `Mark session as ${next}`}
           data-testid={`quick-toggle-${slot.id}`}
         >
-          {slot.status === 'completed' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
+          {isFuture ? <Lock size={13} /> : slot.status === 'completed' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
         </button>
       </div>
 
@@ -215,7 +229,14 @@ export default function TimetablePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(0);
   const [viewAllWeeks, setViewAllWeeks] = useState<boolean>(false);
-  const { user } = useAuthStore();
+  
+  const storeUser = useAuthStore((s) => s.user);
+  const { data: fetchedProfile } = useQuery({
+    queryKey: ['studentProfile'],
+    queryFn: () => authApi.getMe(),
+    staleTime: 1000 * 30,
+  });
+  const user = fetchedProfile || storeUser;
 
   const { data: timetable, isLoading, error, refetch } = useQuery({
     queryKey: QK.timetable,
@@ -324,6 +345,12 @@ export default function TimetablePage() {
   const missedIds = new Set(missedSlots.map(s => s.id));
 
   const handleToggle = (id: string, status: TimetableSlot['status']) => {
+    const targetSlot = optimisticSlots.find(s => s.id === id);
+    if (targetSlot && isFutureSlot(targetSlot.date, today) && status === 'completed') {
+      toast.info('Future study sessions cannot be completed early.');
+      return;
+    }
+
     const finishesToday =
       status === 'completed' &&
       todaySlots.length > 0 &&
@@ -440,20 +467,20 @@ export default function TimetablePage() {
               color: 'var(--color-muted-foreground)',
               marginBottom: '1rem',
             }}
-            data-testid="timetable-study-window-banner"
+            data-testid="study-window-banner"
           >
             <Clock size={14} style={{ flexShrink: 0, color: 'var(--color-primary)' }} aria-hidden="true" />
             <span>
               {`Your daily study window: `}
               <strong style={{ color: 'var(--color-foreground)' }} data-testid="timetable-study-window-value">
-                {period.label}
+                <span data-testid="study-window-range">{period.label}</span>
               </strong>
-              {` · Based on your saved preferences (${startLabel} start, ${hours}h/day). `}
+              <span data-testid="study-window-meta">{` · Based on your saved preferences (${startLabel} start, ${hours}h/day). `}</span>
               <a
                 href="/settings"
-                style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
+                style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}
               >
-                Edit in Settings
+                Change in Settings
               </a>
             </span>
           </div>
@@ -658,6 +685,7 @@ export default function TimetablePage() {
                               slot={slot}
                               isMissed={missedIds.has(slot.id)}
                               isCatchUp={Boolean(slot.isCatchUp)}
+                              isFuture={isFutureSlot(slot.date, today)}
                               onToggle={handleToggle}
                               onOpenDetail={handleOpenDetail}
                             />

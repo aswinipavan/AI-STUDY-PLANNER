@@ -22,12 +22,15 @@ import {
   formatDate,
   formatTimeRange,
 } from '@/utils/dateUtils';
+import {
+  computeDayStudyStats,
+  calculateSlotDuration,
+} from '@/utils/dashboardStats';
 import {useNavigation} from '@react-navigation/native';
 
 export function DashboardScreen() {
   const student = useAuthStore(s => s.student);
   const navigation = useNavigation<any>();
-  const todayIndex = getTodayDayOfWeek();
 
   const {
     data: timetable,
@@ -48,11 +51,15 @@ export function DashboardScreen() {
     refetchExams();
   };
 
-  const todaySlots: SlotResponse[] =
-    timetable?.slots.filter((s: SlotResponse) => s.dayOfWeek === todayIndex) ?? [];
-  const completedToday = todaySlots.filter((s: SlotResponse) => s.isCompleted).length;
-  const nextExam = upcomingExams?.[0];
+  const stats = computeDayStudyStats(timetable?.slots, new Date());
+  const {
+    todaySlots,
+    completedSessions: completedToday,
+    totalSessions: totalToday,
+    plannedStudyTime,
+  } = stats;
 
+  const nextExam = upcomingExams?.[0];
   const firstName = student?.fullName?.split(' ')[0] ?? 'Student';
 
   return (
@@ -92,15 +99,15 @@ export function DashboardScreen() {
         <StatCard
           icon="✅"
           label="Done Today"
-          value={`${completedToday}/${todaySlots.length}`}
+          value={`${completedToday}/${totalToday}`}
           unit="slots"
           color={COLORS.SECONDARY}
         />
         <StatCard
           icon="⏳"
-          label="Hours/Day"
-          value={`${student?.availableHoursPerDay ?? 4}`}
-          unit="hrs"
+          label="Planned Today"
+          value={plannedStudyTime.value}
+          unit={plannedStudyTime.unit}
           color={COLORS.PRIMARY}
         />
       </View>
@@ -169,7 +176,7 @@ export function DashboardScreen() {
                   {slot.subject.subjectName}
                 </Text>
                 <Text style={styles.slotTime}>
-                  {formatTimeRange(slot.startTime, slot.endTime)}
+                  {formatTimeRange(slot.startTime, slot.endTime)} · {calculateSlotDuration(slot)}m
                 </Text>
                 {slot.topic && (
                   <Text style={styles.slotTopic} numberOfLines={1}>

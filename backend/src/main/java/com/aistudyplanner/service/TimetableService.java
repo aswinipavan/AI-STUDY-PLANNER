@@ -508,7 +508,7 @@ public class TimetableService {
         // Use true chronological ordering by concrete slotDate
         List<TimetableSlot> slots = timetableSlotRepository.findAllByTimetableIdOrderBySlotDate(timetable.getId());
         List<SlotResponse> slotResponses = slots.stream()
-                .map(slot -> toSlotResponse(slot, timetable.getWeekStartDate()))
+                .map(slot -> toSlotResponse(slot, timetable.getWeekStartDate(), studentId))
                 .collect(Collectors.toList());
 
         return TimetableResponse.builder()
@@ -529,7 +529,7 @@ public class TimetableService {
         
         return timetables.stream().map(t -> {
             List<SlotResponse> slots = t.getSlots().stream()
-                    .map(slot -> toSlotResponse(slot, t.getWeekStartDate()))
+                    .map(slot -> toSlotResponse(slot, t.getWeekStartDate(), studentId))
                     .collect(Collectors.toList());
             
             return TimetableResponse.builder()
@@ -578,6 +578,17 @@ public class TimetableService {
         }
 
         boolean wasCompleted = Boolean.TRUE.equals(slot.getIsCompleted());
+
+        // Lock check: reject attempts to mark future slots as completed early
+        LocalDate slotDate = slot.getSlotDate();
+        if (slotDate == null && slot.getTimetable() != null && slot.getTimetable().getWeekStartDate() != null && slot.getDayOfWeek() != null) {
+            slotDate = slot.getTimetable().getWeekStartDate().plusDays(slot.getDayOfWeek());
+        }
+
+        if (!wasCompleted && slotDate != null && slotDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot complete a future study session scheduled for " + slotDate);
+        }
+
         slot.setIsCompleted(!wasCompleted);
         slot = timetableSlotRepository.save(slot);
 
@@ -634,6 +645,10 @@ public class TimetableService {
     }
 
     private SlotResponse toSlotResponse(TimetableSlot slot, LocalDate weekStartDate) {
+        return toSlotResponse(slot, weekStartDate, null);
+    }
+
+    private SlotResponse toSlotResponse(TimetableSlot slot, LocalDate weekStartDate, UUID explicitStudentId) {
         // Prefer the concrete persisted date (correct across multi-week/deadline plans); fall back to
         // the legacy weekStartDate + dayOfWeek derivation for rows created before slot_date existed.
         LocalDate slotDate = slot.getSlotDate();
@@ -671,9 +686,16 @@ public class TimetableService {
         }
 
         // Topic metadata from MaterialTopicReader
-        UUID studentId = (slot.getTimetable() != null && slot.getTimetable().getStudent() != null)
-                ? slot.getTimetable().getStudent().getId()
-                : (slot.getSubject() != null && slot.getSubject().getStudent() != null ? slot.getSubject().getStudent().getId() : null);
+        UUID studentId = explicitStudentId;
+        if (studentId == null) {
+            try {
+                if (slot.getTimetable() != null && slot.getTimetable().getStudent() != null) {
+                    studentId = slot.getTimetable().getStudent().getId();
+                } else if (slot.getSubject() != null && slot.getSubject().getStudent() != null) {
+                    studentId = slot.getSubject().getStudent().getId();
+                }
+            } catch (Exception ignored) {}
+        }
         UUID subjectId = slot.getSubject() != null ? slot.getSubject().getId() : null;
         String subjectName = slot.getSubject() != null ? slot.getSubject().getSubjectName() : null;
 

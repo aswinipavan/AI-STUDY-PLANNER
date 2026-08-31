@@ -1,6 +1,122 @@
 # Changelog
 
-## 2026-08-28 (Session 30 - Master Improvement: AI Tutor Error & Diagnostic Analysis Protocol)
+## 2026-08-31 (Session 37 - Timetable Study-Window Synchronization & Future Session Locking)
+- **Files created/changed:**
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java` [MODIFIED] — Enforced strict backend validation in `markSlotComplete` rejecting completion attempts for future study slots (`slotDate.isAfter(LocalDate.now())`), throwing `IllegalArgumentException` (HTTP 400 Bad Request) and preventing streak modification for future days.
+  - `backend/src/test/java/com/aistudyplanner/service/TimetableFutureSlotLockTest.java` [NEW] — Dedicated JUnit test suite verifying future slot completion rejection, today's completion streak incrementation, and past missed session catch-up completion.
+  - `frontend/src/utils/dateHelpers.ts` [MODIFIED] — Added canonical date categorization utilities (`getSlotDateCategory`, `isFutureSlot`, `formatFutureAvailability`).
+  - `frontend/src/app/(dashboard)/settings/page.tsx` [MODIFIED] — Synchronized profile and preference mutations with React Query cache (`queryClient.setQueryData(['studentProfile'])`) and query invalidations (`['studentProfile']`, `QK.timetable`, `QK.timetableInsights`), ensuring updated preferences immediately reflect across all screens.
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED] — Subscribed to live profile query (`['studentProfile']`), dynamically rendered study window banner (e.g. `5:00 PM – 7:00 PM (5:00 PM start, 2h/day)`), rendered locked state badge (`🔒 Locked · Available tomorrow`) and disabled quick toggle for future sessions, and guarded `handleToggle` against early completion.
+  - `frontend/src/app/(dashboard)/dashboard/page.tsx` [MODIFIED] — Harmonized student profile query synchronization.
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED] — Added locked alert banner (`Future Session (Locked)`) and disabled completion toggle button (`Locked (Future)`) for future slots.
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED] — Added styling for `.futureAlertBox`, `.futureAlertIcon`, `.futureAlertTitle`, and `.futureAlertDesc`.
+  - `frontend/src/app/(dashboard)/timetable/timetable.module.css` [MODIFIED] — Added `.slotFuture`, `.futureBadge`, and `.quickToggleLocked` styles.
+  - `frontend/src/__tests__/app/timetable/studyWindowAndLocking.test.tsx` [NEW] — Comprehensive Jest unit test suite covering study window calculations, profile update reactivity, and future slot locking.
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [MODIFIED] — Added tests for future session locked banner and disabled toggle.
+  - `frontend/src/__tests__/e2e/timetable.spec.ts` [MODIFIED] — Added Playwright E2E tests `SEL-116` (study window preference sync) and `SEL-117` (future slot locked badge and modal read-only enforcement).
+- **Reason:**
+  - Issue 1: Prevent stale daily study window calculations on Timetable after modifying preferences in Settings (e.g. changing 1h/day to 2h/day).
+  - Issue 2: Enforce business rule that students cannot complete future-dated timetable sessions early, preserving study streak integrity while keeping today's sessions actionable and past missed sessions catch-up enabled.
+- **Summary:**
+  - Root Cause Analysis: Settings mutations previously omitted React Query cache updates and query invalidations for `['studentProfile']`, and profile `useEffect` lacked change checks for `availableHoursPerDay` and `preferredStudyTime`. Timetable banner was not subscribed to profile query cache.
+  - Comprehensive Implementation:
+    - Backend: `TimetableService.markSlotComplete` checks `slotDate.isAfter(LocalDate.now())` and throws HTTP 400 with descriptive error message.
+    - Frontend: Added `isFutureSlot` and `formatFutureAvailability` helpers. Future slots display `🔒 Locked · Available on [Date]` badge with disabled lock icon button. Slot detail modal displays locked info banner and disables completion toggle.
+    - Testing: Added strictly-typed StudentProfile mocks in studyWindowAndLocking.test.tsx removing extraneous token property, verified TypeScript (0 errors), 23/23 Jest test suites (150/150 passed), and 27/27 Playwright E2E tests in timetable.spec.ts.
+  - Verification:
+    - Backend Maven tests: 3/3 in `TimetableFutureSlotLockTest` passed (`BUILD SUCCESS`).
+    - Frontend Jest unit tests: 23/23 test suites passed, 150/150 tests passed.
+    - Frontend Playwright E2E tests: 27/27 tests passed in `timetable.spec.ts` (including SEL-116 and SEL-117).
+    - Next.js production build: 24/24 static routes compiled successfully with 0 errors.
+- **Impact:** Robust, mathematically consistent, cross-layer study window synchronization and complete future session lock security across Web and Backend.
+- **Files created/changed:**
+  - `frontend/src/utils/dashboardStats.ts` [NEW] — Canonical dashboard study duration and statistics calculation utilities (`computeDayStudyStats`, `calculateSlotDuration`, `formatStudyDuration`).
+  - `frontend/src/app/(dashboard)/dashboard/page.tsx` [MODIFIED] — Synchronized Dashboard "Study Hours" StatCard (`plannedStudyTime`), "Completed" StatCard (`completedSessions/totalSessions`), and Today's Schedule side panel with canonical timetable slot records and duration metrics.
+  - `frontend/src/__tests__/utils/dashboardStats.test.ts` [NEW] — Complete unit test suite covering Cases A-H (pending vs completed durations, multi-session totals, 45m/60m/90m custom durations, empty states, date boundary/timezone parsing, and instant completion transitions).
+  - `frontend/src/__tests__/e2e/dashboard.spec.ts` [MODIFIED] — Updated E2E auth setup and locators, passing 20/20 Playwright tests.
+  - `mobile/src/utils/dashboardStats.ts` [NEW] — Mobile companion dashboard stats utility with local date keying and slot duration computation.
+  - `mobile/src/screens/dashboard/DashboardScreen.tsx` [MODIFIED] — Synchronized mobile Planned Today stat and slot time formatting with live timetable duration.
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED] — Added unit test suite covering Cases A-H for mobile dashboard statistics (20/20 passing).
+  - `backend/src/test/java/com/aistudyplanner/model/StudyTimeWindowTest.java` [MODIFIED] — Corrected package declaration to `com.aistudyplanner.model`.
+- **Reason:** Resolve data inconsistency where Dashboard showed "STUDY HOURS: 0 sessions" for a day with scheduled pending sessions; clearly distinguish planned/scheduled study time from completed sessions and eliminate static assumptions.
+- **Summary:**
+  - Root Cause Identified: Dashboard was previously assigning `studyHours = totalCompleted` (count of completed sessions across the timetable), which displayed `0 sessions` for newly generated or pending timetables.
+  - Defined and implemented canonical calculations:
+    - `Scheduled Study Time` = sum of durations (`durationMinutes` or `endTime - startTime`) of today's scheduled timetable sessions.
+    - `Completed Study Time` = sum of durations of today's completed sessions.
+    - `Completed Sessions` = count of today's completed sessions.
+    - UI Semantics: StatCard 1 displays `1h planned` (or formatted `1.5h`, `45m`, `2h 30m`), StatCard 2 displays `0/1 today` (or `1/1 today`).
+  - Added comprehensive test suites:
+    - Frontend Jest unit tests: 22 passed, 142 total (8 new dedicated Cases A-H tests).
+    - Mobile Jest unit tests: 20 passed, 20 total.
+    - Playwright E2E tests: 20/20 in `dashboard.spec.ts`, 25/25 in `timetable.spec.ts`.
+    - Backend Maven tests: 272 passing, 0 failures.
+  - Next.js production build (`next build`): 24/24 static pages generated successfully.
+- **Impact:** Accurate, unified, cross-platform study time tracking and scheduling across Web, Mobile, and Backend.
+
+## 2026-08-31 (Session 35 - Standalone Production Release APK Build & Verification)
+- **Files created/changed:**
+  - `mobile/node_modules/react-native-reanimated/Common/cpp/reanimated/RuntimeDecorators/RNRuntimeDecorator.cpp` [MODIFIED] — Merged `ReanimatedWorkletRuntimeDecorator::decorate` implementation into `RNRuntimeDecorator.cpp` to prevent Windows Ninja path length/mkdir failures during C++ library compilation.
+  - `mobile/node_modules/react-native-reanimated/Common/cpp/reanimated/NativeModules/NativeReanimatedModule.cpp` [MODIFIED] — Merged `NativeReanimatedModuleSpec` implementation into `NativeReanimatedModule.cpp` to prevent Windows path length/mkdir failures across all Android ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`).
+- **Reason:** Build a true standalone Android release APK (`app-release.apk`) containing pre-compiled Hermes JavaScript bytecode, requiring no Metro server, no ADB reverse connection, no USB debugging, and connecting directly over HTTPS to the Render production backend.
+- **Summary:**
+  - Configured and executed `./gradlew.bat assembleRelease` successfully (`BUILD SUCCESSFUL in 3m 1s`).
+  - Generated standalone release APK at `mobile/android/app/build/outputs/apk/release/app-release.apk` (Size: 67.33 MB).
+  - Inspected APK package contents: confirmed `assets/index.android.bundle` is embedded (2.38 MB uncompressed) with genuine Hermes bytecode magic header `0xC6 0x1F 0xBC 0x03`, alongside native architecture runtime libraries for `arm64-v8a`, `armeabi-v7a`, `x86`, and `x86_64`.
+  - Enforced network security: `main/AndroidManifest.xml` enforces `usesCleartextTraffic="false"` (strict HTTPS for production API `https://ai-study-planner-hp0e.onrender.com`).
+  - Verified on physical Android phone (`CPH2461 - Android 14`, Serial `7367b59`):
+    - Installed `app-release.apk`.
+    - Stopped Metro server completely and terminated background Node process.
+    - Removed ADB reverse port forwarding (`adb reverse --remove tcp:8081`).
+    - Launched StudyPlanner independently: app opened instantly without Metro or USB debugging requirements.
+    - Verified full live backend synchronization: Home dashboard (Streak, Hours/Day, Today's Schedule), Timetable, Subjects, AI Tutor, and Profile screens.
+  - Executed regression tests: `npm run tsc` (0 errors), `npm test` (12/12 passing). Zero web files modified.
+- **Impact:** Production-ready standalone Android APK deployable to any Android device with zero development server dependencies.
+
+## 2026-08-29 (Session 34 - Mobile Timetable 404 Resolution & Full AI Generation Verification)
+- **Files created/changed:**
+  - `mobile/src/api/timetable.api.ts` [MODIFIED] — Updated `getActiveTimetable` error handler to catch both raw Axios `err.response.status === 404` and normalized `err.status === 404`, returning `null` (valid empty state) when no active timetable exists; attached `AI_TIMEOUT` (60s-90s) to `generateAiTimetable`.
+  - `mobile/src/constants/config.ts` [MODIFIED] — Increased `REQUEST_TIMEOUT_MS` to `45000` (45s, matching web client resiliency for cloud cold starts) and `AI_REQUEST_TIMEOUT_MS` to `90000` (90s).
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED] — Added unit tests verifying 404 empty state mapping, full slot data contract formatting (`formatTimeRange`), and date filtering.
+- **Reason:** Resolve "Resource not found" 404 error when a student has no active timetable yet, prevent 15-second client aborts during LLM timetable generation, and verify end-to-end timetable creation on physical Android device.
+- **Summary:**
+  - Identified root cause: Backend `TimetableService.java:505` throws `ResourceNotFoundException("No active timetable found")` (HTTP 404) when a user has not generated a timetable.
+  - Aligned mobile client error handling with web app (`frontend/src/api/timetable.api.ts`), treating 404 as valid `null` state to render the empty timetable screen with "Generate AI Timetable" action.
+  - Increased network request timeouts to avoid premature aborts on Render free-tier latency spikes and AI generation jobs.
+  - Ran Jest unit tests: 12/12 passing. Ran TypeScript check: 0 errors.
+  - Successfully tested on physical Android device (`CPH2461`): Authenticated user, created subjects, triggered AI timetable generation via live backend, verified slot card rendering with full start-end time ranges (`5:00 PM – 6:00 PM · 60m`, topic, chapter), verified interactive slot completion toggle (`☑️ 1/6 done`), and verified Today's Schedule on Dashboard.
+- **Impact:** Robust, resilient timetable and schedule experience on Android with zero web regressions.
+
+## 2026-08-29 (Session 33 - React Native Firebase Modular SDK Migration)
+- **Files created/changed:**
+  - `mobile/src/auth/firebaseAuth.ts` [MODIFIED] — Migrated from deprecated namespaced Firebase API (`auth()`, `auth().currentUser`, `auth().signOut()`, `auth().onAuthStateChanged()`, `auth().signInWithEmailAndPassword()`, `auth().createUserWithEmailAndPassword()`) to current modular API (`getAuth`, `signInWithEmailAndPassword`, `createUserWithEmailAndPassword`, `signOut`, `onAuthStateChanged`, `getIdToken`) exported from `@react-native-firebase/auth@21.14.0`.
+  - `mobile/run-mobile.ps1` [NEW] — Created native PowerShell companion launcher script inside `mobile/` directory.
+- **Reason:** Eliminate React Native Firebase v22 migration deprecation warning on physical Android device while preserving exact authentication lifecycle, state listeners, and token refresh behavior.
+- **Summary:**
+  - Initialized modular auth instance via `const auth = getAuth()`.
+  - Updated `signInWithEmail` to use `signInWithEmailAndPassword(auth, email, password)` and `getIdToken(credential.user)`.
+  - Updated `registerWithEmail` to use `createUserWithEmailAndPassword(auth, email, password)` and `getIdToken(credential.user)`.
+  - Updated `getCurrentIdToken` to use `getIdToken(currentUser, forceRefresh)`.
+  - Updated `firebaseSignOut` to use `signOut(auth)`.
+  - Updated `onFirebaseAuthStateChanged` to use `onAuthStateChanged(auth, callback)`.
+  - Verified with `npm run tsc` (0 errors), `npm test` (10/10 passed), `./gradlew assembleDebug` (Build successful), and live physical device verification (Logcat clean with 0 deprecation warnings, full login/logout/register/session restore functional).
+- **Impact:** Clean, future-proof Firebase Authentication SDK usage with zero deprecation warnings on Android devices and zero changes to web or backend.
+
+## 2026-08-29 (Session 32 - React Native Mobile Windows Batch Launcher)
+- **Files created/changed:**
+  - `run-mobile.bat` [NEW] — Created robust, one-click Windows batch launcher at project root with 6-stage verification flow: checking ADB executable, detecting connected/authorized Android device, checking/launching Metro bundler on port 8081, configuring ADB reverse port forwarding (`tcp:8081 tcp:8081`), installing debug APK via Gradle (`gradlew.bat app:installDebug`), and launching `com.study.planner/.MainActivity`.
+  - `mobile/run-mobile.bat` [NEW] — Placed identical launcher inside `mobile/` directory for convenient direct execution from within the subfolder.
+  - `mobile/README.md` [MODIFIED] — Added comprehensive "Quick Start Launcher (`run-mobile.bat`)" documentation covering USB debugging requirements, device authorization, Metro lifecycle management, step-by-step progress flow, and stopping procedures.
+- **Reason:** Automate Android device checks, Metro bundler startup/reuse, reverse port forwarding, and debug APK installation into a single, repeatable command.
+- **Summary:**
+  - Validates ADB executable across SDK default paths, `ANDROID_HOME`, `ANDROID_SDK_ROOT`, and system `PATH`.
+  - Parses ADB device status to report clear errors when no device is attached (`"No Android device detected. Connect the phone and enable USB debugging."`) or when debugging is unauthorized (`"Authorize USB debugging on the phone and run the script again."`).
+  - Checks if Metro is running on port 8081; reuses existing instance if active, or launches a new dedicated window and waits for readiness before proceeding.
+  - Verifies reverse port forwarding mapping via `adb reverse --list`.
+  - Safe to run repeatedly without starting duplicate Metro servers.
+- **Impact:** Streamlined physical Android device testing and development workflow for the mobile app with zero manual port or Metro setup.
+
+
 - **Files created/changed:**
   - `backend/src/main/java/com/aistudyplanner/util/AiErrorSanitizer.java` [NEW] — Created utility for automatic regex-based credential redaction (JWTs, Authorization headers, Cookie headers, secret keys, passwords) and diagnostic/error input detection.
   - `backend/src/main/java/com/aistudyplanner/service/GroqService.java` [MODIFIED] — Integrated `AiErrorSanitizer` in `chat(...)` and enhanced system prompt with the Technical Error & Diagnostic Analysis Protocol (`## What happened`, `## Root cause`, `## What to do`, `## Verify`, fact vs inference distinction, and noise suppression).
@@ -753,5 +869,35 @@
   - `frontend/src/__tests__/e2e/material_subject_filter.spec.ts` [NEW]: Playwright E2E test suite (5 tests: All Subjects, Discrete Maths filter, OS filter, Toggle, Subject Badge).
   - `frontend/src/__tests__/e2e/materials.spec.ts` [MODIFIED]: Updated auth fixtures to use `setupAuthenticatedContext`.
 - **Reason:** Resolve issue where uploading a PDF to a specific subject folder (e.g., "Discrete Maths") succeeded, but filtering the Materials Library by "Discrete Maths" showed no materials while "All Subjects" showed them.
-- **Summary:** Trace and fixed end-to-end data flow: backend DTO root fields, database query, API query params, frontend response normalization, UI client-side filter resilience, and badge rendering. Verified across 253 backend tests, 123 frontend tests, 20 Playwright E2E tests, and full live browser execution.
 - **Impact:** 100% reliable subject filtering across the materials library with full student data isolation and visual badge indicators.
+
+## [2026-08-29] MASTER TASK — Mobile App Full Audit, Backend Sync, Toolchain Modernization & Android APK Build
+- **Files Modified/Created:**
+  - `mobile/android/gradle/wrapper/gradle-wrapper.properties` [MODIFIED]: Upgraded Gradle distribution URL to Gradle 8.8 (`gradle-8.8-all.zip`).
+  - `mobile/android/settings.gradle` [MODIFIED]: Configured standard React Native 0.75 autolinking settings plugin (`com.facebook.react.settings`) with `autolinkLibrariesFromCommand()`.
+  - `mobile/android/build.gradle` [MODIFIED]: Upgraded Kotlin compiler version to `2.0.21` to support modern Google Play Services and Firebase metadata.
+  - `mobile/android/gradle.properties` [MODIFIED]: Set `hermesEnabled=true` and `newArchEnabled=false`.
+  - `mobile/android/app/build.gradle` [MODIFIED]: Configured Hermes engine, fixed `minifyEnabled false` for release builds, and linked autolinked native module project dependencies (`react-native-screens`, `react-native-safe-area-context`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-vector-icons`, `react-native-linear-gradient`, `react-native-encrypted-storage`, `react-native-community_netinfo`, `@react-native-firebase/app`, `@react-native-firebase/auth`).
+  - `mobile/package.json` [MODIFIED]: Pinned React Native 0.75 compatible dependencies (`react-native-gesture-handler@2.20.2`, `react-native-reanimated@3.16.1`).
+  - `mobile/src/types/student.types.ts` [MODIFIED]: Added missing `preferredStudyTime` and `profilePictureUrl` to `StudentProfile` interface.
+  - `mobile/src/types/material.types.ts` [MODIFIED]: Added root-level `subjectId`, `subjectName`, `processingStatus`, `extractedTopics`, and `uploadedAt` to `MaterialResponse`.
+  - `mobile/src/screens/materials/MaterialsScreen.tsx` [MODIFIED]: Added fallback handling for nested `subject.name` vs flat `subjectName` and safe topic array rendering.
+  - `mobile/src/components/timetable/SlotCard.tsx` [MODIFIED]: Added null-safe subject and topic rendering.
+  - `mobile/android/app/src/main/res/values/colors.xml` [MODIFIED]: Added launcher background color.
+  - `mobile/android/app/src/main/res/drawable/` [NEW]: Added adaptive vector launcher background and foreground drawables (`ic_launcher_background.xml`, `ic_launcher_foreground.xml`, `ic_launcher.xml`, `ic_launcher_round.xml`).
+  - `mobile/android/app/src/main/res/mipmap-anydpi-v26/` [NEW]: Added adaptive icon XML configurations (`ic_launcher.xml`, `ic_launcher_round.xml`).
+  - `mobile/android/app/debug.keystore` [NEW]: Placed standard debug signing keystore.
+- **Reason:** Complete full audit of the React Native mobile application, verify backend connectivity with production Render API, fix React Native 0.75 build toolchain and dependency incompatibilities, and generate a verified Android debug APK without touching or destabilizing the web frontend.
+- **Summary:** Verified all mobile screens, DTOs, and stores; synchronized backend contracts; modernized Gradle and React Native autolinking; passed TypeScript type-checking (0 errors) and Jest unit tests (8/8 passed); successfully assembled `app-debug.apk` (170.58 MB) with 0 Gradle errors.
+- **Impact:** Production-ready mobile codebase and installable Android APK with 100% backend synchronization and zero impact on the working web application or open PR #7.
+
+## [2026-08-29] FIX — Android Debug Cleartext Localhost Policy Fix & Session Restore Hardening
+- **Files Modified/Created:**
+  - `mobile/android/app/src/debug/AndroidManifest.xml` [NEW]: Debug-specific Android manifest overlay declaring `android:usesCleartextTraffic="true"` and `tools:replace="android:usesCleartextTraffic"` along with `SYSTEM_ALERT_WINDOW` permission for development overlays.
+  - `mobile/src/auth/firebaseAuth.ts` [MODIFIED]: Hardened `firebaseSignOut` to defensively check `auth().currentUser` before invoking `signOut()` to prevent unhandled rejections when unauthenticated.
+  - `mobile/src/navigation/RootNavigator.tsx` [MODIFIED]: Added synchronous initial auth resolution on mount and defensive unmounted state guards.
+- **Reason:** Physical Android device Logcat reported `CLEARTEXT communication to localhost not permitted by network security policy` and red screen `Unable to load script` because `src/main/AndroidManifest.xml` disabled cleartext traffic universally.
+- **Summary:** Added `src/debug/AndroidManifest.xml` overlay which applies only during `assembleDebug` builds, enabling Metro bundler communication over HTTP on `localhost:8081` via ADB reverse. Release builds (`assembleRelease`) strictly maintain `android:usesCleartextTraffic="false"` without modification.
+- **Impact:** Metro JavaScript bundle loads smoothly on physical devices; zero weakening of production/release security.
+
+

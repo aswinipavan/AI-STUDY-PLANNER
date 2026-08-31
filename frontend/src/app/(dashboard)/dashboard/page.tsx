@@ -11,13 +11,33 @@ import { useExams } from '@/hooks/useExams';
 import { usePriority } from '@/hooks/usePerformance';
 import { useQuery } from '@tanstack/react-query';
 import { timetableApi } from '@/api/timetable.api';
+import { authApi } from '@/api/auth.api';
 import { QK } from '@/constants/queryKeys';
 import { dayKey, slotDayKey, mondayBasedIndex } from '@/utils/dateHelpers';
+import { computeDayStudyStats, calculateSlotDuration } from '@/utils/dashboardStats';
 import {
   Sparkles, Clock, CheckCircle2, CalendarDays, ArrowRight,
   BookOpen, Brain, Zap, Target, TrendingUp, MessageSquare, LucideIcon
 } from 'lucide-react';
 import styles from './dashboard.module.css';
+
+function formatSlotTimeRange(startTime?: string, endTime?: string): string {
+  if (!startTime) return 'Scheduled';
+  if (!endTime) {
+    try {
+      return new Date(`1970-01-01T${startTime}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    } catch {
+      return startTime;
+    }
+  }
+  try {
+    const startStr = new Date(`1970-01-01T${startTime}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    const endStr = new Date(`1970-01-01T${endTime}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    return `${startStr} – ${endStr}`;
+  } catch {
+    return `${startTime} – ${endTime}`;
+  }
+}
 
 // ── clean-code: Small, focused components with descriptive names ──────────────
 
@@ -77,7 +97,13 @@ function AiActionButton({ icon: Icon, label, description, href }: AiActionButton
 // ── Main Dashboard Page ──────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const user = useAuthStore((s) => s.user);
+  const storeUser = useAuthStore((s) => s.user);
+  const { data: fetchedProfile } = useQuery({
+    queryKey: ['studentProfile'],
+    queryFn: () => authApi.getMe(),
+    staleTime: 1000 * 30,
+  });
+  const user = fetchedProfile || storeUser;
   const firstName = user?.name?.split(' ')[0] || 'Student';
   const currentHour = new Date().getHours();
 
@@ -92,35 +118,24 @@ export default function DashboardPage() {
     queryFn: timetableApi.getActive,
   });
 
-  // Compute real stats from API data
+  // Compute real stats from canonical timetable data
   const examsCount = exams?.length ?? 0;
-
-  /**
-   * "Today" means today's *calendar date*, not merely today's weekday. Matching on
-   * the weekday label pulled in every same-weekday session from the other weeks of
-   * a multi-week plan, so the panel listed sessions the student has no reason to do
-   * today and `completedToday` counted them too. Only a slot with no date at all
-   * falls back to its weekday index.
-   */
   const today = new Date();
-  const todayIso = dayKey(today);
-  const todayIndex = mondayBasedIndex(today);
-  const todaySlots = timetable?.slots?.filter((s) => {
-    const iso = slotDayKey(s.date);
-    return iso ? iso === todayIso : s.dayOfWeek === todayIndex;
-  }) ?? [];
-  const completedToday = todaySlots.filter((s) => s.status === 'completed').length;
+  const stats = computeDayStudyStats(timetable?.slots, today);
+  const {
+    todaySlots,
+    completedSessions: completedToday,
+    totalSessions: totalToday,
+    plannedStudyTime,
+  } = stats;
 
-  // Total completed slots across entire timetable
-  const totalCompleted = timetable?.slots?.filter((s) => s.status === 'completed').length ?? 0;
-
-  // Study hours: each slot assumed 1 hour
-  const studyHours = totalCompleted;
+  // Total completed slots across entire timetable for milestone progression
+  const totalCompletedSessions = timetable?.slots?.filter((s) => s.status === 'completed' || s.isCompleted === true).length ?? 0;
 
   // Subtitle: show real data or a setup prompt
-  const hasData = examsCount > 0 || timetable?.slots?.length;
+  const hasData = examsCount > 0 || (timetable?.slots && timetable.slots.length > 0);
   const dashboardSubtitle = hasData
-    ? `You have ${examsCount > 0 ? `${examsCount} upcoming exam${examsCount !== 1 ? 's' : ''}` : 'no upcoming exams'} and ${completedToday} session${completedToday !== 1 ? 's' : ''} completed today. Keep it up!`
+    ? `You have ${examsCount > 0 ? `${examsCount} upcoming exam${examsCount !== 1 ? 's' : ''}` : 'no upcoming exams'} and ${completedToday} of ${totalToday} session${totalToday !== 1 ? 's' : ''} completed today. Keep it up!`
     : 'Start by adding your subjects and exams, then generate an AI timetable to begin your study journey.';
 
   const aiActions: AiActionButtonProps[] = [
@@ -163,15 +178,15 @@ export default function DashboardPage() {
           <section aria-label="Study statistics" className={styles.statsRow}>
             <StatCard
               label="Study Hours"
-              value={String(studyHours)}
-              unit="sessions"
+              value={plannedStudyTime.value}
+              unit={plannedStudyTime.unit}
               icon={Clock}
               loading={loadingTimetable}
             />
             <StatCard
               label="Completed"
               value={String(completedToday)}
-              unit="today"
+              unit={totalToday > 0 ? `/${totalToday} today` : 'today'}
               icon={CheckCircle2}
               loading={loadingTimetable}
             />
@@ -205,19 +220,19 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className={styles.badgesGrid}>
-              <div className={`${styles.badgeCard} ${studyHours >= 10 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+              <div className={`${styles.badgeCard} ${totalCompletedSessions >= 10 ? styles.badgeUnlocked : styles.badgeLocked}`}>
                 <div className={styles.badgeIconBox}>⏳</div>
                 <div className={styles.badgeInfo}>
                   <p className={styles.badgeTitle}>10h Explorer</p>
-                  <p className={styles.badgeCriteria}>{studyHours >= 10 ? 'Unlocked • Great Start!' : `${studyHours}/10 sessions`}</p>
+                  <p className={styles.badgeCriteria}>{totalCompletedSessions >= 10 ? 'Unlocked • Great Start!' : `${totalCompletedSessions}/10 sessions`}</p>
                 </div>
               </div>
 
-              <div className={`${styles.badgeCard} ${studyHours >= 50 ? styles.badgeUnlocked : styles.badgeLocked}`}>
+              <div className={`${styles.badgeCard} ${totalCompletedSessions >= 50 ? styles.badgeUnlocked : styles.badgeLocked}`}>
                 <div className={styles.badgeIconBox}>🎓</div>
                 <div className={styles.badgeInfo}>
                   <p className={styles.badgeTitle}>50h Master</p>
-                  <p className={styles.badgeCriteria}>{studyHours >= 50 ? 'Unlocked • Elite Scholar' : `${studyHours}/50 sessions`}</p>
+                  <p className={styles.badgeCriteria}>{totalCompletedSessions >= 50 ? 'Unlocked • Elite Scholar' : `${totalCompletedSessions}/50 sessions`}</p>
                 </div>
               </div>
 
@@ -271,25 +286,30 @@ export default function DashboardPage() {
             </div>
           ) : todaySlots.length > 0 ? (
             <div className={styles.recList}>
-              {todaySlots.map((slot) => (
-                <div key={slot.id} className={styles.recItem}>
-                  <CheckCircle2
-                    size={16}
-                    style={{ color: slot.status === 'completed' ? '#34d399' : '#555' }}
-                  />
-                  <div>
-                    <p className={styles.recItemTitle}>{slot.subject?.name || 'Study Session'}</p>
-                    {slot.topic && (
-                      <p className={styles.recItemTopic} title={slot.topic}>{slot.topic}</p>
-                    )}
-                    <p className={styles.recItemTopic}>
-                      {new Date(`1970-01-01T${slot.startTime}`).toLocaleTimeString([], {
-                        hour: '2-digit', minute: '2-digit',
-                      })} · {slot.status}
-                    </p>
+              {todaySlots.map((slot) => {
+                const isCompleted = slot.status === 'completed' || slot.isCompleted === true;
+                const subjectName = typeof slot.subject === 'string'
+                  ? slot.subject
+                  : slot.subject?.name || (slot.subject as { name?: string; subjectName?: string } | undefined)?.subjectName || slot.subjectName || 'Study Session';
+                const durationMins = calculateSlotDuration(slot);
+                return (
+                  <div key={slot.id} className={styles.recItem}>
+                    <CheckCircle2
+                      size={16}
+                      style={{ color: isCompleted ? '#34d399' : '#555' }}
+                    />
+                    <div>
+                      <p className={styles.recItemTitle}>{subjectName}</p>
+                      {slot.topic && (
+                        <p className={styles.recItemTopic} title={slot.topic}>{slot.topic}</p>
+                      )}
+                      <p className={styles.recItemTopic}>
+                        {formatSlotTimeRange(slot.startTime, slot.endTime)} · {durationMins}m · {isCompleted ? 'completed' : 'pending'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className={styles.emptyState}>

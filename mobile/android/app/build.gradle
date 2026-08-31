@@ -3,6 +3,8 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
 
+project.ext.set("hermesEnabled", true)
+
 react {
     /* Autolinking & codegen settings */
 }
@@ -36,7 +38,7 @@ android {
         }
         release {
             signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
@@ -47,10 +49,22 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:hermes-android")
     
+    // Autolinked Native Modules
+    implementation project(":react-native-community_netinfo")
+    implementation project(":react-native-firebase_app")
+    implementation project(":react-native-firebase_auth")
+    implementation project(":react-native-encrypted-storage")
+    implementation project(":react-native-gesture-handler")
+    implementation project(":react-native-linear-gradient")
+    implementation project(":react-native-reanimated")
+    implementation project(":react-native-safe-area-context")
+    implementation project(":react-native-screens")
+    implementation project(":react-native-vector-icons")
+
     // Firebase BOM — manages all firebase versions together
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+

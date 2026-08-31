@@ -1,10 +1,20 @@
-import auth from '@react-native-firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  getIdToken,
+  FirebaseAuthTypes,
+} from '@react-native-firebase/auth';
 
 /**
  * Firebase Auth helpers for the mobile app.
- * Uses @react-native-firebase/auth (native SDK, not the web Firebase SDK).
+ * Uses @react-native-firebase/auth modular SDK.
  * The Firebase project is: study-planner-ec1d2
  */
+
+const auth = getAuth();
 
 /**
  * Sign in with email and password.
@@ -14,8 +24,8 @@ export async function signInWithEmail(
   email: string,
   password: string,
 ): Promise<string> {
-  const credential = await auth().signInWithEmailAndPassword(email, password);
-  const idToken = await credential.user.getIdToken();
+  const credential = await signInWithEmailAndPassword(auth, email, password);
+  const idToken = await getIdToken(credential.user);
   return idToken;
 }
 
@@ -27,11 +37,12 @@ export async function registerWithEmail(
   email: string,
   password: string,
 ): Promise<string> {
-  const credential = await auth().createUserWithEmailAndPassword(
+  const credential = await createUserWithEmailAndPassword(
+    auth,
     email,
     password,
   );
-  const idToken = await credential.user.getIdToken();
+  const idToken = await getIdToken(credential.user);
   return idToken;
 }
 
@@ -43,22 +54,25 @@ export async function registerWithEmail(
 export async function getCurrentIdToken(
   forceRefresh = false,
 ): Promise<string | null> {
-  const currentUser = auth().currentUser;
+  const currentUser = auth.currentUser;
   if (!currentUser) {
     return null;
   }
   try {
-    return await currentUser.getIdToken(forceRefresh);
+    return await getIdToken(currentUser, forceRefresh);
   } catch {
     return null;
   }
 }
 
-/**
- * Sign out the current Firebase user.
- */
 export async function firebaseSignOut(): Promise<void> {
-  await auth().signOut();
+  try {
+    if (auth.currentUser) {
+      await signOut(auth);
+    }
+  } catch {
+    // Silently ignore if already signed out
+  }
 }
 
 /**
@@ -66,14 +80,14 @@ export async function firebaseSignOut(): Promise<void> {
  * Returns an unsubscribe function.
  */
 export function onFirebaseAuthStateChanged(
-  callback: (user: import('@react-native-firebase/auth').FirebaseAuthTypes.User | null) => void,
+  callback: (user: FirebaseAuthTypes.User | null) => void,
 ): () => void {
-  return auth().onAuthStateChanged(callback);
+  return onAuthStateChanged(auth, callback);
 }
 
 /**
  * Get current Firebase user (synchronous).
  */
-export function getCurrentFirebaseUser() {
-  return auth().currentUser;
+export function getCurrentFirebaseUser(): FirebaseAuthTypes.User | null {
+  return auth.currentUser;
 }

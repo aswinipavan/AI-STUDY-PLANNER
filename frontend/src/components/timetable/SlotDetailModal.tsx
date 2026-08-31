@@ -12,9 +12,10 @@ import {
   Layers,
   Sparkles,
   Zap,
+  Lock,
 } from 'lucide-react';
 import { TimetableSlot } from '@/types/api.types';
-import { parseSlotDate } from '@/utils/dateHelpers';
+import { parseSlotDate, isFutureSlot } from '@/utils/dateHelpers';
 import { AppButton } from '@/components/ui/AppButton';
 import styles from './slotDetailModal.module.css';
 
@@ -79,6 +80,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
   const isCompleted = slot.status === 'completed';
   const isMissed = slot.status === 'missed';
   const isCatchUp = Boolean(slot.isCatchUp);
+  const isFuture = isFutureSlot(slot.date);
 
   const duration = slot.durationMinutes || 60;
   const whatToStudy = slot.whatToStudy && slot.whatToStudy.length > 0
@@ -90,6 +92,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
       ];
 
   const handleToggle = () => {
+    if (isFuture) return;
     const next = isCompleted ? 'pending' : 'completed';
     onToggleStatus(slot.id, next);
   };
@@ -100,7 +103,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="slot-modal-title"
+      aria-labelledby="modal-slot-title"
       data-testid="slot-detail-modal"
     >
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
@@ -111,7 +114,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
               <BookOpen size={13} aria-hidden="true" />
               {subjectName}
             </span>
-            <h2 id="slot-modal-title" className={styles.dateTitle}>
+            <h2 id="modal-slot-title" className={styles.dateTitle}>
               {formatFullDate(slot.date)}
             </h2>
           </div>
@@ -127,6 +130,19 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
 
         {/* Body */}
         <div className={styles.modalBody}>
+          {/* Future Locked Alert Banner */}
+          {isFuture && (
+            <div className={styles.futureAlertBox} data-testid="modal-future-locked-banner">
+              <Lock size={15} className={styles.futureAlertIcon} />
+              <div>
+                <p className={styles.futureAlertTitle}>Future Session (Locked)</p>
+                <p className={styles.futureAlertDesc}>
+                  This session is scheduled for {formatFullDate(slot.date)}. It will become available to complete on that day.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Time and Status Banner */}
           <div className={styles.timeBanner}>
             <div className={styles.timeBlock}>
@@ -240,14 +256,25 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
           <AppButton variant="outline" onClick={onClose} data-testid="modal-close-btn">
             Close
           </AppButton>
-          <AppButton
-            variant={isCompleted ? 'outline' : 'primary'}
-            leftIcon={isCompleted ? <Clock size={16} /> : <CheckCircle2 size={16} />}
-            onClick={handleToggle}
-            data-testid="modal-toggle-status-btn"
-          >
-            {isCompleted ? 'Mark Incomplete' : 'Mark Complete'}
-          </AppButton>
+          {isFuture ? (
+            <AppButton
+              variant="outline"
+              leftIcon={<Lock size={16} />}
+              disabled={true}
+              data-testid="modal-toggle-status-btn"
+            >
+              Locked (Future)
+            </AppButton>
+          ) : (
+            <AppButton
+              variant={isCompleted ? 'outline' : 'primary'}
+              leftIcon={isCompleted ? <Clock size={16} /> : <CheckCircle2 size={16} />}
+              onClick={handleToggle}
+              data-testid="modal-toggle-status-btn"
+            >
+              {isCompleted ? 'Mark Incomplete' : 'Mark Complete'}
+            </AppButton>
+          )}
         </div>
       </div>
     </div>

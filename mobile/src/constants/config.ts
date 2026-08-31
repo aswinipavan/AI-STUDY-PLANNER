@@ -13,19 +13,16 @@
 export const CONFIG = {
   BACKEND_URL: 'https://ai-study-planner-hp0e.onrender.com',
 
-  /** Axios timeout for standard requests */
-  REQUEST_TIMEOUT_MS: 15000,
+  /** Axios timeout for standard requests (matches web client 45s) */
+  REQUEST_TIMEOUT_MS: 45000,
 
   /**
    * Longer timeout for the endpoints that generate text with an LLM.
    *
    * The backend tries AgentRouter (22s read ceiling) and, if it fails, falls back
-   * to Groq (30s read ceiling plus one 2.5s retry on a 429). That worst case is
-   * 54.5s, so this must stay above it: a client that gives up sooner would abandon
-   * a request the fallback was about to answer, which looks to the student like the
-   * AI is broken. Raise this first if the backend ceilings are ever raised.
+   * to Groq (30s read ceiling plus one 2.5s retry on a 429).
    */
-  AI_REQUEST_TIMEOUT_MS: 60000,
+  AI_REQUEST_TIMEOUT_MS: 90000,
 
   /** React Query stale times */
   STALE_TIME: {

@@ -1,6 +1,21 @@
 # Tasks
 
 ## Completed
+- [2026-08-31] Fixed Timetable Study-Window Synchronization & Enforced Future Session Locking across Web and Backend:
+  - **Issue 1 (Stale Daily Study Window):** Fixed Settings profile/preference mutations to update React Query cache (`queryClient.setQueryData(['studentProfile'])`) and invalidate related queries (`['studentProfile']`, `QK.timetable`, `QK.timetableInsights`). Updated Timetable page to subscribe to live profile query data, dynamically rendering the exact study period calculated via canonical `calcStudyPeriod` (e.g. `5:00 PM – 7:00 PM (5:00 PM start, 2h/day)`).
+  - **Issue 2 (Future Session Locking):** Implemented client-side date categorization (`getSlotDateCategory`, `isFutureSlot`, `formatFutureAvailability`). Future-dated slots display locked indicators (`🔒 Locked · Available on [Date]`), have disabled quick-toggle buttons with lock icons, and open `SlotDetailModal` in locked read-only mode with an informative notice.
+  - **Backend Security & Streak Integrity:** `TimetableService.markSlotComplete` checks `slotDate.isAfter(LocalDate.now())` and rejects early completion attempts with HTTP 400 Bad Request (`IllegalArgumentException`), preventing streak manipulation while keeping today's sessions actionable and past missed sessions catch-up enabled.
+  - **Comprehensive Verification:** Added backend JUnit tests (`TimetableFutureSlotLockTest`, 3/3 passed), frontend Jest unit tests (`studyWindowAndLocking.test.tsx` and `slotDetailModal.test.tsx`, 150/150 passed), Playwright E2E tests (`timetable.spec.ts` with `SEL-116` and `SEL-117`, 27/27 passed), and Next.js production build (`next build` with 24/24 static routes generated with 0 errors).
+- [2026-08-31] Synchronized Dashboard "Study Hours" and completed sessions with canonical Timetable session data on both Web and Mobile platforms:
+  - Fixed root cause where `studyHours` was assigned to `totalCompleted`, showing 0 sessions when sessions were pending.
+  - Implemented `computeDayStudyStats` and duration calculation utilities (`calculateSlotDuration`, `formatStudyDuration`) supporting variable durations (45m, 60m, 90m, midnight crossover), local date matching (`YYYY-MM-DD`), and proper semantic presentation (`1h planned`, `0/1 today`).
+  - Added dedicated unit tests covering Cases A through H with 100% pass rate in `frontend/src/__tests__/utils/dashboardStats.test.ts` (8/8) and `mobile/src/__tests__/mobileApp.test.ts` (20/20).
+  - Verified Playwright E2E suites (`dashboard.spec.ts` 20/20, `timetable.spec.ts` 25/25), backend JUnit tests (272/272 passing), and Next.js production build (`next build` with 24/24 static routes).
+- [2026-08-31] Built standalone production release APK (`app-release.apk`, 67.33 MB) with pre-bundled Hermes JavaScript bytecode (`assets/index.android.bundle`), zero Metro/ADB dependencies, strict HTTPS network security (`usesCleartextTraffic="false"`), and verified live physical device launch (`CPH2461`).
+- [2026-08-29] Resolved Mobile Timetable 404 "Resource not found" issue and validated end-to-end AI timetable generation on physical Android device (`CPH2461`): mapped backend 404 to empty state `null`, increased timeouts to 45s (standard) and 90s (AI generation), updated Jest unit tests (12/12 passing), created subjects, generated timetable via live Groq AI backend (201 Created), rendered full slot cards with start-end time ranges (`5:00 PM – 6:00 PM · 60m`) and topic/chapter badges, verified slot completion toggle (`☑️ 1/6 done`), and verified Dashboard "Today's Schedule".
+- [2026-08-29] Migrated React Native Mobile Firebase Auth from deprecated namespaced API to modular SDK API (`@react-native-firebase/auth@21.14.0`: `getAuth`, `signInWithEmailAndPassword`, `createUserWithEmailAndPassword`, `signOut`, `onAuthStateChanged`, `getIdToken`). Verified with TypeScript (0 errors), Jest (10/10 passed), Gradle assembleDebug (Success), and live physical device testing with clean Logcat (0 deprecation warnings).
+- [2026-08-29] Built robust Windows batch launcher `run-mobile.bat` (and `mobile/run-mobile.bat`) automating ADB discovery, Android device connection & USB authorization checks, Metro bundler reuse & start on port 8081, ADB reverse port forwarding, Gradle debug APK build/install, and app launch (`com.study.planner`). Added launcher guide in `mobile/README.md`.
+- [2026-08-29] Fixed Mobile Timetable 404 empty state mapping and safe exam unboxing in `StudentMapper.java` / `ExamService.java` preventing backend 500 errors.
 - [2026-07-22] Bootstrap Maven wrapper for Backend.
 - [2026-07-22] Fix logging conflict (`spring-jcl`).
 - [2026-07-22] Update Supabase DB credentials and connect successfully.
@@ -99,6 +114,18 @@
   - **Fact vs. Inference Protocol:** Enforced strict distinction between confirmed facts and diagnostic hypotheses.
   - **Comprehensive Test Suite:** Added `AiErrorAnalysisTest.java` verifying 9 test scenarios (HTTP 400, stack traces, CI logs, JSON API errors, OCR text, redactions, inferences, noise suppression, utility unit tests). All 31 backend AI tests passing.
   - **Pull Request Created:** Opened PR [#7](https://github.com/aswinipavan/AI-STUDY-PLANNER/pull/7) from `feat/master-ai-tutor-and-timetable-overhaul` into `main` for user review.
+- [2026-08-29] MASTER TASK — MOBILE APP FULL AUDIT + BACKEND SYNC + APK BUILD (100% COMPLETED & VERIFIED):
+  - **Comprehensive Codebase & API Contract Audit:** Audited all mobile screens (`DashboardScreen`, `TimetableScreen`, `MaterialsScreen`, `AIChatScreen`, `ProfileScreen`), navigation, Zustand auth store, React Query hooks, and types.
+  - **DTO & Backend Contract Synchronization:** Synced `MaterialResponse` (`subjectId`, `subjectName`, `processingStatus`, `extractedTopics`, etc.) and `StudentProfile` (`preferredStudyTime`, `profilePictureUrl`) with backend. Fixed null-safety and nested/flat fallback handling in `MaterialsScreen` and `SlotCard`.
+  - **Toolchain & Native Build Modernization:** Upgraded Gradle wrapper to Gradle 8.8, configured React Native 0.75 autolinking settings plugin (`com.facebook.react.settings`), upgraded Kotlin compiler to 2.0.21, pinned Hermes engine, pinned stable React Native 0.75 dependencies (`react-native-gesture-handler@2.20.2`, `react-native-reanimated@3.16.1`), generated adaptive vector launcher icon assets, and placed standard debug keystore.
+  - **Zero Web Code Impact:** Completely untouched web frontend (`frontend/`), web tests, Next.js configs, and PR #7.
+  - **Quality & Build Verification:** Ran TypeScript type-check (`npm run tsc` — 0 errors), Jest unit tests (`npm test` — 8/8 passed), and assembled production-ready Android Debug APK (`app-debug.apk`, 170.58 MB) with exit code 0.
+- [2026-08-29] FIX — ANDROID DEBUG CLEARTEXT LOCALHOST METRO CONNECTIVITY (100% COMPLETED & VERIFIED):
+  - **Identified Root Cause:** `android:usesCleartextTraffic="false"` in `src/main/AndroidManifest.xml` blocked Android 9+ devices from fetching the Metro JavaScript bundle from `http://localhost:8081` over cleartext HTTP, causing Logcat error `CLEARTEXT communication to localhost not permitted by network security policy` and the red screen `Unable to load script`.
+  - **Debug Manifest Overlay (`src/debug/AndroidManifest.xml`):** Added a debug-specific manifest overlay with `android:usesCleartextTraffic="true"` and `tools:replace="android:usesCleartextTraffic"`.
+  - **Zero Release Impact:** Gradle applies the debug manifest overlay solely during `debug` compilation (`assembleDebug`). The `release` build variant strictly retains `android:usesCleartextTraffic="false"` in `src/main/AndroidManifest.xml`.
+  - **Defensive Session Restore & Safe Signout:** Hardened `firebaseSignOut` in `firebaseAuth.ts` and `RootNavigator.tsx` with safe unmounted checks and synchronous initial auth resolution.
+  - **Device Verification:** Installed APK onto connected physical Android phone (`CPH2461`), verified ADB reverse (`tcp:8081`), launched `MainActivity`, and confirmed Metro bundle loaded with 0 errors and clean rendered UI.
 
 ## In Progress
 - (none)

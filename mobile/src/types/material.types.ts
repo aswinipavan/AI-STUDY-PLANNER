@@ -11,6 +11,8 @@ export type MaterialType =
 
 export interface MaterialResponse {
   id: string;
+  subjectId?: string;
+  subjectName?: string;
   subject?: SubjectResponse;
   title: string;
   fileName?: string;
@@ -20,6 +22,13 @@ export interface MaterialResponse {
   fileSizeBytes?: number;
   aiSummary?: string;
   aiCategorizedSubject?: string;
+  processingStatus?: string;
+  extractedTopics?: string;
+  extractedChapters?: string;
+  extractedKeywords?: string;
+  overallDifficulty?: string;
+  difficultyScore?: number;
+  difficultyReason?: string;
   uploadedAt: string;
 }
 

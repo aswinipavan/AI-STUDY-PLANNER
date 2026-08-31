@@ -2,6 +2,7 @@ package com.aistudyplanner.service;
 
 import com.aistudyplanner.model.dto.response.StudentResponse;
 import com.aistudyplanner.model.dto.response.SubjectResponse;
+import com.aistudyplanner.model.entity.Exam;
 import com.aistudyplanner.model.entity.Student;
 import com.aistudyplanner.model.entity.Subject;
 
@@ -39,18 +40,22 @@ public class StudentMapper {
         LocalDate nextExamDate = null;
         Long daysUntilExam = null;
         
-        if (subject.getExams() != null && !subject.getExams().isEmpty()) {
-            // Find the nearest upcoming exam for this subject
-            nextExamDate = subject.getExams().stream()
-                    .filter(exam -> exam.getExamDate() != null && !exam.getIsCompleted())
-                    .map(exam -> exam.getExamDate())
-                    .min(LocalDate::compareTo)
-                    .orElse(null);
-            
-            if (nextExamDate != null) {
-                daysUntilExam = ChronoUnit.DAYS.between(LocalDate.now(), nextExamDate);
-                if (daysUntilExam < 0) daysUntilExam = 0L;
+        try {
+            if (subject.getExams() != null && !subject.getExams().isEmpty()) {
+                // Find the nearest upcoming exam for this subject
+                nextExamDate = subject.getExams().stream()
+                        .filter(exam -> exam != null && exam.getExamDate() != null && !Boolean.TRUE.equals(exam.getIsCompleted()))
+                        .map(Exam::getExamDate)
+                        .min(LocalDate::compareTo)
+                        .orElse(null);
+                
+                if (nextExamDate != null) {
+                    daysUntilExam = ChronoUnit.DAYS.between(LocalDate.now(), nextExamDate);
+                    if (daysUntilExam < 0) daysUntilExam = 0L;
+                }
             }
+        } catch (Exception ignored) {
+            // Defensive: if lazy collection cannot be initialized outside open session
         }
         
         return SubjectResponse.builder()

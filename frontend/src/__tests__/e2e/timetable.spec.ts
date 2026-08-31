@@ -172,9 +172,9 @@ test.describe('Timetable Section', () => {
 
   test('SEL-095: Generator Step 2: Available study hours range checks (1-24 bounds)', async ({ page }) => {
     await page.goto('/timetable/generate');
-    // Verify generator page loads and has form controls
-    const formElements = page.locator('input, button, select');
-    const count = await formElements.count();
+    // Verify generator page loads and has interactive form controls
+    await expect(page.locator('body')).toContainText(/Generate AI Timetable|Select Subjects/i, { timeout: 10000 });
+    const count = await page.locator('button, input, [role="button"]').count();
     expect(count).toBeGreaterThan(0);
   });
 
@@ -393,6 +393,108 @@ test.describe('Timetable Section', () => {
       const toast = page.locator('text=error, text=failed, text=unable');
       expect(toast).toBeDefined();
     }
+  });
+
+  test('SEL-116: Daily study window dynamically synchronizes with saved student preferences (1h -> 2h)', async ({ page }) => {
+    await page.goto('/timetable');
+    await expect(page.getByTestId('study-window-banner')).toBeVisible();
+    await expect(page.getByTestId('study-window-range')).toContainText('5:00 PM – 7:00 PM');
+    await expect(page.getByTestId('study-window-meta')).toContainText('5:00 PM start, 2h/day');
+
+    // Update settings via profile API route
+    await page.route('**/api/students/me', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          message: 'OK',
+          data: {
+            ...mockStudent,
+            preferredStudyTime: 'EVENING',
+            availableHoursPerDay: 3,
+          },
+        }),
+      });
+    });
+
+    await page.reload();
+    await expect(page.getByTestId('study-window-range')).toContainText('5:00 PM – 8:00 PM');
+    await expect(page.getByTestId('study-window-meta')).toContainText('5:00 PM start, 3h/day');
+  });
+
+  test('SEL-117: Future timetable sessions display locked badge, disabled quick toggle, and locked modal', async ({ page }) => {
+    const tmrw = new Date();
+    tmrw.setDate(tmrw.getDate() + 1);
+    const tmrwStr = tmrw.toISOString().split('T')[0];
+
+    await page.route('**/api/timetable/active', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          message: 'OK',
+          data: {
+            id: 'tt-future-test',
+            weekStartDate: todayStr,
+            isActive: true,
+            slots: [
+              {
+                id: 'slot-today-e2e',
+                subject: { id: 'sub-1', name: 'Data Structures' },
+                date: todayStr,
+                dayOfWeek: 0,
+                startTime: '17:00:00',
+                endTime: '18:00:00',
+                durationMinutes: 60,
+                topic: 'Binary Search Trees',
+                status: 'pending',
+                isCompleted: false,
+              },
+              {
+                id: 'slot-future-e2e',
+                subject: { id: 'sub-2', name: 'Computer Architecture' },
+                date: tmrwStr,
+                dayOfWeek: 1,
+                startTime: '17:00:00',
+                endTime: '18:00:00',
+                durationMinutes: 60,
+                topic: 'Pipelining & Hazards',
+                status: 'pending',
+                isCompleted: false,
+              },
+            ],
+          },
+        }),
+      });
+    });
+
+    await page.goto('/timetable');
+
+    // Today slot is actionable
+    const todayToggle = page.getByTestId('quick-toggle-slot-today-e2e');
+    await expect(todayToggle).toBeVisible();
+    await expect(todayToggle).toBeEnabled();
+
+    // Future slot is locked
+    const futureBadge = page.getByTestId('future-badge-slot-future-e2e');
+    await expect(futureBadge).toBeVisible();
+    await expect(futureBadge).toContainText('Locked · Available tomorrow');
+
+    const futureToggle = page.getByTestId('quick-toggle-slot-future-e2e');
+    await expect(futureToggle).toBeVisible();
+    await expect(futureToggle).toBeDisabled();
+
+    // Clicking future card opens detail modal in locked read-only state
+    const futureCard = page.getByTestId('slot-card-slot-future-e2e');
+    await futureCard.click();
+
+    await expect(page.getByTestId('modal-future-locked-banner')).toBeVisible();
+    await expect(page.getByTestId('modal-future-locked-banner')).toContainText('Future Session (Locked)');
+    const modalToggleBtn = page.getByTestId('modal-toggle-status-btn');
+    await expect(modalToggleBtn).toBeDisabled();
+    await expect(modalToggleBtn).toContainText('Locked (Future)');
   });
 
 });
