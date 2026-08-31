@@ -1,4 +1,4 @@
-package com.aistudyplanner.service;
+package com.aistudyplanner.model;
 
 import com.aistudyplanner.model.StudyTimeWindow;
 import org.junit.jupiter.api.Test;

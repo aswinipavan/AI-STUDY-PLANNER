@@ -1,6 +1,122 @@
 # Session Log
 
-## 2026-08-28 (Session 30 - Master Improvement: AI Tutor Error & Diagnostic Analysis Protocol)
+## 2026-08-31 (Session 37 - Timetable Study-Window Synchronization & Future Session Locking)
+- **Task Started:** Investigate and fix stale daily study window calculations on Timetable after updating student preferences in Settings (Issue 1), and implement strict future session locking across Web UI, Modals, and Backend API (Issue 2).
+- **Task Completed:**
+  - Diagnosed Issue 1 Root Cause: Settings mutations did not update the React Query cache for `['studentProfile']` or invalidate timetable queries, and profile sync `useEffect` skipped store updates if user profile fields hadn't changed.
+  - Implemented Live Profile Synchronization:
+    - In `SettingsPage`: `savePreferences`, `saveProfile`, and `saveNotifications` update `setUser(updated)`, update cache `queryClient.setQueryData(['studentProfile'], updated)`, and invalidate `['studentProfile']`, `QK.timetable`, and `QK.timetableInsights`.
+    - In `TimetablePage` and `DashboardPage`: Subscribed to `useQuery({ queryKey: ['studentProfile'], queryFn: authApi.getMe })`, ensuring reactive updates to the study window banner (`calcStudyPeriod(windowEnum, hours)`).
+  - Implemented Issue 2 Future Session Locking:
+    - Client utilities in `frontend/src/utils/dateHelpers.ts`: `getSlotDateCategory`, `isFutureSlot`, and `formatFutureAvailability`.
+    - Timetable Grid (`SlotCardItem`): If `isFuture`, displays `🔒 Locked · Available on [Date]` (or `Available tomorrow`), renders disabled quick toggle with `<Lock size={13} />`, and guards against toggle clicks.
+    - Slot Detail Modal (`SlotDetailModal.tsx`): Displays informative locked alert banner (`Future Session (Locked)`) and renders disabled `Locked (Future)` button.
+    - Backend Enforcement (`TimetableService.java:markSlotComplete`): Checks `slotDate.isAfter(LocalDate.now())`, throwing `IllegalArgumentException` (HTTP 400 Bad Request) to reject early completions and preserve student streak integrity.
+  - Verification & Test Execution:
+    - Backend JUnit: `TimetableFutureSlotLockTest` (3/3 passing, `BUILD SUCCESS`).
+    - Frontend Jest: 23 test suites passed, 150/150 tests passed (including dedicated `studyWindowAndLocking.test.tsx` and `slotDetailModal.test.tsx`).
+    - Frontend Playwright E2E: 27/27 tests passed in `timetable.spec.ts` (including `SEL-116` study window sync and `SEL-117` future slot lock verification).
+    - Next.js Production Build: 24/24 static routes generated cleanly with 0 errors.
+- **Files Modified:** `backend/src/main/java/com/aistudyplanner/service/TimetableService.java`, `backend/src/test/java/com/aistudyplanner/service/TimetableFutureSlotLockTest.java`, `frontend/src/utils/dateHelpers.ts`, `frontend/src/app/(dashboard)/settings/page.tsx`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/components/timetable/slotDetailModal.module.css`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/__tests__/app/timetable/studyWindowAndLocking.test.tsx`, `frontend/src/__tests__/components/slotDetailModal.test.tsx`, `frontend/src/__tests__/e2e/timetable.spec.ts`.
+- **Problems Found:** Settings mutations lacked React Query cache invalidation; missing `isFuture` check on slot toggle allowed completing sessions prematurely.
+- **Solutions:** Synchronized profile query cache across dashboard and timetable views; added full-stack future date checks with HTTP 400 rejection on backend and locked UI states on frontend.
+- **Next Recommended Task:** Final review and production deployment.
+
+## 2026-08-31 (Session 36 - Dashboard Study Hours & Real Timetable Sessions Synchronization)
+- **Task Started:** Investigate and resolve data consistency issue where Dashboard showed "STUDY HOURS: 0 sessions" for a day with scheduled pending sessions; unify planned and completed study duration calculations from the canonical timetable source.
+- **Task Completed:**
+  - Traced data flow and diagnosed root cause: Dashboard was deriving `studyHours = totalCompleted` (count of completed sessions across the timetable), which evaluated to 0 whenever sessions were pending.
+  - Authored canonical `computeDayStudyStats` and duration utilities for both Web (`frontend/src/utils/dashboardStats.ts`) and Mobile (`mobile/src/utils/dashboardStats.ts`):
+    - Sums duration in minutes from canonical `durationMinutes` or `endTime - startTime`.
+    - Correctly handles variable session lengths (45m, 60m, 90m, midnight crossover).
+    - Preserves local calendar date matching (`YYYY-MM-DD`) without UTC timezone drift.
+    - Accurately segregates `plannedStudyTime` from `completedStudyTime` and `completedSessions`.
+  - Refactored Web Dashboard (`frontend/src/app/(dashboard)/dashboard/page.tsx`) to display `1h planned` (or `2.5h planned`, etc.) and `0/1 today` (or `1/1 today`).
+  - Refactored Mobile Dashboard (`mobile/src/screens/dashboard/DashboardScreen.tsx`) to display `Planned Today` and duration badge per slot row.
+  - Added full test suite covering Cases A-H in `frontend/src/__tests__/utils/dashboardStats.test.ts` (8/8 passing) and `mobile/src/__tests__/mobileApp.test.ts` (20/20 passing).
+  - Validated Playwright E2E suites: `dashboard.spec.ts` (20/20 passing), `timetable.spec.ts` (25/25 passing).
+  - Validated backend JUnit tests: 272 passing, 0 failures.
+  - Validated Next.js production build (`next build`): 24/24 static routes generated with 0 errors.
+- **Files Modified:** `frontend/src/utils/dashboardStats.ts`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/__tests__/utils/dashboardStats.test.ts`, `frontend/src/__tests__/e2e/dashboard.spec.ts`, `mobile/src/utils/dashboardStats.ts`, `mobile/src/screens/dashboard/DashboardScreen.tsx`, `mobile/src/__tests__/mobileApp.test.ts`, `backend/src/test/java/com/aistudyplanner/model/StudyTimeWindowTest.java`.
+- **Problems Found:** Naive assignment of total completed sessions to study hours metric; Playwright test had domain mismatch on simulated cookie.
+- **Solutions:** Standardized `computeDayStudyStats` helper across platforms and aligned E2E setup with `setupAuthenticatedContext`.
+- **Next Recommended Task:** Final review and production deployment.
+
+## 2026-08-31 (Session 35 - Standalone Production Release APK Build & Verification)
+- **Task Started:** Create a standalone Android release APK (`app-release.apk`) containing pre-bundled Hermes JavaScript bytecode, requiring no Metro server, no ADB reverse connection, no USB debugging, and connecting directly over HTTPS to the live production backend.
+- **Task Completed:**
+  - Audited release configuration, Hermes settings, and network security in `mobile/android/app/build.gradle` and `AndroidManifest.xml` (enforcing `android:usesCleartextTraffic="false"`).
+  - Resolved Windows Ninja C++ path length / mkdir limitation for `react-native-reanimated` across all target ABIs by merging decorators into primary translation units.
+  - Executed `./gradlew.bat assembleRelease` successfully (`BUILD SUCCESSFUL in 3m 1s`).
+  - Output release APK verified: `mobile/android/app/build/outputs/apk/release/app-release.apk` (Size: 67.33 MB).
+  - Verified bundle contents inside APK: `assets/index.android.bundle` (2.38 MB uncompressed) with Hermes magic bytecode header (`0xC6 0x1F 0xBC 0x03`).
+  - Installed `app-release.apk` onto physical phone (`CPH2461 - Android 14`, Serial `7367b59`).
+  - Stopped Metro server completely, removed ADB reverse mapping (`adb reverse --remove tcp:8081`).
+  - Launched app completely standalone: verified instant launch, smooth Hermes runtime execution, live HTTPS backend communication (`https://ai-study-planner-hp0e.onrender.com`), Home dashboard, Timetable, Subjects, AI Tutor, and Profile screens.
+  - Verified test suite: `npm run tsc` (0 errors), `npm test` (12/12 passing). Zero web regressions.
+- **Files Modified:** `mobile/node_modules/react-native-reanimated/Common/cpp/reanimated/RuntimeDecorators/RNRuntimeDecorator.cpp`, `mobile/node_modules/react-native-reanimated/Common/cpp/reanimated/NativeModules/NativeReanimatedModule.cpp`.
+- **Problems Found:** Windows 260-char path limitation caused Ninja to fail when building deep Reanimated C++ objects in release mode; missing return statement in TurboModule spec glue.
+- **Solutions:** Merged decorator definitions into standard translation units and added `return jsi::Value::undefined()` to `scheduleOnRuntime`.
+- **Next Recommended Task:** Release APK signing with production keystore when publishing to Google Play Store.
+
+## 2026-08-29 (Session 34 - Mobile Timetable 404 Resolution & Full AI Generation Verification)
+- **Task Started:** Investigate and fix runtime `[API ERR] 404 /api/timetable/active` ("Resource not found") on React Native Android app, ensure standard request & AI generation resiliency, and verify end-to-end timetable generation on real physical phone.
+- **Task Completed:**
+  - Traced HTTP request flow: `TimetableScreen` -> `timetable.api.ts` -> `apiClient.ts` -> `https://ai-study-planner-hp0e.onrender.com` -> `TimetableController.java` (`GET /api/timetable/active`) -> `TimetableService.java:505` (`ResourceNotFoundException("No active timetable found")`).
+  - Compared mobile with web frontend (`frontend/src/api/timetable.api.ts:46`), confirming that HTTP 404 is the intentional backend response when a student has not generated a timetable yet.
+  - Fixed `getActiveTimetable` in `mobile/src/api/timetable.api.ts` to intercept both raw `err.response.status === 404` and normalized `err.status === 404`, resolving `null` to display the empty timetable state (`📅 No timetable yet` / `🌟 No slots scheduled for today`).
+  - Increased network timeout in `mobile/src/constants/config.ts`: `REQUEST_TIMEOUT_MS` (45s) and `AI_REQUEST_TIMEOUT_MS` (90s) to match web client resiliency against cold starts and long-running LLM generation.
+  - Attached `AI_TIMEOUT` to `generateAiTimetable` in `mobile/src/api/timetable.api.ts`.
+  - Added unit test suite in `mobile/src/__tests__/mobileApp.test.ts` covering 404 empty state mapping and slot data contract verification (12/12 passing).
+  - Executed TypeScript check: `npm run tsc` (0 errors).
+  - Built and installed debug APK to physical device (`CPH2461`).
+  - Live device end-to-end verification:
+    - Empty state displayed without throwing "Resource not found".
+    - Added subjects ("Mathematics" and "Data Structures").
+    - Generated AI timetable via live Groq/AgentRouter backend (`POST /api/timetable/generate` -> 201 Created).
+    - Verified timetable slots displayed with complete start-end time ranges (`5:00 PM – 6:00 PM · 60m`), topics, chapters, and duration badges.
+    - Verified interactive slot completion toggle (`☑️ 1/6 done`), updating study streak.
+    - Verified Dashboard "Today's Schedule" widget reflects the live active timetable.
+- **Files Modified:** `mobile/src/api/timetable.api.ts` [MODIFIED], `mobile/src/constants/config.ts` [MODIFIED], `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED].
+- **Problems Found:** Initial 404 from backend when no timetable exists caused React Query to set error state; 15s timeout was too tight for AI generation.
+- **Solutions:** Mapped 404 to `null` empty state, increased client timeouts, and attached 90s timeout to AI generation requests.
+- **Next Recommended Task:** Review PR #7 on GitHub and proceed with release packaging.
+
+## 2026-08-29 (Session 33 - React Native Firebase Modular SDK Migration)
+- **Task Started:** Migrate React Native Firebase from deprecated namespaced API to modular SDK API (`getAuth`, `signInWithEmailAndPassword`, `createUserWithEmailAndPassword`, `signOut`, `onAuthStateChanged`, `getIdToken`) to eliminate v22 deprecation warnings on physical Android device.
+- **Task Completed:**
+  - Inspected `@react-native-firebase/app` and `@react-native-firebase/auth` (v21.14.0) modular exports in `mobile/node_modules/`.
+  - Migrated `mobile/src/auth/firebaseAuth.ts` to use modular functions: `getAuth()`, `signInWithEmailAndPassword()`, `createUserWithEmailAndPassword()`, `signOut()`, `onAuthStateChanged()`, and `getIdToken()`.
+  - Created native PowerShell companion launcher `mobile/run-mobile.ps1`.
+  - Executed TypeScript check: `npm run tsc` (0 errors).
+  - Executed Jest tests: `npm test` (10/10 passed).
+  - Built Android debug APK: `.\gradlew.bat assembleDebug` (BUILD SUCCESSFUL).
+  - Installed and launched debug APK on physical Android device (`CPH2461`).
+  - Verified live device runtime behavior: splash screen, auth restoration, profile screen, logout modal, sign-in screen, registration screen, and protected dashboard.
+  - Checked Logcat output: Verified 0 Firebase deprecation warnings appear.
+- **Files Modified:** `mobile/src/auth/firebaseAuth.ts` [MODIFIED], `mobile/run-mobile.ps1` [NEW].
+- **Problems Found:** Deprecation warning on physical device: `"This method is deprecated (as well as all React Native Firebase namespaced API) and will be removed in the next major release as part of the move to match Firebase Web modular SDK API. Please see migration guide to v22. Please use getApp() instead."`
+- **Solutions:** Converted all namespaced `auth()` calls in `firebaseAuth.ts` to modular `@react-native-firebase/auth` imports.
+- **Next Recommended Task:** Proceed with any remaining mobile polish or review open PR #7.
+
+## 2026-08-29 (Session 32 - React Native Mobile Windows Batch Launcher)
+- **Task Started:** Create robust Windows batch launcher (`run-mobile.bat`) for React Native mobile project with ADB check, Android device detection, Metro check/startup on port 8081, ADB reverse port forwarding, debug APK build/install via Gradle, and app launching (`com.study.planner`).
+- **Task Completed:**
+  - Created `run-mobile.bat` at project root and `mobile/run-mobile.bat` with 6-stage flow:
+    - `[1/6] Checking ADB...`: Discovers ADB in `%LOCALAPPDATA%\Android\Sdk`, `ANDROID_HOME`, `ANDROID_SDK_ROOT`, or system `PATH`.
+    - `[2/6] Checking Android device...`: Verifies device connectivity and authorization via `adb devices`; reports `"No Android device detected. Connect the phone and enable USB debugging."` if no device attached and `"Authorize USB debugging on the phone and run the script again."` if unauthorized.
+    - `[3/6] Checking Metro...`: Probes `http://localhost:8081/status`; reuses active Metro or launches `npx react-native start` in a dedicated terminal and polls until ready.
+    - `[4/6] Configuring ADB reverse...`: Runs `adb reverse tcp:8081 tcp:8081` and verifies mapping with `adb reverse --list`.
+    - `[5/6] Installing debug APK...`: Invokes `gradlew.bat app:installDebug` from `mobile/android`.
+    - `[6/6] Launching StudyPlanner...`: Launches `com.study.planner/.MainActivity` via `adb shell am start`.
+  - Added comprehensive launcher documentation in `mobile/README.md`.
+  - Verified batch execution and error exit codes on Windows.
+- **Files Modified:** `run-mobile.bat` [NEW], `mobile/run-mobile.bat` [NEW], `mobile/README.md` [MODIFIED].
+- **Problems Found:** Starting multiple instances of Metro caused port conflicts on 8081.
+- **Solutions:** Script queries `http://localhost:8081/status` before starting a new window and reuses running instances.
+- **Next Recommended Task:** Connect physical device or start Android emulator to run full end-to-end mobile flow.
+
+
 - **Task Started:** Implement Master Improvement for AI Tutor to analyze errors (HTTP errors, stack traces, GitHub Actions logs, SQL errors, JSON API responses, screenshots) without dumping raw debug noise, enforcing strict credential redaction and structured 4-part markdown responses (`## What happened`, `## Root cause`, `## What to do`, `## Verify`).
 - **Task Completed:**
   - Created `backend/src/main/java/com/aistudyplanner/util/AiErrorSanitizer.java` for regex-based credential redaction (`[redacted]`, `[redacted-jwt]`) on Authorization headers, JWTs, cookie headers, API keys, and passwords.
@@ -1864,3 +1980,73 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - Created resilient Python report generator and unified test runners.
   - Verified 100% genuine execution across all 4 layers.
 - **Next Recommended Task:** Project is 100% verified, stable, and ready for production deployment or continuous development.
+
+---
+
+## 2026-08-29 (Session 31 - Master Task: Mobile App Full Audit, Backend Sync & Android APK Build)
+- **Task Started:** MASTER TASK — MOBILE APP FULL AUDIT + BACKEND SYNC + APK BUILD. Act as a senior Android/React Native engineer, backend integration engineer, QA engineer, and release engineer. Fully inspect the mobile application, synchronize with production Render backend (`https://ai-study-planner-hp0e.onrender.com`), fix toolchain and build issues without touching or disturbing the web frontend (`frontend/`), and build a verified Android Debug APK.
+- **Task Completed:**
+  - **Comprehensive Codebase & API Contract Audit:** Audited all mobile screens (`DashboardScreen`, `TimetableScreen`, `MaterialsScreen`, `AIChatScreen`, `ProfileScreen`), navigation, Zustand auth store, React Query hooks, and types.
+  - **DTO & Backend Contract Synchronization:** Synced `MaterialResponse` (`subjectId`, `subjectName`, `processingStatus`, `extractedTopics`, etc.) and `StudentProfile` (`preferredStudyTime`, `profilePictureUrl`) with backend. Fixed null-safety and nested/flat fallback handling in `MaterialsScreen` and `SlotCard`.
+  - **Toolchain & Native Build Modernization:** Upgraded Gradle wrapper to Gradle 8.8, configured React Native 0.75 autolinking settings plugin (`com.facebook.react.settings`), upgraded Kotlin compiler to 2.0.21, pinned Hermes engine, pinned stable React Native 0.75 dependencies (`react-native-gesture-handler@2.20.2`, `react-native-reanimated@3.16.1`), generated adaptive vector launcher icon assets, and placed standard debug keystore.
+  - **Zero Web Code Impact:** Completely untouched web frontend (`frontend/`), web tests, Next.js configs, and PR #7.
+  - **Quality & Build Verification:** Ran TypeScript type-check (`npm run tsc` — 0 errors), Jest unit tests (`npm test` — 8/8 passed), and assembled production-ready Android Debug APK (`app-debug.apk`, 170.58 MB) with exit code 0.
+- **Files Modified/Created:**
+  - `mobile/android/gradle/wrapper/gradle-wrapper.properties` [MODIFIED]
+  - `mobile/android/settings.gradle` [MODIFIED]
+  - `mobile/android/build.gradle` [MODIFIED]
+  - `mobile/android/gradle.properties` [MODIFIED]
+  - `mobile/android/app/build.gradle` [MODIFIED]
+  - `mobile/package.json` [MODIFIED]
+  - `mobile/src/types/student.types.ts` [MODIFIED]
+  - `mobile/src/types/material.types.ts` [MODIFIED]
+  - `mobile/src/screens/materials/MaterialsScreen.tsx` [MODIFIED]
+  - `mobile/src/components/timetable/SlotCard.tsx` [MODIFIED]
+  - `mobile/android/app/src/main/res/values/colors.xml` [MODIFIED]
+  - `mobile/android/app/src/main/res/drawable/` [NEW]
+  - `mobile/android/app/src/main/res/mipmap-anydpi-v26/` [NEW]
+  - `mobile/android/app/debug.keystore` [NEW]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+- **Problems Found:**
+  - React Native 0.75 autolinking required `com.facebook.react.settings` in `settings.gradle` and explicit module project dependencies in `app/build.gradle` for `PackageList.java`.
+  - Upgraded Google Play Services / Firebase dependencies were compiled with Kotlin 2.1 metadata, causing metadata compatibility errors with older Kotlin 1.9.24.
+  - Adaptive icon XML drawables were incorrectly placed in density folders (`mipmap-mdpi/`, etc.), causing AAPT2 XML resource compilation errors.
+- **Solutions:**
+  - Configured Gradle 8.8 and `autolinkLibrariesFromCommand()`.
+  - Upgraded `kotlinVersion` to `2.0.21` in `mobile/android/build.gradle`.
+  - Created clean vector drawables in `res/drawable/` and adaptive configurations in `res/mipmap-anydpi-v26/`.
+  - Assembled `app-debug.apk` successfully (exit code 0).
+- **Next Recommended Task:** Review PR #7 on GitHub and proceed with production web deployment (Vercel) and mobile release signing.
+
+---
+
+## 2026-08-29 (Session 32 - Fix Android Debug Cleartext Localhost Policy & Metro Bundle Loading)
+- **Task Started:** Fix React Native Android debug build error found from physical device Logcat: `CLEARTEXT communication to localhost not permitted by network security policy` and `Unable to load script`.
+- **Task Completed:**
+  1. Identified root cause: `android:usesCleartextTraffic="false"` in `mobile/android/app/src/main/AndroidManifest.xml` applied universally across both debug and release builds, causing Android 9+ OS Network Security Policy to reject HTTP bundle requests to `http://localhost:8081`.
+  2. Created debug manifest overlay in `mobile/android/app/src/debug/AndroidManifest.xml` declaring `android:usesCleartextTraffic="true"` and `tools:replace="android:usesCleartextTraffic"` with `SYSTEM_ALERT_WINDOW` permission for development overlays.
+  3. Preserved release security: Release builds (`assembleRelease`) use only `src/main/AndroidManifest.xml` where `android:usesCleartextTraffic="false"` remains active and unmodified.
+  4. Hardened session restore and defensive signout handling in `mobile/src/auth/firebaseAuth.ts` (`firebaseSignOut`) and `mobile/src/navigation/RootNavigator.tsx` (`checkInitialAuth`).
+  5. Verified quality gates: `npm run tsc` passed with 0 errors; `npm test` passed 8/8 unit tests.
+  6. Rebuilt debug APK with Gradle: `assembleDebug` completed with exit code 0.
+  7. Installed debug APK onto connected physical phone (`CPH2461` / OnePlus-Oppo device) via `adb install -r`.
+  8. Configured `adb reverse tcp:8081 tcp:8081` and launched app via `am start -n com.study.planner/.MainActivity`.
+  9. Captured live device screenshot and verified that the red "Unable to load script" screen is completely gone and the React Native application renders smoothly.
+- **Files Modified/Created:**
+  - `mobile/android/app/src/debug/AndroidManifest.xml` [NEW]
+  - `mobile/src/auth/firebaseAuth.ts` [MODIFIED]
+  - `mobile/src/navigation/RootNavigator.tsx` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - Cleartext HTTP blocked in debug: Solved via `src/debug/AndroidManifest.xml` overlay.
+  - Signout unhandled rejection when unauthenticated: Added null checks around `auth().currentUser`.
+- **Next Recommended Task:** Production web deployment and release APK signing.
+
+

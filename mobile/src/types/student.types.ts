@@ -14,6 +14,7 @@ export interface StudentResponse {
   isPremium: boolean;
   studyStreak: number;
   availableHoursPerDay: number; // BigDecimal from backend
+  preferredStudyTime: string | null;
   profilePictureUrl: string | null;
   emailNotifications: boolean;
   pushNotifications: boolean;
@@ -55,6 +56,8 @@ export interface UpdateProfileRequest {
   semester?: number;
   department?: string;
   availableHoursPerDay?: number;
+  preferredStudyTime?: string;
+  profilePictureUrl?: string;
 }
 
 /**

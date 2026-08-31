@@ -118,6 +118,41 @@ describe('SlotDetailModal Component', () => {
     expect(screen.getByTestId('modal-selection-reason')).toHaveTextContent(/Overdue Catch-up/i);
   });
 
+  it('renders future locked banner and disables completion toggle for future session', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 2);
+    const futureIso = `${futureDate.getFullYear()}-${String(futureDate.getMonth() + 1).padStart(2, '0')}-${String(futureDate.getDate()).padStart(2, '0')}`;
+
+    const futureSlot: TimetableSlot = {
+      ...mockSlot,
+      id: 'future-slot-1',
+      date: futureIso,
+      status: 'pending',
+    };
+
+    const handleToggle = jest.fn();
+
+    render(
+      <SlotDetailModal
+        slot={futureSlot}
+        isOpen={true}
+        onClose={jest.fn()}
+        onToggleStatus={handleToggle}
+      />
+    );
+
+    expect(screen.getByTestId('modal-future-locked-banner')).toBeInTheDocument();
+    expect(screen.getByText(/Future Session \(Locked\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/It will become available to complete on that day/i)).toBeInTheDocument();
+
+    const toggleBtn = screen.getByTestId('modal-toggle-status-btn');
+    expect(toggleBtn).toBeDisabled();
+    expect(toggleBtn).toHaveTextContent(/Locked \(Future\)/i);
+
+    fireEvent.click(toggleBtn);
+    expect(handleToggle).not.toHaveBeenCalled();
+  });
+
   it('does not render when isOpen is false', () => {
     const { container } = render(
       <SlotDetailModal

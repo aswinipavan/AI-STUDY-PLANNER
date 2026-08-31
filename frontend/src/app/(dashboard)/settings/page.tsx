@@ -14,6 +14,7 @@ import { useSoundPreference } from '@/hooks/useSoundPreference';
 import { useDialog } from '@/hooks/useDialog';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
+import { QK } from '@/constants/queryKeys';
 import { Moon, Sun, Monitor, Volume2, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera, Shield, Clock, AlertTriangle, Key, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
@@ -219,7 +220,21 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (fetchedProfile) {
-      if (!user || user.id !== fetchedProfile.id || user.fullName !== fetchedProfile.fullName || user.collegeName !== fetchedProfile.collegeName || user.semester !== fetchedProfile.semester || user.department !== fetchedProfile.department || user.phoneNumber !== fetchedProfile.phoneNumber) {
+      const isDifferent =
+        !user ||
+        user.id !== fetchedProfile.id ||
+        user.fullName !== fetchedProfile.fullName ||
+        user.name !== fetchedProfile.name ||
+        user.collegeName !== fetchedProfile.collegeName ||
+        user.semester !== fetchedProfile.semester ||
+        user.department !== fetchedProfile.department ||
+        user.phoneNumber !== fetchedProfile.phoneNumber ||
+        user.availableHoursPerDay !== fetchedProfile.availableHoursPerDay ||
+        user.preferredStudyTime !== fetchedProfile.preferredStudyTime ||
+        user.emailNotifications !== fetchedProfile.emailNotifications ||
+        user.pushNotifications !== fetchedProfile.pushNotifications;
+
+      if (isDifferent) {
         setUser(fetchedProfile);
       }
       if (!initializedRef.current || !isDirty) {
@@ -255,6 +270,7 @@ export default function SettingsPage() {
     onSuccess: (updated) => {
       setUser(updated);
       queryClient.setQueryData(['studentProfile'], updated);
+      queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
       reset({
         name: updated.fullName || updated.name || '',
         collegeName: updated.collegeName || '',
@@ -269,6 +285,8 @@ export default function SettingsPage() {
     mutationFn: authApi.updateNotifications,
     onSuccess: (updated) => {
       setUser(updated);
+      queryClient.setQueryData(['studentProfile'], updated);
+      queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
       setNotifSaved(true);
       setTimeout(() => setNotifSaved(false), 3000);
     },
@@ -289,6 +307,10 @@ export default function SettingsPage() {
     }),
     onSuccess: (updated) => {
       setUser(updated);
+      queryClient.setQueryData(['studentProfile'], updated);
+      queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
+      queryClient.invalidateQueries({ queryKey: QK.timetable });
+      queryClient.invalidateQueries({ queryKey: QK.timetableInsights });
       setPrefSaved(true);
       setTimeout(() => setPrefSaved(false), 3000);
     },

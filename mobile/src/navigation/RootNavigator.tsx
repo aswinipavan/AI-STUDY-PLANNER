@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {useAuthStore} from '@/stores/authStore';
 import {getJwt} from '@/auth/tokenStorage';
 import {loginWithFirebaseToken} from '@/api/auth.api';
-import {getCurrentIdToken, onFirebaseAuthStateChanged} from '@/auth/firebaseAuth';
+import {getCurrentFirebaseUser, getCurrentIdToken, onFirebaseAuthStateChanged} from '@/auth/firebaseAuth';
 import {COLORS} from '@/constants/colors';
 import {AuthStack} from './AuthStack';
 import {AppTabs} from './AppTabs';
@@ -19,45 +19,87 @@ export function RootNavigator() {
     useAuthStore();
 
   useEffect(() => {
-    /**
-     * Session restore flow on app start:
-     * 1. Check if there's a stored backend JWT.
-     * 2. If yes — try to restore via Firebase auth state.
-     * 3. If Firebase has a current user, exchange for a fresh backend JWT.
-     * 4. If no stored JWT or Firebase user → go to login.
-     */
-    const unsubscribe = onFirebaseAuthStateChanged(async firebaseUser => {
-      if (firebaseUser) {
-        try {
+    let isMounted = true;
+
+    async function checkInitialAuth() {
+      try {
+        const currentUser = getCurrentFirebaseUser();
+        if (currentUser) {
           const storedJwt = await getJwt();
           if (storedJwt) {
-            // We have a stored JWT — try to refresh for a fresh one
             const freshFirebaseToken = await getCurrentIdToken(false);
-            if (freshFirebaseToken) {
+            if (freshFirebaseToken && isMounted) {
               const authResponse = await loginWithFirebaseToken(freshFirebaseToken);
               await setSession(authResponse);
               return;
             }
           }
-          // No stored JWT but Firebase user exists — do a fresh login
           const firebaseToken = await getCurrentIdToken(true);
-          if (firebaseToken) {
+          if (firebaseToken && isMounted) {
             const authResponse = await loginWithFirebaseToken(firebaseToken);
             await setSession(authResponse);
             return;
           }
-        } catch {
-          // Restore failed (backend down?) — stay on login
+        }
+        if (isMounted) {
           await logout();
         }
-      } else {
-        // No Firebase user
-        await logout();
+      } catch {
+        if (isMounted) {
+          await logout();
+        }
+      } finally {
+        if (isMounted) {
+          setHydrating(false);
+        }
       }
-      setHydrating(false);
+    }
+
+    checkInitialAuth();
+
+    const unsubscribe = onFirebaseAuthStateChanged(async firebaseUser => {
+      if (!isMounted) {
+        return;
+      }
+      try {
+        if (firebaseUser) {
+          try {
+            const storedJwt = await getJwt();
+            if (storedJwt) {
+              const freshFirebaseToken = await getCurrentIdToken(false);
+              if (freshFirebaseToken && isMounted) {
+                const authResponse = await loginWithFirebaseToken(freshFirebaseToken);
+                await setSession(authResponse);
+                return;
+              }
+            }
+            const firebaseToken = await getCurrentIdToken(true);
+            if (firebaseToken && isMounted) {
+              const authResponse = await loginWithFirebaseToken(firebaseToken);
+              await setSession(authResponse);
+              return;
+            }
+          } catch {
+            if (isMounted) {
+              await logout();
+            }
+          }
+        } else {
+          if (isMounted) {
+            await logout();
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setHydrating(false);
+        }
+      }
     });
 
-    return unsubscribe;
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [setSession, logout, setHydrating]);
 
   if (isHydrating) {

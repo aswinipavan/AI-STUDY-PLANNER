@@ -309,3 +309,36 @@
   border-top: 1px solid var(--color-border, #374151);
   background: rgba(0, 0, 0, 0.2);
 }
+
+.futureAlertBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-muted-foreground);
+  margin-bottom: 1.25rem;
+}
+
+.futureAlertIcon {
+  color: var(--color-muted-foreground);
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.futureAlertTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 0.25rem 0;
+}
+
+.futureAlertDesc {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  line-height: 1.4;
+}
+

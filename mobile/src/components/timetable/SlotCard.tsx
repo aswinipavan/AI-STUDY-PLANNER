@@ -50,7 +50,7 @@ export function SlotCard({slot, onToggle, isToggling}: SlotCardProps) {
               slot.isCompleted && styles.completedText,
             ]}
             numberOfLines={1}>
-            {slot.subject.subjectName}
+            {slot.subject?.subjectName || 'Study Session'}
           </Text>
 
           <Text style={styles.timeRange}>

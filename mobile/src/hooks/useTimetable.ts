@@ -7,7 +7,7 @@ import {
   toggleSlotComplete,
   deleteTimetable,
 } from '@/api/timetable.api';
-import type {TimetableRequest} from '@/types/timetable.types';
+import type {GenerateTimetableRequest} from '@/types/timetable.types';
 
 /** Fetch the active timetable (includes all slots) */
 export function useActiveTimetable() {
@@ -23,7 +23,8 @@ export function useActiveTimetable() {
 export function useGenerateTimetable() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (request: TimetableRequest) => generateAiTimetable(request),
+    mutationFn: (request: GenerateTimetableRequest) =>
+      generateAiTimetable(request),
     onSuccess: timetable => {
       queryClient.setQueryData(QK.TIMETABLE_ACTIVE, timetable);
       queryClient.invalidateQueries({queryKey: QK.TIMETABLE_ALL});

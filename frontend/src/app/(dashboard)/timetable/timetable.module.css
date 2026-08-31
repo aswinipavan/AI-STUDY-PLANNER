@@ -465,6 +465,16 @@
   background: rgba(245, 158, 11, 0.14);
 }
 
+.slotFuture {
+  background: var(--app-overlay-subtle);
+  border-color: var(--color-border);
+  opacity: 0.9;
+}
+.slotFuture:hover {
+  background: var(--app-overlay);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 /* Badge tags on SlotCard */
 .catchUpBadge {
   display: inline-flex;
@@ -478,6 +488,22 @@
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.4);
   padding: 0.15rem 0.4rem;
+  border-radius: 9999px;
+  width: fit-content;
+}
+
+.futureBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted-foreground);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  padding: 0.15rem 0.45rem;
   border-radius: 9999px;
   width: fit-content;
 }
@@ -564,6 +590,18 @@
   background: #10b981;
   border-color: #10b981;
   color: #ffffff;
+}
+
+.quickToggleLocked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--color-border);
+  color: var(--color-muted-foreground);
+}
+.quickToggleLocked:hover {
+  border-color: var(--color-border);
+  color: var(--color-muted-foreground);
+  background: transparent;
 }
 
 @keyframes fadeSlideUp {

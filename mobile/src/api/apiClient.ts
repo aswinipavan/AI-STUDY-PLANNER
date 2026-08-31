@@ -28,6 +28,7 @@ apiClient.interceptors.request.use(
     if (jwt) {
       config.headers.Authorization = `Bearer ${jwt}`;
     }
+    console.log('[API REQ]', config.method?.toUpperCase(), config.url);
     return config;
   },
   error => Promise.reject(error),
@@ -52,8 +53,12 @@ function flushQueue(error: unknown, token: string | null) {
 }
 
 apiClient.interceptors.response.use(
-  response => response,
+  response => {
+    console.log('[API RES]', response.status, response.config.url);
+    return response;
+  },
   async (error: AxiosError) => {
+    console.log('[API ERR]', error.response?.status, error.config?.url, JSON.stringify(error.response?.data));
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };

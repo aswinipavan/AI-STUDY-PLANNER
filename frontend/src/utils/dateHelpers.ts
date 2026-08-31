@@ -40,3 +40,47 @@ export function slotDayKey(slotDate?: string): string | null {
 
 /** Monday-based weekday index for a date (Mon=0 … Sun=6). */
 export const mondayBasedIndex = (date: Date): number => (date.getDay() + 6) % 7;
+
+/**
+ * Categorize a slot's calendar date relative to today:
+ * - 'PAST'   : date < today
+ * - 'TODAY'  : date == today (or dateless slot)
+ * - 'FUTURE' : date > today
+ */
+export function getSlotDateCategory(slotDate?: string, targetDate: Date = new Date()): 'PAST' | 'TODAY' | 'FUTURE' {
+  if (!slotDate) return 'TODAY';
+  const slotDay = slotDayKey(slotDate);
+  if (!slotDay) return 'TODAY';
+  const todayDay = dayKey(targetDate);
+  if (slotDay === todayDay) return 'TODAY';
+  if (slotDay > todayDay) return 'FUTURE';
+  return 'PAST';
+}
+
+/** Check whether a slot is scheduled on a future calendar day */
+export function isFutureSlot(slotDate?: string, targetDate: Date = new Date()): boolean {
+  return getSlotDateCategory(slotDate, targetDate) === 'FUTURE';
+}
+
+/**
+ * Human-readable availability label for future sessions.
+ * e.g. "Available tomorrow", "Available on Sep 1", "Available on Sep 15"
+ */
+export function formatFutureAvailability(slotDate?: string, targetDate: Date = new Date()): string {
+  if (!slotDate) return 'Future session';
+  const parsed = parseSlotDate(slotDate);
+  if (!parsed) return 'Future session';
+
+  const todayDay = dayKey(targetDate);
+  const tmrw = new Date(targetDate);
+  tmrw.setDate(tmrw.getDate() + 1);
+  const tomorrowDay = dayKey(tmrw);
+  const slotDay = dayKey(parsed);
+
+  if (slotDay === tomorrowDay) {
+    return 'Available tomorrow';
+  }
+  const formatted = parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return `Available on ${formatted}`;
+}
+

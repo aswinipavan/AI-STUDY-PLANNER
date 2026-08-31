@@ -40,6 +40,37 @@ cp .env.example .env
 npx react-native run-android
 ```
 
+## Quick Start Launcher (`run-mobile.bat`)
+
+A robust Windows batch launcher is provided at the repository root and in `mobile/` to automate device checks, Metro management, ADB port forwarding, APK installation, and app launch.
+
+### Prerequisites for Running
+1. **USB Debugging**: Must be enabled in phone settings (*Settings -> Developer options -> USB debugging*).
+2. **Phone Connected**: Connect your physical Android phone via USB cable (or start an Android emulator).
+3. **ADB Authorization**: When prompted on your phone, tap **"Allow USB debugging"**.
+4. **Metro Bundler**: React Native debug builds require the Metro bundler on port 8081 to serve JavaScript bundles. The script automatically launches Metro in a separate terminal if not already active and reuses it safely on subsequent runs.
+
+### How to Run the Launcher
+From the project root or the `mobile/` folder:
+```cmd
+run-mobile.bat
+```
+
+### Launcher Progress Flow
+- `[1/6] Checking ADB...` — Verifies ADB executable from Android SDK / PATH.
+- `[2/6] Checking Android device...` — Confirms connected device and authorized USB debugging status.
+- `[3/6] Checking Metro...` — Reuses existing Metro bundler on port 8081 or launches a new dedicated window and waits for readiness.
+- `[4/6] Configuring ADB reverse...` — Executes `adb reverse tcp:8081 tcp:8081` and verifies mapping.
+- `[5/6] Installing debug APK...` — Runs `gradlew.bat app:installDebug` on the connected device.
+- `[6/6] Launching StudyPlanner...` — Launches `com.study.planner/.MainActivity`.
+
+### How to Stop Metro
+- In the dedicated Metro terminal window, press `Ctrl + C` or close the window.
+- Alternatively, stop any process listening on port 8081 via PowerShell:
+```powershell
+Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
 ## Phase 1 Features
 
 - ✅ Firebase Email/Password Authentication

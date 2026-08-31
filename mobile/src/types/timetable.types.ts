@@ -44,8 +44,22 @@ export interface TimetableResponse {
 }
 
 /**
+ * Mirrors backend GenerateTimetableRequest DTO
+ * POST /api/timetable/generate
+ */
+export interface GenerateTimetableRequest {
+  subjectIds: string[];
+  availableHoursPerDay: number;
+  style: 'intense' | 'balanced' | 'relaxed';
+  startDate: string; // "YYYY-MM-DD"
+  durationDays: number;
+  useDeadlines?: boolean;
+  targetDeadlineDate?: string;
+}
+
+/**
  * Mirrors backend TimetableRequest DTO
- * POST /api/timetable/generate or /api/timetable/custom
+ * POST /api/timetable/custom
  */
 export interface TimetableRequest {
   title?: string;
