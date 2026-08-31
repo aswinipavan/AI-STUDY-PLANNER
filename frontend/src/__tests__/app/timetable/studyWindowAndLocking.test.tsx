@@ -10,6 +10,8 @@ import { authApi } from '@/api/auth.api';
 import { calcStudyPeriod, WINDOW_START_LABELS } from '@/utils/studyPeriodUtils';
 import { isFutureSlot, formatFutureAvailability, dayKey } from '@/utils/dateHelpers';
 
+import { StudentProfile } from '@/types/api.types';
+
 // Mocks
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -58,13 +60,16 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayIso = dayKey(yesterday);
 
-  const mockUser = {
+  const mockUser: StudentProfile = {
     id: 'user-1',
+    firebaseUid: 'mock-uid-1',
     name: 'Aswini Pavan',
+    fullName: 'Aswini Pavan',
     email: 'aswini@example.com',
     preferredStudyTime: 'EVENING',
     availableHoursPerDay: 1,
-    role: 'STUDENT',
+    isPremium: false,
+    createdAt: '2026-08-31T00:00:00Z',
   };
 
   const mockSlots = [
@@ -77,7 +82,7 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
       endTime: '18:00:00',
       durationMinutes: 60,
       topic: 'Vector Calculus',
-      status: 'pending',
+      status: 'pending' as const,
       isCompleted: false,
     },
     {
@@ -89,7 +94,7 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
       endTime: '18:00:00',
       durationMinutes: 60,
       topic: 'TCP Handshake & Congestion',
-      status: 'pending',
+      status: 'pending' as const,
       isCompleted: false,
     },
     {
@@ -101,7 +106,7 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
       endTime: '18:00:00',
       durationMinutes: 60,
       topic: 'Indexing & B-Trees',
-      status: 'pending',
+      status: 'pending' as const,
       isCompleted: false,
     },
   ];
@@ -113,7 +118,11 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
       },
     });
 
-    useAuthStore.setState({ user: mockUser as any, token: 'fake-jwt', isAuthenticated: true });
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isPremium: false,
+    });
     (authApi.getMe as jest.Mock).mockResolvedValue(mockUser);
     (timetableApi.getActive as jest.Mock).mockResolvedValue({
       id: 'tt-1',
@@ -167,14 +176,14 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
     });
 
     it('immediately updates timetable study window banner when student profile updates to 2h/day', async () => {
-      const updatedUser = {
+      const updatedUser: StudentProfile = {
         ...mockUser,
         preferredStudyTime: 'EVENING',
         availableHoursPerDay: 2,
       };
 
       (authApi.getMe as jest.Mock).mockResolvedValue(updatedUser);
-      useAuthStore.setState({ user: updatedUser as any });
+      useAuthStore.setState({ user: updatedUser });
 
       renderComponent();
 

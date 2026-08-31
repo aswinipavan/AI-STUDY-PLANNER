@@ -15,8 +15,8 @@
   - Verification & Test Execution:
     - Backend JUnit: `TimetableFutureSlotLockTest` (3/3 passing, `BUILD SUCCESS`).
     - Frontend Jest: 23 test suites passed, 150/150 tests passed (including dedicated `studyWindowAndLocking.test.tsx` and `slotDetailModal.test.tsx`).
-    - Frontend Playwright E2E: 27/27 tests passed in `timetable.spec.ts` (including `SEL-116` study window sync and `SEL-117` future slot lock verification).
     - Next.js Production Build: 24/24 static routes generated cleanly with 0 errors.
+    - Test Type Safety: Resolved TypeScript test fixture error TS2353 in studyWindowAndLocking.test.tsx by enforcing canonical StudentProfile typing and removing non-existent token property on AuthState, passing 100% of TypeScript checks and Jest tests.
 - **Files Modified:** `backend/src/main/java/com/aistudyplanner/service/TimetableService.java`, `backend/src/test/java/com/aistudyplanner/service/TimetableFutureSlotLockTest.java`, `frontend/src/utils/dateHelpers.ts`, `frontend/src/app/(dashboard)/settings/page.tsx`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/components/timetable/slotDetailModal.module.css`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/__tests__/app/timetable/studyWindowAndLocking.test.tsx`, `frontend/src/__tests__/components/slotDetailModal.test.tsx`, `frontend/src/__tests__/e2e/timetable.spec.ts`.
 - **Problems Found:** Settings mutations lacked React Query cache invalidation; missing `isFuture` check on slot toggle allowed completing sessions prematurely.
 - **Solutions:** Synchronized profile query cache across dashboard and timetable views; added full-stack future date checks with HTTP 400 rejection on backend and locked UI states on frontend.

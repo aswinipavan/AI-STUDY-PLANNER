@@ -22,7 +22,7 @@
   - Comprehensive Implementation:
     - Backend: `TimetableService.markSlotComplete` checks `slotDate.isAfter(LocalDate.now())` and throws HTTP 400 with descriptive error message.
     - Frontend: Added `isFutureSlot` and `formatFutureAvailability` helpers. Future slots display `🔒 Locked · Available on [Date]` badge with disabled lock icon button. Slot detail modal displays locked info banner and disables completion toggle.
-    - React Query: Settings mutations update cache and invalidate timetable queries. Timetable and Dashboard pages subscribe to live query data.
+    - Testing: Added strictly-typed StudentProfile mocks in studyWindowAndLocking.test.tsx removing extraneous token property, verified TypeScript (0 errors), 23/23 Jest test suites (150/150 passed), and 27/27 Playwright E2E tests in timetable.spec.ts.
   - Verification:
     - Backend Maven tests: 3/3 in `TimetableFutureSlotLockTest` passed (`BUILD SUCCESS`).
     - Frontend Jest unit tests: 23/23 test suites passed, 150/150 tests passed.

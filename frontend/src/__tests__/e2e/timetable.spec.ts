@@ -172,9 +172,9 @@ test.describe('Timetable Section', () => {
 
   test('SEL-095: Generator Step 2: Available study hours range checks (1-24 bounds)', async ({ page }) => {
     await page.goto('/timetable/generate');
-    // Verify generator page loads and has form controls
-    const formElements = page.locator('input, button, select');
-    const count = await formElements.count();
+    // Verify generator page loads and has interactive form controls
+    await expect(page.locator('body')).toContainText(/Generate AI Timetable|Select Subjects/i, { timeout: 10000 });
+    const count = await page.locator('button, input, [role="button"]').count();
     expect(count).toBeGreaterThan(0);
   });
 
