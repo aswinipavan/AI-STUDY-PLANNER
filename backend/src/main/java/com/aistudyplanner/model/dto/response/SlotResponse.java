@@ -36,5 +36,9 @@ public class SlotResponse {
     private Boolean isCatchUp;
     private LocalDate missedDate;
     private String notes;
+    private Boolean hasEvidence;
+    private String evidenceStatus;
+    private Integer evidenceScore;
+    private UUID evidenceId;
 }
 

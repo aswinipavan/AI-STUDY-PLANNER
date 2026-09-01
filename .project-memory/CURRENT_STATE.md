@@ -2,10 +2,9 @@
 
 ## Current Build Status
 - **GitHub Status:** Pull Request [#7](https://github.com/aswinipavan/AI-STUDY-PLANNER/pull/7) (`feat/master-ai-tutor-and-timetable-overhaul` -> `main`) has been successfully **MERGED** into `main` (commit `806c14d`). All master AI Tutor, Timetable horizon, and CI/CD changes are now live on `main`.
-- **Automated Test Suite & Quality Gate:** 100% genuine executable tests across all layers (456 total tests, 448 passed, 0 failures, 8 skipped in offline profile). Zero hardcoded or simulated test results.
-- **Excel Test-Case Documentation Portfolio:** 7 professional OpenPyXL workbooks in `testing/reports/` with **1,905 total test cases (300+ per sheet)** with 100% traceability to source files, runnable commands, defect tracking, and regression matrix.
-- **Frontend:** Next.js 16.2.9 (App Router) + Turbopack + React 19. Fully builds with 0 errors (`npm run build`, 24/24 routes generated cleanly), 0 ESLint errors (`npm run lint`), 0 TypeScript errors (`npx tsc --noEmit`), 150/150 Jest tests passed (`npm test`), and 78/78 Playwright E2E tests passed.
-- **Backend:** Spring Boot 3.2.4 (Java 17). Builds and tests with 0 errors (34 test classes, 275 passed, 0 failures, 0 errors, 8 skipped via `mvnw test`). Future slot completion attempts strictly rejected with HTTP 400 Bad Request.
+- **Automated Test Suite & Quality Gate:** 100% genuine executable tests across all layers (455+ total tests, 0 failures, 8 skipped in offline profile). Zero hardcoded or simulated test results.
+- **Frontend:** Next.js 16.2.9 (App Router) + Turbopack + React 19. Fully builds with 0 errors (`npm run build`, 24/24 routes generated cleanly), 0 ESLint errors (`npm run lint`), 0 TypeScript errors (`npx tsc --noEmit`), 165/165 Jest tests passed (`npm test`, 25 suites), and 8/8 Playwright E2E tests passed.
+- **Backend:** Spring Boot 3.2.4 (Java 17). Builds and tests with 0 errors (36 test classes, 290 passed, 0 failures, 0 errors, 8 skipped via `mvnw test`). Anti-bypass evidence completion validation strictly enforced. Future slot completion attempts strictly rejected with HTTP 400 Bad Request.
 - **Mobile (Android):** React Native 0.75.5 with TypeScript (`npm run tsc` passes with 0 errors), ESLint (0 errors), 20/20 Jest unit tests passing, and Standalone Production Release APK (`app-release.apk`, 67.33 MB) successfully compiled, assembled, and verified on connected physical Android device. Strict HTTPS for production Render backend (`https://ai-study-planner-hp0e.onrender.com`). Fully synchronized planned study duration and session metrics with canonical timetable API.
 - **Database:** Supabase PostgreSQL connected and stable with Flyway migrations `V1`, `V2`, `V3`, `V5` (15 tables) and `ddl-auto=validate`. Local H2 file persistence at `./data/studyplanner.mv.db`.
 - **Storage:** Local filesystem storage active for local development and offline mode (`/api/files/...`); Supabase Storage configured with anon key for cloud deployments (`materials/` and `avatars/` buckets).
@@ -48,3 +47,10 @@
 - **Full Start–End Time Range:** Displays full slot time (e.g. `6:00 PM – 7:00 PM`) and duration badge (`60m`), derived from user's preferred start time + target duration / session style.
 - **Study Session Detail Modal (`SlotDetailModal.tsx`):** Clicking any slot card opens a rich modal rendering: Subject badge, formatted date, full time range, duration, Status badge, **TODAY'S TOPIC**, **SOURCE MATERIAL**, **CHAPTER**, **DIFFICULTY**, **WHAT TO STUDY**, and **SELECTION REASON & EXAM RELEVANCE**.
 - **Missed Session & Catch-up History:** Past uncompleted slots are marked `status = 'missed'` and preserved in history. The active day displays an urgent `🔴 MISSED — COMPLETE TODAY` badge on catch-up slots.
+
+## Evidence-Based Study Session Completion & AI Verification
+- **Multi-Modal Evidence Upload:** `SlotDetailModal.tsx` provides a drag-and-drop dropzone supporting PDF notes, photos of handwritten notes/diagrams, screenshots, and text notes (up to 15MB).
+- **Deep AI Analysis Pipeline:** `StudyEvidenceVerificationService.java` extracts content using PDFBox, cross-references assigned curriculum topics via `MaterialTopicReader`, and queries AI for structured evaluation (relevance, depth, derivation quality).
+- **Deterministic Structured Verdict:** Returns status (`APPROVED`, `NEEDS_MORE_WORK`, `REVIEW_REQUIRED`), score (0–100), summary, matched topics, missing topics, actionable guidance, and confidence score.
+- **Strict Anti-Bypass Backend Gate:** `TimetableService.markSlotComplete` and `approveSlotCompletion` require a valid, student-owned, `APPROVED` evidence submission in `study_evidence_submissions` before setting `isCompleted = true`. Malicious direct completion calls are rejected with HTTP 400.
+

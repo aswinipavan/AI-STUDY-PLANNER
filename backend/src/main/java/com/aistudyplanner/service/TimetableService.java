@@ -37,7 +37,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class TimetableService {
 
@@ -49,6 +48,43 @@ public class TimetableService {
     private final StudentRepository studentRepository;
     private final MaterialTopicReader materialTopicReader;
     private final GroqService groqService;
+    private final com.aistudyplanner.repository.StudyEvidenceSubmissionRepository evidenceRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public TimetableService(
+            TimetableRepository timetableRepository,
+            TimetableSlotRepository timetableSlotRepository,
+            SubjectRepository subjectRepository,
+            MarksRepository marksRepository,
+            ExamRepository examRepository,
+            StudentRepository studentRepository,
+            MaterialTopicReader materialTopicReader,
+            GroqService groqService,
+            com.aistudyplanner.repository.StudyEvidenceSubmissionRepository evidenceRepository
+    ) {
+        this.timetableRepository = timetableRepository;
+        this.timetableSlotRepository = timetableSlotRepository;
+        this.subjectRepository = subjectRepository;
+        this.marksRepository = marksRepository;
+        this.examRepository = examRepository;
+        this.studentRepository = studentRepository;
+        this.materialTopicReader = materialTopicReader;
+        this.groqService = groqService;
+        this.evidenceRepository = evidenceRepository;
+    }
+
+    public TimetableService(
+            TimetableRepository timetableRepository,
+            TimetableSlotRepository timetableSlotRepository,
+            SubjectRepository subjectRepository,
+            MarksRepository marksRepository,
+            ExamRepository examRepository,
+            StudentRepository studentRepository,
+            MaterialTopicReader materialTopicReader,
+            GroqService groqService
+    ) {
+        this(timetableRepository, timetableSlotRepository, subjectRepository, marksRepository, examRepository, studentRepository, materialTopicReader, groqService, null);
+    }
 
     @Transactional
     public TimetableResponse generateAiTimetable(UUID studentId, GenerateTimetableRequest request) {
@@ -569,6 +605,58 @@ public class TimetableService {
     }
 
     @Transactional
+    public SlotResponse approveSlotCompletion(UUID studentId, UUID slotId, UUID evidenceId) {
+        TimetableSlot slot = timetableSlotRepository.findById(slotId)
+                .orElseThrow(() -> new ResourceNotFoundException("Slot not found"));
+
+        if (!slot.getTimetable().getStudent().getId().equals(studentId)) {
+            throw new IllegalArgumentException("Slot does not belong to student");
+        }
+
+        LocalDate slotDate = slot.getSlotDate();
+        if (slotDate == null && slot.getTimetable() != null && slot.getTimetable().getWeekStartDate() != null && slot.getDayOfWeek() != null) {
+            slotDate = slot.getTimetable().getWeekStartDate().plusDays(slot.getDayOfWeek());
+        }
+
+        if (slotDate != null && slotDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot complete a future study session scheduled for " + slotDate);
+        }
+
+        com.aistudyplanner.model.entity.StudyEvidenceSubmission evidence = evidenceRepository.findByIdAndStudentId(evidenceId, studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Evidence submission not found"));
+
+        if (!evidence.getTimetableSlot().getId().equals(slotId)) {
+            throw new IllegalArgumentException("Evidence does not belong to this study session");
+        }
+
+        if (evidence.getVerificationStatus() != com.aistudyplanner.model.VerificationStatus.APPROVED) {
+            throw new IllegalArgumentException("Cannot complete session: evidence verification status is " + evidence.getVerificationStatus());
+        }
+
+        boolean wasCompleted = Boolean.TRUE.equals(slot.getIsCompleted());
+        slot.setIsCompleted(true);
+        evidence.setIsUsedForCompletion(true);
+        evidenceRepository.save(evidence);
+        slot = timetableSlotRepository.save(slot);
+
+        if (!wasCompleted) {
+            Student student = slot.getTimetable().getStudent();
+            LocalDate today = LocalDate.now();
+            if (student.getLastActiveDate() == null || !student.getLastActiveDate().equals(today)) {
+                if (student.getLastActiveDate() != null && ChronoUnit.DAYS.between(student.getLastActiveDate(), today) == 1) {
+                    student.setStudyStreak((student.getStudyStreak() != null ? student.getStudyStreak() : 0) + 1);
+                } else if (student.getStudyStreak() == null || student.getStudyStreak() == 0) {
+                    student.setStudyStreak(1);
+                }
+                student.setLastActiveDate(today);
+                studentRepository.save(student);
+            }
+        }
+
+        return toSlotResponse(slot, slot.getTimetable().getWeekStartDate());
+    }
+
+    @Transactional
     public SlotResponse markSlotComplete(UUID studentId, UUID slotId) {
         TimetableSlot slot = timetableSlotRepository.findById(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Slot not found"));
@@ -587,6 +675,18 @@ public class TimetableService {
 
         if (!wasCompleted && slotDate != null && slotDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Cannot complete a future study session scheduled for " + slotDate);
+        }
+
+        if (!wasCompleted && evidenceRepository != null) {
+            // Require approved evidence for marking completion
+            java.util.Optional<com.aistudyplanner.model.entity.StudyEvidenceSubmission> approvedEvidence = evidenceRepository
+                    .findTopByTimetableSlotIdAndStudentIdOrderBySubmittedAtDesc(slotId, studentId);
+
+            if (approvedEvidence.isEmpty() || approvedEvidence.get().getVerificationStatus() != com.aistudyplanner.model.VerificationStatus.APPROVED) {
+                throw new IllegalArgumentException("Cannot complete session without approved study proof evidence. Please submit study proof first.");
+            }
+            approvedEvidence.get().setIsUsedForCompletion(true);
+            evidenceRepository.save(approvedEvidence.get());
         }
 
         slot.setIsCompleted(!wasCompleted);
@@ -743,6 +843,23 @@ public class TimetableService {
             selectionReason = "Standard syllabus allocation based on subject difficulty and available study hours.";
         }
 
+        Boolean hasEvidence = false;
+        String evidenceStatus = null;
+        Integer evidenceScore = null;
+        UUID evidenceId = null;
+
+        if (studentId != null && slot.getId() != null && evidenceRepository != null) {
+            java.util.Optional<com.aistudyplanner.model.entity.StudyEvidenceSubmission> latestEvidence = evidenceRepository
+                    .findTopByTimetableSlotIdAndStudentIdOrderBySubmittedAtDesc(slot.getId(), studentId);
+            if (latestEvidence.isPresent()) {
+                com.aistudyplanner.model.entity.StudyEvidenceSubmission ev = latestEvidence.get();
+                hasEvidence = true;
+                evidenceStatus = ev.getVerificationStatus() != null ? ev.getVerificationStatus().name() : null;
+                evidenceScore = ev.getScore();
+                evidenceId = ev.getId();
+            }
+        }
+
         return SlotResponse.builder()
                 .id(slot.getId())
                 .subject(StudentMapper.toSubjectResponse(slot.getSubject()))
@@ -767,6 +884,10 @@ public class TimetableService {
                 .isCatchUp(isCatchUp)
                 .missedDate(missedDate)
                 .notes(slot.getNotes())
+                .hasEvidence(hasEvidence)
+                .evidenceStatus(evidenceStatus)
+                .evidenceScore(evidenceScore)
+                .evidenceId(evidenceId)
                 .build();
     }
 }

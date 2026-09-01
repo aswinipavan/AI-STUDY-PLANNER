@@ -72,6 +72,12 @@ frontend/lint_results.txt
 # Scratch scripts
 scratch/
 
+# ── Local Data & Uploads ──────────────────────
+data/
+uploads/
+backend/data/
+backend/uploads/
+
 # ── Mobile (React Native / Android) ──────────
 mobile/node_modules/
 mobile/android/build/

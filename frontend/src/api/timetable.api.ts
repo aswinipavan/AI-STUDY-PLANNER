@@ -8,6 +8,7 @@ import {
   SubjectReadiness,
   Timetable,
   TimetableSlot,
+  StudyEvidenceResponse,
 } from '@/types/api.types';
 
 /**
@@ -55,7 +56,32 @@ export const timetableApi = {
 
   markSlotComplete: async (id: string): Promise<TimetableSlot> => {
     const response = await apiClient.patch(`/api/timetable/slots/${id}/complete`);
+    return normalizeSlot(response.data.data ?? response.data);
+  },
+
+  uploadEvidence: async (slotId: string, file: File): Promise<StudyEvidenceResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/api/timetable/slots/${slotId}/evidence`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data.data ?? response.data;
+  },
+
+  getLatestEvidence: async (slotId: string): Promise<StudyEvidenceResponse | null> => {
+    try {
+      const response = await apiClient.get(`/api/timetable/slots/${slotId}/evidence`);
+      return response.data.data ?? response.data ?? null;
+    } catch {
+      return null;
+    }
+  },
+
+  approveCompletion: async (slotId: string, evidenceId: string): Promise<TimetableSlot> => {
+    const response = await apiClient.post(`/api/timetable/slots/${slotId}/approve-completion`, {
+      evidenceId,
+    });
+    return normalizeSlot(response.data.data ?? response.data);
   },
 
   // Wrapper for frontend status - maps to backend's boolean isCompleted

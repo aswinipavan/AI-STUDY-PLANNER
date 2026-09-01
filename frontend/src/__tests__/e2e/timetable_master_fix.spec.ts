@@ -13,6 +13,9 @@ test.describe('Timetable Master Fix E2E Verification', () => {
     availableHoursPerDay: 1,
     isPremium: false,
   };
+  const today = new Date();
+  const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
   const mockSlots = [
     // Slot 1: Discrete Maths on Aug 27 (6:00 PM – 7:00 PM) - Missed past session
     {
@@ -43,15 +46,15 @@ test.describe('Timetable Master Fix E2E Verification', () => {
       isCompleted: false,
       status: 'missed',
     },
-    // Slot 2: Operating Systems on Aug 28 (6:00 PM – 7:00 PM) - Today's catch-up slot
+    // Slot 2: Operating Systems on today (Catch-up slot)
     {
       id: 'slot-aug28-catchup',
       subjectId: 'sub-dm',
       subject: { id: 'sub-dm', name: 'Discrete Maths' },
-      date: '2026-08-28',
-      dayOfWeek: 4,
-      startTime: '18:00:00',
-      endTime: '19:00:00',
+      date: todayIso,
+      dayOfWeek: (today.getDay() + 6) % 7,
+      startTime: '23:00:00',
+      endTime: '23:59:00',
       durationMinutes: 60,
       topic: 'Matrices - Determinant calculation',
       chapter: 'Matrices',
@@ -249,13 +252,30 @@ test.describe('Timetable Master Fix E2E Verification', () => {
     await expect(missedBadge).toHaveText(/🔴 MISSED/i);
   });
 
-  test('TF-05: Next-day catch-up slot shows 🔴 MISSED — COMPLETE TODAY badge', async ({ page }) => {
+  test('TF-05: Today catch-up slot shows CATCH-UP TODAY badge and carry-forward modal context', async ({ page }) => {
     await page.goto('/timetable');
 
-    // Catch-up badge on Aug 28 slot
+    // Catch-up badge on today's slot
     const catchUpBadge = page.locator('[data-testid="slot-card-slot-aug28-catchup"] [data-testid="catchup-badge"]');
     await expect(catchUpBadge).toBeVisible();
-    await expect(catchUpBadge).toHaveText(/🔴 MISSED — COMPLETE TODAY/i);
+    await expect(catchUpBadge).toHaveText(/CATCH-UP/i);
+
+    // Open detail modal
+    await page.locator('[data-testid="slot-card-slot-aug28-catchup"]').click();
+    const modal = page.locator('[data-testid="slot-detail-modal"]');
+    await expect(modal).toBeVisible();
+
+    // Verify Catch-up Required badge
+    await expect(page.locator('[data-testid="modal-status-badge"]')).toHaveText(/Catch-up Required/i);
+
+    // Verify Carry-Forward Context Box
+    const contextBox = page.locator('[data-testid="modal-catchup-context"]');
+    await expect(contextBox).toBeVisible();
+    await expect(contextBox).toContainText(/Original Missed:/i);
+    await expect(contextBox).toContainText(/Rescheduled Execution:/i);
+
+    // Close modal
+    await page.locator('[data-testid="close-slot-modal-btn"]').click();
   });
 
   test('TF-06: Switching to All Weeks view reveals Week 2 without date collision', async ({ page }) => {

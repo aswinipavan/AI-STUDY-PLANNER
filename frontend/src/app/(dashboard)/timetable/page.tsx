@@ -26,7 +26,17 @@ import { AdaptationResult, AdaptationTrigger, TimetableSlot } from '@/types/api.
 import { QK } from '@/constants/queryKeys';
 import { useAdaptTimetable } from '@/hooks/useTimetable';
 import { useSoundPreference } from '@/hooks/useSoundPreference';
-import { parseSlotDate, dayLabel, dayKey, slotDayKey, mondayBasedIndex, isFutureSlot, formatFutureAvailability } from '@/utils/dateHelpers';
+import {
+  parseSlotDate,
+  dayLabel,
+  dayKey,
+  slotDayKey,
+  mondayBasedIndex,
+  isFutureSlot,
+  formatFutureAvailability,
+  evaluateSessionState,
+  getSessionState,
+} from '@/utils/dateHelpers';
 import { SlotDetailModal } from '@/components/timetable/SlotDetailModal';
 import styles from './timetable.module.css';
 import { useAuthStore } from '@/stores/authStore';
@@ -54,6 +64,21 @@ function formatDay(value?: string): string | null {
   if (!value) return null;
   const parsed = parseSlotDate(value);
   return parsed ? parsed.toLocaleDateString([], { day: 'numeric', month: 'short' }) : null;
+}
+
+function SubjectProgressCard({ subject, current, target }: { subject: string; current: number; target: number }) {
+  const pct = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+  return (
+    <div className={styles.progressCard}>
+      <div className={styles.progressHeader}>
+        <span className={styles.progressSubject}>{subject}</span>
+        <span className={styles.progressRatio}>{current}/{target} sessions</span>
+      </div>
+      <div className={styles.progressBar}>
+        <div className={styles.progressFill} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
 }
 
 function DayProgressBar({ slots }: { slots: TimetableSlot[] }) {
@@ -85,27 +110,35 @@ function DayProgressBar({ slots }: { slots: TimetableSlot[] }) {
 
 function SlotCardItem({
   slot,
-  isMissed,
-  isCatchUp,
-  isFuture,
+  now = new Date(),
   onToggle,
   onOpenDetail,
 }: {
   slot: TimetableSlot;
-  isMissed: boolean;
-  isCatchUp: boolean;
-  isFuture?: boolean;
+  now?: Date;
   onToggle: (id: string, status: TimetableSlot['status']) => void;
   onOpenDetail: (slot: TimetableSlot) => void;
 }) {
+  const {
+    isLocked,
+    isMissed,
+    isActive,
+    isUpcoming,
+    isCompleted,
+    isCatchUpActive,
+  } = evaluateSessionState(slot, now);
+
   const nextStatus = (current: TimetableSlot['status']): TimetableSlot['status'] =>
     current === 'pending' ? 'completed' : current === 'completed' ? 'pending' : 'completed';
 
   let statusClass = styles.slotPending;
-  if (slot.status === 'completed') statusClass = styles.slotCompleted;
+  if (isCompleted) statusClass = styles.slotCompleted;
   else if (slot.status === 'skipped') statusClass = styles.slotSkipped;
-  else if (isCatchUp) statusClass = styles.slotCatchUp;
-  else if (isFuture) statusClass = styles.slotFuture;
+  else if (isLocked) statusClass = styles.slotFuture;
+  else if (isActive) statusClass = styles.slotActive;
+  else if (isCatchUpActive) statusClass = styles.slotCatchUp;
+  else if (isMissed) statusClass = styles.slotMissed;
+
   const subject = slot.subject?.name || (slot.subject as { name?: string; subjectName?: string })?.subjectName || 'Study';
   const duration = slot.durationMinutes || 60;
   const next = nextStatus(slot.status);
@@ -123,26 +156,39 @@ function SlotCardItem({
         }
       }}
       data-testid={`slot-card-${slot.id}`}
-      aria-label={`${subject}, ${slot.topic || 'Session'} from ${formatTimeRange(slot.startTime, slot.endTime)}. Status: ${isFuture ? 'locked (future session)' : isMissed ? 'missed' : slot.status}. Click for details.`}
+      aria-label={`${subject}, ${slot.topic || 'Session'} from ${formatTimeRange(slot.startTime, slot.endTime)}. Status: ${isLocked ? 'locked (future session)' : isMissed ? 'missed' : isCompleted ? 'completed' : isActive ? 'active' : 'upcoming'}. Click for details.`}
     >
-      {/* Catch-up urgent indicator */}
-      {isCatchUp && slot.status !== 'completed' && (
-        <span className={styles.catchUpBadge} data-testid="catchup-badge">
-          🔴 MISSED — COMPLETE TODAY
+      {/* 1. Future Locked Badge */}
+      {isLocked && !isCompleted && (
+        <span className={styles.futureBadge} data-testid={`future-badge-${slot.id}`}>
+          <Lock size={10} style={{ marginRight: '0.2rem' }} aria-hidden="true" /> Locked · {formatFutureAvailability(slot.date, now)}
         </span>
       )}
 
-      {/* Historical missed badge */}
-      {isMissed && slot.status !== 'completed' && !isCatchUp && (
+      {/* 2. Catch-up indicator on actionable active/upcoming session on today */}
+      {isCatchUpActive && !isCompleted && !isLocked && !isMissed && (
+        isActive ? (
+          <span className={styles.catchUpActiveBadge} data-testid="catchup-badge">
+            ⚡ ACTIVE CATCH-UP
+          </span>
+        ) : (
+          <span className={styles.catchUpBadge} data-testid="catchup-badge">
+            📌 CATCH-UP TODAY
+          </span>
+        )
+      )}
+
+      {/* 3. Missed badge (historical uncompleted session or missed execution deadline) */}
+      {isMissed && !isCompleted && !isLocked && (
         <span className={styles.missedBadge} data-testid="missed-badge">
           🔴 MISSED
         </span>
       )}
 
-      {/* Future locked badge */}
-      {isFuture && slot.status !== 'completed' && (
-        <span className={styles.futureBadge} data-testid={`future-badge-${slot.id}`}>
-          <Lock size={10} style={{ marginRight: '0.2rem' }} aria-hidden="true" /> Locked · {formatFutureAvailability(slot.date)}
+      {/* 4. Active in-progress session badge (standard session) */}
+      {isActive && !isCompleted && !isCatchUpActive && (
+        <span className={styles.activeBadge} data-testid={`active-badge-${slot.id}`}>
+          ⚡ ACTIVE NOW
         </span>
       )}
 
@@ -152,18 +198,18 @@ function SlotCardItem({
         </p>
         <button
           type="button"
-          disabled={isFuture}
+          disabled={isLocked}
           onClick={e => {
             e.stopPropagation();
-            if (isFuture) return;
+            if (isLocked) return;
             onToggle(slot.id, next);
           }}
-          className={`${styles.quickToggleBtn} ${slot.status === 'completed' ? styles.quickToggleDone : ''} ${isFuture ? styles.quickToggleLocked : ''}`}
-          title={isFuture ? `Locked · ${formatFutureAvailability(slot.date)}` : `Click to mark as ${next}`}
-          aria-label={isFuture ? `Locked: future session` : `Mark session as ${next}`}
+          className={`${styles.quickToggleBtn} ${isCompleted ? styles.quickToggleDone : ''} ${isLocked ? styles.quickToggleLocked : ''}`}
+          title={isLocked ? `Locked · ${formatFutureAvailability(slot.date, now)}` : `Click to mark as ${next}`}
+          aria-label={isLocked ? `Locked: future session` : `Mark session as ${next}`}
           data-testid={`quick-toggle-${slot.id}`}
         >
-          {isFuture ? <Lock size={13} /> : slot.status === 'completed' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
+          {isLocked ? <Lock size={13} /> : isCompleted ? <CheckCircle2 size={14} /> : <Clock size={14} />}
         </button>
       </div>
 
@@ -336,18 +382,21 @@ export default function TimetablePage() {
     return iso ? iso === todayIso : s.dayOfWeek === mondayBasedIndex(today);
   });
 
-  /** Missed sessions: past slots not marked completed */
-  const missedSlots = optimisticSlots.filter(s => {
-    if (s.status === 'completed') return false;
-    const iso = slotDay(s);
-    return (s.status === 'missed') || (iso !== null && iso < todayIso);
-  });
+  /** Missed sessions: past slots not marked completed, or today's session where local time has passed endTime */
+  const missedSlots = optimisticSlots.filter(s => getSessionState(s, today) === 'PAST_MISSED');
   const missedIds = new Set(missedSlots.map(s => s.id));
 
   const handleToggle = (id: string, status: TimetableSlot['status']) => {
     const targetSlot = optimisticSlots.find(s => s.id === id);
-    if (targetSlot && isFutureSlot(targetSlot.date, today) && status === 'completed') {
+    if (targetSlot && getSessionState(targetSlot, today) === 'FUTURE_LOCKED' && status === 'completed') {
       toast.info('Future study sessions cannot be completed early.');
+      return;
+    }
+
+    // Evidence requirement: if marking completed without approved evidence, open modal to submit proof
+    if (status === 'completed' && targetSlot && (!targetSlot.hasEvidence || targetSlot.evidenceStatus !== 'APPROVED')) {
+      setSelectedSlot(targetSlot);
+      setIsModalOpen(true);
       return;
     }
 
@@ -359,7 +408,7 @@ export default function TimetablePage() {
     startTransition(async () => {
       updateOptimistic({ id, status });
       if (selectedSlot && selectedSlot.id === id) {
-        setSelectedSlot(prev => (prev ? { ...prev, status } : null));
+        setSelectedSlot(prev => (prev ? { ...prev, status, isCompleted: status === 'completed' } : null));
       }
       if (finishesToday) {
         fireCelebrationConfetti();
@@ -380,12 +429,11 @@ export default function TimetablePage() {
   };
 
   const handleOpenDetail = (slot: TimetableSlot) => {
-    const isMissed = missedIds.has(slot.id);
-    const isCatchUp = Boolean(slot.isCatchUp);
+    const { isMissed, isCatchUpActive } = evaluateSessionState(slot, today);
     setSelectedSlot({
       ...slot,
       status: slot.status === 'completed' ? 'completed' : isMissed ? 'missed' : slot.status,
-      isCatchUp,
+      isCatchUp: isCatchUpActive,
     });
     setIsModalOpen(true);
   };
@@ -683,9 +731,7 @@ export default function TimetablePage() {
                             <SlotCardItem
                               key={slot.id}
                               slot={slot}
-                              isMissed={missedIds.has(slot.id)}
-                              isCatchUp={Boolean(slot.isCatchUp)}
-                              isFuture={isFutureSlot(slot.date, today)}
+                              now={today}
                               onToggle={handleToggle}
                               onOpenDetail={handleOpenDetail}
                             />

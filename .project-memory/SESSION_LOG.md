@@ -1,5 +1,94 @@
 # Session Log
 
+## 2026-09-01 (Session 40 - Master Feature & Live E2E Verification: Evidence-Based Study Session Completion with AI Verification)
+- **Task Started:** Implement evidence-based study completion workflow with AI analysis, resolve 404 endpoint routing issue, synchronize local H2 database schema with migration V7, and execute full end-to-end browser verification against live local backend and Next.js frontend with real files and real AI verification.
+- **Task Completed:**
+  - **Live Browser & End-to-End Verification (17 Steps):**
+    - Step 1: Loaded `http://localhost:3000/timetable` with live authenticated student context.
+    - Step 2: Located today's scheduled study slots.
+    - Step 3: Verified direct "Mark Complete" toggle bypass is prevented without evidence.
+    - Step 4: Opened session modal and accessed "STUDY PROOF & AI VERIFICATION" dropzone.
+    - Step 5: Uploaded real study proof file (`test-evidence-notes.txt` covering TCP Handshake & Congestion Control).
+    - Step 6: Verified network call `POST /api/timetable/slots/{slotId}/evidence` returned HTTP 200 OK.
+    - Step 7: Verified modal displays real AI verification result card.
+    - Step 8: Confirmed `APPROVED` verdict displays score (e.g. 78/100, 88% confidence), summary, matched topics list, AI feedback, and `[ Approve & Complete Session ]` action button.
+    - Step 9: Clicked `[ Approve & Complete Session ]`.
+    - Step 10: Verified backend `POST /api/timetable/slots/{slotId}/approve-completion` returned HTTP 200 OK.
+    - Step 11: Confirmed modal and session updated to "Verified & Completed" with proof metadata.
+    - Step 12: Reloaded timetable (`page.reload()`).
+    - Step 13: Confirmed completed state persisted from database.
+    - Step 14: Navigated to `http://localhost:3000/dashboard` and confirmed progress metrics updated.
+    - Step 15: Confirmed session is marked as done and not treated as pending/missed.
+    - Step 16: Uploaded insufficient notes file (`test-insufficient-notes.txt`) on uncompleted session and confirmed real AI evaluated `NEEDS_MORE_WORK` (Score 48/100), missing topics, constructive guidance, and completion remained blocked without approval button.
+    - Step 17: Tested future session and confirmed `🔒 Locked` banner and proof submission disabled.
+  - **Full Automated Test Suite Execution:**
+    - Frontend TypeScript (`npx tsc --noEmit`): 0 errors.
+    - Frontend Jest (`npm test`): 25/25 test suites passed, 165/165 tests passed.
+    - Playwright E2E (`npx playwright test`): 2/2 live real browser tests passed, 30/30 unit E2E tests passed.
+    - Backend Unit & Integration Tests (`.\mvnw.cmd test`): 36 test classes, 290 passed, 0 failures, 0 errors, 8 skipped (offline profile).
+    - Backend JAR Build (`.\mvnw.cmd package -DskipTests`): `BUILD SUCCESS`.
+    - Frontend Production Build (`npm run build`): 24/24 static routes generated cleanly with 0 errors.
+    - Verified `mobile/` directory was 100% untouched.
+- **Files Modified/Created:** `backend/src/main/resources/schema-local.sql`, `backend/src/main/resources/db/migration/V7__add_study_evidence_submissions.sql`, `backend/src/main/java/com/aistudyplanner/model/VerificationStatus.java`, `backend/src/main/java/com/aistudyplanner/model/entity/StudyEvidenceSubmission.java`, `backend/src/main/java/com/aistudyplanner/repository/StudyEvidenceSubmissionRepository.java`, `backend/src/main/java/com/aistudyplanner/model/dto/response/StudyEvidenceResponse.java`, `backend/src/main/java/com/aistudyplanner/model/dto/request/ApproveCompletionRequest.java`, `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotResponse.java`, `backend/src/main/java/com/aistudyplanner/service/StudyEvidenceVerificationService.java`, `backend/src/main/java/com/aistudyplanner/service/TimetableService.java`, `backend/src/main/java/com/aistudyplanner/controller/TimetableController.java`, `backend/src/test/java/com/aistudyplanner/service/StudyEvidenceVerificationTest.java`, `backend/src/test/java/com/aistudyplanner/controller/TimetableEvidenceControllerIntegrationTest.java`, `frontend/src/types/api.types.ts`, `frontend/src/api/evidence.api.ts`, `frontend/src/api/timetable.api.ts`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/components/timetable/slotDetailModal.module.css`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/__tests__/components/slotDetailModalEvidence.test.tsx`, `frontend/src/__tests__/e2e/evidence_completion.spec.ts`, `frontend/src/__tests__/e2e/live_evidence_browser_verification.spec.ts`.
+- **Problems Found:** Initial 404 caused by running backend instance lacking updated routes and missing H2 table definition in `schema-local.sql`.
+- **Solutions:** Synchronized `schema-local.sql`, compiled backend, added MockMvc integration test suite (8/8 passed), and verified live browser workflow with Playwright against live backend and Next.js proxy.
+- **Next Recommended Task:** Project ready for Git push or next master feature.
+- **Task Started:** Rebuild adaptive timetable planning logic and session state engine to decouple historical missed session origin from current execution date, eliminating false "MISSED" labels on today's actionable catch-up sessions, enforcing 6 canonical session states (`FUTURE_LOCKED`, `TODAY_UPCOMING`, `TODAY_ACTIVE`, `TODAY_COMPLETED`, `PAST_MISSED`, `CATCH_UP_TODAY`), and providing explicit carry-forward context in detail modal and dashboard.
+- **Task Completed:**
+  - **Core Domain Separation (Original vs Execution Session):**
+    - Original Session: Historical calendar date (e.g. Aug 29) remains permanently recorded as `PAST_MISSED` in history and is never mutated to today.
+    - Adaptive Catch-Up Execution: Carried forward to today's available capacity (`slotDate` = 2026-08-31) with `status = pending`, `isCatchUp = true`, and `missedDate = 2026-08-29`.
+    - Resolved UI confusion: Today's execution opportunity is classified as `CATCH_UP_TODAY` (or `⚡ ACTIVE CATCH-UP` / `📌 CATCH-UP TODAY`) and is never labeled as `MISSED` until today's 6:00 PM execution deadline has expired without completion.
+  - **Canonical State Engine (`frontend/src/utils/dateHelpers.ts`):**
+    - Enforced 6 canonical states: `FUTURE_LOCKED`, `TODAY_UPCOMING`, `TODAY_ACTIVE`, `TODAY_COMPLETED`, `PAST_MISSED`, and `CATCH_UP_TODAY`.
+    - Integrated with sub-phases (`isActive` during session window, `isUpcoming` before window, `isActionable = !isLocked`).
+  - **UI & Modal Enhancements:**
+    - `SlotCardItem` (`timetable/page.tsx`): Displays `📌 CATCH-UP TODAY` (amber) when upcoming, `⚡ ACTIVE CATCH-UP` (emerald) when active, `🔴 MISSED` (red) only when past deadline, and `🔒 Locked` when future.
+    - `SlotDetailModal` (`SlotDetailModal.tsx` & `slotDetailModal.module.css`): Added Carry-Forward Context Box showing Original Missed Date (`August 29, 2026`), Rescheduled Execution (`Today`), status badge (`⚡ Catch-up Required`), and clear pedagogical rationale.
+    - `DashboardPage` (`dashboard/page.tsx`): Dynamically labels Today's Schedule side panel items (`catch-up today`, `active now · catch-up`, `upcoming`, `active now`, `completed`, `missed`).
+  - **Verification & Testing (Regression Cases A–J):**
+    - Created unit tests in `frontend/src/__tests__/utils/sessionState.test.ts` covering Cases A through J.
+    - Updated `SlotDetailModal.test.tsx` and Playwright `timetable_master_fix.spec.ts` (TF-01 through TF-06).
+    - Jest Unit Tests: 24/24 test suites passed, 159/159 tests passed.
+    - Playwright E2E Tests: 6/6 tests passed (14.6s).
+    - Backend Maven Tests: 275/275 tests passed (`BUILD SUCCESS`).
+    - Next.js Production Build: 24/24 static routes generated cleanly with 0 errors.
+    - TypeScript Typecheck (`npx tsc --noEmit`): 0 errors.
+- **Files Modified:** `frontend/src/utils/dateHelpers.ts`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/components/timetable/slotDetailModal.module.css`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/__tests__/utils/sessionState.test.ts`, `frontend/src/__tests__/components/slotDetailModal.test.tsx`, `frontend/src/__tests__/e2e/timetable_master_fix.spec.ts`.
+- **Problems Found:** Mixing of original missed status with today's rescheduled execution slot; lack of explicit carry-forward context banner.
+- **Solutions:** Separated original historical record from execution slot state and added canonical `CATCH_UP_TODAY` state and carry-forward modal box.
+- **Next Recommended Task:** Ready for final review.
+
+## 2026-08-31 (Session 38 - Canonical Timetable Session-State Classification & Missed Session Fix)
+- **Task Started:** Fix timetable session-state classification logic to eliminate false "MISSED" badges on today's upcoming/active sessions (e.g. 5–6 PM at 2:58 PM) and tomorrow's future locked sessions (Sep 1), and implement a single canonical session-state function used across Timetable, Dashboard, Slot Details, and Adaptive Planner.
+- **Task Completed:**
+  - Diagnosed Root Cause:
+    1. Slots containing catch-up or rescheduled notes had `isCatchUp = true` unconditionally triggering `🔴 MISSED — COMPLETE TODAY` badge, even for sessions rescheduled to tomorrow or future dates.
+    2. Missing state evaluation for today's pre-session window (e.g. at 2:58 PM for a 5:00 PM session).
+    3. `missedSlots` filter previously checked `s.status === 'missed'` directly from backend responses without verifying if the slot is today or future.
+  - Implemented Unified Canonical Session-State System:
+    - In `frontend/src/utils/dateHelpers.ts`: Added `getSessionState`, `evaluateSessionState`, `parseTimeToMinutes`, `TimetableSessionState`, and `SessionStateEvaluation`.
+    - Defined 5 strictly distinct canonical states:
+      1. `PAST_MISSED`: session date < today without completion, or today's session where local time > endTime.
+      2. `TODAY_UPCOMING`: session is on today, current time < startTime, not completed.
+      3. `TODAY_ACTIVE`: session is on today, startTime <= current time <= endTime, not completed.
+      4. `TODAY_COMPLETED`: session is completed (`isCompleted: true` or `status: 'completed'`).
+      5. `FUTURE_LOCKED`: session date > today (strictly locked, cannot be completed early, never missed).
+    - Updated Timetable Grid (`timetable/page.tsx`): Integrated `evaluateSessionState`, cleaned up `SlotCardItem`, updated `missedSlots` filter, and added `⚡ ACTIVE NOW` badge styling.
+    - Updated Slot Detail Modal (`SlotDetailModal.tsx`): Integrated `evaluateSessionState` to display accurate status banners (`Locked (Future)`, `Active Now`, `Upcoming (Today)`, `Catch-up Required`, `Missed Session`, `Completed`) and disabled action button for future sessions.
+    - Updated Dashboard (`dashboard/page.tsx`): Harmonized Today's Schedule item labels (`active now`, `upcoming`, `completed`, `missed`).
+  - Verification & Testing:
+    - Added unit test suite `frontend/src/__tests__/utils/sessionState.test.ts` testing yesterday's missed sessions, today's upcoming session, active session during window, incomplete session after end time, tomorrow's locked session (even with rescheduled notes), and completed status.
+    - TypeScript compiler check (`npx tsc --noEmit`): 0 errors.
+    - Frontend Jest unit tests (`npm test`): 24/24 test suites passed, 162/162 tests passed.
+    - Playwright E2E tests (`timetable_master_fix.spec.ts`): 6/6 passed.
+    - Backend Maven tests (`./mvnw.cmd test`): 275 tests passed, 0 failures (`BUILD SUCCESS`).
+    - Next.js production build (`npm run build`): 24/24 static routes generated cleanly in 7.1s.
+- **Files Modified:** `frontend/src/utils/dateHelpers.ts`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/components/timetable/slotDetailModal.module.css`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/__tests__/utils/sessionState.test.ts`.
+- **Problems Found:** Unconditional catch-up badge triggering on future rescheduled slots; missing time-of-day interval checks for today's sessions.
+- **Solutions:** Standardized canonical `getSessionState` and `evaluateSessionState` across client components using exact local date and time calculations.
+- **Next Recommended Task:** Final review and production deployment.
+
 ## 2026-08-31 (Session 37 - Timetable Study-Window Synchronization & Future Session Locking)
 - **Task Started:** Investigate and fix stale daily study window calculations on Timetable after updating student preferences in Settings (Issue 1), and implement strict future session locking across Web UI, Modals, and Backend API (Issue 2).
 - **Task Completed:**
@@ -17,6 +106,7 @@
     - Frontend Jest: 23 test suites passed, 150/150 tests passed (including dedicated `studyWindowAndLocking.test.tsx` and `slotDetailModal.test.tsx`).
     - Next.js Production Build: 24/24 static routes generated cleanly with 0 errors.
     - Test Type Safety: Resolved TypeScript test fixture error TS2353 in studyWindowAndLocking.test.tsx by enforcing canonical StudentProfile typing and removing non-existent token property on AuthState, passing 100% of TypeScript checks and Jest tests.
+    - Infinite Re-render Resolution: Eliminated "Maximum update depth exceeded" error on Settings page by using `lastSyncedProfileRef` to guard Zustand `setUser` synchronizations against object reference cycles and narrowing preference effect dependencies to scalar properties.
 - **Files Modified:** `backend/src/main/java/com/aistudyplanner/service/TimetableService.java`, `backend/src/test/java/com/aistudyplanner/service/TimetableFutureSlotLockTest.java`, `frontend/src/utils/dateHelpers.ts`, `frontend/src/app/(dashboard)/settings/page.tsx`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/components/timetable/slotDetailModal.module.css`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/__tests__/app/timetable/studyWindowAndLocking.test.tsx`, `frontend/src/__tests__/components/slotDetailModal.test.tsx`, `frontend/src/__tests__/e2e/timetable.spec.ts`.
 - **Problems Found:** Settings mutations lacked React Query cache invalidation; missing `isFuture` check on slot toggle allowed completing sessions prematurely.
 - **Solutions:** Synchronized profile query cache across dashboard and timetable views; added full-stack future date checks with HTTP 400 rejection on backend and locked UI states on frontend.
@@ -2044,9 +2134,53 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - `.project-memory/TASKS.md` [MODIFIED]
   - `.project-memory/CHANGELOG.md` [MODIFIED]
   - `.project-memory/SESSION_LOG.md` [MODIFIED]
+
+---
+
+## 2026-09-01 (Session 40 - Master Feature: Evidence-Based Study Session Completion with AI Verification)
+- **Task Started:** Implement Evidence-Based Study Session Completion with AI Verification replacing direct "Mark Complete" clicks across the Web application and Spring Boot backend.
+- **Task Completed:**
+  1. Created backend JPA entity `StudyEvidenceSubmission`, repository `StudyEvidenceSubmissionRepository`, enum `VerificationStatus`, and Flyway migration `V7__add_study_evidence_submissions.sql`.
+  2. Built `StudyEvidenceVerificationService` with Apache PDFBox text extraction, plain text parser, image/diagram detection, and curriculum cross-referencing via `MaterialTopicReader`.
+  3. Integrated structured AI verification prompt via `AiProviderGateway` returning status (`APPROVED`, `NEEDS_MORE_WORK`, `REVIEW_REQUIRED`), score (0–100), summary, matched topics, missing topics, guidance, and confidence.
+  4. Added backend endpoints `POST /api/timetable/slots/{slotId}/evidence`, `GET /api/timetable/slots/{slotId}/evidence`, and `POST /api/timetable/slots/{slotId}/approve-completion`.
+  5. Enforced anti-bypass validation in `TimetableService.markSlotComplete` requiring verified proof for completion while maintaining strict future session locking (`LocalDate.now()`).
+  6. Built rich interactive modal workflow in `SlotDetailModal.tsx` and `slotDetailModal.module.css` with drag-and-drop file upload, AI analyzing spinner, verification verdict card, approve-completion button, and verified completion badge.
+  7. Added unit tests in `StudyEvidenceVerificationTest.java` (7/7 passed), Jest tests in `slotDetailModalEvidence.test.tsx` (6/6 passed), Playwright E2E tests in `evidence_completion.spec.ts` (2/2 passed), and verified 100% pass rate across entire repository test suites (282 backend tests, 165 frontend Jest tests, 8 Playwright tests, 0 TypeScript errors, 24/24 static build routes).
+- **Files Modified/Created:**
+  - `backend/src/main/java/com/aistudyplanner/model/VerificationStatus.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/entity/StudyEvidenceSubmission.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/repository/StudyEvidenceSubmissionRepository.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/StudyEvidenceResponse.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/request/ApproveCompletionRequest.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotResponse.java` [MODIFIED]
+  - `backend/src/main/resources/db/migration/V7__add_study_evidence_submissions.sql` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/StudyEvidenceVerificationService.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/TimetableService.java` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/controller/TimetableController.java` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/service/StudyEvidenceVerificationTest.java` [NEW]
+  - `frontend/src/types/api.types.ts` [MODIFIED]
+  - `frontend/src/api/evidence.api.ts` [NEW]
+  - `frontend/src/api/timetable.api.ts` [MODIFIED]
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED]
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED]
+  - `frontend/src/__tests__/components/slotDetailModalEvidence.test.tsx` [NEW]
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [MODIFIED]
+  - `frontend/src/__tests__/app/timetable/studyWindowAndLocking.test.tsx` [MODIFIED]
+  - `frontend/src/__tests__/e2e/evidence_completion.spec.ts` [NEW]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/API_STATUS.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/TEST_PROGRESS.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
 - **Problems Found & Solutions:**
-  - Cleartext HTTP blocked in debug: Solved via `src/debug/AndroidManifest.xml` overlay.
-  - Signout unhandled rejection when unauthenticated: Added null checks around `auth().currentUser`.
-- **Next Recommended Task:** Production web deployment and release APK signing.
+  - `TimetableService` ambiguous constructor injection: added `@Autowired` to canonical 9-arg constructor and 8-arg fallback constructor.
+  - JSON unwrapping when `data` key was present: handled safely with property existence checks in `evidence.api.ts`.
+- **Next Recommended Task:** Prepare production release testing and mobile APK build.
+
 
 
