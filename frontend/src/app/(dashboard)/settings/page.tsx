@@ -14,6 +14,7 @@ import { useSoundPreference } from '@/hooks/useSoundPreference';
 import { useDialog } from '@/hooks/useDialog';
 import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/api/auth.api';
+import { StudentProfile } from '@/types/api.types';
 import { QK } from '@/constants/queryKeys';
 import { Moon, Sun, Monitor, Volume2, User, Bell, LogOut, BookOpen, Building2, Phone, GraduationCap, Camera, Shield, Clock, AlertTriangle, Key, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -194,7 +195,7 @@ export default function SettingsPage() {
       setEmailNotifs(activeUser.emailNotifications ?? true);
       setPushNotifs(activeUser.pushNotifications ?? false);
     }
-  }, [activeUser]);
+  }, [activeUser?.emailNotifications, activeUser?.pushNotifications]);
 
   // Load saved study preferences so the dropdowns reflect what the timetable generator will actually use.
   // studyTime is now the start-time label ("5:00 PM") not the old broad-range ("Evening (5 PM - 9 PM)").
@@ -203,9 +204,10 @@ export default function SettingsPage() {
       setStudyTime(ENUM_TO_LABEL[activeUser.preferredStudyTime ?? ''] ?? '5:00 PM');
       setStudyDuration(hoursToDurationLabel(activeUser.availableHoursPerDay));
     }
-  }, [activeUser]);
+  }, [activeUser?.preferredStudyTime, activeUser?.availableHoursPerDay]);
 
   const initializedRef = useRef(false);
+  const lastSyncedProfileRef = useRef<StudentProfile | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -218,25 +220,17 @@ export default function SettingsPage() {
     },
   });
 
+  // Sync fresh fetchedProfile into auth store safely when reference changes from React Query
+  useEffect(() => {
+    if (fetchedProfile && lastSyncedProfileRef.current !== fetchedProfile) {
+      lastSyncedProfileRef.current = fetchedProfile;
+      setUser(fetchedProfile);
+    }
+  }, [fetchedProfile, setUser]);
+
+  // Prepopulate form values once initialized or on clean profile refresh
   useEffect(() => {
     if (fetchedProfile) {
-      const isDifferent =
-        !user ||
-        user.id !== fetchedProfile.id ||
-        user.fullName !== fetchedProfile.fullName ||
-        user.name !== fetchedProfile.name ||
-        user.collegeName !== fetchedProfile.collegeName ||
-        user.semester !== fetchedProfile.semester ||
-        user.department !== fetchedProfile.department ||
-        user.phoneNumber !== fetchedProfile.phoneNumber ||
-        user.availableHoursPerDay !== fetchedProfile.availableHoursPerDay ||
-        user.preferredStudyTime !== fetchedProfile.preferredStudyTime ||
-        user.emailNotifications !== fetchedProfile.emailNotifications ||
-        user.pushNotifications !== fetchedProfile.pushNotifications;
-
-      if (isDifferent) {
-        setUser(fetchedProfile);
-      }
       if (!initializedRef.current || !isDirty) {
         reset({
           name: fetchedProfile.fullName || fetchedProfile.name || '',
@@ -257,7 +251,7 @@ export default function SettingsPage() {
       });
       initializedRef.current = true;
     }
-  }, [fetchedProfile, user, isDirty, reset, setUser]);
+  }, [fetchedProfile, user, isDirty, reset]);
 
   const { mutate: saveProfile, isPending, isSuccess } = useMutation({
     mutationFn: (data: ProfileFormData) => authApi.updateMe({

@@ -13,6 +13,25 @@ import { isFutureSlot, formatFutureAvailability, dayKey } from '@/utils/dateHelp
 import { StudentProfile } from '@/types/api.types';
 
 // Mocks
+jest.mock('firebase/auth', () => ({
+  getAuth: jest.fn(),
+  GoogleAuthProvider: jest.fn(),
+  onAuthStateChanged: jest.fn(),
+}));
+
+jest.mock('@/lib/firebase', () => ({
+  auth: {},
+  googleProvider: {},
+}));
+
+jest.mock('@/api/evidence.api', () => ({
+  evidenceApi: {
+    uploadEvidence: jest.fn(),
+    getLatestEvidence: jest.fn().mockResolvedValue(null),
+    approveCompletion: jest.fn(),
+  },
+}));
+
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
@@ -84,6 +103,8 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
       topic: 'Vector Calculus',
       status: 'pending' as const,
       isCompleted: false,
+      hasEvidence: true,
+      evidenceStatus: 'APPROVED' as const,
     },
     {
       id: 'slot-future',

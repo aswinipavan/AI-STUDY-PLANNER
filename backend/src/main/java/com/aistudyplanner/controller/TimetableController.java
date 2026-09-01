@@ -35,6 +35,7 @@ public class TimetableController {
 
     private final TimetableService timetableService;
     private final AdaptiveScheduleService adaptiveScheduleService;
+    private final com.aistudyplanner.service.StudyEvidenceVerificationService studyEvidenceVerificationService;
 
     @PostMapping("/generate")
     @Operation(summary = "Generate AI Timetable")
@@ -81,6 +82,38 @@ public class TimetableController {
         log.info("Updating slot: {} for student: {}", slotId, student.getId());
         SlotResponse response = timetableService.updateSlot(student.getId(), slotId, request);
         return ResponseEntity.ok(ApiResponse.success(response, "Slot updated successfully"));
+    }
+
+    @PostMapping(value = "/slots/{slotId}/evidence", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Submit and AI-verify study evidence proof for a slot")
+    public ResponseEntity<ApiResponse<com.aistudyplanner.model.dto.response.StudyEvidenceResponse>> submitStudyEvidence(
+            @CurrentStudent Student student,
+            @PathVariable UUID slotId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        log.info("Submitting study evidence for slot: {} by student: {}", slotId, student.getId());
+        com.aistudyplanner.model.dto.response.StudyEvidenceResponse response = studyEvidenceVerificationService.submitAndVerifyEvidence(student.getId(), slotId, file);
+        return ResponseEntity.ok(ApiResponse.success(response, "Study proof evidence analyzed successfully"));
+    }
+
+    @GetMapping("/slots/{slotId}/evidence")
+    @Operation(summary = "Get latest study evidence submission for a slot")
+    public ResponseEntity<ApiResponse<com.aistudyplanner.model.dto.response.StudyEvidenceResponse>> getLatestEvidence(
+            @CurrentStudent Student student,
+            @PathVariable UUID slotId) {
+        log.info("Fetching latest study evidence for slot: {} by student: {}", slotId, student.getId());
+        com.aistudyplanner.model.dto.response.StudyEvidenceResponse response = studyEvidenceVerificationService.getLatestEvidenceForSlot(student.getId(), slotId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Latest evidence fetched successfully"));
+    }
+
+    @PostMapping("/slots/{slotId}/approve-completion")
+    @Operation(summary = "Approve and complete slot using verified study evidence")
+    public ResponseEntity<ApiResponse<SlotResponse>> approveSlotCompletion(
+            @CurrentStudent Student student,
+            @PathVariable UUID slotId,
+            @Valid @RequestBody com.aistudyplanner.model.dto.request.ApproveCompletionRequest request) {
+        log.info("Approving slot completion: {} with evidence: {} for student: {}", slotId, request.getEvidenceId(), student.getId());
+        SlotResponse response = timetableService.approveSlotCompletion(student.getId(), slotId, request.getEvidenceId());
+        return ResponseEntity.ok(ApiResponse.success(response, "Study session approved and completed successfully"));
     }
 
     @PatchMapping("/slots/{slotId}/complete")

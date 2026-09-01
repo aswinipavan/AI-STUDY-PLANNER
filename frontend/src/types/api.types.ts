@@ -72,7 +72,32 @@ export interface TimetableSlot {
   isCatchUp?: boolean;
   missedDate?: string;
   notes?: string;
+  hasEvidence?: boolean;
+  evidenceStatus?: 'APPROVED' | 'NEEDS_MORE_WORK' | 'REVIEW_REQUIRED' | null;
+  evidenceScore?: number;
+  evidenceId?: string;
   timetableId?: string;
+}
+
+export type VerificationStatus = 'APPROVED' | 'NEEDS_MORE_WORK' | 'REVIEW_REQUIRED';
+
+export interface StudyEvidenceResponse {
+  id: string;
+  slotId: string;
+  fileName: string;
+  fileUrl: string;
+  fileType?: string;
+  fileSizeBytes?: number;
+  verificationStatus: VerificationStatus;
+  score?: number;
+  summary?: string;
+  matchedTopics?: string[];
+  missingTopics?: string[];
+  feedback?: string;
+  confidence?: number;
+  verifiedAt?: string;
+  isUsedForCompletion?: boolean;
+  submittedAt?: string;
 }
 
 export interface Timetable {

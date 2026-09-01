@@ -1,0 +1,20 @@
+COMPUTER NETWORKS - ADVANCED STUDY PROOF
+Subject: Computer Networks (CS401)
+Topic: TCP Handshake & Congestion Control Architecture
+
+1. TCP Three-Way Handshake Connection Establishment:
+- Step 1: Client -> Server [SYN, Seq = x] (Client in SYN_SENT state)
+- Step 2: Server -> Client [SYN + ACK, Seq = y, Ack = x + 1] (Server in SYN_RECEIVED state)
+- Step 3: Client -> Server [ACK, Seq = x + 1, Ack = y + 1] (Both in ESTABLISHED state)
+
+2. Congestion Control Mechanics (RFC 5681):
+- Slow Start: cwnd starts at initial window (IW <= 4 MSS). For each ACK received, cwnd += 1 MSS (exponential growth per RTT).
+- Congestion Avoidance: When cwnd >= ssthresh, cwnd increases by 1 MSS per RTT (Additive Increase).
+- Fast Retransmit: Triggered upon reception of 3 duplicate ACKs (4 identical ACKs total).
+- Fast Recovery: Sets ssthresh = max(FlightSize / 2, 2 * MSS) and cwnd = ssthresh + 3 * MSS (Multiplicative Decrease).
+
+3. Practice Problem & Numerical Calculation:
+- Initial ssthresh = 64 KB, MSS = 2 KB.
+- Packet loss occurs at cwnd = 32 KB.
+- New ssthresh = 32 KB / 2 = 16 KB.
+- Transmission resumes via Fast Recovery with cwnd set to 16 KB + 3 * 2 KB = 22 KB.

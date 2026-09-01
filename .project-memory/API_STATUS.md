@@ -17,3 +17,7 @@
 | `GET /api/timetable/active` | Implemented & Enriched Slots | Yes | Yes | No | Agent |
 | `POST /api/timetable/slots/{id}/toggle` | Implemented & History Preserved | Yes | Yes | No | Agent |
 | `POST /api/timetable/adapt` | Implemented & Rescheduled | Yes | Yes | No | Agent |
+| `POST /api/timetable/slots/{id}/evidence` | Implemented & Multi-Modal Verified | Yes | Yes | No | Agent |
+| `GET /api/timetable/slots/{id}/evidence` | Implemented & Latest Retrieved | Yes | Yes | No | Agent |
+| `POST /api/timetable/slots/{id}/approve-completion` | Implemented & Anti-Bypass Enforced | Yes | Yes | No | Agent |
+

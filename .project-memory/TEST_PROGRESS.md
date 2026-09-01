@@ -17,11 +17,11 @@
 
 | Layer | Framework & Runner | Total Tests | Passed | Failed | Skipped | Pass Rate | Duration | Detailed Report |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Backend Service & API** | JUnit 5 / Spring Boot Test / MockMvc | **263** | 255 | 0 | 8 | 96.96% | 85.9s | `testing/reports/backend/BACKEND_TEST_REPORT.md` |
-| **Frontend Unit & Component** | Jest / React Testing Library | **134** | 134 | 0 | 0 | 100.0% | 61.03s | `testing/reports/frontend/FRONTEND_TEST_REPORT.md` |
-| **Frontend End-to-End** | Playwright (Chromium) | **51** | 51 | 0 | 0 | 100.0% | 59.96s | `testing/reports/e2e/E2E_PLAYWRIGHT_REPORT.md` |
-| **Mobile React Native** | Jest / React Native | **8** | 8 | 0 | 0 | 100.0% | 0.42s | `testing/reports/mobile/MOBILE_TEST_REPORT.md` |
-| **TOTAL CONSOLIDATED** | **All 4 Test Frameworks** | **456** | **448** | **0** | **8** | **98.25%** | **207.31s** | `testing/reports/summary/TEST_EXECUTION_SUMMARY.json` |
+| **Backend Service & API** | JUnit 5 / Spring Boot Test / MockMvc | **290** | 290 | 0 | 8 | 100.0% | 85.9s | `testing/reports/backend/BACKEND_TEST_REPORT.md` |
+| **Frontend Unit & Component** | Jest / React Testing Library | **165** | 165 | 0 | 0 | 100.0% | 6.0s | `testing/reports/frontend/FRONTEND_TEST_REPORT.md` |
+| **Frontend End-to-End** | Playwright (Chromium) | **53** | 53 | 0 | 0 | 100.0% | 59.96s | `testing/reports/e2e/E2E_PLAYWRIGHT_REPORT.md` |
+| **Mobile React Native** | Jest / React Native | **20** | 20 | 0 | 0 | 100.0% | 0.42s | `testing/reports/mobile/MOBILE_TEST_REPORT.md` |
+| **TOTAL CONSOLIDATED** | **All 4 Test Frameworks** | **528** | **520** | **0** | **8** | **98.48%** | **152.28s** | `testing/reports/summary/TEST_EXECUTION_SUMMARY.json` |
 
 ---
 

@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { timetableApi } from '@/api/timetable.api';
 import { authApi } from '@/api/auth.api';
 import { QK } from '@/constants/queryKeys';
-import { dayKey, slotDayKey, mondayBasedIndex } from '@/utils/dateHelpers';
+import { dayKey, slotDayKey, mondayBasedIndex, evaluateSessionState } from '@/utils/dateHelpers';
 import { computeDayStudyStats, calculateSlotDuration } from '@/utils/dashboardStats';
 import {
   Sparkles, Clock, CheckCircle2, CalendarDays, ArrowRight,
@@ -287,7 +287,17 @@ export default function DashboardPage() {
           ) : todaySlots.length > 0 ? (
             <div className={styles.recList}>
               {todaySlots.map((slot) => {
-                const isCompleted = slot.status === 'completed' || slot.isCompleted === true;
+                const stateEval = evaluateSessionState(slot);
+                const isCompleted = stateEval.isCompleted;
+                const statusLabel = isCompleted
+                  ? 'completed'
+                  : stateEval.isCatchUpActive && !stateEval.isMissed
+                  ? (stateEval.isActive ? 'active now · catch-up' : 'catch-up today')
+                  : stateEval.isActive
+                  ? 'active now'
+                  : stateEval.isUpcoming
+                  ? 'upcoming'
+                  : 'missed';
                 const subjectName = typeof slot.subject === 'string'
                   ? slot.subject
                   : slot.subject?.name || (slot.subject as { name?: string; subjectName?: string } | undefined)?.subjectName || slot.subjectName || 'Study Session';
@@ -304,7 +314,7 @@ export default function DashboardPage() {
                         <p className={styles.recItemTopic} title={slot.topic}>{slot.topic}</p>
                       )}
                       <p className={styles.recItemTopic}>
-                        {formatSlotTimeRange(slot.startTime, slot.endTime)} · {durationMins}m · {isCompleted ? 'completed' : 'pending'}
+                        {formatSlotTimeRange(slot.startTime, slot.endTime)} · {durationMins}m · {statusLabel}
                       </p>
                     </div>
                   </div>

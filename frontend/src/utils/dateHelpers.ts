@@ -84,3 +84,188 @@ export function formatFutureAvailability(slotDate?: string, targetDate: Date = n
   return `Available on ${formatted}`;
 }
 
+/**
+ * Parse time string ("17:00", "17:00:00", "5:00 PM") into minutes from midnight.
+ */
+export function parseTimeToMinutes(timeStr?: string): number | null {
+  if (!timeStr) return null;
+  const str = timeStr.trim();
+
+  // Check 12-hour format with AM/PM (e.g. "5:00 PM", "05:00 PM", "5:00:00 PM")
+  const match12 = /(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)/i.exec(str);
+  if (match12) {
+    let hours = parseInt(match12[1], 10);
+    const minutes = parseInt(match12[2], 10);
+    const meridian = match12[3].toUpperCase();
+    if (meridian === 'PM' && hours < 12) hours += 12;
+    if (meridian === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  }
+
+  // Check 24-hour format "HH:mm" or "HH:mm:ss"
+  const match24 = /^(\d{1,2}):(\d{2})(?::\d{2})?/.exec(str);
+  if (match24) {
+    const hours = parseInt(match24[1], 10);
+    const minutes = parseInt(match24[2], 10);
+    if (!Number.isNaN(hours) && !Number.isNaN(minutes)) {
+      return hours * 60 + minutes;
+    }
+  }
+  return null;
+}
+
+export type TimetableSessionState =
+  | 'FUTURE_LOCKED'
+  | 'TODAY_UPCOMING'
+  | 'TODAY_ACTIVE'
+  | 'TODAY_COMPLETED'
+  | 'PAST_MISSED'
+  | 'CATCH_UP_TODAY';
+
+export interface SessionStateEvaluation {
+  state: TimetableSessionState;
+  isActionable: boolean;
+  isLocked: boolean;
+  isMissed: boolean;
+  isActive: boolean;
+  isUpcoming: boolean;
+  isCompleted: boolean;
+  isCatchUpActive: boolean;
+}
+
+/**
+ * Evaluates the precise canonical state of a timetable session based on local calendar date and time.
+ *
+ * States:
+ * 1. TODAY_COMPLETED: Session is completed.
+ * 2. FUTURE_LOCKED: Session date > today (future date). Cannot be completed early, never missed.
+ * 3. PAST_MISSED: Session date < today without completion, OR today's session where local time > endTime without completion.
+ * 4. CATCH_UP_TODAY: Session date == today, carried from a historical missed date, and local time <= endTime (not completed).
+ * 5. TODAY_ACTIVE: Session is on today (standard) and local time is within [startTime, endTime].
+ * 6. TODAY_UPCOMING: Session is on today (standard) and local time is before startTime.
+ */
+export function getSessionState(
+  slot: {
+    date?: string;
+    dayOfWeek?: number;
+    startTime?: string;
+    endTime?: string;
+    status?: string;
+    isCompleted?: boolean;
+    isCatchUp?: boolean;
+  },
+  now: Date = new Date()
+): TimetableSessionState {
+  if (slot.isCompleted || slot.status === 'completed') {
+    return 'TODAY_COMPLETED';
+  }
+
+  const slotDay = slotDayKey(slot.date);
+  const todayDay = dayKey(now);
+
+  // 1. Future day: strictly FUTURE_LOCKED (never missed, cannot be completed early)
+  if (slotDay !== null && slotDay > todayDay) {
+    return 'FUTURE_LOCKED';
+  }
+
+  // 2. Past day: strictly PAST_MISSED
+  if (slotDay !== null && slotDay < todayDay) {
+    return 'PAST_MISSED';
+  }
+
+  // 3. Today's session (or dateless slot matching today's weekday)
+  const isCatchUp = Boolean(slot.isCatchUp);
+  const startMins = parseTimeToMinutes(slot.startTime);
+  const endMins = parseTimeToMinutes(slot.endTime);
+
+  // If time is unspecified, default to TODAY_UPCOMING or CATCH_UP_TODAY
+  if (startMins === null || endMins === null) {
+    return isCatchUp ? 'CATCH_UP_TODAY' : 'TODAY_UPCOMING';
+  }
+
+  const currentMins = now.getHours() * 60 + now.getMinutes();
+
+  if (endMins < startMins) {
+    // Overnight session crossing midnight (e.g. 23:00 to 01:00)
+    if (currentMins >= startMins || currentMins <= endMins) {
+      return isCatchUp ? 'CATCH_UP_TODAY' : 'TODAY_ACTIVE';
+    }
+    return isCatchUp ? 'CATCH_UP_TODAY' : 'TODAY_UPCOMING';
+  }
+
+  // Standard same-day session (e.g. 17:00 to 18:00)
+  if (currentMins < startMins) {
+    return isCatchUp ? 'CATCH_UP_TODAY' : 'TODAY_UPCOMING';
+  }
+  if (currentMins <= endMins) {
+    return isCatchUp ? 'CATCH_UP_TODAY' : 'TODAY_ACTIVE';
+  }
+  // Execution window has passed on today without completion
+  return 'PAST_MISSED';
+}
+
+export function evaluateSessionState(
+  slot: {
+    date?: string;
+    dayOfWeek?: number;
+    startTime?: string;
+    endTime?: string;
+    status?: string;
+    isCompleted?: boolean;
+    isCatchUp?: boolean;
+  },
+  now: Date = new Date()
+): SessionStateEvaluation {
+  const state = getSessionState(slot, now);
+
+  const isCompleted = state === 'TODAY_COMPLETED';
+  const isLocked = state === 'FUTURE_LOCKED';
+  const isMissed = state === 'PAST_MISSED';
+  const isActionable = !isLocked;
+
+  const startMins = parseTimeToMinutes(slot.startTime);
+  const endMins = parseTimeToMinutes(slot.endTime);
+  const currentMins = now.getHours() * 60 + now.getMinutes();
+
+  let isActive = false;
+  let isUpcoming = false;
+
+  if (state === 'TODAY_ACTIVE') {
+    isActive = true;
+  } else if (state === 'TODAY_UPCOMING') {
+    isUpcoming = true;
+  } else if (state === 'CATCH_UP_TODAY') {
+    if (startMins !== null && endMins !== null) {
+      if (endMins < startMins) {
+        if (currentMins >= startMins || currentMins <= endMins) {
+          isActive = true;
+        } else {
+          isUpcoming = true;
+        }
+      } else {
+        if (currentMins >= startMins && currentMins <= endMins) {
+          isActive = true;
+        } else {
+          isUpcoming = true;
+        }
+      }
+    } else {
+      isUpcoming = true;
+    }
+  }
+
+  // A catch-up session is actionable on today (or past missed). Future is locked.
+  const isCatchUpActive = (state === 'CATCH_UP_TODAY') || (Boolean(slot.isCatchUp) && isMissed);
+
+  return {
+    state,
+    isActionable,
+    isLocked,
+    isMissed,
+    isActive,
+    isUpcoming,
+    isCompleted,
+    isCatchUpActive,
+  };
+}
+

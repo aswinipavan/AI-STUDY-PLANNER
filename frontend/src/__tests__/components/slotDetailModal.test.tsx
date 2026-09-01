@@ -4,6 +4,14 @@ import '@testing-library/jest-dom';
 import { SlotDetailModal } from '@/components/timetable/SlotDetailModal';
 import { TimetableSlot } from '@/types/api.types';
 
+jest.mock('@/api/evidence.api', () => ({
+  evidenceApi: {
+    uploadEvidence: jest.fn(),
+    getLatestEvidence: jest.fn().mockResolvedValue(null),
+    approveCompletion: jest.fn(),
+  },
+}));
+
 describe('SlotDetailModal Component', () => {
   const mockSlot: TimetableSlot = {
     id: 'slot-123',
@@ -78,13 +86,19 @@ describe('SlotDetailModal Component', () => {
     expect(screen.getByTestId('modal-exam-deadline')).toHaveTextContent(/14 days away/i);
   });
 
-  it('handles completion toggle when clicking Mark Complete button', () => {
+  it('handles completion toggle when session is completed', () => {
     const handleToggle = jest.fn();
     const handleClose = jest.fn();
 
+    const completedSlot: TimetableSlot = {
+      ...mockSlot,
+      isCompleted: true,
+      status: 'completed',
+    };
+
     render(
       <SlotDetailModal
-        slot={mockSlot}
+        slot={completedSlot}
         isOpen={true}
         onClose={handleClose}
         onToggleStatus={handleToggle}
@@ -92,15 +106,22 @@ describe('SlotDetailModal Component', () => {
     );
 
     const toggleBtn = screen.getByTestId('modal-toggle-status-btn');
-    expect(toggleBtn).toHaveTextContent('Mark Complete');
+    expect(toggleBtn).toHaveTextContent('Mark Incomplete');
     fireEvent.click(toggleBtn);
-    expect(handleToggle).toHaveBeenCalledWith('slot-123', 'completed');
+    expect(handleToggle).toHaveBeenCalledWith('slot-123', 'pending');
   });
 
-  it('renders catch-up required status for catch-up slot', () => {
+  it('renders catch-up required status and carry-forward context for catch-up slot', () => {
+    const today = new Date();
+    const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
     const catchUpSlot: TimetableSlot = {
       ...mockSlot,
+      date: todayIso,
+      startTime: '23:00:00',
+      endTime: '23:59:00',
       isCatchUp: true,
+      missedDate: '2026-08-27',
       notes: 'Rescheduled from 2026-08-27 (missed session caught up)',
       selectionReason: '🔴 Overdue Catch-up: Missed session from 2026-08-27 carried forward.',
     };
@@ -116,6 +137,9 @@ describe('SlotDetailModal Component', () => {
 
     expect(screen.getByTestId('modal-status-badge')).toHaveTextContent('Catch-up Required');
     expect(screen.getByTestId('modal-selection-reason')).toHaveTextContent(/Overdue Catch-up/i);
+    expect(screen.getByTestId('modal-catchup-context')).toBeInTheDocument();
+    expect(screen.getByTestId('modal-catchup-context')).toHaveTextContent(/Carry-Forward Catch-Up Session/i);
+    expect(screen.getByTestId('modal-catchup-context')).toHaveTextContent(/Original Missed:/i);
   });
 
   it('renders future locked banner and disables completion toggle for future session', () => {

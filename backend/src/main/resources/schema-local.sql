@@ -233,6 +233,30 @@ CREATE TABLE IF NOT EXISTS study_room_messages (
     FOREIGN KEY (sender_id) REFERENCES students(id) ON DELETE SET NULL
 );
 
+-- V7: study_evidence_submissions
+CREATE TABLE IF NOT EXISTS study_evidence_submissions (
+    id UUID NOT NULL DEFAULT RANDOM_UUID(),
+    timetable_slot_id UUID NOT NULL,
+    student_id UUID NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_url TEXT NOT NULL,
+    file_type VARCHAR(100),
+    file_size_bytes BIGINT,
+    verification_status VARCHAR(30) NOT NULL,
+    score INT,
+    summary TEXT,
+    matched_topics TEXT,
+    missing_topics TEXT,
+    feedback TEXT,
+    confidence INT,
+    verified_at TIMESTAMP,
+    is_used_for_completion BOOLEAN DEFAULT FALSE,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (timetable_slot_id) REFERENCES timetable_slots(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
 -- ============================================================
 -- INDEXES
 -- ============================================================
@@ -253,6 +277,8 @@ CREATE INDEX IF NOT EXISTS idx_study_rooms_owner ON study_rooms(owner_id);
 CREATE INDEX IF NOT EXISTS idx_study_rooms_status ON study_rooms(status);
 CREATE INDEX IF NOT EXISTS idx_room_participants_room ON study_room_participants(room_id);
 CREATE INDEX IF NOT EXISTS idx_room_messages_room ON study_room_messages(room_id);
+CREATE INDEX IF NOT EXISTS idx_evidence_slot_student ON study_evidence_submissions(timetable_slot_id, student_id);
+CREATE INDEX IF NOT EXISTS idx_evidence_status ON study_evidence_submissions(verification_status);
 
 -- ============================================================
 -- SEED DEMO DATA FOR LOCAL FACULTY DEMONSTRATION
