@@ -35,8 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Flyway migrations against a real PostgreSQL server")
 class FlywayPostgresMigrationTest {
 
-    /** V1..V6. */
-    private static final int MIGRATION_COUNT = 6;
+    /** V1..V7. */
+    private static final int MIGRATION_COUNT = 7;
 
     /** policyname -> "table|command|USING expression", exactly as V3 defines them. */
     private static final Map<String, String> INTENDED_STUDY_TOGETHER_POLICIES = Map.of(

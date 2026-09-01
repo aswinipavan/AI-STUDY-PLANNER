@@ -14,6 +14,7 @@
   - `backend/src/main/java/com/aistudyplanner/controller/TimetableController.java` [MODIFIED] — Added `POST /api/timetable/slots/{slotId}/evidence`, `GET /api/timetable/slots/{slotId}/evidence`, and `POST /api/timetable/slots/{slotId}/approve-completion`.
   - `backend/src/main/resources/schema-local.sql` [MODIFIED] — Added `study_evidence_submissions` table and indexes for local H2 database profile.
   - `backend/src/test/java/com/aistudyplanner/controller/TimetableEvidenceControllerIntegrationTest.java` [NEW] — MockMvc integration tests for evidence upload, retrieval, approval, security, and edge-case rejection (8/8 passed).
+  - `backend/src/test/java/com/aistudyplanner/migration/FlywayPostgresMigrationTest.java` [MODIFIED] — Updated `MIGRATION_COUNT` from 6 to 7 to account for migration V7 (`study_evidence_submissions`).
   - `frontend/src/types/api.types.ts` [MODIFIED] — Added `VerificationStatus`, `StudyEvidenceResponse`, and slot evidence metadata fields.
   - `frontend/src/api/evidence.api.ts` [NEW] — API client for `uploadEvidence`, `getLatestEvidence`, and `approveCompletion`.
   - `frontend/src/api/timetable.api.ts` [MODIFIED] — Exported evidence client methods.
