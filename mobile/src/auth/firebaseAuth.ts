@@ -24,7 +24,8 @@ export async function signInWithEmail(
   email: string,
   password: string,
 ): Promise<string> {
-  const credential = await signInWithEmailAndPassword(auth, email, password);
+  const cleanEmail = email.trim();
+  const credential = await signInWithEmailAndPassword(auth, cleanEmail, password);
   const idToken = await getIdToken(credential.user);
   return idToken;
 }
@@ -37,9 +38,10 @@ export async function registerWithEmail(
   email: string,
   password: string,
 ): Promise<string> {
+  const cleanEmail = email.trim();
   const credential = await createUserWithEmailAndPassword(
     auth,
-    email,
+    cleanEmail,
     password,
   );
   const idToken = await getIdToken(credential.user);

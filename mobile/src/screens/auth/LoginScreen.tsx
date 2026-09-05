@@ -68,7 +68,8 @@ export function LoginScreen() {
   const handleLogin = async (data: LoginForm) => {
     setLoading(true);
     try {
-      const firebaseToken = await signInWithEmail(data.email, data.password);
+      const cleanEmail = data.email.trim();
+      const firebaseToken = await signInWithEmail(cleanEmail, data.password);
       const authResponse = await loginWithFirebaseToken(firebaseToken);
       await setSession(authResponse);
       // RootNavigator detects isAuthenticated=true → renders AppTabs
@@ -82,7 +83,8 @@ export function LoginScreen() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true);
     try {
-      const firebaseToken = await registerWithEmail(data.email, data.password);
+      const cleanEmail = data.email.trim();
+      const firebaseToken = await registerWithEmail(cleanEmail, data.password);
       const authResponse = await loginWithFirebaseToken(firebaseToken);
       await setSession(authResponse);
     } catch (err) {

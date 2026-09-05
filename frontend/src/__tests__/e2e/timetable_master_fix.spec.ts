@@ -255,6 +255,13 @@ test.describe('Timetable Master Fix E2E Verification', () => {
   test('TF-05: Today catch-up slot shows CATCH-UP TODAY badge and carry-forward modal context', async ({ page }) => {
     await page.goto('/timetable');
 
+    // The catch-up slot is dated today, but the horizon starts at the fixed
+    // mockStartDate (2026-08-27) and the page opens on week 1. Once today falls
+    // past that first week the slot is no longer rendered, so jump to the week
+    // containing today before asserting. Keep this ahead of the assertions —
+    // without it the test only passes while today is inside week 1.
+    await page.locator('[data-testid="quick-jump-today"]').click();
+
     // Catch-up badge on today's slot
     const catchUpBadge = page.locator('[data-testid="slot-card-slot-aug28-catchup"] [data-testid="catchup-badge"]');
     await expect(catchUpBadge).toBeVisible();
