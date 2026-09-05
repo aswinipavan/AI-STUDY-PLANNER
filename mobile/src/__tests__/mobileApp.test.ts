@@ -55,6 +55,17 @@ describe('Mobile App Unit & Utilities Test Suite', () => {
       expect(isTimeoutError({ isTimeout: true })).toBe(true);
       expect(isTimeoutError({ isTimeout: false })).toBe(false);
     });
+
+    it('translates Firebase Auth error codes to user-friendly messages', () => {
+      expect(getErrorMessage(new Error('[auth/invalid-credential] The supplied auth credential is incorrect.')))
+        .toContain('Invalid email or password');
+      expect(getErrorMessage(new Error('[auth/user-not-found] There is no user record.')))
+        .toContain('No account found with this email');
+      expect(getErrorMessage(new Error('[auth/wrong-password] The password is invalid.')))
+        .toContain('Incorrect password');
+      expect(getErrorMessage(new Error('[auth/email-already-in-use] Email is in use.')))
+        .toContain('already exists');
+    });
   });
 
   describe('timetable contract & slot filtering', () => {
