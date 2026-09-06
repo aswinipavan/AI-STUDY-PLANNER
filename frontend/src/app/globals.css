@@ -71,10 +71,22 @@
   /* Premium design tokens */
   --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
   --glow-teal: 0 0 20px rgba(0, 200, 180, 0.25), 0 0 60px rgba(0, 200, 180, 0.08);
   --glow-blue: 0 0 20px rgba(59, 130, 246, 0.25), 0 0 60px rgba(59, 130, 246, 0.08);
-  --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
   --shadow-elevated: 0 20px 60px -10px rgba(0,0,0,0.15), 0 8px 24px -6px rgba(0,0,0,0.1);
+
+  /* ── Elevation system ────────────────────────────────────────────────────────
+     Material-inspired elevation ladder. Consumed by both Tailwind-styled
+     components and CSS Modules. Higher elevations = more diffuse + darker shadows,
+     matching real-world light physics. */
+  --app-elevation-0: none;
+  --app-elevation-1: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.06);
+  --app-elevation-2: 0 2px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.08);
+  --app-elevation-3: 0 4px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.02);
+  --app-elevation-4: 0 8px 16px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.03);
+  --app-elevation-5: 0 16px 32px rgba(0,0,0,0.08), 0 24px 64px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.04);
 
   /* ── Shared scales ──────────────────────────────────────────────────────
      One ladder for the whole app, consumed by both Tailwind-styled components
@@ -167,8 +179,17 @@
   --ring: 170 100% 40%;
 
   --glow-teal: 0 0 20px rgba(0, 229, 192, 0.3), 0 0 80px rgba(0, 229, 192, 0.12);
-  --shadow-card: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
-  --shadow-elevated: 0 20px 60px -10px rgba(0,0,0,0.5), 0 8px 24px -6px rgba(0,0,0,0.3);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-elevated: 0 16px 48px -10px rgba(0,0,0,0.5), 0 8px 24px -6px rgba(0,0,0,0.3);
+
+  /* Dark mode elevation uses lighter, more diffuse shadows since the canvas is
+     already very dark. */
+  --app-elevation-0: none;
+  --app-elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.4);
+  --app-elevation-2: 0 2px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.4);
+  --app-elevation-3: 0 4px 8px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  --app-elevation-4: 0 8px 16px rgba(0,0,0,0.4), 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  --app-elevation-5: 0 16px 32px rgba(0,0,0,0.5), 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
 }
 
 /* ── Base Reset ─────────────────────────────────────────────────────────── */
@@ -209,6 +230,78 @@ h1, h2, h3, h4 {
   select {
     min-height: 44px;
     min-width: 44px;
+  }
+}
+
+/* ── Liquid Glassmorphism Design System ─────────────────────────────────── */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.05);
+  background-blend-mode: luminosity;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 
+    0 4px 24px -1px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.liquid-glass:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-rise {
+  animation: fade-rise 0.8s ease-out both;
+}
+
+.animate-fade-rise-delay {
+  animation: fade-rise 0.8s ease-out 0.2s both;
+}
+
+.animate-fade-rise-delay-2 {
+  animation: fade-rise 0.8s ease-out 0.4s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-rise,
+  .animate-fade-rise-delay,
+  .animate-fade-rise-delay-2 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -382,9 +475,17 @@ h1, h2, h3, h4 {
   transition-duration: var(--app-duration-instant);
 }
 
-/* Tactile press feedback. Deliberately declares only the :active transform and
-   no `transition` of its own, so it can be combined with a component's own
-   transition utilities without clobbering them. */
+/* Elevation utilities — map the token ladder to reusable classes. */
+.elevation-0 { box-shadow: var(--app-elevation-0); }
+.elevation-1 { box-shadow: var(--app-elevation-1); }
+.elevation-2 { box-shadow: var(--app-elevation-2); }
+.elevation-3 { box-shadow: var(--app-elevation-3); }
+.elevation-4 { box-shadow: var(--app-elevation-4); }
+.elevation-5 { box-shadow: var(--app-elevation-5); }
+
+/* ── Tactile press feedback. Deliberately declares only the :active transform and
+    no `transition` of its own, so it can be combined with a component's own
+    transition utilities without clobbering them. */
 .press:active:not(:disabled) {
   transform: scale(0.97);
 }

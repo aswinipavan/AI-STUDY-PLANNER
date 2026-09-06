@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-06 (Session 45 - Authentication & Login Page Cinematic Glassmorphism Parity)
+- **Files created/changed:**
+  - `frontend/src/app/(auth)/login/page.module.css` [MODIFIED] — Redesigned login CSS to match landing page aesthetic: deep navy vignette gradient (`#030a16`), Instrument Serif typography for brand titles, floating pill capsule tabs (`Sign In` / `Register`), 20px blur glassmorphic card with specular highlights, liquid glass CTA pill buttons, glowing `.errorBanner` with blur and Lucide vector icons, and `.inputError` crimson glass border halos.
+  - `frontend/src/app/(auth)/login/page.tsx` [MODIFIED] — Added `<StarField />` starry sky background canvas, updated brand headline with Instrument Serif and italic tagline, added `noValidate` attributes to form containers to eliminate browser default white validation popups, added `submitted` state tracking for field-level error highlighting, and aligned checkbox accent colors.
+- **Reason:**
+  - Bring `/login` (Sign In, Register, Forgot Password) and its validation error states into complete aesthetic parity with the luxury cinematic glassmorphism of the landing page (`/`), replacing outdated flat black/cyan layout and stark browser default validation popups.
+- **Summary:**
+  - Eliminated browser default white tooltip (`Please fill in this field.`) and replaced with custom glassmorphic alert pill badges and field highlights.
+  - Live browser verification captured via Playwright on desktop (1280x800) and mobile (390x844) across Sign In, Register, Forgot Password, and validation error states.
+  - Zero modifications to backend authentication APIs or Firebase logic.
+  - All test selectors (`#signin-email`, `#signin-password`, `#btn-signin-email`, `#btn-google`, `#tab-signin`, `#tab-register`, etc.) preserved.
+  - TypeScript compilation: 0 errors (`npx tsc --noEmit` PASS).
+  - Frontend Jest tests: 165/165 passing across 25 suites (`npm test` PASS).
+  - Playwright E2E auth tests: 22 passed, 8 skipped (live-network only), 0 failed (`npx playwright test src/__tests__/e2e/auth.spec.ts` PASS).
+
+## 2026-09-06 (Session 44 - Landing Page Typography, Glassmorphism & Minimal Vector Icon Upgrade)
+- **Files created/changed:**
+  - `frontend/src/app/globals.css` [MODIFIED] — Defined high-definition, cross-browser `.liquid-glass` class with `backdrop-filter: blur(16px)`, `background: rgba(255, 255, 255, 0.05)`, crisp border (`rgba(255, 255, 255, 0.16)`), top specular highlight pseudo-element, and smooth hover elevation.
+  - `frontend/src/app/page.module.css` [MODIFIED] — Updated `.navPill`, `.navLink`, `.navCta`, `.primaryCta`, and `.cardIconBox` with glassmorphic styles and connected Instrument Serif font family across headlines, brand logo, section titles, card headers, step numbers, and count-up stats.
+  - `frontend/src/app/page.tsx` [MODIFIED] — Replaced cartoon OS emojis (`🧠`, `📚`, `🎯`, `💬`, `📊`, `⚡`) with minimal, high-end Lucide vector icons (`Sparkles`, `BookOpen`, `ShieldCheck`, `Bot`, `TrendingUp`, `RotateCcw`) enclosed in frosted glass icon badge containers (`.cardIconBox`).
+  - `frontend/src/components/onboarding/OnboardingProvider.tsx` [MODIFIED] — Added route filter to bypass the full-screen onboarding modal on public marketing pages (`/`, `/login`), ensuring uninhibited presentation of the cinematic hero.
+  - `frontend/src/__tests__/e2e/auth.spec.ts` [MODIFIED] — Fixed Playwright test fixture parameter names (`_page`/`_context` -> `page`/`context`), resolving 44 TypeScript compilation errors.
+- **Reason:**
+  - Replace mismatched OS emojis with sleek vector icon badges matching the high-end cinematic agency aesthetic, fix Instrument Serif typography and liquid glass styling on the landing page, and ensure the onboarding overlay does not obscure the public hero.
+- **Summary:**
+  - Sleek Lucide icons inside frosted glass icon containers verified live.
+  - Instrument Serif rendering verified live in real browser (99.2px hero headline, brand title, stats).
+  - Liquid glass backdrop blur, borders, and specular highlights verified live in real browser.
+  - TypeScript compilation: 0 errors (`npx tsc --noEmit` PASS).
+  - Frontend Jest tests: 165/165 passing across 25 suites (`npm test` PASS).
+  - Zero modifications to backend or mobile projects.
+
 ## 2026-09-01 (Session 40 - Master Feature: Evidence-Based Study Session Completion with AI Verification)
 - **Files created/changed:**
   - `backend/src/main/java/com/aistudyplanner/model/VerificationStatus.java` [NEW] — Verification enum (`APPROVED`, `NEEDS_MORE_WORK`, `REVIEW_REQUIRED`).

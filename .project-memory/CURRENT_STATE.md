@@ -18,6 +18,20 @@
   - ⚙️ `backend-api-db` (Backend API & DB Suite - 405+ Cases)
   - $\rightarrow$ 🏆 `master-summary` (Master Execution Summary converging all 5 suites, generating `Master_Execution_Summary.md/.html` and step summaries)
 
+## Cinematic Glassmorphic Landing Page & Visual Architecture
+- **Fullscreen Video Background (Hero-Scoped):** Top hero embeds full-bleed video (`autoPlay`, `loop`, `muted`, `playsInline`) with graceful navy fallback (`#030a16`), masked bottom gradient fade, and deep starry night atmosphere extending throughout all subsequent sections via continuous `<StarField />`.
+- **Instrument Serif Typography:** Loaded natively via `next/font/google` and Google Fonts fallback, applying `--font-serif` to display headlines (`Study smarter. Build your future.`), brand logo, section headers, step numbers, and count-up statistics (`10K+`, `99.9%`, `50+`, `100%`).
+- **Liquid Glass Navigation & CTA Architecture:** `.liquid-glass` styling with 16px backdrop blur, translucent white fill (`rgba(255, 255, 255, 0.05)`), 1px border highlight (`rgba(255, 255, 255, 0.16)`), inset top specular highlight reflection, and hover elevation.
+- **Public Route Onboarding Shield:** `OnboardingProvider` automatically bypasses on public marketing routes (`/`, `/login`) to guarantee clean, unimpeded presentation of the hero.
+- **Quality Gate:** Strict TypeScript verification (`0 errors`), 165/165 Jest tests passing (25 suites), 0 regressions on E2E test selectors (`#cta-login`, `#cta-dashboard`, `#nav-signin`).
+
+## Cinematic Glassmorphic Authentication Experience (`/login`)
+- **Starfield Atmosphere & Deep Sky Backdrop:** Full aesthetic parity with the landing page featuring continuous dynamic canvas `<StarField />` over a deep navy vignette backdrop (`#030a16` + `radial-gradient`).
+- **Instrument Serif Brand Typography:** Display title styled in `Instrument Serif` (`--font-serif`) with italicized subtitle descriptions.
+- **Floating Pill Capsule Tabs:** Fluid glass pill toggle switching between **Sign In** and **Register** with specular edge highlights.
+- **Liquid Glass Card & CTA Controls:** 20px blur frosted glass card (`rgba(5, 18, 38, 0.5)`), translucent glass input fields, liquid glass CTA pill buttons with hover scale animations, and restyled Google OAuth button.
+- **Quality & E2E Validation:** Form containers equipped with `noValidate` to ensure clean glass error banners; verified 100% pass across Playwright E2E auth tests (`auth.spec.ts`, 22 passed, 8 skipped, 0 failed).
+
 ## AI Tutor Chat Layout & Interaction
 - **Sticky Composer Architecture:** The message composer is fixed/anchored at the bottom of the chat viewport (`position: sticky; bottom: 0; z-index: 20;`). Scrolling through long message conversations scrolls solely within the internal scroll container (`.messageList`) without moving the input box or shifting page layout.
 - **Clean Model Header:** Technical provider subtitles removed; clean avatar and clean title display.

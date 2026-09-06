@@ -46,9 +46,12 @@ export interface BackendSubjectResponse {
 interface BackendSubjectRequest {
   subjectName?: string;
   subjectCode?: string;
-  credits: number;
-  difficultyLevel: number;
-  semester: number | null;
+  credits?: number;
+  difficultyLevel?: number;
+  semester?: number | null;
+  color?: string;
+  icon?: string;
+  targetHours?: number;
 }
 
 // Map backend SubjectResponse to frontend Subject type
@@ -75,5 +78,6 @@ function mapSubjectToBackend(frontend: Partial<Subject>): BackendSubjectRequest 
     difficultyLevel: frontend.difficultyLevel,
     credits: frontend.credits,
     semester: frontend.semester,
+    icon: frontend.icon,
   };
 }

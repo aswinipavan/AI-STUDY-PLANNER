@@ -1,5 +1,21 @@
 # Session Log
 
+## 2026-09-06 (Session 45 - Authentication & Login Page Cinematic Glassmorphism Parity)
+- **Task Started:** Redesign `/login` (Sign In, Register, Forgot Password) to establish visual and aesthetic parity with the luxury cinematic glassmorphic design system of the landing page (`/`).
+- **Task Completed:**
+  - Redesigned `frontend/src/app/(auth)/login/page.module.css` with dark atmospheric navy background (`#030a16`), radial vignette gradient, Instrument Serif headings (`--font-serif`), floating pill tab navigation (`Sign In` / `Register`), 20px frosted glass card with specular highlights, and liquid glass CTA pill buttons.
+  - Added dynamic `<StarField />` starry sky background canvas in `frontend/src/app/(auth)/login/page.tsx`.
+  - Added `noValidate` attributes to form elements to allow client-side validation to route cleanly through the stylized glass error banners without browser tooltip conflicts.
+  - Aligned Google OAuth button and remember-me checkbox with clean glass accents.
+  - Captured visual verification screenshots via Playwright on desktop (1280x800) and mobile (390x844) across all tabs.
+  - Verified 0 TypeScript errors (`npx tsc --noEmit`).
+  - Verified 165/165 frontend Jest tests pass (`npm test`).
+  - Verified Playwright E2E auth test suite passes (`22 passed, 8 skipped, 0 failed`).
+- **Files Modified:** `frontend/src/app/(auth)/login/page.module.css`, `frontend/src/app/(auth)/login/page.tsx`, `.project-memory/*`.
+- **Problems Found:** Outdated flat black background with bright cyan neon grid was disconnected from the cinematic agency landing page. HTML5 form validation previously intercepted empty input submission before custom styled error banners rendered.
+- **Solutions:** Applied cinematic glassmorphism CSS matching landing page tokens and added `noValidate` to form elements.
+- **Next Recommended Task:** Ready for user review or next enhancement.
+
 ## 2026-09-01 (Session 40 - Master Feature & Live E2E Verification: Evidence-Based Study Session Completion with AI Verification)
 - **Task Started:** Implement evidence-based study completion workflow with AI analysis, resolve 404 endpoint routing issue, synchronize local H2 database schema with migration V7, and execute full end-to-end browser verification against live local backend and Next.js frontend with real files and real AI verification.
 - **Task Completed:**
@@ -2181,6 +2197,48 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - `TimetableService` ambiguous constructor injection: added `@Autowired` to canonical 9-arg constructor and 8-arg fallback constructor.
   - JSON unwrapping when `data` key was present: handled safely with property existence checks in `evidence.api.ts`.
 - **Next Recommended Task:** Prepare production release testing and mobile APK build.
+
+---
+
+## Session 44: 2026-09-06 - Landing Page Typography & Liquid Glassmorphism Remediation
+- **Task Started:** Resolve user-reported issue where Instrument Serif font and `.liquid-glass` styling were not visually applied on the landing page.
+- **Task Completed:**
+  1. Diagnosed root causes:
+     - Invalid mask gradient syntax in `.liquid-glass::before` caused CSS parsers to drop the `.liquid-glass` rule entirely.
+     - Hardcoded `--font-serif` in `:root` was overriding the Next.js `Instrument_Serif` web font variable.
+     - `OnboardingProvider` was displaying the full-screen onboarding modal in `Playfair Display` font over the public marketing landing page (`/`) on first visit.
+  2. Implemented fixes:
+     - Updated `frontend/src/app/globals.css` with a standard, robust `.liquid-glass` class featuring 16px backdrop blur, translucent white background, crisp 1px border (`rgba(255,255,255,0.16)`), inset specular highlight reflection, and hover elevation.
+     - Updated `frontend/src/app/page.module.css` with explicit glassmorphic styles for `.navPill`, `.navLink`, `.navCta`, and `.primaryCta`.
+     - Added route filtering to `frontend/src/components/onboarding/OnboardingProvider.tsx` to bypass onboarding on public marketing routes (`/`, `/login`).
+     - Fixed parameter fixture names in `frontend/src/__tests__/e2e/auth.spec.ts` (`_page`/`_context` -> `page`/`context`), resolving 44 TypeScript compilation errors.
+  3. Verified across all verification tiers:
+     - Real browser computed style verification via Playwright confirmed Instrument Serif typography on 99.2px hero headline, brand title, and stats.
+     - Real browser computed style verification confirmed `backdrop-filter: blur(16px)`, `background: rgba(255,255,255,0.05)`, and `border: 1px solid rgba(255,255,255,0.16)`.
+     - Captured 8 full-resolution desktop and mobile viewport screenshots.
+     - Executed TypeScript check: `npx tsc --noEmit` -> **0 errors (PASS)**.
+     - Executed frontend Jest tests: `npm test` -> **165/165 tests passed across 25 suites (PASS)**.
+     - Verified zero backend or mobile modifications.
+- **Files Modified:**
+  - `frontend/src/app/globals.css` [MODIFIED]
+  - `frontend/src/app/page.module.css` [MODIFIED]
+  - `frontend/src/components/onboarding/OnboardingProvider.tsx` [MODIFIED]
+  - `frontend/src/__tests__/e2e/auth.spec.ts` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem 1:* `.liquid-glass` CSS was dropped by compiler due to double-position mask gradient shorthand syntax.
+    *Solution:* Re-wrote `.liquid-glass` with standard cross-browser backdrop-filter, border, and inset specular highlights.
+  - *Problem 2:* `OnboardingProvider` rendered over public landing page.
+    *Solution:* Added `usePathname()` check to render modal only on authenticated application pages.
+  - *Problem 3:* TypeScript compilation had 44 errors in `auth.spec.ts`.
+    *Solution:* Aligned destructured fixture parameters to standard `page` and `context`.
+- **Next Recommended Task:** Await user confirmation for next roadmap feature or git push.
+
 
 
 

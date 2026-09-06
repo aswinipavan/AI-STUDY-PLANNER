@@ -2,8 +2,8 @@
 
 | Page / Component | Completion | Animations | Responsiveness | Accessibility | Design Quality | Notes |
 |------------------|------------|------------|----------------|---------------|----------------|-------|
-| `/` Landing | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Fully working. CTA buttons navigate correctly. |
-| `/login` (Sign In + Register tabs) | 90% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Firebase email + Google OAuth. Both tabs functional. |
+| `/` Landing (Cinematic Glassmorphic Hero) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | Fullscreen video hero with navy fallback, continuous StarField night atmosphere, Instrument Serif display typography, floating liquid glass pill nav & CTAs, interactive count-up statistics, Intelligence Layer feature cards, and responsive mobile adaptation. |
+| `/login` (Sign In, Register & Forgot Password) | 100% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ | Full cinematic glassmorphism parity with landing page: deep navy vignette backdrop, dynamic canvas StarField, Instrument Serif brand typography, floating pill tab capsule, liquid glass card & CTAs, Google OAuth button, and verified responsive mobile styling. |
 | `/dashboard` | 85% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Fixed: was showing hardcoded fake data. Now uses real API. |
 | `/subjects` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Add/Edit/Delete with modal. Empty state shown. |
 | `/exams` | 95% | ✅ | ✅ | ✅ | ⭐⭐⭐⭐ | Add/Delete. Countdown timer. Empty state. |

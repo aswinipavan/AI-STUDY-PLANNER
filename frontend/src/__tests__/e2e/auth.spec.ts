@@ -16,7 +16,7 @@ test.describe('Authentication and Route Protection', () => {
   // BLOCKED TESTS - Require Real Firebase Authentication Environment
   // ============================================================================
   
-  test('SEL-001: Valid login with email/password redirection', async ({ _page }) => {
+  test('SEL-001: Valid login with email/password redirection', async ({ page: _page }) => {
     test.skip(true, 'BLOCKED: Requires real Firebase authentication. Cannot be tested with pre-authenticated state as it tests the actual login flow including Firebase SDK, token exchange, and cookie setting.');
     
     // This test would verify:
@@ -30,7 +30,7 @@ test.describe('Authentication and Route Protection', () => {
     // Requires: Firebase test project with test accounts
   });
 
-  test('SEL-002: Invalid password error display', async ({ _page }) => {
+  test('SEL-002: Invalid password error display', async ({ page: _page }) => {
     test.skip(true, 'BLOCKED: Requires real Firebase authentication. Cannot mock Firebase password validation errors accurately without Firebase SDK integration.');
     
     // This test would verify:
@@ -40,7 +40,7 @@ test.describe('Authentication and Route Protection', () => {
     // Requires: Firebase test project with test accounts
   });
 
-  test('SEL-003: Unregistered email error display', async ({ _page }) => {
+  test('SEL-003: Unregistered email error display', async ({ page: _page }) => {
     test.skip(true, 'BLOCKED: Requires real Firebase authentication. Cannot mock Firebase user-not-found errors accurately without Firebase SDK integration.');
     
     // This test would verify:
@@ -50,7 +50,7 @@ test.describe('Authentication and Route Protection', () => {
     // Requires: Firebase test project with test accounts
   });
 
-  test('SEL-009: Valid account registration flow', async ({ _page }) => {
+  test('SEL-009: Valid account registration flow', async ({ page: _page }) => {
     test.skip(true, 'BLOCKED: Requires real Firebase authentication. Cannot test actual account creation without Firebase SDK integration and backend database access.');
     
     // This test would verify:
@@ -63,7 +63,7 @@ test.describe('Authentication and Route Protection', () => {
     // Requires: Firebase test project + test database
   });
 
-  test('SEL-010: Google OAuth popup opens click event', async ({ _page }) => {
+  test('SEL-010: Google OAuth popup opens click event', async ({ page: _page }) => {
     test.skip(true, 'BLOCKED: OAuth flows cannot be automated in E2E tests. Google OAuth requires real user interaction, CAPTCHA challenges, and third-party authentication servers.');
     
     // This test would verify:
@@ -80,7 +80,7 @@ test.describe('Authentication and Route Protection', () => {
   // CLIENT-SIDE VALIDATION TESTS - No Authentication Required
   // ============================================================================
 
-  test('SEL-004: Empty email validation warning', async ({ _page, _context }) => {
+  test('SEL-004: Empty email validation warning', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -95,7 +95,7 @@ test.describe('Authentication and Route Protection', () => {
     await expect(errorBanner).toContainText(/fill in all fields/i);
   });
 
-  test('SEL-005: Empty password validation warning', async ({ _page, _context }) => {
+  test('SEL-005: Empty password validation warning', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -110,7 +110,7 @@ test.describe('Authentication and Route Protection', () => {
     await expect(errorBanner).toContainText(/fill in all fields/i);
   });
 
-  test('SEL-006: Malformed email validation error', async ({ _page, _context }) => {
+  test('SEL-006: Malformed email validation error', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -131,7 +131,7 @@ test.describe('Authentication and Route Protection', () => {
     }
   });
 
-  test('SEL-007: Password too short registration validation', async ({ _page, _context }) => {
+  test('SEL-007: Password too short registration validation', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -153,7 +153,7 @@ test.describe('Authentication and Route Protection', () => {
     await expect(errorBanner).toContainText(/at least 6 characters/i);
   });
 
-  test('SEL-008: Password mismatch registration validation', async ({ _page, _context }) => {
+  test('SEL-008: Password mismatch registration validation', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -193,7 +193,7 @@ test.describe('Authentication and Route Protection', () => {
   ];
 
   for (const route of protectedRoutes) {
-    test(`${route.id}: Direct access to ${route.path} (unauthenticated)`, async ({ _page, _context }) => {
+    test(`${route.id}: Direct access to ${route.path} (unauthenticated)`, async ({ page, context }) => {
       // Set up unauthenticated context
       await setupUnauthenticatedContext(context);
       
@@ -209,7 +209,7 @@ test.describe('Authentication and Route Protection', () => {
   // SESSION MANAGEMENT TESTS - Use Authenticated State
   // ============================================================================
 
-  test('SEL-021: Session persistence on page reload', async ({ _page }) => {
+  test('SEL-021: Session persistence on page reload', async ({ page }) => {
     // Set up authenticated session
     await setupAuthenticatedSession(page);
     
@@ -224,7 +224,7 @@ test.describe('Authentication and Route Protection', () => {
     await expect(page).toHaveURL(/\/dashboard/);
   });
 
-  test('SEL-022: Silent token refresh triggers successfully', async ({ _page }) => {
+  test('SEL-022: Silent token refresh triggers successfully', async ({ page }) => {
     // Set up authenticated session with short-lived token
     await setupAuthenticatedSession(page);
     
@@ -246,7 +246,7 @@ test.describe('Authentication and Route Protection', () => {
     // Full testing of token expiration requires time manipulation
   });
 
-  test('SEL-023: Logout clears cookies and redirects', async ({ _page, _context }) => {
+  test('SEL-023: Logout clears cookies and redirects', async ({ page, context: _context }) => {
     // Set up authenticated session
     await setupAuthenticatedSession(page);
     
@@ -278,7 +278,7 @@ test.describe('Authentication and Route Protection', () => {
     // Note: This may not work perfectly without full logout UI flow
   });
 
-  test('SEL-024: Back button does not return to dashboard post-logout', async ({ _page, _context }) => {
+  test('SEL-024: Back button does not return to dashboard post-logout', async ({ page, context }) => {
     // Set up authenticated session
     await setupAuthenticatedSession(page);
     
@@ -302,7 +302,7 @@ test.describe('Authentication and Route Protection', () => {
     expect(currentUrl).toMatch(/\/login/);
   });
 
-  test('SEL-025: Unauthorized redirect preserves from URL parameter', async ({ _page, _context }) => {
+  test('SEL-025: Unauthorized redirect preserves from URL parameter', async ({ page, context }) => {
     // Set up unauthenticated context
     await setupUnauthenticatedContext(context);
     
@@ -317,17 +317,17 @@ test.describe('Authentication and Route Protection', () => {
   // UI/UX TESTS - No Authentication Required
   // ============================================================================
 
-  test('SEL-026: Successful login redirects to from parameter URL', async ({ _page }) => {
+  test('SEL-026: Successful login redirects to from parameter URL', async ({ page: _page }) => {
     // This test is BLOCKED because it requires real authentication
     test.skip(true, 'BLOCKED: Requires real Firebase authentication to test actual login redirect behavior.');
   });
 
-  test('SEL-027: Multiple tabs session sharing', async ({ _page }) => {
+  test('SEL-027: Multiple tabs session sharing', async ({ page: _page }) => {
     // This test is BLOCKED because it requires real authentication
     test.skip(true, 'BLOCKED: Requires real Firebase authentication to test session sharing across tabs.');
   });
 
-  test('SEL-028: Authentication rate limiting warning (10/min)', async ({ _page, _context }) => {
+  test('SEL-028: Authentication rate limiting warning (10/min)', async ({ page: _page, context: _context }) => {
     test.skip(true, 'TEST BUG: Route mocking does not intercept Firebase authentication. This test requires Firebase Admin SDK to trigger actual rate limiting, or application-level rate limiting implementation that can be mocked. Current implementation uses Firebase Authentication which cannot be easily mocked in E2E tests.');
     
     // This test would verify:
@@ -338,7 +338,7 @@ test.describe('Authentication and Route Protection', () => {
     // Blocked by: Firebase SDK cannot be mocked in Playwright E2E tests
   });
 
-  test('SEL-029: Sign In tab switching animation', async ({ _page, _context }) => {
+  test('SEL-029: Sign In tab switching animation', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
@@ -363,7 +363,7 @@ test.describe('Authentication and Route Protection', () => {
     await expect(signinTab).toHaveClass(/active/i);
   });
 
-  test('SEL-030: UI Loader spinner during login transaction', async ({ _page, _context }) => {
+  test('SEL-030: UI Loader spinner during login transaction', async ({ page, context }) => {
     await setupUnauthenticatedContext(context);
     // Mock a slow login response
     await page.route('**/api/auth/login', async (route) => {

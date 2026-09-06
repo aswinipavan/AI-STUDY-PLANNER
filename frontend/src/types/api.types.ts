@@ -30,6 +30,10 @@ export interface Subject {
   studentId: string;
   examDate?: string; // Next exam date for this subject
   daysUntilExam?: number; // Calculated remaining days
+  subjectCode?: string;
+  difficultyLevel?: number;
+  credits?: number;
+  semester?: number;
 }
 
 export interface Exam {

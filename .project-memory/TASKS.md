@@ -1,6 +1,16 @@
 # Tasks
 
 ## Completed
+- [2026-09-06] Authentication & Login Page Cinematic Glassmorphism Parity:
+  - **Atmosphere & Dynamic Canvas:** Embedded `<StarField />` starry sky backdrop with deep navy vignette (`#030a16` + `radial-gradient`) across `/login`.
+  - **Typography & Brand Identity:** Styled brand title with Instrument Serif (`--font-serif`) and italic subtitle highlights.
+  - **Glassmorphic Card & Floating Tabs:** Constructed 20px blur translucent card (`rgba(5, 18, 38, 0.5)`) with specular rim highlight, pill capsule tabs for Sign In and Register switching, and liquid glass CTA pill buttons.
+  - **Form Validation & Quality Gate:** Added `noValidate` attributes to route client validation into custom styled error banners, 0 TypeScript errors (`npx tsc --noEmit`), 165/165 Jest tests passing (`npm test`), and Playwright E2E suite passing (`22 passed, 8 skipped, 0 failed`).
+- [2026-09-06] Landing Page Typography & Liquid Glassmorphism Remediation:
+  - **Instrument Serif Typography:** Loaded Instrument Serif natively via `next/font/google` and Google Fonts fallback, applying `--font-serif` to display headlines (`Study smarter. Build your future.`), brand logo, section headers, step numbers, and count-up statistics (`10K+`, `99.9%`, `50+`, `100%`).
+  - **Liquid Glass Navigation & CTA Architecture:** Re-architected `.liquid-glass` in `globals.css` with 16px backdrop blur, translucent white fill (`rgba(255, 255, 255, 0.05)`), 1px border highlight (`rgba(255, 255, 255, 0.16)`), inset top specular highlight reflection, and hover elevation. Applied to floating nav capsule and primary CTAs.
+  - **Public Route Onboarding Shield:** Added route filter to `OnboardingProvider` to bypass the full-screen onboarding modal on public marketing pages (`/`, `/login`), ensuring uninhibited presentation of the cinematic hero.
+  - **Quality & Test Gate:** Fixed Playwright test fixture parameter names (`_page`/`_context` -> `page`/`context`), achieving 0 TypeScript errors (`npx tsc --noEmit` PASS) and 100% frontend Jest test pass rate (165/165 tests across 25 suites).
 - [2026-09-01] Built Master Feature: Evidence-Based Study Session Completion with AI Verification (WEB APPLICATION):
   - **Entity & Migration:** Created `VerificationStatus` enum (`APPROVED`, `NEEDS_MORE_WORK`, `REVIEW_REQUIRED`), `StudyEvidenceSubmission` JPA entity, `StudyEvidenceSubmissionRepository`, and Flyway migration `V7__add_study_evidence_submissions.sql`.
   - **AI Verification Engine:** Built `StudyEvidenceVerificationService` with Apache PDFBox text extraction, plain text parser, image/diagram metadata extractor, curriculum topic cross-referencing via `MaterialTopicReader`, and multi-modal AI evaluation via `AiProviderGateway`.

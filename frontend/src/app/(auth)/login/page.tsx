@@ -15,7 +15,8 @@ import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import styles from './page.module.css';
 import { StudentProfile } from '@/types/api.types';
-
+import { StarField } from '@/components/ui/StarField';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 type Tab = 'signin' | 'register' | 'forgot';
 
@@ -65,11 +66,12 @@ export default function LoginPage() {
   const [success, setSuccess]   = useState('');
   const [loading, setLoading]   = useState(false);
   const [showPwd, setShowPwd]   = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [backendStatus, setBackendStatus] = useState<'warming' | 'awake' | null>(null);
 
   // Clear errors when switching tabs
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setError(''); setSuccess(''); }, [tab]);
+  useEffect(() => { setError(''); setSuccess(''); setSubmitted(false); }, [tab]);
 
   // Wake up the Render backend on page mount to avoid cold-start delays on login
   useEffect(() => {
@@ -149,6 +151,7 @@ export default function LoginPage() {
   // ── Email Sign In ─────────────────────────────────────────────────────────
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true);
     setError('');
@@ -166,6 +169,7 @@ export default function LoginPage() {
   // ── Email Register ────────────────────────────────────────────────────────
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
     if (!name || !email || !password || !confirm) { setError('Please fill in all fields.'); return; }
     if (password !== confirm) { setError('Passwords do not match.'); return; }
     if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
@@ -186,6 +190,7 @@ export default function LoginPage() {
   // ── Forgot Password ──────────────────────────────────────────────────────
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
     if (!email) { setError('Please enter your email address to reset password.'); return; }
     setLoading(true);
     setError('');
@@ -202,35 +207,40 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
+      {/* ── Continuous Star Atmosphere ── */}
+      <StarField />
+
       {/* Backend warm-up status — only show while warming */}
       {backendStatus === 'warming' && (
-        <div style={{ position: 'fixed', top: 12, right: 16, fontSize: 12, color: '#aaa', background: 'rgba(0,0,0,0.5)', padding: '4px 10px', borderRadius: 999, zIndex: 999 }}>
+        <div style={{ position: 'fixed', top: 12, right: 16, fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', background: 'rgba(5, 18, 38, 0.7)', border: '1px solid rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(10px)', padding: '4px 12px', borderRadius: 999, zIndex: 999 }}>
           ⚡ Connecting to server...
         </div>
       )}
-      
-      {/* Subtle grid */}
-      <div aria-hidden className={styles.backgroundGrid} />
 
       <div className={styles.contentWrapper}>
 
         {/* Logo + Brand */}
         <div className={styles.header}>
-          <div className={styles.logoBox}>
-            <span className={styles.logoText}>S</span>
-          </div>
-          <h1 className={styles.title}>
-            AI Study Planner
-          </h1>
+          <Link href="/" className={styles.brandLink}>
+            <h1 className={styles.title}>
+              AI Study Planner
+            </h1>
+          </Link>
           <p className={styles.subtitle}>
-            {tab === 'signin' && 'Welcome back! Sign in to continue.'}
-            {tab === 'register' && 'Create your free account today.'}
-            {tab === 'forgot' && 'Reset your password to regain access.'}
+            {tab === 'signin' && (
+              <>Welcome back. Continue your <em>academic journey.</em></>
+            )}
+            {tab === 'register' && (
+              <>Create your account. Start studying <em>smarter.</em></>
+            )}
+            {tab === 'forgot' && (
+              <>Reset password. Regain access to your <em>planner.</em></>
+            )}
           </p>
         </div>
 
         {/* Card */}
-        <div className={styles.card}>
+        <div className={`liquid-glass ${styles.card}`}>
 
           {/* Tabs */}
           {tab !== 'forgot' && (
@@ -250,19 +260,21 @@ export default function LoginPage() {
 
           {/* Error / Success banners */}
           {error && (
-            <div className={styles.errorBanner}>
-              {error}
+            <div className={styles.errorBanner} role="alert">
+              <AlertCircle className={styles.bannerIcon} />
+              <span>{error}</span>
             </div>
           )}
           {success && (
-            <div className={styles.successBanner}>
-              {success}
+            <div className={styles.successBanner} role="status">
+              <CheckCircle2 className={styles.bannerIcon} />
+              <span>{success}</span>
             </div>
           )}
 
           {/* ── SIGN IN FORM ── */}
           {tab === 'signin' && (
-            <form onSubmit={handleSignIn} className={styles.form}>
+            <form onSubmit={handleSignIn} className={styles.form} noValidate>
               <div>
                 <label className={styles.label}>
                   Email
@@ -275,7 +287,7 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && !email ? styles.inputError : ''}`}
                 />
               </div>
 
@@ -300,18 +312,18 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   autoComplete="current-password"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && !password ? styles.inputError : ''}`}
                 />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--color-muted)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'rgba(255, 255, 255, 0.55)' }}>
                   <input
                     type="checkbox"
                     id="remember-me"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    style={{ accentColor: '#00A896', cursor: 'pointer' }}
+                    style={{ accentColor: '#ffffff', cursor: 'pointer' }}
                   />
                   Remember me
                 </label>
@@ -341,7 +353,7 @@ export default function LoginPage() {
 
           {/* ── REGISTER FORM ── */}
           {tab === 'register' && (
-            <form onSubmit={handleRegister} className={styles.form}>
+            <form onSubmit={handleRegister} className={styles.form} noValidate>
               <div>
                 <label className={styles.label}>
                   Full Name
@@ -354,7 +366,7 @@ export default function LoginPage() {
                   placeholder="Aswin Kumar"
                   autoComplete="name"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && !name ? styles.inputError : ''}`}
                 />
               </div>
 
@@ -370,7 +382,7 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && !email ? styles.inputError : ''}`}
                 />
               </div>
 
@@ -395,7 +407,7 @@ export default function LoginPage() {
                   placeholder="Min. 6 characters"
                   autoComplete="new-password"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && (!password || password.length < 6 || password !== confirm) ? styles.inputError : ''}`}
                 />
               </div>
 
@@ -411,7 +423,7 @@ export default function LoginPage() {
                   placeholder="Re-enter password"
                   autoComplete="new-password"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && (!confirm || password !== confirm) ? styles.inputError : ''}`}
                 />
               </div>
 
@@ -430,7 +442,7 @@ export default function LoginPage() {
 
           {/* ── FORGOT PASSWORD FORM ── */}
           {tab === 'forgot' && (
-            <form onSubmit={handleForgotPassword} className={styles.form}>
+            <form onSubmit={handleForgotPassword} className={styles.form} noValidate>
               <div>
                 <label className={styles.label}>
                   Enter your account email
@@ -443,7 +455,7 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
-                  className={styles.input}
+                  className={`${styles.input} ${submitted && !email ? styles.inputError : ''}`}
                 />
               </div>
 

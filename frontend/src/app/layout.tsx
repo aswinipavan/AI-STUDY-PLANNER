@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { ToastProvider } from "@/components/ui/ToastProvider";
@@ -18,6 +18,13 @@ const inter = Inter({
 const outfit = Outfit({
   variable: "--font-display",
   subsets: ["latin"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
+  weight: "400",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -47,10 +54,13 @@ export default function RootLayout({
     // before React hydrates, so the DOM legitimately differs from the markup.
     <html
       lang="en"
-      className={`${inter.variable} ${outfit.variable}`}
+      className={`${inter.variable} ${outfit.variable} ${instrumentSerif.variable}`}
       suppressHydrationWarning
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
