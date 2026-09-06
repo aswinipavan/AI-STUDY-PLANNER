@@ -84,14 +84,9 @@ export const timetableApi = {
     return normalizeSlot(response.data.data ?? response.data);
   },
 
-  // Wrapper for frontend status - maps to backend's boolean isCompleted
-  updateSlotStatus: async (id: string, _status: TimetableSlot['status']): Promise<TimetableSlot> => {
-    // Backend only supports toggle, so we check current state
-    // If setting to 'completed' and not already complete, toggle
-    // If setting to 'pending' or 'skipped' and currently complete, toggle
-    // Otherwise, this is a no-op on backend (frontend optimistic update handles UI)
+  updateSlotStatus: async (id: string): Promise<TimetableSlot> => {
     const response = await apiClient.patch(`/api/timetable/slots/${id}/complete`);
-    return response.data.data ?? response.data;
+    return normalizeSlot(response.data.data ?? response.data);
   },
 
   /**

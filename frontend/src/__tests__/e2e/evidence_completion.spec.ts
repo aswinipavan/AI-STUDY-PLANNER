@@ -1,15 +1,13 @@
 ﻿import { test, expect } from '@playwright/test';
 import { setupAuthenticatedContext } from '../../../playwright/auth-setup';
+import type { AuthenticatedUser } from '../../../playwright/auth-setup';
 
 test.describe('Evidence-Based Study Session Completion & AI Verification E2E', () => {
-  const mockStudent = {
+  const mockStudent: AuthenticatedUser = {
     id: 'stud-1',
     firebaseUid: 'mock-uid-evidence-spec',
-    fullName: 'Aswini Lead',
     name: 'Aswini Lead',
     email: 'aswini@example.com',
-    preferredStudyTime: 'EVENING',
-    availableHoursPerDay: 1,
     isPremium: false,
   };
 
@@ -67,7 +65,7 @@ test.describe('Evidence-Based Study Session Completion & AI Verification E2E', (
   ];
 
   test.beforeEach(async ({ page, context }) => {
-    await setupAuthenticatedContext(context, mockStudent as any);
+    await setupAuthenticatedContext(context, mockStudent);
 
     await page.addInitScript((student) => {
       localStorage.setItem('ai-study-planner-onboarding-completed', 'true');

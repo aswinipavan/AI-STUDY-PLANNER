@@ -66,6 +66,20 @@ describe('Mobile App Unit & Utilities Test Suite', () => {
       expect(getErrorMessage(new Error('[auth/email-already-in-use] Email is in use.')))
         .toContain('already exists');
     });
+
+    it('maps react-native-firebase auth error objects with code and message separately', () => {
+      const firebaseError = {
+        code: 'auth/invalid-credential',
+        message: 'The supplied auth credential is incorrect, malformed or has expired.',
+      };
+      expect(getErrorMessage(firebaseError)).toContain('Invalid email or password');
+
+      const userNotFound = {
+        code: 'auth/user-not-found',
+        message: 'There is no user record corresponding to this identifier.',
+      };
+      expect(getErrorMessage(userNotFound)).toContain('No account found with this email');
+    });
   });
 
   describe('timetable contract & slot filtering', () => {

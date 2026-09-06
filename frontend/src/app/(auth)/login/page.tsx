@@ -119,19 +119,15 @@ export default function LoginPage() {
       body: JSON.stringify({ firebaseToken: idToken }),
     });
     const data = await res.json();
-    // Accept both 200 (backend success) and any response that has a user
-    if (!res.ok && !data.user) {
+    if (!data.user) {
       if (res.status === 502 || res.status === 503 || res.status === 504) {
         throw new Error('backend-unavailable');
       }
-      // Use Firebase code if present, otherwise surface real error
       const firebaseCode = (data as {code?: string}).code;
       if (firebaseCode) throw Object.assign(new Error(firebaseCode), { code: firebaseCode });
       throw new Error(data.error || `Server error (${res.status})`);
     }
-    if (data.user) {
-      setUserAction(data.user as StudentProfile);
-    }
+    setUserAction(data.user as StudentProfile);
     router.push('/dashboard');
   }
 

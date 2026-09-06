@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const ONBOARDING_KEY = 'ai-study-planner-onboarding-completed';
 
@@ -13,19 +13,15 @@ export interface UseOnboardingReturn {
 }
 
 export function useOnboarding(): UseOnboardingReturn {
-  const [shouldShow, setShouldShow] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
+  const [shouldShow, setShouldShow] = useState<boolean>(() => {
     try {
       const completed = localStorage.getItem(ONBOARDING_KEY);
-      setShouldShow(completed !== 'true');
+      return completed !== 'true';
     } catch {
-      // If localStorage is unavailable (e.g. SSR or private mode), don't show
-      setShouldShow(false);
+      return false;
     }
-    setIsLoaded(true);
-  }, []);
+  });
+  const isLoaded = true;
 
   const completeOnboarding = useCallback(() => {
     try {

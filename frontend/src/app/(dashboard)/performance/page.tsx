@@ -197,17 +197,23 @@ export default function PerformancePage() {
                 <h3 className={styles.cardTitle}>Overall Score</h3>
               </div>
               <div className={styles.scoreRingContainer}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart
-                    cx="50%" cy="50%" innerRadius="70%" outerRadius="100%"
-                    data={[{ name: 'Score', value: report?.overallAverage ?? 0, fill: '#00e5c0' }]}
-                    startAngle={180} endAngle={-180}
-                  >
-                    <RadialBar dataKey="value" cornerRadius={10} />
-                  </RadialBarChart>
-                </ResponsiveContainer>
+                {report?.overallAverage != null ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadialBarChart
+                      cx="50%" cy="50%" innerRadius="70%" outerRadius="100%"
+                      data={[{ name: 'Score', value: report.overallAverage, fill: '#00e5c0' }]}
+                      startAngle={180} endAngle={-180}
+                    >
+                      <RadialBar dataKey="value" cornerRadius={10} />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-muted-foreground)', fontSize: '0.875rem' }}>
+                    No data yet
+                  </div>
+                )}
                 <div className={styles.scoreValueWrap}>
-                  <span className={styles.scoreValue}>{report?.overallAverage?.toFixed(0) ?? 0}%</span>
+                  <span className={styles.scoreValue}>{report?.overallAverage?.toFixed(0) ?? '--'}%</span>
                   <span className={styles.scoreLabel}>Average</span>
                 </div>
               </div>
@@ -258,14 +264,15 @@ export default function PerformancePage() {
               </ResponsiveContainer>
             </div>
 
-            <div className={styles.card} style={{ animationDelay: '0.3s' }}>
-              <div className={styles.cardTitleWrap}>
-                <h3 className={styles.cardTitle}>Study vs Score Correlation</h3>
-              </div>
+              <div className={styles.card} style={{ animationDelay: '0.3s' }}>
+                <div className={styles.cardTitleWrap}>
+                  <h3 className={styles.cardTitle}>Study vs Score Correlation</h3>
+                  <span style={{ fontSize: 11, color: '#888', marginTop: 2 }}>Estimated from assessment count</span>
+                </div>
               <ResponsiveContainer width="100%" height={200}>
                 <ScatterChart>
                   <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} />
-                  <XAxis dataKey="hours" name="Hours Studied" tick={{ fill: '#888', fontSize: 11 }} axisLine={{ stroke: '#333' }} tickLine={false} />
+                  <XAxis dataKey="hours" name="Study Sessions" tick={{ fill: '#888', fontSize: 11 }} axisLine={{ stroke: '#333' }} tickLine={false} />
                   <YAxis dataKey="score" name="Score" domain={[0, 100]} tick={{ fill: '#888', fontSize: 11 }} axisLine={{ stroke: '#333' }} tickLine={false} />
                   <ZAxis range={[50, 100]} />
                   <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#555' }} contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px' }} />
@@ -312,7 +319,10 @@ export default function PerformancePage() {
                     let rankClass = styles.priorityRank;
                     if (idx === 0) rankClass += ` ${styles.rank1}`;
                     else if (idx === 1) rankClass += ` ${styles.rank2}`;
-                    else rankClass += ` ${styles.rank3}`;
+                    else if (idx === 2) rankClass += ` ${styles.rank3}`;
+                    else if (idx === 3) rankClass += ` ${styles.rank4}`;
+                    else if (idx === 4) rankClass += ` ${styles.rank5}`;
+                    else rankClass += ` ${styles.rankOther}`;
                     
                     return (
                       <div key={item.id || idx} className={styles.priorityItem}>

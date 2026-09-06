@@ -24,10 +24,14 @@ function CodeBlock({ children, className }: { children?: React.ReactNode; classN
     return <code className={styles.inlineCode}>{children}</code>;
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable (e.g. HTTP context or permission denied)
+    }
   };
 
   const language = className?.replace('language-', '') || 'code';
@@ -182,8 +186,9 @@ export default function MessageBubble({ message }: Props) {
                   },
                   // Links
                   a({ href, children }) {
+                    const safeHref = typeof href === 'string' && /^https?:\/\//i.test(href) ? href : '#';
                     return (
-                      <a href={href} target="_blank" rel="noopener noreferrer" className={styles.proseLink}>
+                      <a href={safeHref} target="_blank" rel="noopener noreferrer" className={styles.proseLink}>
                         {children}
                       </a>
                     );

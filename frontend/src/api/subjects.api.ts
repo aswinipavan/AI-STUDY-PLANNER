@@ -69,9 +69,11 @@ export function mapSubjectFromBackend(backend: BackendSubjectResponse): Subject 
 function mapSubjectToBackend(frontend: Partial<Subject>): BackendSubjectRequest {
   return {
     subjectName: frontend.name,
-    subjectCode: frontend.color, // reusing color field for code if needed
-    credits: 3,
-    difficultyLevel: 3,
-    semester: null,
+    subjectCode: frontend.subjectCode,
+    color: frontend.color,
+    targetHours: frontend.targetHours,
+    difficultyLevel: frontend.difficultyLevel,
+    credits: frontend.credits,
+    semester: frontend.semester,
   };
 }

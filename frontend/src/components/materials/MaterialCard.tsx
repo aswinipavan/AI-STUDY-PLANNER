@@ -78,6 +78,7 @@ export default function MaterialCard({ material }: Props) {
   };
 
   const handlePreview = () => {
+    if (!material.fileUrl) return;
     if (material.fileType === 'pdf') {
       window.open(material.fileUrl, '_blank');
     } else if (material.fileType === 'image') {

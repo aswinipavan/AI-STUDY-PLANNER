@@ -71,7 +71,6 @@ export function formatFutureAvailability(slotDate?: string, targetDate: Date = n
   const parsed = parseSlotDate(slotDate);
   if (!parsed) return 'Future session';
 
-  const todayDay = dayKey(targetDate);
   const tmrw = new Date(targetDate);
   tmrw.setDate(tmrw.getDate() + 1);
   const tomorrowDay = dayKey(tmrw);

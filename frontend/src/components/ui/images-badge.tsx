@@ -137,6 +137,7 @@ export function ImagesBadge({
                 zIndex: 10 + index,
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={image}
                 alt={`Preview ${index + 1}`}

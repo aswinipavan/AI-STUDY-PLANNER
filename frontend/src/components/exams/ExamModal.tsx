@@ -40,6 +40,7 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
   const qc = useQueryClient();
   const isEditing = !!editExam;
   const { data: subjects = [] } = useSubjects();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitting } } = useForm<ExamFormData>({
     resolver: zodResolver(examSchema),
@@ -59,7 +60,7 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
       reset({
         subjectId: editExam.subjectId,
         examName: editExam.examName || '',
-        examDate: editExam.examDate.split('T')[0],
+        examDate: editExam.examDate ? editExam.examDate.split('T')[0] : '',
         difficulty: editExam.difficulty,
         notes: editExam.notes || '',
       });
@@ -71,13 +72,19 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
   const { mutateAsync: createExam } = useCreateExam();
 
   const onSubmit = async (data: ExamFormData) => {
-    if (isEditing && editExam) {
-      await examsApi.update(editExam.id, data);
-      qc.invalidateQueries({ queryKey: QK.exams });
-    } else {
-      await createExam(data);
+    setSubmitError(null);
+    try {
+      if (isEditing && editExam) {
+        await examsApi.update(editExam.id, data);
+        qc.invalidateQueries({ queryKey: QK.exams });
+      } else {
+        await createExam(data);
+      }
+      onClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save exam. Please try again.';
+      setSubmitError(msg);
     }
-    onClose();
   };
 
   return (
@@ -141,6 +148,10 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
           />
           {errors.notes && <p className="text-destructive text-xs mt-1">{errors.notes.message}</p>}
         </div>
+
+        {submitError && (
+          <p className="text-destructive text-sm">{submitError}</p>
+        )}
 
         <div className="pt-4 flex gap-3">
           <AppButton type="button" variant="outline" className="flex-1" onClick={onClose}>

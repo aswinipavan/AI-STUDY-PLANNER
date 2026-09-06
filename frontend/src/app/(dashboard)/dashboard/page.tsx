@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { timetableApi } from '@/api/timetable.api';
 import { authApi } from '@/api/auth.api';
 import { QK } from '@/constants/queryKeys';
-import { dayKey, slotDayKey, mondayBasedIndex, evaluateSessionState } from '@/utils/dateHelpers';
+import { evaluateSessionState } from '@/utils/dateHelpers';
 import { computeDayStudyStats, calculateSlotDuration } from '@/utils/dashboardStats';
 import {
   Sparkles, Clock, CheckCircle2, CalendarDays, ArrowRight,

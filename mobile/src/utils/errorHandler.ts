@@ -12,6 +12,38 @@ export function getErrorMessage(error: unknown): string {
     return (error as ApiError).message;
   }
 
+  // Firebase auth errors from @react-native-firebase/auth have both code and message
+  if (typeof error === 'object' && error !== null && 'code' in error && 'message' in error) {
+    const code = String((error as {code?: string}).code || '');
+    const message = String((error as {message?: string}).message || '');
+    const lowerCode = code.toLowerCase();
+    const lowerMessage = message.toLowerCase();
+    if (lowerCode.includes('auth/invalid-credential') || lowerMessage.includes('invalid credential')) {
+      return 'Invalid email or password. Please check your credentials or switch to Register if you do not have an account.';
+    }
+    if (lowerCode.includes('auth/user-not-found') || lowerCode.includes('email_not_found')) {
+      return 'No account found with this email. Please register to create your account.';
+    }
+    if (lowerCode.includes('auth/wrong-password') || lowerCode.includes('invalid_password')) {
+      return 'Incorrect password. Please verify your password and try again.';
+    }
+    if (lowerCode.includes('auth/email-already-in-use') || lowerCode.includes('email_exists')) {
+      return 'An account with this email already exists. Please switch to Sign In.';
+    }
+    if (lowerCode.includes('auth/weak-password') || lowerCode.includes('weak_password')) {
+      return 'Password must be at least 6 characters.';
+    }
+    if (lowerCode.includes('auth/network-request-failed') || lowerCode.includes('network_error')) {
+      return 'Network connection failed. Please check your internet connection.';
+    }
+    if (lowerCode.includes('auth/too-many-requests') || lowerCode.includes('too_many_attempts_try_later')) {
+      return 'Too many failed login attempts. Please try again in a few minutes.';
+    }
+    if (message) {
+      return message;
+    }
+  }
+
   let msg = '';
   if (error instanceof Error) {
     msg = error.message;

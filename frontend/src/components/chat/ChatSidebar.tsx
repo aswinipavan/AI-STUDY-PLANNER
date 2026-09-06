@@ -47,7 +47,8 @@ export default function ChatSidebar({ onSelectSession, className = '' }: ChatSid
           <p className="text-sm text-muted-foreground px-2">No history yet.</p>
         ) : (
           sessions.map(session => {
-            const isActive = pathname.includes(`/chat/${session.id}`);
+            const chatPath = `/chat/${session.id}`;
+            const isActive = pathname === chatPath || pathname.startsWith(`${chatPath}/`);
             return (
               <Link
                 key={session.id}

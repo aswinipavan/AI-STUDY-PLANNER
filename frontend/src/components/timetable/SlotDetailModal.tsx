@@ -1,11 +1,11 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect, useState, useRef } from 'react';
 import {
   X,
   Clock,
   BookOpen,
-  Calendar,
   CheckCircle2,
   AlertTriangle,
   AlertCircle,
@@ -19,11 +19,25 @@ import {
   Check,
   ShieldCheck,
 } from 'lucide-react';
-import { TimetableSlot, StudyEvidenceResponse } from '@/types/api.types';
+import { TimetableSlot, StudyEvidenceResponse, VerificationStatus } from '@/types/api.types';
 import { parseSlotDate, evaluateSessionState } from '@/utils/dateHelpers';
 import { evidenceApi } from '@/api/evidence.api';
 import { AppButton } from '@/components/ui/AppButton';
 import styles from './slotDetailModal.module.css';
+
+function getApiErrorMessage(error: unknown): string {
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    const axiosError = error as { response?: { data?: { message?: string } } };
+    return axiosError.response?.data?.message || 'Something went wrong. Please try again.';
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Something went wrong. Please try again.';
+}
 
 interface SlotDetailModalProps {
   slot: TimetableSlot | null;
@@ -101,7 +115,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
           slotId: slot.id,
           fileName: 'Submitted Study Proof',
           fileUrl: '',
-          verificationStatus: slot.evidenceStatus as any,
+          verificationStatus: slot.evidenceStatus as VerificationStatus,
           score: slot.evidenceScore,
           summary: 'Verified evidence on record for this session.',
           matchedTopics: slot.topic ? [slot.topic] : [],
@@ -130,7 +144,6 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
     isLocked,
     isMissed,
     isActive,
-    isUpcoming,
     isCompleted,
     isCatchUpActive,
   } = evaluateSessionState(slot);
@@ -158,9 +171,8 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
       setIsUploading(true);
       const res = await evidenceApi.uploadEvidence(slot.id, file);
       setEvidence(res);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Failed to analyze study proof. Please retry.';
-      setUploadError(msg);
+    } catch (err) {
+      setUploadError(getApiErrorMessage(err));
     } finally {
       setIsUploading(false);
     }
@@ -181,9 +193,8 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
       await evidenceApi.approveCompletion(slot.id, evidence.id);
       onToggleStatus(slot.id, 'completed');
       setEvidence((prev) => prev ? { ...prev, isUsedForCompletion: true } : null);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Failed to complete session.';
-      setUploadError(msg);
+    } catch (err) {
+      setUploadError(getApiErrorMessage(err));
     } finally {
       setIsCompleting(false);
     }

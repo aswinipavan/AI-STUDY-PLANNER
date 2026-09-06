@@ -32,7 +32,6 @@ import {
   dayKey,
   slotDayKey,
   mondayBasedIndex,
-  isFutureSlot,
   formatFutureAvailability,
   evaluateSessionState,
   getSessionState,
@@ -64,21 +63,6 @@ function formatDay(value?: string): string | null {
   if (!value) return null;
   const parsed = parseSlotDate(value);
   return parsed ? parsed.toLocaleDateString([], { day: 'numeric', month: 'short' }) : null;
-}
-
-function SubjectProgressCard({ subject, current, target }: { subject: string; current: number; target: number }) {
-  const pct = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
-  return (
-    <div className={styles.progressCard}>
-      <div className={styles.progressHeader}>
-        <span className={styles.progressSubject}>{subject}</span>
-        <span className={styles.progressRatio}>{current}/{target} sessions</span>
-      </div>
-      <div className={styles.progressBar}>
-        <div className={styles.progressFill} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
 }
 
 function DayProgressBar({ slots }: { slots: TimetableSlot[] }) {
@@ -123,13 +107,15 @@ function SlotCardItem({
     isLocked,
     isMissed,
     isActive,
-    isUpcoming,
     isCompleted,
     isCatchUpActive,
   } = evaluateSessionState(slot, now);
 
-  const nextStatus = (current: TimetableSlot['status']): TimetableSlot['status'] =>
-    current === 'pending' ? 'completed' : current === 'completed' ? 'pending' : 'completed';
+  const nextStatus = (current: TimetableSlot['status']): TimetableSlot['status'] => {
+    if (current === 'pending') return 'completed';
+    if (current === 'completed') return 'pending';
+    return current;
+  };
 
   let statusClass = styles.slotPending;
   if (isCompleted) statusClass = styles.slotCompleted;
@@ -156,7 +142,7 @@ function SlotCardItem({
         }
       }}
       data-testid={`slot-card-${slot.id}`}
-      aria-label={`${subject}, ${slot.topic || 'Session'} from ${formatTimeRange(slot.startTime, slot.endTime)}. Status: ${isLocked ? 'locked (future session)' : isMissed ? 'missed' : isCompleted ? 'completed' : isActive ? 'active' : 'upcoming'}. Click for details.`}
+      aria-label={`${subject}, ${slot.topic || 'Session'} at ${formatTimeRange(slot.startTime, slot.endTime)}. ${isLocked ? 'Locked' : isMissed ? 'Missed' : isCompleted ? 'Completed' : isActive ? 'Active' : 'Upcoming'}. Press Enter for details.`}
     >
       {/* 1. Future Locked Badge */}
       {isLocked && !isCompleted && (
@@ -250,7 +236,7 @@ function AdaptationSummary({ result }: { result: AdaptationResult }) {
       {changes.length > 0 && (
         <ul className={styles.planChanges}>
           {changes.map((change, i) => (
-            <li key={`${i}-${change}`}>{change}</li>
+            <li key={i}>{change}</li>
           ))}
         </ul>
       )}
@@ -384,7 +370,6 @@ export default function TimetablePage() {
 
   /** Missed sessions: past slots not marked completed, or today's session where local time has passed endTime */
   const missedSlots = optimisticSlots.filter(s => getSessionState(s, today) === 'PAST_MISSED');
-  const missedIds = new Set(missedSlots.map(s => s.id));
 
   const handleToggle = (id: string, status: TimetableSlot['status']) => {
     const targetSlot = optimisticSlots.find(s => s.id === id);
@@ -414,7 +399,7 @@ export default function TimetablePage() {
         fireCelebrationConfetti();
       }
       try {
-        await timetableApi.updateSlotStatus(id, status);
+        await timetableApi.updateSlotStatus(id);
         if (status === 'completed') play(finishesToday ? 'achievement' : 'sessionComplete');
         qc.invalidateQueries({ queryKey: QK.timetable });
         qc.invalidateQueries({ queryKey: QK.timetableInsights });

@@ -46,12 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Main auth state listener ─────────────────────────────────────────────
   useEffect(() => {
     setIsMounted(true);
-    
+    let requestId = 0;
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const currentRequestId = ++requestId;
       setFirebaseUser(user);
 
       if (user) {
-        // Upsert user profile in Firestore if available (fail-safe)
         try {
           await setUserProfile(user.uid, {
             email: user.email,
@@ -62,20 +63,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.warn('[AuthProvider] Firestore sync skipped or failed:', firestoreErr);
         }
 
-        // Try to fetch full profile from backend database to ensure 100% persistence
         let profileLoaded = false;
         try {
           const profile = await authApi.getMe();
           if (profile && profile.id) {
+            if (currentRequestId !== requestId) return;
             setUser(profile);
             profileLoaded = true;
           }
         } catch {
-          // If getMe fails (e.g. cookie expired or first session), exchange the Firebase token
           try {
             const token = await user.getIdToken();
             const loginRes = await authApi.login(token);
             if (loginRes?.user) {
+              if (currentRequestId !== requestId) return;
               setUser(loginRes.user as StudentProfile);
               profileLoaded = true;
             }
@@ -85,9 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (!profileLoaded) {
-          // Fallback: If backend is temporarily offline, keep existing persisted user if matching UID
           const current = useAuthStore.getState().user;
           if (!current || (current.firebaseUid !== user.uid && current.id !== user.uid)) {
+            if (currentRequestId !== requestId) return;
             setUser({
               id: user.uid,
               name: user.displayName ?? '',
@@ -104,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const profile = await authApi.getMe();
           if (profile && (profile.id || profile.email)) {
+            if (currentRequestId !== requestId) return;
             setUser(profile);
             setLoading(false);
             return;
@@ -111,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch {
           // No active session or unauthenticated
         }
+        if (currentRequestId !== requestId) return;
         clearAuth();
       }
 
