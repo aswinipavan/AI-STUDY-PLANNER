@@ -39,7 +39,7 @@ test.describe('E2E Real Browser Live Evidence Verification & Completion Workflow
     });
     if (subjRes.ok()) {
       const body = await subjRes.json();
-      const subjectIds = (body.data || []).map((s: any) => s.id);
+      const subjectIds = (body.data || []).map((s: { id: string }) => s.id);
       if (subjectIds.length > 0) {
         await request.post('http://localhost:8080/api/timetable/generate', {
           headers: {

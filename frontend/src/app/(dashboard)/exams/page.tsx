@@ -15,8 +15,12 @@ import { Exam } from '@/types/api.types';
 import styles from './exams.module.css';
 
 function getDaysUntil(dateStr: string) {
-  const diff = new Date(dateStr).getTime() - Date.now();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const target = new Date(dateStr + 'T00:00:00');
+  if (Number.isNaN(target.getTime())) return null;
+  const now = new Date();
+  const diff = target.getTime() - now.getTime();
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  return days;
 }
 
 const difficultyClasses: Record<string, string> = {
@@ -74,6 +78,7 @@ export default function ExamsPage() {
           {exams.map((exam, index) => {
             const days = getDaysUntil(exam.examDate);
             const isToday = days === 0;
+            const isInvalid = days === null;
             const diffClass = difficultyClasses[exam.difficulty] || styles.diffMedium;
             
             return (
@@ -91,7 +96,7 @@ export default function ExamsPage() {
                       </span>
                       <span className={`${styles.countdown} ${isToday ? styles.countdownToday : ''}`}>
                         <Clock size={12} />
-                        {days > 0 ? `in ${days} day${days !== 1 ? 's' : ''}` : days === 0 ? 'Today!' : 'Past'}
+                        {isInvalid ? 'Invalid date' : days > 0 ? `in ${days} day${days !== 1 ? 's' : ''}` : days === 0 ? 'Today!' : 'Past'}
                       </span>
                     </div>
                   </div>

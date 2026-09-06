@@ -289,7 +289,7 @@ export default function ChatInput({
         title: (savedMaterial as { title?: string })?.title || title,
         fileName: file.name,
         fileUrl: (savedMaterial as { fileUrl?: string })?.fileUrl,
-        fileType: file.type || (isPdf ? 'application/pdf' : isImage ? 'image/jpeg' : 'text/plain'),
+        fileType: file.type || (isPdf ? 'application/pdf' : isImage ? file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.webp') || file.name.toLowerCase().endsWith('.gif') ? 'image/png' : 'image/jpeg' : 'text/plain'),
         fileSizeBytes: file.size,
         thumbnailUrl: objectUrl || undefined,
         processingStatus: 'READY',

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatApi } from '@/api/chat.api';
 import { aiApi } from '@/api/ai.api';
@@ -128,7 +129,7 @@ export const useChat = (initialSessionId: string | null) => {
 
     const attachBadge = isImage ? '📷 **Attached Image:**' : '📄 **Attached Document:**';
     const optimisticMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       role: 'user',
       content: attachedMaterial 
         ? `${attachBadge} [${attachedMaterial.title || attachedMaterial.fileName}]\n\n${messageContent}`
@@ -200,7 +201,7 @@ export const useChat = (initialSessionId: string | null) => {
           id: String(Date.now()),
           role: 'assistant',
           content: displayMessage,
-          sessionId: sessionId || 'temp',
+      sessionId: sessionId || `temp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           timestamp: new Date().toISOString(),
         },
       ]);

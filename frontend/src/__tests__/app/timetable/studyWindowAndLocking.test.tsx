@@ -7,7 +7,7 @@ import { ToastProvider } from '@/components/ui/ToastProvider';
 import { useAuthStore } from '@/stores/authStore';
 import { timetableApi } from '@/api/timetable.api';
 import { authApi } from '@/api/auth.api';
-import { calcStudyPeriod, WINDOW_START_LABELS } from '@/utils/studyPeriodUtils';
+import { calcStudyPeriod } from '@/utils/studyPeriodUtils';
 import { isFutureSlot, formatFutureAvailability, dayKey } from '@/utils/dateHelpers';
 
 import { StudentProfile } from '@/types/api.types';
@@ -255,7 +255,7 @@ describe('Timetable Study Window Synchronization & Future Session Locking', () =
 
       fireEvent.click(todayToggle);
       await waitFor(() => {
-        expect(timetableApi.updateSlotStatus).toHaveBeenCalledWith('slot-today', 'completed');
+        expect(timetableApi.updateSlotStatus).toHaveBeenCalledWith('slot-today');
       });
     });
   });

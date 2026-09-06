@@ -186,8 +186,22 @@ export default function SettingsPage() {
   // Notification preferences
   const [emailNotifs, setEmailNotifs] = useState<boolean>(activeUser?.emailNotifications ?? true);
   const [pushNotifs, setPushNotifs] = useState<boolean>(activeUser?.pushNotifications ?? false);
-  const [examReminders, setExamReminders] = useState<boolean>(true);
-  const [nlpAlerts, setNlpAlerts] = useState<boolean>(true);
+  const [examReminders, setExamReminders] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('settings-examReminders');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+  const [nlpAlerts, setNlpAlerts] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('settings-nlpAlerts');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
   const [notifSaved, setNotifSaved] = useState(false);
 
   useEffect(() => {
@@ -195,7 +209,23 @@ export default function SettingsPage() {
       setEmailNotifs(activeUser.emailNotifications ?? true);
       setPushNotifs(activeUser.pushNotifications ?? false);
     }
-  }, [activeUser?.emailNotifications, activeUser?.pushNotifications]);
+  }, [activeUser, activeUser?.emailNotifications, activeUser?.pushNotifications]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('settings-examReminders', JSON.stringify(examReminders));
+    } catch {
+      // Silently fail
+    }
+  }, [examReminders]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('settings-nlpAlerts', JSON.stringify(nlpAlerts));
+    } catch {
+      // Silently fail
+    }
+  }, [nlpAlerts]);
 
   // Load saved study preferences so the dropdowns reflect what the timetable generator will actually use.
   // studyTime is now the start-time label ("5:00 PM") not the old broad-range ("Evening (5 PM - 9 PM)").
@@ -204,7 +234,7 @@ export default function SettingsPage() {
       setStudyTime(ENUM_TO_LABEL[activeUser.preferredStudyTime ?? ''] ?? '5:00 PM');
       setStudyDuration(hoursToDurationLabel(activeUser.availableHoursPerDay));
     }
-  }, [activeUser?.preferredStudyTime, activeUser?.availableHoursPerDay]);
+  }, [activeUser, activeUser?.preferredStudyTime, activeUser?.availableHoursPerDay]);
 
   const initializedRef = useRef(false);
   const lastSyncedProfileRef = useRef<StudentProfile | null>(null);
@@ -503,7 +533,7 @@ export default function SettingsPage() {
               />
             </div>
 
-            {user?.isPremium && (
+            {activeUser?.isPremium && (
               <div className={styles.premiumBadge}>
                 ⭐ Premium Member
               </div>

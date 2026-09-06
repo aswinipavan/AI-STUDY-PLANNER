@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { subjectsApi } from '@/api/subjects.api';
-import { QK } from '@/constants/queryKeys';
+import { useSubjects, useDeleteSubject } from '@/hooks/useSubjects';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -15,7 +13,6 @@ import { Subject } from '@/types/api.types';
 import styles from './subjects.module.css';
 
 export default function SubjectsPage() {
-  const qc = useQueryClient();
   const [slideOpen, setSlideOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Subject | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Subject | null>(null);
@@ -23,15 +20,9 @@ export default function SubjectsPage() {
   const openAdd = () => { setEditTarget(null); setSlideOpen(true); };
   const openEdit = (s: Subject) => { setEditTarget(s); setSlideOpen(true); };
 
-  const { data: subjects, isLoading, error, refetch } = useQuery({
-    queryKey: QK.subjects,
-    queryFn: subjectsApi.getAll,
-  });
+  const { data: subjects, isLoading, error, refetch } = useSubjects();
 
-  const { mutate: deleteSubject } = useMutation({
-    mutationFn: (id: string) => subjectsApi.remove(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: QK.subjects }),
-  });
+  const { mutate: deleteSubject } = useDeleteSubject();
 
   if (isLoading) return (
     <div className={`${styles.container} ${styles.skeletonList}`}>

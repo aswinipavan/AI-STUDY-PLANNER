@@ -1,4 +1,4 @@
-﻿import { parseSlotDate, dayKey, slotDayKey, mondayBasedIndex } from './dateHelpers';
+﻿import { dayKey, slotDayKey, mondayBasedIndex } from './dateHelpers';
 
 export interface TimetableSlotLike {
   id?: string;

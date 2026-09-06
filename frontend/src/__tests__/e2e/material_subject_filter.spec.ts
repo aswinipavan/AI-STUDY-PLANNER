@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { test, expect } from '@playwright/test';
-import { setupAuthenticatedContext, mockAuthenticatedApiRoutes } from '../../../playwright/auth-setup';
+import { setupAuthenticatedContext } from '../../../playwright/auth-setup';
 
 test.describe('Materials Subject Filter End-to-End Tests', () => {
   const mockStudent = {

@@ -25,11 +25,13 @@ export function useTheme() {
 
   // `null` until mounted. The OS preference is not knowable while rendering on
   // the server, and guessing would make the server and client markup disagree.
-  const [systemDark, setSystemDark] = useState<boolean | null>(null);
+  const [systemDark, setSystemDark] = useState<boolean | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
     const mql = window.matchMedia('(prefers-color-scheme: dark)');
-    setSystemDark(mql.matches);
     const onChange = (event: MediaQueryListEvent) => setSystemDark(event.matches);
     mql.addEventListener('change', onChange);
     return () => mql.removeEventListener('change', onChange);
