@@ -24,10 +24,16 @@ async function handleProxy(request: NextRequest, context: { params: Promise<{ pa
     // binary payloads (PDFs, images) and destroys multipart/form-data boundaries — the root cause of
     // the HTTP 400 upload failures. ArrayBuffer forwards the exact bytes; the original Content-Type
     // header (including the multipart boundary) is preserved via the copied headers above.
-    const requestBody =
+    const rawBody =
       request.method !== 'GET' && request.method !== 'HEAD'
         ? await request.arrayBuffer()
         : undefined;
+
+    const requestBody = rawBody && rawBody.byteLength > 0 ? rawBody : undefined;
+
+    if (!requestBody) {
+      headers.delete('content-length');
+    }
 
     const response = await fetch(url.toString(), {
       method: request.method,

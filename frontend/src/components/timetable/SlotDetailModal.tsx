@@ -18,10 +18,14 @@ import {
   RefreshCw,
   Check,
   ShieldCheck,
+  Video,
+  Play,
+  ExternalLink,
 } from 'lucide-react';
-import { TimetableSlot, StudyEvidenceResponse, VerificationStatus } from '@/types/api.types';
+import { TimetableSlot, StudyEvidenceResponse, VerificationStatus, VideoRecommendation } from '@/types/api.types';
 import { parseSlotDate, evaluateSessionState } from '@/utils/dateHelpers';
 import { evidenceApi } from '@/api/evidence.api';
+import { videoRecommendationsApi } from '@/api/videoRecommendations.api';
 import { AppButton } from '@/components/ui/AppButton';
 import styles from './slotDetailModal.module.css';
 
@@ -88,6 +92,13 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
+  // Video Recommendations state
+  const [videos, setVideos] = useState<VideoRecommendation[]>([]);
+  const [isLoadingVideos, setIsLoadingVideos] = useState<boolean>(false);
+  const [isRefreshingVideos, setIsRefreshingVideos] = useState<boolean>(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [videoWarning, setVideoWarning] = useState<string | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -102,7 +113,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  // Load existing evidence when modal opens
+  // Load existing evidence and video recommendations when modal opens
   useEffect(() => {
     if (isOpen && slot?.id) {
       setUploadError(null);
@@ -132,10 +143,44 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
           setEvidence(null);
         });
       }
+
+      // Fetch video recommendations asynchronously
+      setIsLoadingVideos(true);
+      setVideoError(null);
+      setVideoWarning(null);
+      videoRecommendationsApi.getVideoRecommendations(slot.id)
+        .then((res) => {
+          setVideos(res.recommendations || []);
+          setVideoWarning(res.warningMessage || null);
+        })
+        .catch((err) => {
+          setVideoError(getApiErrorMessage(err));
+        })
+        .finally(() => {
+          setIsLoadingVideos(false);
+        });
     } else {
       setEvidence(null);
+      setVideos([]);
+      setVideoError(null);
+      setVideoWarning(null);
     }
   }, [isOpen, slot?.id, slot?.hasEvidence, slot?.evidenceStatus, slot?.evidenceScore, slot?.evidenceId, slot?.topic, slot?.isCompleted]);
+
+  const handleRefreshVideos = async () => {
+    if (!slot?.id || isRefreshingVideos) return;
+    try {
+      setIsRefreshingVideos(true);
+      setVideoError(null);
+      const res = await videoRecommendationsApi.refreshVideoRecommendations(slot.id);
+      setVideos(res.recommendations || []);
+      setVideoWarning(res.warningMessage || null);
+    } catch (err) {
+      setVideoError(getApiErrorMessage(err));
+    } finally {
+      setIsRefreshingVideos(false);
+    }
+  };
 
   if (!isOpen || !slot) return null;
 
@@ -365,6 +410,126 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Recommended Study Videos Section */}
+          <div className={styles.section} data-testid="modal-video-recommendations-section">
+            <div className={styles.videoSectionHeader}>
+              <div className={styles.videoSectionTitleRow}>
+                <p className={styles.sectionLabel} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Video size={14} style={{ color: '#ff4e4e' }} />
+                  Recommended Study Videos
+                </p>
+                <span className={styles.videoAiBadge}>
+                  <Sparkles size={10} /> AI Ranked
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles.videoRefreshButton}
+                onClick={handleRefreshVideos}
+                disabled={isLoadingVideos || isRefreshingVideos}
+                aria-label="Refresh video recommendations"
+                data-testid="refresh-video-recommendations-btn"
+              >
+                <RefreshCw size={12} className={isRefreshingVideos ? styles.analyzingSpinner : ''} style={isRefreshingVideos ? { width: 12, height: 12, borderWidth: 2 } : {}} />
+                <span>{isRefreshingVideos ? 'Searching...' : 'Refresh'}</span>
+              </button>
+            </div>
+
+            {isLoadingVideos ? (
+              <div className={styles.videoGrid} data-testid="video-recommendations-loading">
+                {[1, 2, 3].map((idx) => (
+                  <div key={idx} className={styles.videoSkeletonCard}>
+                    <div className={styles.videoSkeletonThumb} />
+                    <div className={styles.videoSkeletonContent}>
+                      <div className={styles.videoSkeletonLine} style={{ width: '85%' }} />
+                      <div className={styles.videoSkeletonLine} style={{ width: '60%' }} />
+                      <div className={styles.videoSkeletonLine} style={{ width: '40%' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : videoError ? (
+              <div className={styles.futureAlertBox} style={{ borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.08)' }} data-testid="video-error-banner">
+                <AlertCircle size={16} style={{ color: '#ef4444' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <p style={{ color: '#ef4444', fontSize: '0.8125rem', margin: 0 }}>{videoError}</p>
+                  <button
+                    type="button"
+                    onClick={handleRefreshVideos}
+                    style={{ background: 'transparent', border: 'none', color: '#ff4e4e', fontSize: '0.75rem', fontWeight: 600, padding: 0, textAlign: 'left', cursor: 'pointer' }}
+                  >
+                    Try Again ↻
+                  </button>
+                </div>
+              </div>
+            ) : videos.length > 0 ? (
+              <div className={styles.videoGrid} data-testid="video-recommendations-grid">
+                {videos.map((vid) => {
+                  const isExcellent = vid.matchVerdict === 'EXCELLENT MATCH' || vid.matchScore >= 85;
+                  const isGood = vid.matchVerdict === 'GOOD MATCH' || (vid.matchScore >= 70 && vid.matchScore < 85);
+                  const pillClass = isExcellent ? styles.matchScoreExcellent : isGood ? styles.matchScoreGood : styles.matchScoreRelated;
+
+                  return (
+                    <a
+                      key={vid.videoId}
+                      href={vid.videoUrl || `https://www.youtube.com/watch?v=${vid.videoId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.videoCard}
+                      data-testid={`video-card-${vid.videoId}`}
+                    >
+                      <div className={styles.videoThumbnailContainer}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={vid.thumbnailUrl || `https://i.ytimg.com/vi/${vid.videoId}/hqdefault.jpg`}
+                          alt={vid.title}
+                          className={styles.videoThumbnail}
+                          loading="lazy"
+                        />
+                        <div className={styles.videoPlayOverlay}>
+                          <Play size={20} className={styles.videoPlayIcon} fill="white" />
+                        </div>
+                      </div>
+
+                      <div className={styles.videoCardContent}>
+                        <h4 className={styles.videoTitle} title={vid.title}>
+                          {vid.title}
+                        </h4>
+
+                        {vid.channelTitle && (
+                          <div className={styles.videoChannelRow}>
+                            <span>{vid.channelTitle}</span>
+                          </div>
+                        )}
+
+                        {vid.matchReason && (
+                          <span className={styles.videoReasonText}>
+                            {vid.matchReason}
+                          </span>
+                        )}
+
+                        <div className={styles.videoBadgeRow}>
+                          <span className={`${styles.matchScorePill} ${pillClass}`}>
+                            {vid.matchScore}% Match {isExcellent ? '· High Signal' : ''}
+                          </span>
+                          <span className={styles.videoWatchLink}>
+                            Watch on YouTube <ExternalLink size={12} />
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className={styles.reasonBox} data-testid="video-empty-state">
+                <p className={styles.reasonText}>
+                  {videoWarning || 'No video recommendations found for this specific topic yet. Click Refresh to search YouTube.'}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Evidence-Based Verification Section */}

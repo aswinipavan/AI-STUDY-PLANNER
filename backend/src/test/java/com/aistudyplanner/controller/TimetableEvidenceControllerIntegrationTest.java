@@ -70,6 +70,9 @@ class TimetableEvidenceControllerIntegrationTest {
     @MockBean
     private StudyEvidenceVerificationService studyEvidenceVerificationService;
 
+    @MockBean
+    private com.aistudyplanner.service.YouTubeRecommendationService youTubeRecommendationService;
+
     private Student mockStudent;
     private UUID studentId;
     private UUID slotId;

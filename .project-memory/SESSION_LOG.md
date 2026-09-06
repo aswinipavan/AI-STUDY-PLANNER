@@ -2239,6 +2239,105 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
     *Solution:* Aligned destructured fixture parameters to standard `page` and `context`.
 - **Next Recommended Task:** Await user confirmation for next roadmap feature or git push.
 
+---
+
+## Session 46: 2026-09-06 - AI-Powered YouTube Video Recommendations for Timetable Slots
+- **Task Started:** Build an intelligent, server-side AI-powered educational video recommendation engine for timetable study slots based on curriculum topics, chapters, "What to Study" objectives, and difficulty, with complete Web and Mobile parity.
+- **Task Completed:**
+  1. **Database & Migrations:**
+     - Created Flyway migration `V8__add_timetable_video_recommendations_cache.sql` creating `timetable_video_recommendations_cache` table with unique index on `cache_key` and indexes on `expires_at` and `timetable_slot_id`.
+     - Updated local H2 `schema-local.sql` with table definition and indexes.
+     - Updated `FlywayPostgresMigrationTest.java` to set migration count to 8.
+  2. **Configuration & Server-Side Security:**
+     - Configured `youtube.api-key`, `youtube.base-url`, timeouts, and 72-hour cache TTL in `application.properties` and `application-local.properties`.
+     - Guaranteed zero client-side API key exposure.
+  3. **Backend Models & Services:**
+     - Created `VideoRecommendation.java`, `SlotVideoRecommendationsResponse.java`, `VideoRecommendationCache.java`, `VideoRecommendationCacheRepository.java`.
+     - Built `VideoQueryGeneratorService.java` with LaTeX cleaning and 4-query portfolio generation.
+     - Built `YouTubeApiClient.java` with server-side YouTube Data API v3 HTTP communication.
+     - Built `VideoRelevanceRanker.java` with multi-signal explainable relevance scoring (0–100).
+     - Built `YouTubeRecommendationService.java` orchestrating student ownership validation, cache lookup, search execution, ranking, and 72h TTL cache persistence.
+     - Exposed `GET /api/timetable/slots/{slotId}/video-recommendations` and `POST /api/timetable/slots/{slotId}/video-recommendations/refresh` in `TimetableController.java`.
+  4. **Frontend Web UI (`SlotDetailModal.tsx`):**
+     - Defined TypeScript interfaces in `api.types.ts`.
+     - Created `videoRecommendations.api.ts`.
+     - Added asynchronous `Recommended Study Videos` section in `SlotDetailModal.tsx` and `slotDetailModal.module.css` with non-blocking skeleton loaders, high-res thumbnails with play overlay, match score badges (e.g. `94% Match · High Signal`), and safe YouTube links.
+     - Added Jest tests in `slotDetailModalVideoRecommendations.test.tsx`.
+  5. **Mobile Parity (`mobile/`):**
+     - Added types in `mobile/src/types/timetable.types.ts`.
+     - Added API client functions in `mobile/src/api/timetable.api.ts`.
+     - Built touch-friendly `VideoRecommendationsSection.tsx` with native `Linking.openURL` launcher and refresh action.
+     - Added mobile unit tests in `mobileApp.test.ts`.
+  6. **Comprehensive Quality Gate:**
+     - Backend: 48/48 timetable & video tests passed (`mvnw test` PASS).
+     - Frontend: 169/169 Jest tests passed across 26 test suites (`npm test` PASS).
+     - Frontend TypeScript: 0 errors (`npx tsc --noEmit` PASS).
+     - Next.js Production Build: 24/24 static & dynamic routes compiled cleanly (`npm run build` PASS).
+     - Mobile: 23/23 tests passed (`npm test` PASS).
+  7. **Documentation & Memory System:**
+     - Created comprehensive `YOUTUBE_VIDEO_RECOMMENDATION_IMPLEMENTATION_REPORT.md` in `.project-memory/`.
+     - Updated `CURRENT_STATE.md`, `TASKS.md`, `CHANGELOG.md`, `API_STATUS.md`, `NEXT_TASK.md`, and `SESSION_LOG.md`.
+- **Files Modified / Created:**
+  - `backend/src/main/resources/db/migration/V8__add_timetable_video_recommendations_cache.sql` [NEW]
+  - `backend/src/main/resources/schema-local.sql` [MODIFIED]
+  - `backend/src/main/resources/application.properties` [MODIFIED]
+  - `backend/src/main/resources/application-local.properties` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/VideoRecommendation.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotVideoRecommendationsResponse.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/entity/VideoRecommendationCache.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/repository/VideoRecommendationCacheRepository.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/VideoQueryGeneratorService.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/YouTubeApiClient.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/VideoRelevanceRanker.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/YouTubeRecommendationService.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/controller/TimetableController.java` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/service/VideoQueryGeneratorServiceTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/service/VideoRelevanceRankerTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/service/YouTubeRecommendationServiceTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/controller/TimetableVideoRecommendationsControllerIntegrationTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/controller/TimetableEvidenceControllerIntegrationTest.java` [MODIFIED]
+  - `backend/src/test/java/com/aistudyplanner/migration/FlywayPostgresMigrationTest.java` [MODIFIED]
+  - `frontend/src/types/api.types.ts` [MODIFIED]
+  - `frontend/src/api/videoRecommendations.api.ts` [NEW]
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED]
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED]
+  - `frontend/src/__tests__/components/slotDetailModalVideoRecommendations.test.tsx` [NEW]
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [MODIFIED]
+  - `frontend/src/__tests__/components/slotDetailModalEvidence.test.tsx` [MODIFIED]
+  - `mobile/src/types/timetable.types.ts` [MODIFIED]
+  - `mobile/src/api/timetable.api.ts` [MODIFIED]
+  - `mobile/src/components/timetable/VideoRecommendationsSection.tsx` [NEW]
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED]
+  - `.project-memory/YOUTUBE_VIDEO_RECOMMENDATION_IMPLEMENTATION_REPORT.md` [NEW]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/API_STATUS.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem 1:* In `YouTubeRecommendationService.java`, `Subject` entity method was `getSubjectName()`, not `getName()`.
+    *Solution:* Corrected method invocation to `subject.getSubjectName()`.
+  - *Problem 2:* Transitive import of `videoRecommendations.api` in `slotDetailModal.test.tsx` and `slotDetailModalEvidence.test.tsx` needed mocked client.
+    *Solution:* Added `jest.mock('@/api/videoRecommendations.api')` to both test files.
+- **Next Recommended Task:** Await user instruction for next feature or roadmap enhancement.
+
+---
+
+### Session Entry: 2026-09-06T23:36:00+05:30
+- **Task Started:** Root-Cause Diagnosis of `POST /api/timetable/slots/{slotId}/video-recommendations/refresh` from Chrome DevTools AI Assistance
+- **Task Completed:** Identified 4 specific factors causing the failure (Next.js API proxy 0-byte ArrayBuffer forwarding, missing request body in Axios POST, session authentication, and missing `YOUTUBE_API_KEY`). Hardened Next.js proxy route and client API call.
+- **Files Modified:**
+  - `frontend/src/app/api/[...path]/route.ts` [MODIFIED] (Stripped empty 0-byte body and `content-length` header on proxy requests)
+  - `frontend/src/api/videoRecommendations.api.ts` [MODIFIED] (Passed explicit empty payload `{}` in `apiClient.post`)
+  - `.project-memory/BUG_TRACKER.md` [MODIFIED] (Logged BUG-028)
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem:* Next.js catch-all proxy forwarded zero-byte `ArrayBuffer(0)` with incoming `content-length` header, which could cause Node `fetch` / gateway failures on empty POST requests.
+  - *Solution:* Added defensive check `rawBody && rawBody.byteLength > 0 ? rawBody : undefined` and removed `content-length` when body is empty. Passed `{}` payload in `videoRecommendationsApi.refreshVideoRecommendations`.
+- **Next Recommended Task:** Configure `YOUTUBE_API_KEY` in `backend/.env` if live YouTube search is desired.
+
+
 
 
 

@@ -267,6 +267,36 @@ describe('Mobile App Unit & Utilities Test Suite', () => {
       expect(after.scheduledMinutes).toBe(60);
     });
   });
+
+  describe('videoRecommendations API & Types', () => {
+    it('structures video recommendation response correctly', () => {
+      const mockRec: import('../types/timetable.types').VideoRecommendation = {
+        videoId: 'vid-test-1',
+        title: 'Fourier Sine Series Lecture',
+        channelTitle: 'MIT OpenCourseWare',
+        thumbnailUrl: 'https://img.youtube.com/vi/vid-test-1/hqdefault.jpg',
+        videoUrl: 'https://www.youtube.com/watch?v=vid-test-1',
+        matchScore: 94,
+        matchVerdict: 'EXCELLENT MATCH',
+        matchReason: 'Direct topic match in title',
+        duration: '15 mins',
+      };
+
+      const mockResponse: import('../types/timetable.types').SlotVideoRecommendationsResponse = {
+        slotId: 'slot-100',
+        topic: 'Fourier Sine Series',
+        chapter: 'Fourier Analysis',
+        subjectName: 'Mathematics',
+        recommendations: [mockRec],
+        isCached: true,
+      };
+
+      expect(mockResponse.recommendations).toHaveLength(1);
+      expect(mockResponse.recommendations[0].matchScore).toBe(94);
+      expect(mockResponse.recommendations[0].matchVerdict).toBe('EXCELLENT MATCH');
+      expect(mockResponse.isCached).toBe(true);
+    });
+  });
 });
 
 

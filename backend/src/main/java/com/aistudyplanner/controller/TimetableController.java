@@ -36,6 +36,7 @@ public class TimetableController {
     private final TimetableService timetableService;
     private final AdaptiveScheduleService adaptiveScheduleService;
     private final com.aistudyplanner.service.StudyEvidenceVerificationService studyEvidenceVerificationService;
+    private final com.aistudyplanner.service.YouTubeRecommendationService youTubeRecommendationService;
 
     @PostMapping("/generate")
     @Operation(summary = "Generate AI Timetable")
@@ -162,5 +163,27 @@ public class TimetableController {
     public ResponseEntity<ApiResponse<List<SubjectReadinessResponse>>> getInsights(@CurrentStudent Student student) {
         List<SubjectReadinessResponse> insights = adaptiveScheduleService.getSubjectReadiness(student.getId());
         return ResponseEntity.ok(ApiResponse.success(insights, "Adaptive insights fetched successfully"));
+    }
+
+    @GetMapping("/slots/{slotId}/video-recommendations")
+    @Operation(summary = "Get intelligent YouTube video recommendations for a timetable study slot")
+    public ResponseEntity<ApiResponse<com.aistudyplanner.model.dto.response.SlotVideoRecommendationsResponse>> getVideoRecommendations(
+            @CurrentStudent Student student,
+            @PathVariable UUID slotId) {
+        log.info("Fetching video recommendations for slot: {} for student: {}", slotId, student.getId());
+        com.aistudyplanner.model.dto.response.SlotVideoRecommendationsResponse response =
+                youTubeRecommendationService.getVideoRecommendations(student.getId(), slotId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Video recommendations fetched successfully"));
+    }
+
+    @PostMapping("/slots/{slotId}/video-recommendations/refresh")
+    @Operation(summary = "Force refresh YouTube video recommendations for a timetable study slot")
+    public ResponseEntity<ApiResponse<com.aistudyplanner.model.dto.response.SlotVideoRecommendationsResponse>> refreshVideoRecommendations(
+            @CurrentStudent Student student,
+            @PathVariable UUID slotId) {
+        log.info("Refreshing video recommendations for slot: {} for student: {}", slotId, student.getId());
+        com.aistudyplanner.model.dto.response.SlotVideoRecommendationsResponse response =
+                youTubeRecommendationService.refreshVideoRecommendations(student.getId(), slotId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Video recommendations refreshed successfully"));
     }
 }

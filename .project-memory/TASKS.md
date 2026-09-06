@@ -1,6 +1,15 @@
 # Tasks
 
 ## Completed
+- [2026-09-06] AI-Powered YouTube Video Recommendations for Timetable Slots (Web & Mobile Parity):
+  - **Context Resolution & Query Generation:** Built `VideoQueryGeneratorService.java` resolving exact curriculum topics, chapters, "What to Study" bullet lists, difficulty, and generating 4 structured pedagogical queries with automated LaTeX / prefix cleaning.
+  - **Server-Side API Security:** Created `YouTubeApiClient.java` interfacing with YouTube Data API v3 strictly on backend with strict timeouts and safeSearch. Zero client-side API key exposure.
+  - **Explainable Relevance Scoring:** Built `VideoRelevanceRanker.java` with 0–100 relevance scoring based on title topic overlap, chapter match, syllabus keywords, subject alignment, educational channel boosts, and non-educational noise/shorts penalty.
+  - **Multi-Day Database Cache:** Created Flyway migration `V8__add_timetable_video_recommendations_cache.sql`, H2 schema definition, `VideoRecommendationCache.java` JPA entity, and repository with 72-hour TTL.
+  - **Endpoints & Authorization:** Added `GET /api/timetable/slots/{slotId}/video-recommendations` and `POST /api/timetable/slots/{slotId}/video-recommendations/refresh` to `TimetableController.java` with student ownership validation.
+  - **Web Frontend Modal:** Updated `SlotDetailModal.tsx` and `slotDetailModal.module.css` with asynchronous `Recommended Study Videos` section, non-blocking skeleton loader, high-res thumbnail with play overlay, match badge (e.g. `94% Match · High Signal`), and safe YouTube launcher.
+  - **Mobile App Component:** Added `VideoRecommendationsSection.tsx` with touch-friendly cards and `Linking.openURL` browser launcher.
+  - **Full Quality Gate:** 48/48 backend tests passing, 169/169 frontend Jest tests passing, Next.js production build passing (24/24 static routes), and 23/23 mobile tests passing.
 - [2026-09-06] Authentication & Login Page Cinematic Glassmorphism Parity:
   - **Atmosphere & Dynamic Canvas:** Embedded `<StarField />` starry sky backdrop with deep navy vignette (`#030a16` + `radial-gradient`) across `/login`.
   - **Typography & Brand Identity:** Styled brand title with Instrument Serif (`--font-serif`) and italic subtitle highlights.

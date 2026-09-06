@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-09-06 (Session 46 - AI-Powered YouTube Video Recommendations for Timetable Slots)
+- **Files created/changed:**
+  - `backend/src/main/resources/db/migration/V8__add_timetable_video_recommendations_cache.sql` [NEW] — Flyway migration creating `timetable_video_recommendations_cache` table with unique index on `cache_key` and indexes on `expires_at` and `timetable_slot_id`.
+  - `backend/src/main/resources/schema-local.sql` [MODIFIED] — Added table definition and indexes for local H2 file database.
+  - `backend/src/main/resources/application.properties` & `application-local.properties` [MODIFIED] — Added `youtube.*` configuration properties (API key, base URL, connect/read timeouts, max results per query, 72h cache TTL).
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/VideoRecommendation.java` [NEW] — DTO representing an individual educational video recommendation with match score, verdict, explainable reasoning, and watch URL.
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotVideoRecommendationsResponse.java` [NEW] — Response DTO containing slot context, generated queries, recommendations, cache flag, and status notices.
+  - `backend/src/main/java/com/aistudyplanner/model/entity/VideoRecommendationCache.java` [NEW] — JPA Entity for persistent multi-day recommendation caching.
+  - `backend/src/main/java/com/aistudyplanner/repository/VideoRecommendationCacheRepository.java` [NEW] — Spring Data JPA repository for cache retrieval, expiration deletion, and key lookup.
+  - `backend/src/main/java/com/aistudyplanner/service/VideoQueryGeneratorService.java` [NEW] — Service generating 3-4 distinct high-signal pedagogical queries from curriculum topic, chapter, syllabus keywords ("What to Study"), subject, and difficulty with LaTeX/prefix normalization.
+  - `backend/src/main/java/com/aistudyplanner/service/YouTubeApiClient.java` [NEW] — Server-side YouTube Data API v3 HTTP client with strict timeout control, safeSearch, and graceful degradation on unconfigured/quota limits.
+  - `backend/src/main/java/com/aistudyplanner/service/VideoRelevanceRanker.java` [NEW] — Service computing explainable multi-signal relevance scoring (0–100) with topic token overlap (40 pts), chapter match (20 pts), syllabus keywords (20 pts), subject match (10 pts), educational channel boosts (+10 pts), and noise/shorts penalty (-30 pts).
+  - `backend/src/main/java/com/aistudyplanner/service/YouTubeRecommendationService.java` [NEW] — Orchestration service managing student slot ownership authorization, persistent cache retrieval, live YouTube search, ranking, and 72-hour TTL cache persistence.
+  - `backend/src/main/java/com/aistudyplanner/controller/TimetableController.java` [MODIFIED] — Added `GET /api/timetable/slots/{slotId}/video-recommendations` and `POST /api/timetable/slots/{slotId}/video-recommendations/refresh`.
+  - `backend/src/test/java/com/aistudyplanner/service/VideoQueryGeneratorServiceTest.java` [NEW] — Unit tests for topic cleaning, LaTeX handling, and query portfolio generation.
+  - `backend/src/test/java/com/aistudyplanner/service/VideoRelevanceRankerTest.java` [NEW] — Unit tests for scoring, channel authority boost, clickbait rejection, and deduplication.
+  - `backend/src/test/java/com/aistudyplanner/service/YouTubeRecommendationServiceTest.java` [NEW] — Unit tests for cache hits/misses, student ownership authorization, and slot lookup.
+  - `backend/src/test/java/com/aistudyplanner/controller/TimetableVideoRecommendationsControllerIntegrationTest.java` [NEW] — MockMvc integration tests for video recommendation endpoints (3/3 passed).
+  - `backend/src/test/java/com/aistudyplanner/controller/TimetableEvidenceControllerIntegrationTest.java` [MODIFIED] — Injected `YouTubeRecommendationService` mock bean.
+  - `backend/src/test/java/com/aistudyplanner/migration/FlywayPostgresMigrationTest.java` [MODIFIED] — Incremented `MIGRATION_COUNT` from 7 to 8 for V8 migration.
+  - `frontend/src/types/api.types.ts` [MODIFIED] — Added `VideoRecommendation` and `SlotVideoRecommendationsResponse` TypeScript interfaces.
+  - `frontend/src/api/videoRecommendations.api.ts` [NEW] — API client methods for fetching and refreshing video recommendations.
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED] — Integrated asynchronous `Recommended Study Videos` section with non-blocking skeleton loader, high-res thumbnail with play overlay, match badge (e.g. `94% Match · High Signal`), and safe YouTube launcher.
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED] — Added responsive styles for video cards, play overlays, score badges, and skeleton shimmer.
+  - `frontend/src/__tests__/components/slotDetailModalVideoRecommendations.test.tsx` [NEW] — Frontend Jest unit tests for video recommendations rendering, refresh, error handling, and empty state.
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` & `slotDetailModalEvidence.test.tsx` [MODIFIED] — Added mocks for `videoRecommendations.api`.
+  - `mobile/src/types/timetable.types.ts` [MODIFIED] — Added video recommendation types.
+  - `mobile/src/api/timetable.api.ts` [MODIFIED] — Added `getVideoRecommendations` and `refreshVideoRecommendations` client functions.
+  - `mobile/src/components/timetable/VideoRecommendationsSection.tsx` [NEW] — Touch-friendly React Native video recommendation component with `Linking.openURL` launcher and refresh action.
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED] — Added unit test for video recommendation API response and type safety.
+- **Reason:**
+  - Build intelligent, server-side AI-powered educational video recommendations for every timetable study slot based on curriculum topic, chapter, syllabus learning objectives, and difficulty, with full Web and Mobile parity.
+- **Summary:**
+  - All 48 backend tests passed (100% pass rate).
+  - All 169 frontend Jest tests passed across 26 test suites (100% pass rate).
+  - Frontend TypeScript typechecking: 0 errors (`npx tsc --noEmit` PASS).
+  - Next.js production build: 24/24 static and dynamic routes compiled cleanly (`npm run build` PASS).
+  - All 23 mobile tests passed (100% pass rate).
+  - Zero API key exposure on client platforms. Zero disruption to existing timetable scheduling algorithm.
+
 ## 2026-09-06 (Session 45 - Authentication & Login Page Cinematic Glassmorphism Parity)
 - **Files created/changed:**
   - `frontend/src/app/(auth)/login/page.module.css` [MODIFIED] — Redesigned login CSS to match landing page aesthetic: deep navy vignette gradient (`#030a16`), Instrument Serif typography for brand titles, floating pill capsule tabs (`Sign In` / `Register`), 20px blur glassmorphic card with specular highlights, liquid glass CTA pill buttons, glowing `.errorBanner` with blur and Lucide vector icons, and `.inputError` crimson glass border halos.

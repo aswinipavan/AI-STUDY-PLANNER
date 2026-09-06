@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SlotDetailModal } from '@/components/timetable/SlotDetailModal';
@@ -8,8 +8,15 @@ import { evidenceApi } from '@/api/evidence.api';
 jest.mock('@/api/evidence.api', () => ({
   evidenceApi: {
     uploadEvidence: jest.fn(),
-    getLatestEvidence: jest.fn(),
+    getLatestEvidence: jest.fn().mockResolvedValue(null),
     approveCompletion: jest.fn(),
+  },
+}));
+
+jest.mock('@/api/videoRecommendations.api', () => ({
+  videoRecommendationsApi: {
+    getVideoRecommendations: jest.fn().mockResolvedValue({ recommendations: [] }),
+    refreshVideoRecommendations: jest.fn().mockResolvedValue({ recommendations: [] }),
   },
 }));
 

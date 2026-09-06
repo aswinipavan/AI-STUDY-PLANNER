@@ -257,6 +257,24 @@ CREATE TABLE IF NOT EXISTS study_evidence_submissions (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
+-- V8: timetable_video_recommendations_cache
+CREATE TABLE IF NOT EXISTS timetable_video_recommendations_cache (
+    id UUID NOT NULL DEFAULT RANDOM_UUID(),
+    cache_key VARCHAR(255) NOT NULL,
+    student_id UUID,
+    timetable_slot_id UUID,
+    topic VARCHAR(255) NOT NULL,
+    chapter VARCHAR(255),
+    subject_name VARCHAR(255),
+    recommendations_json TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT uq_video_rec_cache_key UNIQUE (cache_key),
+    FOREIGN KEY (timetable_slot_id) REFERENCES timetable_slots(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
+);
+
 -- ============================================================
 -- INDEXES
 -- ============================================================
@@ -279,6 +297,9 @@ CREATE INDEX IF NOT EXISTS idx_room_participants_room ON study_room_participants
 CREATE INDEX IF NOT EXISTS idx_room_messages_room ON study_room_messages(room_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_slot_student ON study_evidence_submissions(timetable_slot_id, student_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_status ON study_evidence_submissions(verification_status);
+CREATE INDEX IF NOT EXISTS idx_video_rec_cache_key ON timetable_video_recommendations_cache(cache_key);
+CREATE INDEX IF NOT EXISTS idx_video_rec_expires ON timetable_video_recommendations_cache(expires_at);
+CREATE INDEX IF NOT EXISTS idx_video_rec_slot ON timetable_video_recommendations_cache(timetable_slot_id);
 
 -- ============================================================
 -- SEED DEMO DATA FOR LOCAL FACULTY DEMONSTRATION

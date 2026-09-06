@@ -84,3 +84,29 @@ export async function toggleSlotComplete(slotId: string): Promise<SlotResponse> 
 export async function deleteTimetable(timetableId: string): Promise<void> {
   await apiClient.delete(`/api/timetable/${timetableId}`);
 }
+
+/**
+ * GET /api/timetable/slots/{slotId}/video-recommendations
+ * Retrieves ranked YouTube video recommendations for a timetable slot.
+ */
+export async function getVideoRecommendations(
+  slotId: string,
+): Promise<import('@/types/timetable.types').SlotVideoRecommendationsResponse> {
+  const res = await apiClient.get<
+    ApiResponse<import('@/types/timetable.types').SlotVideoRecommendationsResponse>
+  >(`/api/timetable/slots/${slotId}/video-recommendations`);
+  return res.data.data;
+}
+
+/**
+ * POST /api/timetable/slots/{slotId}/video-recommendations/refresh
+ * Forces cache revalidation and re-fetches fresh video recommendations.
+ */
+export async function refreshVideoRecommendations(
+  slotId: string,
+): Promise<import('@/types/timetable.types').SlotVideoRecommendationsResponse> {
+  const res = await apiClient.post<
+    ApiResponse<import('@/types/timetable.types').SlotVideoRecommendationsResponse>
+  >(`/api/timetable/slots/${slotId}/video-recommendations/refresh`);
+  return res.data.data;
+}
