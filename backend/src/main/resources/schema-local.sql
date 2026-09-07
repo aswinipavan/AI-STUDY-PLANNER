@@ -257,49 +257,8 @@ CREATE TABLE IF NOT EXISTS study_evidence_submissions (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
--- V8: timetable_video_recommendations_cache
-CREATE TABLE IF NOT EXISTS timetable_video_recommendations_cache (
-    id UUID NOT NULL DEFAULT RANDOM_UUID(),
-    cache_key VARCHAR(255) NOT NULL,
-    student_id UUID,
-    timetable_slot_id UUID,
-    topic VARCHAR(255) NOT NULL,
-    chapter VARCHAR(255),
-    subject_name VARCHAR(255),
-    recommendations_json TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT uq_video_rec_cache_key UNIQUE (cache_key),
-    FOREIGN KEY (timetable_slot_id) REFERENCES timetable_slots(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
-);
-
--- ============================================================
--- INDEXES
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_subjects_student_id ON subjects(student_id);
-CREATE INDEX IF NOT EXISTS idx_marks_student_id ON marks(student_id);
-CREATE INDEX IF NOT EXISTS idx_exams_student_id ON exams(student_id);
-CREATE INDEX IF NOT EXISTS idx_timetables_student_id ON timetables(student_id);
-CREATE INDEX IF NOT EXISTS idx_materials_student_id ON materials(student_id);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_student_id ON subscriptions(student_id);
-CREATE INDEX IF NOT EXISTS idx_chat_history_student_id ON chat_history(student_id);
-CREATE INDEX IF NOT EXISTS idx_performance_snapshots_student_id ON performance_snapshots(student_id);
-CREATE INDEX IF NOT EXISTS idx_students_firebase_uid ON students(firebase_uid);
-CREATE INDEX IF NOT EXISTS idx_marks_exam_date ON marks(exam_date);
-CREATE INDEX IF NOT EXISTS idx_exams_exam_date ON exams(exam_date);
-CREATE INDEX IF NOT EXISTS idx_materials_processing_status ON materials(processing_status);
-CREATE INDEX IF NOT EXISTS idx_study_rooms_room_code ON study_rooms(room_code);
-CREATE INDEX IF NOT EXISTS idx_study_rooms_owner ON study_rooms(owner_id);
-CREATE INDEX IF NOT EXISTS idx_study_rooms_status ON study_rooms(status);
-CREATE INDEX IF NOT EXISTS idx_room_participants_room ON study_room_participants(room_id);
-CREATE INDEX IF NOT EXISTS idx_room_messages_room ON study_room_messages(room_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_slot_student ON study_evidence_submissions(timetable_slot_id, student_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_status ON study_evidence_submissions(verification_status);
-CREATE INDEX IF NOT EXISTS idx_video_rec_cache_key ON timetable_video_recommendations_cache(cache_key);
-CREATE INDEX IF NOT EXISTS idx_video_rec_expires ON timetable_video_recommendations_cache(expires_at);
-CREATE INDEX IF NOT EXISTS idx_video_rec_slot ON timetable_video_recommendations_cache(timetable_slot_id);
 
 -- ============================================================
 -- SEED DEMO DATA FOR LOCAL FACULTY DEMONSTRATION

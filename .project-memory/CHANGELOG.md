@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-09-07 (Session 47 - Clean Removal of YouTube Video Recommendations Module)
+- **Files deleted/modified:**
+  - `backend/src/main/resources/db/migration/V8__add_timetable_video_recommendations_cache.sql` [DELETED]
+  - `backend/src/main/resources/schema-local.sql` [MODIFIED] — Removed `timetable_video_recommendations_cache` table DDL and indexes.
+  - `backend/src/main/resources/application.properties` & `application-local.properties` [MODIFIED] — Removed `youtube.*` configuration properties.
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/VideoRecommendation.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotVideoRecommendationsResponse.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/model/entity/VideoRecommendationCache.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/repository/VideoRecommendationCacheRepository.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/service/VideoQueryGeneratorService.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/service/YouTubeApiClient.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/service/VideoRelevanceRanker.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/service/YouTubeRecommendationService.java` [DELETED]
+  - `backend/src/main/java/com/aistudyplanner/controller/TimetableController.java` [MODIFIED] — Removed video recommendation endpoints and service dependency.
+  - `backend/src/test/java/com/aistudyplanner/service/VideoQueryGeneratorServiceTest.java` [DELETED]
+  - `backend/src/test/java/com/aistudyplanner/service/VideoRelevanceRankerTest.java` [DELETED]
+  - `backend/src/test/java/com/aistudyplanner/service/YouTubeRecommendationServiceTest.java` [DELETED]
+  - `backend/src/test/java/com/aistudyplanner/controller/TimetableVideoRecommendationsControllerIntegrationTest.java` [DELETED]
+  - `backend/src/test/java/com/aistudyplanner/controller/TimetableEvidenceControllerIntegrationTest.java` [MODIFIED] — Removed `YouTubeRecommendationService` mock bean.
+  - `backend/src/test/java/com/aistudyplanner/migration/FlywayPostgresMigrationTest.java` [MODIFIED] — Reverted `MIGRATION_COUNT` to 7.
+  - `frontend/src/types/api.types.ts` [MODIFIED] — Removed `VideoRecommendation` and `SlotVideoRecommendationsResponse` interfaces.
+  - `frontend/src/api/videoRecommendations.api.ts` [DELETED]
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED] — Removed `Recommended Study Videos` section, state, and API triggers.
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED] — Removed video recommendation CSS classes.
+  - `frontend/src/__tests__/components/slotDetailModalVideoRecommendations.test.tsx` [DELETED]
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` & `slotDetailModalEvidence.test.tsx` [MODIFIED] — Cleaned up video API mocks.
+  - `mobile/src/types/timetable.types.ts` [MODIFIED] — Removed video recommendation types.
+  - `mobile/src/api/timetable.api.ts` [MODIFIED] — Removed video recommendation API functions.
+  - `mobile/src/components/timetable/VideoRecommendationsSection.tsx` [DELETED]
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED] — Cleaned up video unit test suite.
+  - `.project-memory/YOUTUBE_VIDEO_RECOMMENDATION_IMPLEMENTATION_REPORT.md` [DELETED]
+- **Reason:**
+  - User requested complete deletion of the YouTube recommendations feature due to lack of a YouTube API key.
+- **Summary:**
+  - Full codebase restored to clean state with 0 residual dead code or broken dependencies.
+  - All 290 backend tests passed (`mvnw test` PASS).
+  - All 165 frontend Jest tests passed across 25 suites (`npm test` PASS).
+  - Frontend TypeScript compilation: 0 errors (`npx tsc --noEmit` PASS).
+  - Next.js production build: 24/24 static & dynamic routes compiled cleanly (`npm run build` PASS).
+  - All 22 mobile tests passed (`npm test` PASS).
+
 ## 2026-09-06 (Session 46 - AI-Powered YouTube Video Recommendations for Timetable Slots)
 - **Files created/changed:**
   - `backend/src/main/resources/db/migration/V8__add_timetable_video_recommendations_cache.sql` [NEW] — Flyway migration creating `timetable_video_recommendations_cache` table with unique index on `cache_key` and indexes on `expires_at` and `timetable_slot_id`.

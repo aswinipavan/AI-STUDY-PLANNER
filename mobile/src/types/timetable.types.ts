@@ -79,29 +79,4 @@ export interface SlotRequest {
   notes?: string;
 }
 
-export interface VideoRecommendation {
-  videoId: string;
-  title: string;
-  description?: string;
-  channelTitle?: string;
-  channelId?: string;
-  publishedAt?: string;
-  thumbnailUrl: string;
-  videoUrl: string;
-  matchScore: number;
-  matchVerdict: 'EXCELLENT MATCH' | 'GOOD MATCH' | 'RELATED' | string;
-  matchReason?: string;
-  duration?: string;
-}
 
-export interface SlotVideoRecommendationsResponse {
-  slotId: string;
-  topic: string;
-  chapter?: string;
-  subjectName?: string;
-  generatedQueries?: string[];
-  recommendations: VideoRecommendation[];
-  isCached: boolean;
-  cachedAt?: string;
-  warningMessage?: string;
-}

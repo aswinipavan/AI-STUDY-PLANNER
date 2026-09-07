@@ -12,12 +12,7 @@ jest.mock('@/api/evidence.api', () => ({
   },
 }));
 
-jest.mock('@/api/videoRecommendations.api', () => ({
-  videoRecommendationsApi: {
-    getVideoRecommendations: jest.fn().mockResolvedValue({ recommendations: [] }),
-    refreshVideoRecommendations: jest.fn().mockResolvedValue({ recommendations: [] }),
-  },
-}));
+
 
 describe('SlotDetailModal Component', () => {
   const mockSlot: TimetableSlot = {

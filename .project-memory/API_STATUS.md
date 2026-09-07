@@ -20,6 +20,5 @@
 | `POST /api/timetable/slots/{id}/evidence` | Implemented & Multi-Modal Verified | Yes | Yes | No | Agent |
 | `GET /api/timetable/slots/{id}/evidence` | Implemented & Latest Retrieved | Yes | Yes | No | Agent |
 | `POST /api/timetable/slots/{id}/approve-completion` | Implemented & Anti-Bypass Enforced | Yes | Yes | No | Agent |
-| `GET /api/timetable/slots/{id}/video-recommendations` | Implemented & AI Relevance Ranked | Yes | Yes | No | Agent |
-| `POST /api/timetable/slots/{id}/video-recommendations/refresh` | Implemented & Cache Revalidation | Yes | Yes | No | Agent |
+
 
