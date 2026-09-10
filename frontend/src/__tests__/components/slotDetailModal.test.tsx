@@ -12,6 +12,10 @@ jest.mock('@/api/evidence.api', () => ({
   },
 }));
 
+jest.mock('@/components/timetable/RevisionModal', () => ({
+  RevisionModal: () => null,
+}));
+
 
 
 describe('SlotDetailModal Component', () => {
@@ -74,9 +78,10 @@ describe('SlotDetailModal Component', () => {
     expect(screen.getByTestId('modal-topic-title')).toHaveTextContent('Matrices - Determinant calculation');
     expect(screen.getByTestId('modal-chapter-name')).toHaveTextContent('Matrices');
 
-    // Source Material & Difficulty
+    // Source Material & Difficulty & Priority
     expect(screen.getByTestId('modal-source-material')).toHaveTextContent('Applied Mathematics Assignment.pdf');
     expect(screen.getByTestId('modal-difficulty')).toHaveTextContent('HARD · 85/100');
+    expect(screen.getByTestId('modal-priority')).toHaveTextContent('HIGH');
 
     // What to Study bullets
     const studyList = screen.getByTestId('modal-what-to-study-list');

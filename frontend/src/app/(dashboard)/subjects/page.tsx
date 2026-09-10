@@ -35,13 +35,24 @@ export default function SubjectsPage() {
     </div>
   );
 
-  if (error) return <div className="p-6"><ErrorState message="Could not load subjects." onRetry={refetch} /></div>;
+  if (error) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Could Not Load Subjects"
+          message="We were unable to retrieve your subject curriculum from the server."
+          suggestion="Please check your connection and retry."
+          onRetry={refetch}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <PageHeader
         title="My Subjects"
-        subtitle="Manage all your study subjects in one place."
+        subtitle="Manage your courses, set study targets, and track upcoming exams."
         breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Subjects' }]}
         action={
           <AppButton leftIcon={<Plus size={16} />} onClick={openAdd}>
@@ -53,8 +64,9 @@ export default function SubjectsPage() {
       {!subjects?.length ? (
         <EmptyState
           icon={BookOpen}
-          message="Add your first subject to start building your study plan!"
-          action={{ label: 'Add Subject', onClick: openAdd }}
+          title="No Subjects Added Yet"
+          message="Add your academic subjects and courses to organize your daily schedule, log marks, and let AI allocate optimal study time."
+          action={{ label: '+ Add Your First Subject', onClick: openAdd, icon: Plus }}
         />
       ) : (
         <div className={styles.grid}>

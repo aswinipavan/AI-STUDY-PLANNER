@@ -23,6 +23,9 @@ import { TimetableSlot, StudyEvidenceResponse, VerificationStatus } from '@/type
 import { parseSlotDate, evaluateSessionState } from '@/utils/dateHelpers';
 import { evidenceApi } from '@/api/evidence.api';
 import { AppButton } from '@/components/ui/AppButton';
+import { RevisionModal } from '@/components/timetable/RevisionModal';
+import { SessionProgressionStepper } from '@/components/timetable/SessionProgressionStepper';
+import type { SessionCanonicalState } from '@/components/ui/StatusIndicator';
 import styles from './slotDetailModal.module.css';
 
 function getApiErrorMessage(error: unknown): string {
@@ -87,6 +90,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
   const [isCompleting, setIsCompleting] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
+  const [isRevisionOpen, setIsRevisionOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -157,6 +161,17 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
         `• Note down questions for revision and follow-up`,
       ];
 
+  const priorityLevel: 'HIGH' | 'MEDIUM' | 'LOW' =
+    (slot as unknown as { priorityLevel?: 'HIGH' | 'MEDIUM' | 'LOW' }).priorityLevel ||
+    (slot.subject as unknown as { priorityLevel?: 'HIGH' | 'MEDIUM' | 'LOW' })?.priorityLevel ||
+    (slot.daysUntilExam !== undefined && slot.daysUntilExam !== null && slot.daysUntilExam <= 7
+      ? 'HIGH'
+      : (slot.difficultyScore && slot.difficultyScore >= 70) || (slot.difficulty && slot.difficulty.toLowerCase() === 'hard')
+      ? 'HIGH'
+      : (slot.difficulty && slot.difficulty.toLowerCase() === 'easy')
+      ? 'LOW'
+      : 'MEDIUM');
+
   const handleFileSelect = async (file: File) => {
     if (!file) return;
     setUploadError(null);
@@ -204,6 +219,22 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
     onToggleStatus(slot.id, 'pending');
   };
 
+  const canonicalState: SessionCanonicalState = isCompleted
+    ? 'COMPLETED'
+    : isLocked
+    ? 'LOCKED'
+    : evidence?.verificationStatus === 'APPROVED' || evidence?.isUsedForCompletion
+    ? 'VERIFIED'
+    : isUploading || (evidence && evidence.verificationStatus === 'NEEDS_MORE_WORK') || (evidence && !evidence.verificationStatus)
+    ? 'SUBMITTED'
+    : isCatchUpActive && !isMissed
+    ? 'CATCH_UP'
+    : isMissed
+    ? 'MISSED'
+    : isActive
+    ? 'ACTIVE'
+    : 'UPCOMING';
+
   return (
     <div
       className={styles.overlay}
@@ -237,6 +268,14 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
 
         {/* Body */}
         <div className={styles.modalBody}>
+          {/* Progression Stepper */}
+          <SessionProgressionStepper
+            canonicalState={canonicalState}
+            hasEvidenceSubmitted={!!evidence}
+            isVerified={evidence?.verificationStatus === 'APPROVED'}
+            isCompleted={isCompleted}
+          />
+
           {/* Future Locked Alert Banner */}
           {isLocked && (
             <div className={styles.futureAlertBox} data-testid="modal-future-locked-banner">
@@ -324,7 +363,7 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
             </div>
           </div>
 
-          {/* Metadata Grid: Source Material & Difficulty */}
+          {/* Metadata Grid: Source Material, Chapter, Difficulty, Priority */}
           <div className={styles.metaGrid}>
             <div className={styles.metaCard}>
               <span className={styles.sectionLabel} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -352,6 +391,25 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
                 {slot.difficulty || 'Medium'} {slot.difficultyScore ? `· ${slot.difficultyScore}/100` : ''}
               </span>
             </div>
+
+            <div className={styles.metaCard}>
+              <span className={styles.sectionLabel} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <AlertCircle size={11} /> Priority
+              </span>
+              <span className={styles.metaValue} data-testid="modal-priority">
+                <span
+                  className={
+                    priorityLevel === 'HIGH'
+                      ? styles.priorityHigh
+                      : priorityLevel === 'LOW'
+                      ? styles.priorityLow
+                      : styles.priorityMedium
+                  }
+                >
+                  {priorityLevel}
+                </span>
+              </span>
+            </div>
           </div>
 
           {/* What to Study */}
@@ -374,16 +432,41 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
             <p className={styles.sectionLabel}>Study Proof & AI Verification</p>
 
             {isCompleted || evidence?.isUsedForCompletion ? (
-              <div className={styles.verifiedCompletedCard} data-testid="modal-verified-completed">
-                <ShieldCheck size={24} style={{ color: '#10b981', flexShrink: 0 }} />
-                <div className={styles.verifiedCompletedBody}>
-                  <p className={styles.verifiedCompletedTitle}>
-                    <Check size={16} /> Verified & Completed
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div className={styles.verifiedCompletedCard} data-testid="modal-verified-completed">
+                  <ShieldCheck size={24} style={{ color: '#10b981', flexShrink: 0 }} />
+                  <div className={styles.verifiedCompletedBody}>
+                    <p className={styles.verifiedCompletedTitle}>
+                      <Check size={16} /> Verified & Completed
+                    </p>
+                    <p className={styles.verifiedCompletedMeta}>
+                      {evidence?.score !== undefined ? `Verified Score: ${evidence.score}/100 · ` : ''}
+                      {evidence?.fileName ? `Proof: ${evidence.fileName}` : 'Proof recorded on system'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className={styles.revisionOfferCard} data-testid="modal-revision-offer-card">
+                  <div className={styles.revisionOfferHeader}>
+                    <div className={styles.revisionOfferTitleRow}>
+                      <Sparkles size={16} className="text-indigo-400" />
+                      <span className={styles.revisionOfferTitle}>AI Revision Mode Available</span>
+                    </div>
+                    <span className={styles.revisionDurationPill}>⏱️ 5–15 min review</span>
+                  </div>
+                  <p className={styles.revisionOfferDesc}>
+                    Solidify your understanding of <strong>{slot.topic || subjectName}</strong> with a concise summary, key formulas, common traps, and a fast 5-question interactive quiz.
                   </p>
-                  <p className={styles.verifiedCompletedMeta}>
-                    {evidence?.score !== undefined ? `Verified Score: ${evidence.score}/100 · ` : ''}
-                    {evidence?.fileName ? `Proof: ${evidence.fileName}` : 'Proof recorded on system'}
-                  </p>
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <AppButton
+                      variant="primary"
+                      leftIcon={<Sparkles size={15} />}
+                      onClick={() => setIsRevisionOpen(true)}
+                      data-testid="modal-start-revision-btn"
+                    >
+                      Start Revision / Review Topic
+                    </AppButton>
+                  </div>
                 </div>
               </div>
             ) : isLocked ? (
@@ -582,14 +665,24 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
               Locked (Future)
             </AppButton>
           ) : isCompleted ? (
-            <AppButton
-              variant="outline"
-              leftIcon={<Clock size={16} />}
-              onClick={handleMarkIncomplete}
-              data-testid="modal-toggle-status-btn"
-            >
-              Mark Incomplete
-            </AppButton>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <AppButton
+                variant="primary"
+                leftIcon={<Sparkles size={16} />}
+                onClick={() => setIsRevisionOpen(true)}
+                data-testid="modal-footer-revision-btn"
+              >
+                Review Topic
+              </AppButton>
+              <AppButton
+                variant="outline"
+                leftIcon={<Clock size={16} />}
+                onClick={handleMarkIncomplete}
+                data-testid="modal-toggle-status-btn"
+              >
+                Mark Incomplete
+              </AppButton>
+            </div>
           ) : evidence?.verificationStatus === 'APPROVED' ? (
             <AppButton
               variant="primary"
@@ -612,6 +705,14 @@ export const SlotDetailModal: React.FC<SlotDetailModalProps> = ({
           )}
         </div>
       </div>
+
+      <RevisionModal
+        isOpen={isRevisionOpen}
+        onClose={() => setIsRevisionOpen(false)}
+        slotId={slot.id}
+        topic={slot.topic || subjectName}
+        subjectName={subjectName}
+      />
     </div>
   );
 };

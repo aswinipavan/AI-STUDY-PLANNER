@@ -102,6 +102,12 @@
   border-color: var(--color-primary);
 }
 
+.select option {
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+  padding: 0.5rem;
+}
+
 .premiumBadge {
   display: inline-flex;
   align-items: center;

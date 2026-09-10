@@ -323,7 +323,7 @@ export default function Home() {
         <div className={styles.cardsGrid}>
           {TESTIMONIALS.map((t, i) => (
             <div key={i} className={styles.card}>
-              <p className={styles.testimonialText}>"{t.content}"</p>
+              <p className={styles.testimonialText}>&ldquo;{t.content}&rdquo;</p>
               <div className={styles.testimonialAuthor}>
                 <div className={styles.avatarCircle}>{t.avatar}</div>
                 <div>

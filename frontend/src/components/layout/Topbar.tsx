@@ -63,7 +63,21 @@ export function Topbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header
+      className="sticky top-0 z-30 flex h-16 items-center justify-between px-4"
+      style={{
+        background: 'hsl(var(--background) / 0.92)',
+        backdropFilter: 'blur(20px) saturate(1.2)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
+        borderBottom: '1px solid transparent',
+        backgroundImage: `
+          linear-gradient(hsl(var(--background) / 0.92), hsl(var(--background) / 0.92)),
+          linear-gradient(90deg, transparent 0%, hsl(var(--border)) 30%, rgba(0,229,192,0.25) 50%, hsl(var(--border)) 70%, transparent 100%)
+        `,
+        backgroundOrigin: 'padding-box, border-box',
+        backgroundClip: 'padding-box, border-box',
+      }}
+    >
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
@@ -101,14 +115,23 @@ export function Topbar() {
           >
             <Bell size={20} />
             {isWaking || notifLoading ? (
-              <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-muted-foreground/40 animate-pulse" />
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-muted-foreground/40 animate-pulse" />
             ) : notifications && notifications.length > 0 ? (
-              <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-destructive animate-pulse" />
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive animate-pulse ring-2 ring-destructive/30" />
             ) : null}
           </button>
 
           {showBell && (
-            <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-border bg-background shadow-xl z-50 overflow-hidden">
+            <div
+              className="absolute right-0 top-full mt-2 w-80 rounded-xl z-50 overflow-hidden"
+              style={{
+                background: 'hsl(var(--card) / 0.98)',
+                backdropFilter: 'blur(16px) saturate(1.2)',
+                WebkitBackdropFilter: 'blur(16px) saturate(1.2)',
+                border: '1px solid hsl(var(--border))',
+                boxShadow: 'var(--app-elevation-4)',
+              }}
+            >
               <div className="px-4 py-3 border-b border-border flex justify-between items-center">
                 <p className="text-sm font-semibold text-foreground">Smart Notifications</p>
                 <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
@@ -181,7 +204,19 @@ export function Topbar() {
           <button
             id="topbar-avatar"
             onClick={() => { setShowAvatar(v => !v); setShowBell(false); }}
-            className="relative h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all"
+            className="relative h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold overflow-hidden cursor-pointer transition-all"
+            style={{
+              boxShadow: 'none',
+              transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 0 2px rgba(0,229,192,0.4), 0 0 0 4px rgba(0,229,192,0.12)';
+              (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.05)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
+              (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+            }}
             aria-label="Profile menu"
           >
             {user?.photoUrl ? (
@@ -198,7 +233,16 @@ export function Topbar() {
           </button>
 
           {showAvatar && (
-            <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-border bg-background shadow-xl z-50 overflow-hidden">
+            <div
+              className="absolute right-0 top-full mt-2 w-56 rounded-xl z-50 overflow-hidden"
+              style={{
+                background: 'hsl(var(--card) / 0.98)',
+                backdropFilter: 'blur(16px) saturate(1.2)',
+                WebkitBackdropFilter: 'blur(16px) saturate(1.2)',
+                border: '1px solid hsl(var(--border))',
+                boxShadow: 'var(--app-elevation-4)',
+              }}
+            >
               {/* User info header */}
               <div className="px-4 py-3 border-b border-border">
                 <p className="text-sm font-semibold text-foreground truncate">{user?.name || 'Student'}</p>

@@ -21,7 +21,7 @@ export const useUpdateSlot = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status?: string }) =>
+    mutationFn: ({ id, status: _status }: { id: string; status?: string }) =>
       timetableApi.updateSlotStatus(id),
     onMutate: async ({ id, status }) => {
       await qc.cancelQueries({ queryKey: QK.timetable });

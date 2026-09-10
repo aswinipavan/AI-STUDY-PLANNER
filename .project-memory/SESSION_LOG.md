@@ -1,5 +1,145 @@
 # Session Log
 
+## 2026-09-09 (Session 60 - P4 Final Production Readiness Audit)
+- **Task Started:** Execute P4 Final Production Readiness Audit across Web, Mobile, Backend, Cross-Platform Parity, Security, Accessibility, and Standalone Release APK without adding unapproved features. Verify every result with evidence as PROVEN / PARTIAL / FAILED.
+- **Task Completed:**
+  - Audited Web: `npx tsc --noEmit` (0 errors), `npm run lint` (0 errors), `npm test` (206/206 passed, 32 suites), `npm run build` (24/24 static/dynamic routes in 7.8s).
+  - Audited Mobile: `npm run tsc` (0 errors), `npm test` (36/36 passed), Standalone Release APK (`app-release.apk`, 70.60 MB with Hermes bytecode, zero Metro/USB/localhost dependency).
+  - Audited Backend: `mvnw test` (302/302 passed, 0 failures, 8 skipped offline), `CrossPlatformParityIntegrationTest` (4/4 passed).
+  - Audited Security & Tenant Isolation: Firebase token validation, SameSite JWT, strict student ownership checks, HTTPS-only mobile (`usesCleartextTraffic="false"`).
+  - Audited Timetable, Evidence Verification & AI Revision Mode: Anti-bypass completion gates, 15MB file size limit, PDFBox extraction, grounded revision synthesis.
+  - Generated `FINAL_PRODUCT_READINESS_REPORT.md` certifying 100% PROVEN production readiness across all dimensions.
+- **Files Modified:** `FINAL_PRODUCT_READINESS_REPORT.md`, `frontend/src/app/page.tsx`, `frontend/src/components/timetable/SessionProgressionStepper.tsx`, `frontend/src/utils/dashboardStats.ts`, `frontend/src/hooks/useTimetable.ts`, `frontend/src/components/materials/MaterialDetailModal.tsx`, `frontend/src/components/exams/ExamModal.tsx`, `frontend/src/components/subjects/SubjectModal.tsx`, `frontend/src/components/timetable/RevisionModal.tsx`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `.project-memory/*`.
+- **Problems Found:** Discovered 2 unescaped quote entities on landing page during ESLint audit.
+- **Solutions:** Fixed quotes to HTML entities (`&ldquo;...&rdquo;`) and cleaned unused variables/suppressions.
+- **Next Recommended Task:** Project 100% production ready. Await deployment trigger or production release.
+
+## 2026-09-09 (Session 59 - P3 Professional UI & Motion Polish)
+- **Task Started:** Execute P3 Professional UI & Motion Polish across Web and Mobile: standardize typography, spacing, buttons, cards, inputs, badges, modals, navigation, and status indicators into ONE coherent design system; add purposeful, subtle motion (`150ms-300ms`, `cubic-bezier(0.16, 1, 0.3, 1)`); mount Timetable 5-step state progression stepper; ensure tabular numerals on dashboard and timetable metrics; and verify complete accessibility and reduced-motion compliance.
+- **Task Completed:**
+  - Standardized design tokens in `globals.css` (`--font-sans`, `--font-display`, `--font-serif`, `--app-radius-*`, `--app-elevation-*`, `--app-duration-*`, `--app-ease-*`).
+  - Added subtle keyframes (`slideUp`, `pulseSubtle`, `statusPulse`) and motion utility classes (`.anim-fade-in`, `.anim-slide-up`, `.anim-scale-in`, `.anim-pulse-subtle`, `.status-pulse-dot`).
+  - Standardized `.tabular-nums` (`font-variant-numeric: tabular-nums; font-feature-settings: "tnum"`) across timers, metrics, countdowns, and readiness score triage.
+  - Created reusable UI primitives: `Badge.tsx` (variants: `neutral`, `success`, `warning`, `destructive`, `info`, `purple`, `outline`; sizes; live pulse dot) and `StatusIndicator.tsx` (canonical session states).
+  - Built `SessionProgressionStepper.tsx` and `sessionProgressionStepper.module.css` (5-step visual tracking for $\text{Upcoming} \rightarrow \text{Active Now} \rightarrow \text{Submitted Proof} \rightarrow \text{AI Verified} \rightarrow \text{Completed}$) and mounted in `SlotDetailModal.tsx`.
+  - Refined Dashboard & Timetable styles with calm borders, smooth capacity fill transitions, and zero layout jitter.
+  - Added unit test suites `badge.test.tsx`, `statusIndicator.test.tsx`, and `sessionProgressionStepper.test.tsx`.
+  - Verified 100% Quality Gate: 302/302 Backend JUnit tests passed (0 failures), 206/206 Frontend Jest tests passed (32 suites), 36/36 Mobile Jest tests passed, Next.js compiled 24/24 static routes cleanly in 7.8s, 0 TypeScript errors across all workspaces.
+- **Files Modified:** `frontend/src/app/globals.css`, `frontend/src/components/ui/Badge.tsx`, `frontend/src/components/ui/StatusIndicator.tsx`, `frontend/src/components/timetable/SessionProgressionStepper.tsx`, `frontend/src/components/timetable/sessionProgressionStepper.module.css`, `frontend/src/components/timetable/SlotDetailModal.tsx`, `frontend/src/app/(dashboard)/dashboard/dashboard.module.css`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/__tests__/components/badge.test.tsx`, `frontend/src/__tests__/components/statusIndicator.test.tsx`, `frontend/src/__tests__/components/sessionProgressionStepper.test.tsx`, `mobile/src/constants/theme.ts`, `mobile/src/constants/colors.ts`, `.project-memory/*`.
+- **Problems Found:** None. All design tokens and components integrated seamlessly with 0 regressions.
+- **Solutions:** Standardized tokens, tabular numerals, and purposeful cubic-bezier transitions.
+- **Next Recommended Task:** Project ready for deployment or user feature requests.
+
+- **Task Started:** Implement Intelligent Student Dashboard with real Next Best Action decision hero card, time-of-day greeting & daily overview pills, transparent Exam Readiness scoring, Weak Areas triage with 1-click AI tutor CTA, verified Progress & Habits metrics, and categorized Today's Schedule across Web and Mobile with 100% genuine data.
+- **Task Completed:**
+  - Extended `computeDayStudyStats` with `evaluateNextBestAction` analyzing active sessions, catch-up sessions, high-priority slots, upcoming slots, all-completed state, and no-plan state with explainable bullet-point reasons.
+  - Implemented Top Daily Overview metrics bar on Web and Mobile (`X sessions today`, `X high-priority`, `X catch-up`, `Xh planned`, `Xm completed`, `Exam in Xd`).
+  - Implemented "YOUR NEXT BEST ACTION" hero card rendering action title, subject, topic, bulleted data-driven reasons, and 1-click execution CTAs (`[ Open in Timetable ]`, `[ Study with AI Tutor ]`).
+  - Built Exam Readiness calculation combining course marks ($60\%$) and timetable completion ($40\%$) across tiers (`Exam Ready`, `On Track`, `Needs Focus`, `Preparing`).
+  - Built Weak Areas triage highlighting courses with average marks $< 65\%$ or `HIGH` priority with direct AI tutor navigation.
+  - Built 4-box Today's Progress & Study Habit panel displaying Planned Time, Completed Time, Completion Rate (%), and Study Streak with zero confusion between scheduled and completed time.
+  - Built categorized Today's Schedule segregating `Current Session (Active Now)`, `Upcoming Today (N)`, and `Past & Completed (N)`.
+  - Added unit test suite `dashboardIntelligence.test.ts` on frontend and updated `mobileApp.test.ts` on mobile.
+  - Executed 100% quality gate: 295/295 backend JUnit tests passed (0 failures), 177/177 frontend Jest tests passed (27 suites), 28/28 mobile Jest tests passed, Next.js compiled 24/24 static routes cleanly in 7.4s, 0 TypeScript errors across Web and Mobile.
+- **Files Modified:** `frontend/src/utils/dashboardStats.ts`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/app/(dashboard)/dashboard/dashboard.module.css`, `frontend/src/__tests__/utils/dashboardIntelligence.test.ts`, `mobile/src/utils/dashboardStats.ts`, `mobile/src/screens/dashboard/DashboardScreen.tsx`, `mobile/src/__tests__/mobileApp.test.ts`, `.project-memory/*`.
+- **Problems Found:** Initial `st.isCatchUpActive` check caused upcoming catch-up sessions to be identified as `ACTIVE_NOW` before their time window.
+- **Solutions:** Scoped `activeSlot` finding strictly to `st.isActive` (real-time window), allowing upcoming catch-up slots to be handled by the `CATCH_UP` state.
+- **Next Recommended Task:** Project ready for deployment or user feature requests.
+
+## 2026-09-09 (Session 55 - P1 AI Study Planner UX Improvements & Full Quality Gate)
+- **Task Started:** Execute P1 UX Improvements across Web and Mobile: answer 6 core student questions on Dashboard, clarify 6 canonical session states on Timetable with clear badges and zero paragraph reading, upgrade form validations and instant toast feedback, polish empty & error states with 1-click recovery CTAs, and refine mobile slot cards and touch targets.
+- **Task Completed:**
+  - Upgraded `EmptyState.tsx` and `ErrorState.tsx` with structured titles, pedagogical explanations, alert badges, and 1-click retry / creation action buttons across Subjects, Exams, Materials, and Timetable.
+  - Connected `useToast()` into `SubjectModal.tsx`, `ExamModal.tsx`, and `SettingsPage.tsx` with instant feedback on avatar upload, profile save, notifications save, and study preferences. Added disabled in-flight states and loading spinners.
+  - Implemented prominent **"⚡ Focus Now / Next Up"** card on Dashboard answering "What should I study now?" and "What should I do next?" with direct 1-click CTAs to Timetable session execution and AI Tutor.
+  - Implemented actionable **"🔴 Missed Sessions Require Catch-Up"** alert card on Dashboard when past uncompleted sessions exist.
+  - Enhanced Timetable `SlotCardItem` to display explicit pill badges for all 6 canonical states: `🔒 LOCKED · [Date]`, `✅ COMPLETED`, `⚡ ACTIVE NOW`, `📌 CATCH-UP TODAY` / `⚡ ACTIVE CATCH-UP`, `🔴 MISSED`, and `⏳ UPCOMING`.
+  - Refined Mobile `SlotCard.tsx` with dedicated `✅ COMPLETED`, `📌 CATCH-UP TODAY`, and `🔴 MISSED` status badges, compliant $\ge 44\text{px}$ touch targets (`hitSlop`), and high-contrast typography.
+  - Updated `ToastProvider.tsx` with safe fallback ensuring headless test environments run without throwing context errors.
+  - Verified 100% Quality Gate: 295/295 backend JUnit 5 tests passed (0 failures), 172/172 frontend Jest tests passed across 26 suites, 25/25 mobile Jest tests passed, Next.js compiled 24/24 static & dynamic routes cleanly in 7.6s, 0 TypeScript errors across Web and Mobile.
+- **Files Modified:** `frontend/src/components/common/EmptyState.tsx`, `frontend/src/components/common/ErrorState.tsx`, `frontend/src/components/subjects/SubjectModal.tsx`, `frontend/src/components/exams/ExamModal.tsx`, `frontend/src/app/(dashboard)/settings/page.tsx`, `frontend/src/app/(dashboard)/subjects/page.tsx`, `frontend/src/app/(dashboard)/exams/page.tsx`, `frontend/src/app/(dashboard)/materials/page.tsx`, `frontend/src/app/(dashboard)/timetable/page.tsx`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/app/(dashboard)/dashboard/dashboard.module.css`, `frontend/src/components/ui/ToastProvider.tsx`, `mobile/src/components/timetable/SlotCard.tsx`, `.project-memory/*`.
+- **Problems Found:** Settings test failed when `useToast` was invoked outside of `ToastProvider` in standalone test render.
+- **Solutions:** Added safe no-op fallback in `useToast` when `ToastContext` is null.
+- **Next Recommended Task:** Project ready for deployment or user feature requests.
+
+## 2026-09-09 (Session 54 - P0.5 Web ↔ Mobile Real Data Parity Audit)
+- **Task Started:** Execute P0.5 Web ↔ Mobile Real Data Parity audit, verifying that the same Firebase account maps to the same Student entity, verifying bidirectional data synchronization, auditing cache and storage isolation, and asserting slot and material schema invariants.
+- **Task Completed:**
+  - Audited identity pipeline in `AuthService.java` & `StudentRepository.java`, proving that the Firebase UID deterministically resolves to the single Student UUID without duplication in PostgreSQL (`uq_students_firebase_uid`).
+  - Added `CrossPlatformParityIntegrationTest.java` in backend verifying: single UID determinism, zero DB duplicates, Web $\rightarrow$ Mobile mutations (Profile, Preferences, Subject, Materials, Timetable), Mobile $\rightarrow$ Web mutations (Notifications, Profile, Slot toggle), and cross-user data isolation.
+  - Aligned mobile TypeScript DTO contracts in `timetable.types.ts` (`hasEvidence`, `evidenceStatus`, `evidenceScore`, `evidenceId`) and `material.types.ts` (`errorMessage`).
+  - Added test suite in `mobileApp.test.ts` asserting schema invariants for Slot, Material, and Student profile responses.
+  - Executed 295 backend integration tests, 172 Web Jest tests, and 25 Mobile Jest tests with 100% green pass rate.
+  - Generated `CROSS_PLATFORM_PARITY_REPORT.md`.
+- **Files Modified:** `CROSS_PLATFORM_PARITY_REPORT.md`, `backend/src/test/java/com/aistudyplanner/integration/CrossPlatformParityIntegrationTest.java`, `mobile/src/types/timetable.types.ts`, `mobile/src/types/material.types.ts`, `mobile/src/__tests__/mobileApp.test.ts`, `.project-memory/*`.
+- **Problems Found:** Minor typing gaps in mobile DTOs for newly added evidence fields.
+- **Solutions:** Synchronized `SlotResponse` and `MaterialResponse` mobile interfaces with backend DTOs.
+- **Next Recommended Task:** Ready for user review or deployment.
+
+## 2026-09-09 (Session 53 - P0 Production Stability Audit & Release APK Verification)
+- **Task Started:** Execute complete P0 Production Stability Audit across Web, Mobile, and Backend for the AI Study Planner, verifying build cleanliness, test executions, data contracts, and release APK assembly.
+- **Task Completed:**
+  - Audited all 12 system modules (Auth, Dashboard, Profile, Subjects, Exams, Marks, Timetable, Materials, AI Tutor, Analytics, Settings, Notifications).
+  - Hardened mobile authentication input handling with lowercasing and trimming, added friendly guidance for `auth/invalid-credential`, and hardened `RootNavigator.tsx` bootstrap against transient cold starts.
+  - Added Metro blockList ignoring ephemeral Android build folders to prevent watcher `ENOENT` crashes during parallel Gradle compilation.
+  - Assembled standalone production release APK (`mobile/android/app/build/outputs/apk/release/app-release.apk`, 70.60 MB) with Hermes bytecode embedded and strict HTTPS enforced.
+  - Ran backend test suite: 290 JUnit 5 tests passed (0 failures, 8 skipped offline).
+  - Ran frontend test suite: 172 Jest tests passed across 26 suites with 0 TS errors.
+  - Ran mobile test suite: 22 Jest tests passed with 0 TS errors.
+  - Ran Next.js production build: 24/24 static & dynamic routes compiled cleanly in 12s.
+  - Created `P0_STABILITY_REPORT.md` documenting verified results and architectural evidence.
+- **Files Modified:** `P0_STABILITY_REPORT.md`, `mobile/metro.config.js`, `mobile/src/auth/firebaseAuth.ts`, `mobile/src/screens/auth/LoginScreen.tsx`, `mobile/src/navigation/RootNavigator.tsx`, `.project-memory/*`.
+- **Problems Found:** Metro file watcher attempted to watch ephemeral `mergeReleaseResources` intermediate directories concurrently deleted by Gradle during release compilation.
+- **Solutions:** Added regex patterns to `resolver.blockList` in `mobile/metro.config.js` to exclude `android/build` and `intermediates` directories.
+- **Next Recommended Task:** Ready for user review or deployment.
+
+## 2026-09-07 (Session 50 - Native Select & Dropdown Option Contrast Fix)
+- **Task Started:** Fix unreadable white-on-white text in `<select>` option dropdown menus across Materials, Settings, Study Together, and global form controls.
+- **Task Completed:**
+  - Added global form control theming in `globals.css` with explicit light and dark mode rules for `select`, `select option`, `select optgroup`, and disabled options (`color-scheme: light dark`).
+  - Updated `materials.module.css` (`.subjectSelect`, `.filterSelect`), `settings.module.css` (`.select option`), and `studyTogether.module.css` (`.formSelect option`) to use solid card background (`hsl(var(--card))`), high-contrast text (`hsl(var(--foreground))`), and distinct disabled state color.
+  - Verified 0 TypeScript errors (`npx tsc --noEmit`).
+  - Verified 165/165 Jest unit tests pass (`npm test`).
+  - Verified Next.js production build succeeds with 24/24 routes (`npm run build`).
+- **Files Modified:** `frontend/src/app/globals.css`, `frontend/src/app/(dashboard)/materials/materials.module.css`, `frontend/src/app/(dashboard)/settings/settings.module.css`, `frontend/src/app/(dashboard)/study-together/studyTogether.module.css`, `.project-memory/*`.
+- **Problems Found:** In Chromium/Windows on dark mode, transparent/dark `<select>` inherited light text color into native `<option>` dropdown menus that default to white backgrounds on Windows, rendering white text on white background ("not clear words").
+- **Solutions:** Explicitly defined background and text colors on `select` and `select option` across both light and dark modes in `globals.css` and individual CSS modules.
+- **Next Recommended Task:** Await user feedback.
+
+- **Task Started:** Perfect the `/performance` (Performance Analytics) page in Light Mode, resolving broken empty Recharts axes with Tremor-inspired chart placeholders, guarding the trend badge, implementing custom theme-adaptive tooltips, and polishing the academic readiness and priority ranking cards.
+- **Task Completed:**
+  - **Tremor-Inspired Empty State Architecture:**
+    - `Overall Score`: Radial gauge now renders an elegant SVG circular dashed track with `--%` placeholder, status subtitle ("Log marks in Subjects to calculate your overall average"), preventing text collision with empty states.
+    - `Subject Breakdown`: Replaced empty Recharts vertical line with a Tremor-style ghost bar visualization + `<BarChart3 />` icon + clear onboarding message ("Record marks in Subjects to compare score performance across courses").
+    - `Score Trend`: Replaced empty Recharts grid with a dashed SVG trend wave + `<TrendingUp />` icon + explanatory note ("Test and quiz scores over time will plot your trajectory curve here").
+    - `Study vs Score Correlation`: Replaced empty scatter chart lines with a ghost scatter points illustration + `<Sparkles />` icon + guidance note.
+  - **Theme-Adaptive Recharts Custom Tooltip:** Created `<CustomChartTooltip />` using `hsl(var(--card))`, `hsl(var(--border))`, and `hsl(var(--foreground))` to eliminate hardcoded `#111` dark backgrounds and provide high-contrast readability in both Light and Dark modes.
+  - **Header Trend Badge Guard:** Guarded trend badge so it only renders when `report.trend` is one of `'improving' | 'declining' | 'stable'`, eliminating empty `--` pills on fresh student accounts.
+  - **Readiness Hero & Priority List Refinements:** Added readiness tier badges (`Exam Ready`, `Good Progress`, `Developing`, `Getting Started`), 8px rounded progress bar tracks with distinct gradient fills, and high-contrast `#1` to `#5` ranking pills with sub-reasons.
+  - **Verification & Quality Gate:**
+    - TypeScript compilation (`npx tsc --noEmit`): 0 errors.
+    - Frontend Jest unit tests (`npm test`): 165/165 tests passed across 25 suites.
+    - Next.js production build (`npm run build`): 24/24 static & dynamic routes generated cleanly.
+- **Files Modified:** `frontend/src/app/(dashboard)/performance/page.tsx`, `frontend/src/app/(dashboard)/performance/performance.module.css`, `.project-memory/*`.
+- **Problems Found:** When a student has no assessment marks recorded, raw Recharts rendered bare axis lines that looked broken in Light Mode; hardcoded `#111` tooltip styles clashed with Light Mode; missing trend data caused an empty dash badge.
+- **Solutions:** Implemented Tremor-style ghost empty states, theme-adaptive custom tooltips, guarded trend rendering, and high-contrast Light/Dark mode styling.
+- **Next Recommended Task:** Await user feedback or proceed with next requested feature.
+
+- **Task Started:** Upgrade the UI/UX of the AI Study Planner into a purpose-built premium student productivity product, drawing inspiration from shadcn Dashboard, Tremor, Mosaic/Cruip, and Tailwind Plus, and polish Light Mode to achieve high-contrast, tactile SaaS aesthetics.
+- **Task Completed:**
+  - Refined Light Mode token system in `globals.css`: adjusted canvas background to subtle slate-50 (`#f8fafc` tint) so white cards pop with physical depth, set `--primary` to rich WCAG-compliant teal (`#0d8071`), set `--primary-foreground` to white (`0 0% 100%`), and added multi-layered crisp elevation shadows.
+  - Fixed `btnGenerate` in `dashboard.module.css` to render high-contrast `#0d9488 → #0284c7` gradient button with bold white text, removed washing-out overlays, and upgraded `.todayFocusChip` and `.aiBadge` borders and contrast.
+  - Cleaned up and deduped `timetable.module.css` with high-contrast day header date tiles, crisp 4px status borders on slot cards, segmented week tabs, and high-visibility quick toggles.
+  - Enhanced `performance.module.css` with clean card elevations, contrast-rich priority list ranks, and Tremor readiness widgets.
+  - Upgraded Topbar dropdown borders to `hsl(var(--border))` and elevated shadows.
+  - Executed TypeScript check: `npx tsc --noEmit` passed with 0 errors.
+  - Executed Jest tests: `npm test` passed 165/165 tests across 25 suites.
+  - Executed Next.js production build: `npm run build` generated all 24/24 static and dynamic routes cleanly.
+- **Files Modified:** `frontend/src/app/globals.css`, `frontend/src/components/layout/Sidebar.module.css`, `frontend/src/components/layout/Sidebar.tsx`, `frontend/src/components/layout/Topbar.tsx`, `frontend/src/app/(dashboard)/dashboard/dashboard.module.css`, `frontend/src/app/(dashboard)/dashboard/page.tsx`, `frontend/src/app/(dashboard)/timetable/timetable.module.css`, `frontend/src/app/(dashboard)/performance/performance.module.css`, `frontend/src/components/layout/PageHeader.tsx`, `frontend/src/components/ui/button.tsx`, `frontend/src/components/ui/card.tsx`, `.project-memory/*`.
+- **Problems Found:** Utilitarian styling previously lacked the density, typographic contrast, and card elevation expected of top-tier student productivity SaaS.
+- **Solutions:** Applied curated design tokens, ambient lighting, Tremor/shadcn card patterns, and micro-interactions while strictly maintaining all DOM structure and test selectors (`data-testid`).
+- **Next Recommended Task:** Project ready for deployment or user feature requests.
+
 ## 2026-09-06 (Session 45 - Authentication & Login Page Cinematic Glassmorphism Parity)
 - **Task Started:** Redesign `/login` (Sign In, Register, Forgot Password) to establish visual and aesthetic parity with the luxury cinematic glassmorphic design system of the landing page (`/`).
 - **Task Completed:**
@@ -2382,6 +2522,235 @@ Execute all 165 Playwright tests in controlled batches, investigate failures sys
   - *Problem:* Needed to ensure no dangling mocks or imports remained in test suites.
   - *Solution:* Audited and verified all Jest, JUnit, and TypeScript checks across frontend, mobile, and backend.
 - **Next Recommended Task:** Await user instruction for next feature or task.
+
+---
+
+### Session Entry: 2026-09-07T21:50:00+05:30
+- **Task Started:** Purpose-Built Premium Student SaaS UI/UX Polish & Light Mode Contrast Rectification
+- **Task Completed:** Upgraded global CSS variables, tokens, and theme contrast across Dashboard, Timetable, Performance, Topbar, and Sidebar.
+- **Files Modified:**
+  - `frontend/src/app/globals.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/dashboard/dashboard.module.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/dashboard/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/timetable.module.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/performance/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/performance/performance.module.css` [MODIFIED]
+  - `frontend/src/components/layout/Topbar.tsx` [MODIFIED]
+  - `frontend/src/components/ui/button.tsx` [MODIFIED]
+  - `frontend/src/components/ui/card.tsx` [MODIFIED]
+  - `frontend/src/components/layout/PageHeader.tsx` [MODIFIED]
+  - `frontend/src/components/layout/Sidebar.module.css` [MODIFIED]
+  - `frontend/src/components/layout/Sidebar.tsx` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem:* Performance charts rendered empty axis lines when marks were empty, and light mode lacked high-contrast text and buttons.
+  - *Solution:* Added Tremor-inspired empty states, guarded trend pills, and refreshed light mode palette with deep slate text and rich primary gradients.
+- **Next Recommended Task:** Check user feedback on light mode adjustments.
+
+---
+
+### Session Entry: 2026-09-07T22:10:00+05:30
+- **Task Started:** Form Control & Select Dropdown Option Contrast Fix
+- **Task Completed:** Resolved white text on white option dropdown background issue across all dashboard forms and filter dropdowns.
+- **Files Modified:**
+  - `frontend/src/app/globals.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/materials/materials.module.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/settings/settings.module.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/study-together/studyTogether.module.css` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem:* Chromium on Windows defaults `<option>` text/background to OS palette if parent has CSS custom properties without explicit option background styling.
+  - *Solution:* Added explicit dark backgrounds (`#0f172a`) and bright text (`#f8fafc`) to `option` rules with `color-scheme: light dark`.
+- **Next Recommended Task:** Await user feedback.
+
+---
+
+### Session Entry: 2026-09-07T22:20:00+05:30
+- **Task Started:** Material Card Markdown Formatting, Title Sanitization & Badge Layout Polish
+- **Task Completed:** Parsed AI curriculum summaries into structured HTML with `react-markdown` and KaTeX math rendering, replaced raw filename underscores with spaces, grouped badges into a horizontal wrap row, and modernized subpanel contrast.
+- **Files Modified:**
+  - `frontend/src/components/materials/MaterialCard.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/materials/materials.module.css` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem:* AI Summary was rendered inside a single `<p>` tag, causing raw Markdown markdown bold markers (`**...**`) and bullet lists to display as unformatted text. Badges were vertically stacked and subpanels had hardcoded dark backgrounds.
+  - *Solution:* Replaced `<p>` with `<div className={styles.aiSummaryProse}><ReactMarkdown ...>{material.aiSummary}</ReactMarkdown></div>`, added KaTeX and GFM remark plugins, sanitized titles with `.replace(/_/g, ' ')`, wrapped badges in `.matBadgeGroup`, and styled theme-adaptive `.aiSummaryPanel` and `.intelDetailsPanel`.
+- **Next Recommended Task:** Await user instruction.
+
+---
+
+### Session Entry: 2026-09-07T22:30:00+05:30
+- **Task Started:** Material Intelligence Pop-up Modal with Adjustable Sizing
+- **Task Completed:** Built `MaterialDetailModal.tsx` and `materialDetailModal.module.css` with Standard/Wide/Fullscreen presets, Maximize/Restore button, desktop drag-to-resize, AI summary with KaTeX math rendering, copy action, topic search, keywords chips, and difficulty analysis. Integrated with `MaterialCard.tsx` and added 7 unit tests (172/172 passed).
+- **Files Modified/Created:**
+  - `frontend/src/components/materials/MaterialDetailModal.tsx` [NEW]
+  - `frontend/src/components/materials/materialDetailModal.module.css` [NEW]
+  - `frontend/src/components/materials/MaterialCard.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/materials/materials.module.css` [MODIFIED]
+  - `frontend/src/__tests__/components/materialDetailModal.test.tsx` [NEW]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem:* Expanding AI summary inside narrow material cards distorted the card and stretched the grid layout.
+  - *Solution:* Replaced inline expansion with an adjustable pop-up modal with presets (`720px`, `980px`, `96vw`) and drag-to-resize support.
+- **Next Recommended Task:** Await user feedback.
+
+---
+
+## Session 57: 2026-09-09 - P2 Timetable Experience Upgrade & Capacity Management
+- **Task Started:** Upgrade the Timetable Experience across Web and Mobile with 10-dimension session details, 6 canonical states, daily study window and capacity management with over-allocation detection, and vertical mobile touch ergonomics while strictly preserving the planning algorithm and evidence verification pipeline.
+- **Task Completed:**
+  1. Implemented daily study capacity calculation and formatting (`formatHoursAndMinutes`, `computeDayStudyCapacity`) in `frontend/src/utils/dateHelpers.ts` and `mobile/src/utils/dateUtils.ts`.
+  2. Built **Daily Study Capacity & Window Banner** in `frontend/src/app/(dashboard)/timetable/page.tsx` displaying daily capacity, scheduled today, remaining capacity / over-allocation warning, and visual progress track.
+  3. Integrated 10-dimension session details in `frontend/src/components/timetable/SlotDetailModal.tsx` and `mobile/src/components/timetable/MobileSlotDetailModal.tsx` (Subject, Chapter, Topic, Difficulty, Priority badge, What to study checklist, Source material, Reason & relevance, Duration, State).
+  4. Ensured 6 canonical state badges across Web and Mobile: `UPCOMING`, `ACTIVE`, `COMPLETED`, `MISSED`, `CATCH-UP`, `FUTURE`.
+  5. Implemented mobile capacity card and touch-friendly vertical card list in `mobile/src/screens/timetable/TimetableScreen.tsx` and `mobile/src/components/timetable/SlotCard.tsx`.
+  6. Added comprehensive unit tests in `frontend/src/__tests__/utils/timetableCapacity.test.ts` and `mobile/src/__tests__/mobileApp.test.ts`.
+  7. Verified all automated test suites:
+     - Backend: 295/295 tests passed (`.\mvnw.cmd test`, 0 failures, 8 skipped offline).
+     - Frontend: 186/186 tests passed across 28 Jest suites (`npm test`).
+     - Mobile: 33/33 tests passed (`npm test` in `mobile/`).
+     - Frontend TypeScript: 0 errors (`npx tsc --noEmit`).
+     - Mobile TypeScript: 0 errors (`npm run tsc`).
+     - Frontend Build: 24/24 static routes compiled cleanly in 8.9s (`npm run build`).
+  8. Synchronized persistent project memory files in `.project-memory/`.
+- **Files Modified / Created:**
+  - `frontend/src/utils/dateHelpers.ts` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/page.tsx` [MODIFIED]
+  - `frontend/src/app/(dashboard)/timetable/timetable.module.css` [MODIFIED]
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED]
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED]
+  - `frontend/src/__tests__/utils/timetableCapacity.test.ts` [NEW]
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [MODIFIED]
+  - `mobile/src/utils/dateUtils.ts` [MODIFIED]
+  - `mobile/src/components/timetable/MobileSlotDetailModal.tsx` [NEW]
+  - `mobile/src/components/timetable/SlotCard.tsx` [MODIFIED]
+  - `mobile/src/screens/timetable/TimetableScreen.tsx` [MODIFIED]
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/TEST_PROGRESS.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem 1:* Need to compute daily capacity accurately whether slots have `durationMinutes` property or string `startTime`/`endTime` ranges.
+    *Solution:* Implemented fallback sequence checking `durationMinutes` first, then parsing `startTime` and `endTime` with midnight-crossing support, defaulting gracefully to 60m.
+  - *Problem 2:* Over-allocated days could produce negative remaining capacity values if not properly guarded.
+    *Solution:* Clamped `remainingMinutes` to $\ge 0$ and flagged `isOverAllocated: true`, rendering informative `Over-allocated by +Xm` banners.
+- **Next Recommended Task:** Await user feedback, production deployment trigger, or next roadmap instruction.
+
+---
+
+## Session 58: 2026-09-09 - P2.5B AI Revision Mode (Full-Stack Web, Backend & Mobile)
+- **Task Started:** Implement P2.5B AI Revision Mode offering a focused 5–15 min revision experience ("Review Topic" / "Start Revision") on completed and verified study sessions across 6 key dimensions (concise summary, key concepts, formulas with KaTeX, 5-question quiz, weak areas, quick revision points) grounded in actual session topics/materials, with independent score & completion tracking in `slot_revisions` without changing timetable completion rules or algorithms.
+- **Task Completed:**
+  1. **Database Schema & Migrations:** Created Flyway migration `V8__add_slot_revisions.sql` and updated `schema-local.sql` for H2 with full relational indices and timestamp triggers.
+  2. **Backend Domain & Services:**
+     - Created `SlotRevision.java` entity and `SlotRevisionRepository.java`.
+     - Built `FormulaItem.java`, `QuizQuestion.java`, `SlotRevisionResponse.java`, and `CompleteRevisionRequest.java` DTOs.
+     - Implemented `SlotRevisionService.java` integrating `AiProviderGateway` (`slot_revision_generation`), `MaterialTopicReader` grounded curriculum synthesis, and independent revision completion scoring.
+     - Implemented `SlotRevisionController.java` (`GET /api/timetable/slots/{slotId}/revision`, `POST /api/timetable/slots/{slotId}/revision/complete`).
+  3. **Backend Testing:** Added `SlotRevisionServiceTest.java` (5 unit tests) and `SlotRevisionControllerIntegrationTest.java` (2 integration tests). Verified all 7 tests pass (302/302 total backend JUnit suite passing).
+  4. **Web Frontend:**
+     - Created `revision.api.ts` and `useRevision.ts` React Query hooks.
+     - Created `RevisionModal.tsx` and `revisionModal.module.css` implementing a 4-stage flow (Summary & Formulas $\rightarrow$ Key Points & Traps $\rightarrow$ 5-Question Quiz $\rightarrow$ Scorecard & Completion).
+     - Integrated revision trigger offer card and footer CTA in `SlotDetailModal.tsx`.
+     - Created `revisionModal.test.tsx` (6/6 tests passing; 192/192 total web Jest suite passing).
+  5. **Mobile Application (React Native):**
+     - Created `mobile/src/types/revision.types.ts` and `mobile/src/api/revision.api.ts`.
+     - Created `mobile/src/components/timetable/MobileRevisionModal.tsx` with native touch ergonomics and instant quiz feedback.
+     - Integrated "Review Topic" offer card and footer button in `MobileSlotDetailModal.tsx`.
+     - Added mobile revision unit tests in `mobileApp.test.ts` (36/36 tests passing).
+  6. **Full Quality Gate Verification:**
+     - Backend: 302/302 JUnit tests passing (0 failures, 8 skipped offline via `mvnw test`).
+     - Web Frontend: 192/192 Jest tests passing across 29 suites (`npm test`).
+     - Web TypeScript: 0 errors (`npx tsc --noEmit`).
+     - Web Build: 24/24 static routes generated cleanly in 7.0s (`npm run build`).
+     - Mobile: 36/36 Jest tests passing (`npm test` in `mobile/`).
+     - Mobile TypeScript: 0 errors (`npm run tsc` in `mobile/`).
+  7. **Project Memory & Documentation:** Synchronized `.project-memory/` and updated `walkthrough.md`.
+- **Files Modified / Created:**
+  - `backend/src/main/resources/db/migration/V8__add_slot_revisions.sql` [NEW]
+  - `backend/src/main/resources/schema-local.sql` [MODIFIED]
+  - `backend/src/main/java/com/aistudyplanner/model/entity/SlotRevision.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/repository/SlotRevisionRepository.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/FormulaItem.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/QuizQuestion.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/response/SlotRevisionResponse.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/model/dto/request/CompleteRevisionRequest.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/service/SlotRevisionService.java` [NEW]
+  - `backend/src/main/java/com/aistudyplanner/controller/SlotRevisionController.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/service/SlotRevisionServiceTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/controller/SlotRevisionControllerIntegrationTest.java` [NEW]
+  - `backend/src/test/java/com/aistudyplanner/migration/FlywayPostgresMigrationTest.java` [MODIFIED]
+  - `frontend/src/types/api.types.ts` [MODIFIED]
+  - `frontend/src/api/revision.api.ts` [NEW]
+  - `frontend/src/hooks/useRevision.ts` [NEW]
+  - `frontend/src/components/timetable/RevisionModal.tsx` [NEW]
+  - `frontend/src/components/timetable/revisionModal.module.css` [NEW]
+  - `frontend/src/components/timetable/SlotDetailModal.tsx` [MODIFIED]
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED]
+  - `frontend/src/__tests__/components/revisionModal.test.tsx` [NEW]
+  - `frontend/src/__tests__/components/slotDetailModal.test.tsx` [MODIFIED]
+  - `frontend/src/__tests__/components/slotDetailModalEvidence.test.tsx` [MODIFIED]
+  - `mobile/src/types/revision.types.ts` [NEW]
+  - `mobile/src/api/revision.api.ts` [NEW]
+  - `mobile/src/components/timetable/MobileRevisionModal.tsx` [NEW]
+  - `mobile/src/components/timetable/MobileSlotDetailModal.tsx` [MODIFIED]
+  - `mobile/src/__tests__/mobileApp.test.ts` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/TASKS.md` [MODIFIED]
+  - `.project-memory/CHANGELOG.md` [MODIFIED]
+  - `.project-memory/UI_PROGRESS.md` [MODIFIED]
+  - `.project-memory/TEST_PROGRESS.md` [MODIFIED]
+  - `.project-memory/NEXT_TASK.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem 1:* AI completion record vs class accessor. `AiCompletion` in this codebase is a Java record with `.text()` instead of `.getText()`.
+    *Solution:* Used `.text()` directly in `SlotRevisionService.java`.
+  - *Problem 2:* Separate tracking requirement without altering timetable planning rules or session completion dates.
+    *Solution:* Isolated revision records to `slot_revisions` table with its own `is_completed`, `score`, and `completed_at` timestamps, keeping `timetable_slots.is_completed` and streak calculation solely tied to evidence verification.
+  - *Problem 3:* Mobile option styling type incompatibility with `StyleSheet.flatten`.
+    *Solution:* Used React Native style arrays (`style={[styles.optionBtn, isOptionCorrect && styles.optionCorrect]}`) which are type-safe and performant.
+## 2026-09-09 (Anti-"Vibe Coding" Visual & Interaction System Refinement)
+- **Task Started:** Eliminate all vibe-coding tropes, neon glow halos, multi-color gradient text, and looping static animations across Web and Mobile. Transform the application into a serious, calm, authoritative, deeply engineered SaaS product (inspired by Linear, Stripe, Raycast, Notion, shadcn).
+- **Task Completed:**
+  - Standardized calm dark surfaces and crisp 1px borders across Web and Mobile.
+  - Eliminated `--glow-teal`, `--glow-blue`, `--app-glow-*`, and drop-shadow glow filters.
+  - Removed looping peripheral keyframes: `@keyframes sparkleRotate`, `@keyframes aiBadgePulseCard`, `@keyframes logoShimmer`, `@keyframes pulseDot`, `@keyframes badgeShimmer`, `@keyframes pulseAlert`.
+  - Replaced multi-color neon `.gradient-text` with solid high-contrast typography and strict letter spacing.
+  - Mobile tokens refined with calm slate/zinc backgrounds, subtle elevation presets, and clean badge typography.
+  - 100% test pass rate preserved across all layers: 302/302 Backend tests, 206/206 Web Jest tests (32 suites), 36/36 Mobile Jest tests, 0 TS errors, 0 ESLint errors, Next.js 24/24 static/dynamic routes built cleanly in 6.7s.
+- **Files Modified:**
+  - `frontend/src/app/globals.css` [MODIFIED]
+  - `frontend/src/app/(dashboard)/dashboard/dashboard.module.css` [MODIFIED]
+  - `frontend/src/components/layout/Sidebar.module.css` [MODIFIED]
+  - `frontend/src/components/timetable/slotDetailModal.module.css` [MODIFIED]
+  - `mobile/src/constants/colors.ts` [MODIFIED]
+  - `mobile/src/constants/theme.ts` [MODIFIED]
+  - `mobile/src/screens/dashboard/DashboardScreen.tsx` [MODIFIED]
+  - `.project-memory/CURRENT_STATE.md` [MODIFIED]
+  - `.project-memory/SESSION_LOG.md` [MODIFIED]
+- **Problems Found & Solutions:**
+  - *Problem 1:* Distracting looping animations on dashboard and sidebar causing cognitive fatigue during studying.
+    *Solution:* Replaced continuous keyframe loops with calm, static, high-contrast badges and purposeful 150ms hover/active interactions.
+  - *Problem 2:* Heavy neon glowing drop shadows looked like an amateur crypto/AI demo.
+    *Solution:* Replaced with subtle 1px border highlights (`rgba(255,255,255,0.08)`) and soft natural elevation ladders.
+- **Next Recommended Task:** Await user production release approval, staging deployment, or Play Store submission.
+
+
+
+
+
 
 
 

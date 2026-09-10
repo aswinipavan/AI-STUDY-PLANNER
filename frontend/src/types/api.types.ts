@@ -104,6 +104,43 @@ export interface StudyEvidenceResponse {
   submittedAt?: string;
 }
 
+export interface FormulaItem {
+  name: string;
+  formula: string;
+  explanation: string;
+}
+
+export interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation: string;
+}
+
+export interface SlotRevisionResponse {
+  id: string;
+  slotId: string;
+  topic: string;
+  chapter?: string;
+  subjectName?: string;
+  summary?: string;
+  keyConcepts?: string[];
+  importantFormulas?: FormulaItem[];
+  quizQuestions?: QuizQuestion[];
+  weakAreas?: string[];
+  quickRevisionPoints?: string[];
+  score?: number;
+  isCompleted?: boolean;
+  completedAt?: string;
+  createdAt?: string;
+}
+
+export interface CompleteRevisionRequest {
+  score: number;
+  selectedAnswers?: Record<string, number>;
+}
+
 
 
 export interface Timetable {

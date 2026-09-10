@@ -13,6 +13,10 @@ jest.mock('@/api/evidence.api', () => ({
   },
 }));
 
+jest.mock('@/components/timetable/RevisionModal', () => ({
+  RevisionModal: () => null,
+}));
+
 
 
 describe('SlotDetailModal Evidence Verification Workflow', () => {

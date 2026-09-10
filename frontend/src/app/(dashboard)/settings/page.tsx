@@ -20,6 +20,7 @@ import { Moon, Sun, Monitor, Volume2, User, Bell, LogOut, BookOpen, Building2, P
 import { useRouter } from 'next/navigation';
 import styles from './settings.module.css';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useToast } from '@/components/ui/ToastProvider';
 import AvatarImage from '@/components/common/AvatarImage';
 import { sendPasswordResetEmail, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -100,6 +101,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const { soundEnabled, setSoundEnabled } = useSoundPreference();
   const { user, setUser, clearAuth } = useAuthStore();
+  const { toast } = useToast();
   const router = useRouter();
   const { replayOnboarding } = useOnboarding();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -155,10 +157,12 @@ export default function SettingsPage() {
     const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!ALLOWED.includes(file.type)) {
       setAvatarError('Only JPG, PNG, WEBP, or GIF images are allowed.');
+      toast.error('Only JPG, PNG, WEBP, or GIF images are allowed.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       setAvatarError('Image must be under 5MB.');
+      toast.error('Image must be under 5MB.');
       return;
     }
 
@@ -167,15 +171,15 @@ export default function SettingsPage() {
     setAvatarProgress(30);
 
     try {
-      // Single multipart request: backend stores the image and returns the updated profile with the
-      // new (cache-busted) avatar URL. Replaces the old signed-URL + direct-PUT flow (HTTP 400 local).
       const updatedProfile = await authApi.uploadAvatar(file);
       setAvatarProgress(100);
       setUser(updatedProfile);
       queryClient.setQueryData(['studentProfile'], updatedProfile);
+      toast.success('Profile photo updated successfully!');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
       setAvatarError(message);
+      toast.error(message);
     } finally {
       setAvatarUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -295,6 +299,7 @@ export default function SettingsPage() {
       setUser(updated);
       queryClient.setQueryData(['studentProfile'], updated);
       queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
+      toast.success('Student profile updated successfully!');
       reset({
         name: updated.fullName || updated.name || '',
         collegeName: updated.collegeName || '',
@@ -302,6 +307,10 @@ export default function SettingsPage() {
         department: updated.department || '',
         phoneNumber: updated.phoneNumber || '',
       });
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Failed to update profile. Please try again.';
+      toast.error(msg);
     },
   });
 
@@ -311,8 +320,13 @@ export default function SettingsPage() {
       setUser(updated);
       queryClient.setQueryData(['studentProfile'], updated);
       queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
+      toast.success('Academic notifications updated!');
       setNotifSaved(true);
       setTimeout(() => setNotifSaved(false), 3000);
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Failed to update notifications.';
+      toast.error(msg);
     },
   });
 
@@ -335,8 +349,13 @@ export default function SettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
       queryClient.invalidateQueries({ queryKey: QK.timetable });
       queryClient.invalidateQueries({ queryKey: QK.timetableInsights });
+      toast.success('Study preferences saved! Timetable settings updated.');
       setPrefSaved(true);
       setTimeout(() => setPrefSaved(false), 3000);
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Failed to save study preferences.';
+      toast.error(msg);
     },
   });
 

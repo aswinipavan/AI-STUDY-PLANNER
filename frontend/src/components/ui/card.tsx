@@ -8,15 +8,20 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
    * pointer cannot do anything with should not move when it passes over.
    */
   interactive?: boolean
+  /**
+   * Adds a subtle gradient top accent bar to the card.
+   */
+  accent?: boolean
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, interactive = false, ...props }, ref) => (
+  ({ className, interactive = false, accent = false, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "rounded-[var(--app-radius-lg)] border border-border bg-card text-card-foreground shadow-[var(--shadow-card)]",
+        "rounded-[var(--app-radius-xl)] border border-border bg-card text-card-foreground shadow-[var(--shadow-card)] relative overflow-hidden",
         interactive && "card-interactive",
+        accent && "accent-bar",
         className
       )}
       {...props}

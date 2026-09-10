@@ -10,19 +10,16 @@ import {
   File,
   Trash2,
   Sparkles,
-  ChevronDown,
-  ChevronUp,
   Tag,
   BookOpen,
   RotateCw,
   Gauge,
-  Layers,
-  Key
 } from 'lucide-react';
 import { useDeleteMaterial } from '@/hooks/useMaterials';
 import { materialsApi } from '@/api/materials.api';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/constants/queryKeys';
+import MaterialDetailModal, { MaterialTabType } from './MaterialDetailModal';
 import styles from '@/app/(dashboard)/materials/materials.module.css';
 
 interface Props {
@@ -33,8 +30,8 @@ export default function MaterialCard({ material }: Props) {
   const qc = useQueryClient();
   const { mutate: deleteMaterial, isPending } = useDeleteMaterial();
   const [showLightbox, setShowLightbox] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
-  const [showIntelligence, setShowIntelligence] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState<MaterialTabType>('summary');
   const [isReprocessing, setIsReprocessing] = useState(false);
 
   // Parse topics, chapters, keywords safely
@@ -117,6 +114,8 @@ export default function MaterialCard({ material }: Props) {
   const difficulty = material.overallDifficulty;
   const difficultyScore = material.difficultyScore;
 
+  const displayTitle = material.title ? material.title.replace(/_/g, ' ') : 'Untitled Material';
+
   return (
     <>
       <div className={styles.matCard}>
@@ -137,151 +136,111 @@ export default function MaterialCard({ material }: Props) {
           </div>
 
           <h4 className={styles.matTitle} title={material.title}>
-            {material.title}
+            {displayTitle}
           </h4>
+        </div>
 
+        {/* Badges Container */}
+        <div className={styles.matBadgeGroup}>
           <span className={styles.matType}>
             {material.fileType}
           </span>
-        </div>
 
-        {/* User-selected Subject Badge */}
-        {(material.subjectName || (typeof material.subject === 'object' && (material.subject?.name || (material.subject as { subjectName?: string })?.subjectName))) && (
-          <div className={styles.subjectBadge}>
-            <BookOpen size={10} />
-            <span>{material.subjectName || (typeof material.subject === 'object' ? (material.subject?.name || (material.subject as { subjectName?: string })?.subjectName) : '')}</span>
-          </div>
-        )}
-
-        {/* AI Category badge */}
-        {material.aiCategorizedSubject && (
-          <div className={styles.aiCategoryBadge}>
-            <Tag size={10} />
-            <span>{material.aiCategorizedSubject}</span>
-          </div>
-        )}
-
-        {/* Processing Status Badge */}
-        {status === 'PROCESSING' || status === 'PENDING' ? (
-          <div className={styles.nlpBadgePending}>
-            <Sparkles size={10} />
-            <span>NLP Analyzing...</span>
-          </div>
-        ) : status === 'FAILED' ? (
-          <div>
-            <div className={styles.nlpBadgeFailed}>
-              <span>Failed</span>
+          {(material.subjectName || (typeof material.subject === 'object' && (material.subject?.name || (material.subject as { subjectName?: string })?.subjectName))) && (
+            <div className={styles.subjectBadge}>
+              <BookOpen size={10} />
+              <span>{material.subjectName || (typeof material.subject === 'object' ? (material.subject?.name || (material.subject as { subjectName?: string })?.subjectName) : '')}</span>
             </div>
-            <button
-              onClick={handleReprocess}
-              disabled={isReprocessing}
-              className={styles.retryBtn}
-            >
-              <RotateCw size={10} className={isReprocessing ? 'animate-spin' : ''} />
-              <span>Retry</span>
-            </button>
-          </div>
-        ) : (
-          <div className={styles.nlpBadgeCompleted}>
-            <Sparkles size={10} />
-            <span>NLP Processed</span>
-          </div>
-        )}
+          )}
 
-        {/* Difficulty Badge */}
-        {difficulty && (
-          <div className={`${styles.diffBadge} ${
-            difficulty === 'HARD' ? styles.diffHard :
-            difficulty === 'MEDIUM' ? styles.diffMedium : styles.diffEasy
-          }`}>
-            <Gauge size={10} />
-            <span>{difficulty} {difficultyScore ? `• ${difficultyScore}/100` : ''}</span>
-          </div>
-        )}
+          {material.aiCategorizedSubject && (
+            <div className={styles.aiCategoryBadge}>
+              <Tag size={10} />
+              <span>{material.aiCategorizedSubject}</span>
+            </div>
+          )}
+
+          {status === 'PROCESSING' || status === 'PENDING' ? (
+            <div className={styles.nlpBadgePending}>
+              <Sparkles size={10} />
+              <span>NLP Analyzing...</span>
+            </div>
+          ) : status === 'FAILED' ? (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div className={styles.nlpBadgeFailed}>
+                <span>Failed</span>
+              </div>
+              <button
+                onClick={handleReprocess}
+                disabled={isReprocessing}
+                className={styles.retryBtn}
+              >
+                <RotateCw size={10} className={isReprocessing ? 'animate-spin' : ''} />
+                <span>Retry</span>
+              </button>
+            </div>
+          ) : (
+            <div className={styles.nlpBadgeCompleted}>
+              <Sparkles size={10} />
+              <span>NLP Processed</span>
+            </div>
+          )}
+
+          {difficulty && (
+            <div className={`${styles.diffBadge} ${
+              difficulty === 'HARD' ? styles.diffHard :
+              difficulty === 'MEDIUM' ? styles.diffMedium : styles.diffEasy
+            }`}>
+              <Gauge size={10} />
+              <span>{difficulty} {difficultyScore ? `• ${difficultyScore}/100` : ''}</span>
+            </div>
+          )}
+        </div>
 
         {/* Action Buttons Row */}
         <div className={styles.intelActionRow}>
           {material.aiSummary && (
             <button
+              type="button"
               className={styles.intelToggleBtn}
-              onClick={(e) => { e.stopPropagation(); setShowSummary(!showSummary); setShowIntelligence(false); }}
-              title="View Summary"
+              onClick={(e) => {
+                e.stopPropagation();
+                setModalTab('summary');
+                setIsDetailModalOpen(true);
+              }}
+              title="View AI Curriculum Summary"
             >
               <Sparkles size={11} />
               <span>Summary</span>
-              {showSummary ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
           )}
 
           {(parsedTopics.length > 0 || parsedChapters.length > 0 || parsedKeywords.length > 0 || material.difficultyReason) && (
             <button
+              type="button"
               className={styles.intelToggleBtn}
-              onClick={(e) => { e.stopPropagation(); setShowIntelligence(!showIntelligence); setShowSummary(false); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setModalTab('topics');
+                setIsDetailModalOpen(true);
+              }}
               title="View Extracted Topics & Chapters"
             >
               <BookOpen size={11} />
               <span>Topics ({parsedTopics.length})</span>
-              {showIntelligence ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
           )}
         </div>
-
-        {/* AI Summary Panel */}
-        {showSummary && material.aiSummary && (
-          <div className={styles.aiSummaryPanel} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.aiSummaryText}>{material.aiSummary}</p>
-          </div>
-        )}
-
-        {/* Intelligence Details Panel (Topics, Chapters, Keywords, Difficulty) */}
-        {showIntelligence && (
-          <div className={styles.intelDetailsPanel} onClick={(e) => e.stopPropagation()}>
-            {/* Extracted Topics */}
-            {parsedTopics.length > 0 && (
-              <>
-                <div className={styles.intelSectionHeader}>
-                  <Layers size={11} />
-                  <span>Key Topics</span>
-                </div>
-                <div className={styles.topicList}>
-                  {parsedTopics.map((t, idx) => (
-                    <div key={idx} className={styles.topicItem}>
-                      <strong>{t.name}</strong>
-                      {t.chapter && <span className={styles.topicChapterLabel}>Chapter: {t.chapter}</span>}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Extracted Keywords */}
-            {parsedKeywords.length > 0 && (
-              <>
-                <div className={styles.intelSectionHeader}>
-                  <Key size={11} />
-                  <span>Concepts & Terms</span>
-                </div>
-                <div className={styles.keywordWrap}>
-                  {parsedKeywords.map((kw, idx) => (
-                    <span key={idx} className={styles.keywordChip}>{kw}</span>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Difficulty Reason */}
-            {material.difficultyReason && (
-              <>
-                <div className={styles.intelSectionHeader}>
-                  <Gauge size={11} />
-                  <span>Complexity Analysis</span>
-                </div>
-                <p className={styles.diffReasonText}>{material.difficultyReason}</p>
-              </>
-            )}
-          </div>
-        )}
       </div>
+
+      {/* Adjustable Material Intelligence Detail Modal */}
+      <MaterialDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        material={material}
+        initialTab={modalTab}
+        onPreviewFile={handlePreview}
+      />
 
       {/* Lightbox */}
       {showLightbox && (
@@ -303,3 +262,4 @@ export default function MaterialCard({ material }: Props) {
     </>
   );
 }
+

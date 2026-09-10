@@ -28,6 +28,10 @@ export interface SlotResponse {
   isCatchUp?: boolean;
   missedDate?: string;
   notes: string | null;
+  hasEvidence?: boolean;
+  evidenceStatus?: 'APPROVED' | 'NEEDS_MORE_WORK' | 'REVIEW_REQUIRED' | string | null;
+  evidenceScore?: number;
+  evidenceId?: string;
 }
 
 /**

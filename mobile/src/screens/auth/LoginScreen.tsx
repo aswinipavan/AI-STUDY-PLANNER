@@ -68,7 +68,7 @@ export function LoginScreen() {
   const handleLogin = async (data: LoginForm) => {
     setLoading(true);
     try {
-      const cleanEmail = data.email.trim();
+      const cleanEmail = data.email.trim().toLowerCase();
       const firebaseToken = await signInWithEmail(cleanEmail, data.password);
       const authResponse = await loginWithFirebaseToken(firebaseToken);
       await setSession(authResponse);
@@ -83,7 +83,7 @@ export function LoginScreen() {
   const handleRegister = async (data: RegisterForm) => {
     setLoading(true);
     try {
-      const cleanEmail = data.email.trim();
+      const cleanEmail = data.email.trim().toLowerCase();
       const firebaseToken = await registerWithEmail(cleanEmail, data.password);
       const authResponse = await loginWithFirebaseToken(firebaseToken);
       await setSession(authResponse);

@@ -27,11 +27,19 @@ export function RootNavigator() {
         if (currentUser) {
           const storedJwt = await getJwt();
           if (storedJwt) {
-            const freshFirebaseToken = await getCurrentIdToken(false);
-            if (freshFirebaseToken && isMounted) {
-              const authResponse = await loginWithFirebaseToken(freshFirebaseToken);
-              await setSession(authResponse);
-              return;
+            try {
+              const freshFirebaseToken = await getCurrentIdToken(false);
+              if (freshFirebaseToken && isMounted) {
+                const authResponse = await loginWithFirebaseToken(freshFirebaseToken);
+                await setSession(authResponse);
+                return;
+              }
+            } catch (netErr: any) {
+              const isNetOrTimeout = !netErr?.response || netErr?.code === 'ECONNABORTED' || netErr?.status === 0;
+              if (isNetOrTimeout && isMounted) {
+                console.warn('[RootNavigator] Network issue during token check, keeping existing session');
+                return;
+              }
             }
           }
           const firebaseToken = await getCurrentIdToken(true);
@@ -44,8 +52,11 @@ export function RootNavigator() {
         if (isMounted) {
           await logout();
         }
-      } catch {
-        if (isMounted) {
+      } catch (err: any) {
+        const isNetOrTimeout = !err?.response || err?.code === 'ECONNABORTED' || err?.status === 0;
+        if (isNetOrTimeout && isMounted) {
+          console.warn('[RootNavigator] Network issue during checkInitialAuth, skipping logout');
+        } else if (isMounted) {
           await logout();
         }
       } finally {
@@ -79,8 +90,11 @@ export function RootNavigator() {
               await setSession(authResponse);
               return;
             }
-          } catch {
-            if (isMounted) {
+          } catch (err: any) {
+            const isNetOrTimeout = !err?.response || err?.code === 'ECONNABORTED' || err?.status === 0;
+            if (isNetOrTimeout && isMounted) {
+              console.warn('[RootNavigator] Network issue during auth state change, skipping logout');
+            } else if (isMounted) {
               await logout();
             }
           }

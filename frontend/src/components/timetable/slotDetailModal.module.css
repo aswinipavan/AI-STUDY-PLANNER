@@ -197,7 +197,6 @@
   border: 1px solid rgba(239, 68, 68, 0.4);
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-  animation: pulseAlert 2s infinite;
 }
 
 .statusCatchUp {
@@ -224,11 +223,6 @@
   border: 1px solid rgba(59, 130, 246, 0.3);
   padding: 0.25rem 0.625rem;
   border-radius: 9999px;
-}
-
-@keyframes pulseAlert {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.75; }
 }
 
 .section {
@@ -282,6 +276,42 @@
   font-weight: 600;
   color: var(--color-foreground, #f3f4f6);
   word-break: break-word;
+}
+
+.priorityHigh {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.priorityMedium {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.priorityLow {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
 }
 
 .whatToStudyList {
@@ -719,6 +749,51 @@
 .verifiedCompletedMeta {
   font-size: 0.75rem;
   color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.revisionOfferCard {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.08) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 0.875rem;
+  padding: 1.125rem;
+  margin-top: 0.75rem;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.revisionOfferHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.revisionOfferTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.revisionOfferTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c7d2fe;
+}
+
+.revisionDurationPill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.revisionOfferDesc {
+  font-size: 0.825rem;
+  color: #e2e8f0;
+  line-height: 1.45;
   margin: 0;
 }
 

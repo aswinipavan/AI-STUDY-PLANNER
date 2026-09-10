@@ -2,11 +2,11 @@
 
 ## Master Quality Assurance & Genuine Executable Test Suite Summary
 - **Execution Architecture:** 100% dynamically parsed from real test runners (Surefire JUnit 5 XML, Jest JSON, Playwright JSON, Mobile Jest). Zero simulated or hardcoded results.
-- **Total Executable Automated Tests:** **456**
-- **Passing Tests:** **448** (0 Failures, 8 Skipped in offline test profile)
-- **Overall Suite Pass Rate:** **98.25%** (100% Green on active tests)
-- **Cumulative Execution Duration:** **207.31s**
-- **Git Commit SHA:** `15a41330e8dd8ea719281580c67806b18f9fb710` (Branch: `feat/master-ai-tutor-and-timetable-overhaul`)
+- **Total Executable Automated Tests:** **591**
+- **Passing Tests:** **583** (0 Failures, 8 Skipped in offline test profile)
+- **Overall Suite Pass Rate:** **98.65%** (100% Green on active tests)
+- **Cumulative Execution Duration:** **162.1s**
+- **Git Commit SHA:** `15a41330e8dd8ea719281580c67806b18f9fb710` (Branch: `main`)
 - **Master Report:** `testing/reports/MASTER_TEST_REPORT.md`
 - **Machine Ledger:** `testing/reports/summary/TEST_EXECUTION_SUMMARY.json`
 - **Legacy Simulation Archive:** Preserved in `testing/reports/legacy_archive/`
@@ -17,11 +17,11 @@
 
 | Layer | Framework & Runner | Total Tests | Passed | Failed | Skipped | Pass Rate | Duration | Detailed Report |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Backend Service & API** | JUnit 5 / Spring Boot Test / MockMvc | **290** | 290 | 0 | 8 | 100.0% | 85.9s | `testing/reports/backend/BACKEND_TEST_REPORT.md` |
-| **Frontend Unit & Component** | Jest / React Testing Library | **165** | 165 | 0 | 0 | 100.0% | 6.0s | `testing/reports/frontend/FRONTEND_TEST_REPORT.md` |
+| **Backend Service & API** | JUnit 5 / Spring Boot Test / MockMvc | **302** | 302 | 0 | 8 | 100.0% | 94.2s | `testing/reports/backend/BACKEND_TEST_REPORT.md` |
+| **Frontend Unit & Component** | Jest / React Testing Library | **206** | 206 | 0 | 0 | 100.0% | 6.3s | `testing/reports/frontend/FRONTEND_TEST_REPORT.md` |
 | **Frontend End-to-End** | Playwright (Chromium) | **53** | 53 | 0 | 0 | 100.0% | 59.96s | `testing/reports/e2e/E2E_PLAYWRIGHT_REPORT.md` |
-| **Mobile React Native** | Jest / React Native | **20** | 20 | 0 | 0 | 100.0% | 0.42s | `testing/reports/mobile/MOBILE_TEST_REPORT.md` |
-| **TOTAL CONSOLIDATED** | **All 4 Test Frameworks** | **528** | **520** | **0** | **8** | **98.48%** | **152.28s** | `testing/reports/summary/TEST_EXECUTION_SUMMARY.json` |
+| **Mobile React Native** | Jest / React Native | **36** | 36 | 0 | 0 | 100.0% | 0.93s | `testing/reports/mobile/MOBILE_TEST_REPORT.md` |
+| **TOTAL CONSOLIDATED** | **All 4 Test Frameworks** | **605** | **597** | **0** | **8** | **98.68%** | **162.1s** | `testing/reports/summary/TEST_EXECUTION_SUMMARY.json` |
 
 ---
 

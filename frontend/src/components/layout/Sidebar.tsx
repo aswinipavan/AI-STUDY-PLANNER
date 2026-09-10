@@ -128,8 +128,8 @@ function UserProfileFooter() {
         </span>
       </div>
 
-      <Link href="/settings" title="Settings">
-        <Settings size={15} className={styles.settingsIcon} />
+      <Link href="/settings" title="Settings" className={styles.settingsIconBtn}>
+        <Settings size={15} />
       </Link>
     </div>
   );

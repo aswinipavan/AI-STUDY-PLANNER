@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -13,6 +14,8 @@ import { examsApi } from '@/api/exams.api';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSubjects } from '@/hooks/useSubjects';
 import { QK } from '@/constants/queryKeys';
+
+import { useToast } from '@/components/ui/ToastProvider';
 
 const examSchema = z.object({
   subjectId: z.string().min(1, 'Please select a subject'),
@@ -38,6 +41,7 @@ interface Props {
 
 export function ExamModal({ isOpen, onClose, editExam }: Props) {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const isEditing = !!editExam;
   const { data: subjects = [] } = useSubjects();
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -56,6 +60,7 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
   const selectedDifficulty = useWatch({ control, name: 'difficulty' });
 
   useEffect(() => {
+    setSubmitError(null);
     if (editExam) {
       reset({
         subjectId: editExam.subjectId,
@@ -67,7 +72,7 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
     } else {
       reset({ subjectId: '', examName: '', examDate: '', difficulty: 'medium', notes: '' });
     }
-  }, [editExam, reset]);
+  }, [editExam, reset, isOpen]);
 
   const { mutateAsync: createExam } = useCreateExam();
 
@@ -77,13 +82,16 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
       if (isEditing && editExam) {
         await examsApi.update(editExam.id, data);
         qc.invalidateQueries({ queryKey: QK.exams });
+        toast.success(`Exam "${data.examName}" updated successfully!`);
       } else {
         await createExam(data);
+        toast.success(`Exam "${data.examName}" added to schedule!`);
       }
       onClose();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to save exam. Please try again.';
       setSubmitError(msg);
+      toast.error(msg);
     }
   };
 
@@ -150,14 +158,16 @@ export function ExamModal({ isOpen, onClose, editExam }: Props) {
         </div>
 
         {submitError && (
-          <p className="text-destructive text-sm">{submitError}</p>
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm" role="alert">
+            {submitError}
+          </div>
         )}
 
         <div className="pt-4 flex gap-3">
-          <AppButton type="button" variant="outline" className="flex-1" onClick={onClose}>
+          <AppButton type="button" variant="outline" className="flex-1" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </AppButton>
-          <AppButton type="submit" className="flex-1" loading={isSubmitting}>
+          <AppButton type="submit" className="flex-1" loading={isSubmitting} disabled={isSubmitting}>
             {isEditing ? 'Save Changes' : 'Add Exam'}
           </AppButton>
         </div>

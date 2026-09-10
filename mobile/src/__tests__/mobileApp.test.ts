@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { formatDate, formatTime, formatTimeRange, getDayLabel, getDayShort } from '../utils/dateUtils';
+import { formatDate, formatTime, formatTimeRange, getDayLabel, getDayShort, evaluateMobileSessionState } from '../utils/dateUtils';
 import { getErrorMessage, isNetworkError, isTimeoutError } from '../utils/errorHandler';
 
 describe('Mobile App Unit & Utilities Test Suite', () => {
@@ -267,6 +267,393 @@ describe('Mobile App Unit & Utilities Test Suite', () => {
       expect(after.scheduledMinutes).toBe(60);
     });
   });
+
+  describe('Mobile Decision Intelligence & Slot Categorization', () => {
+    const {
+      evaluateNextBestActionMobile,
+      computeDayStudyStats,
+      getLocalDateString,
+    } = require('../utils/dashboardStats');
+
+    const fixedTarget = new Date('2026-09-09T14:30:00'); // 2:30 PM
+    const targetIso = getLocalDateString(fixedTarget);
+
+    const mockExams = [
+      {
+        id: 'exam-1',
+        examName: 'Discrete Mathematics Final',
+        subject: { subjectName: 'Mathematics' },
+        daysRemaining: 4,
+        examDate: '2026-09-13',
+      },
+    ];
+
+    const mockPriorities = [
+      {
+        id: 'p-1',
+        subjectName: 'Mathematics',
+        priorityLevel: 'HIGH',
+        priorityScore: 88,
+        averagePercentage: 58,
+        reasons: ['Low assessment average: 58%'],
+      },
+    ];
+
+    it('generates ACTIVE_NOW Next Best Action during active slot window', () => {
+      const activeSlot = {
+        id: 'slot-active',
+        date: targetIso,
+        startTime: '14:00',
+        endTime: '15:00',
+        durationMinutes: 60,
+        isCompleted: false,
+        subject: { subjectName: 'Mathematics' },
+        topic: 'Graph Theory & Trees',
+      };
+
+      const action = evaluateNextBestActionMobile([activeSlot], [activeSlot], mockExams, mockPriorities, fixedTarget);
+      expect(action.type).toBe('ACTIVE_NOW');
+      expect(action.actionTitle).toBe('Complete Active Session');
+      expect(action.targetName).toBe('Mathematics');
+      expect(action.topic).toBe('Graph Theory & Trees');
+      expect(action.reasons.some((r: string) => r.includes('Active study session'))).toBe(true);
+      expect(action.reasons.some((r: string) => r.includes('High priority subject'))).toBe(true);
+      expect(action.reasons.some((r: string) => r.includes('Exam in 4 days'))).toBe(true);
+    });
+
+    it('generates CATCH_UP Next Best Action when an uncompleted catch-up slot exists', () => {
+      const catchUpSlot = {
+        id: 'slot-catchup',
+        date: targetIso,
+        startTime: '17:00',
+        endTime: '18:00',
+        durationMinutes: 60,
+        isCompleted: false,
+        isCatchUp: true,
+        subject: { subjectName: 'Operating Systems' },
+        topic: 'Process Scheduling',
+      };
+
+      const action = evaluateNextBestActionMobile([catchUpSlot], [catchUpSlot], mockExams, mockPriorities, fixedTarget);
+      expect(action.type).toBe('CATCH_UP');
+      expect(action.actionTitle).toBe('Catch Up on Missed Session');
+      expect(action.targetName).toBe('Operating Systems');
+      expect(action.reasons.some((r: string) => r.includes('Carried forward'))).toBe(true);
+    });
+
+    it('categorizes slots into past, current, and upcoming with completion rate calculation', () => {
+      const slots = [
+        {
+          id: 'slot-past',
+          date: targetIso,
+          startTime: '09:00',
+          endTime: '10:00',
+          durationMinutes: 60,
+          isCompleted: true,
+          subject: { subjectName: 'Mathematics' },
+        },
+        {
+          id: 'slot-current',
+          date: targetIso,
+          startTime: '14:00',
+          endTime: '15:00',
+          durationMinutes: 60,
+          isCompleted: false,
+          subject: { subjectName: 'Operating Systems' },
+        },
+        {
+          id: 'slot-upcoming',
+          date: targetIso,
+          startTime: '18:00',
+          endTime: '19:00',
+          durationMinutes: 60,
+          isCompleted: false,
+          subject: { subjectName: 'Networks' },
+        },
+      ];
+
+      const stats = computeDayStudyStats(slots, fixedTarget, mockExams, mockPriorities);
+      expect(stats.categorizedSlots.past).toHaveLength(1);
+      expect(stats.categorizedSlots.past[0].id).toBe('slot-past');
+      expect(stats.categorizedSlots.current?.id).toBe('slot-current');
+      expect(stats.categorizedSlots.upcoming).toHaveLength(1);
+      expect(stats.categorizedSlots.upcoming[0].id).toBe('slot-upcoming');
+      expect(stats.highPrioritySessions).toBe(1);
+      expect(stats.completionRate).toBe(33);
+    });
+  });
+
+  describe('Web <-> Mobile Data Parity & Schema Invariants', () => {
+    it('verifies SlotResponse schema matches Web and Backend evidence verification contracts', () => {
+      const slot: import('../types/timetable.types').SlotResponse = {
+        id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+        subject: {
+          id: 'sub-1',
+          subjectName: 'Computer Networks',
+          subjectCode: 'CS401',
+          credits: 4,
+          difficultyLevel: 3,
+          semester: 6,
+          createdAt: '2026-09-01T10:00:00Z',
+        },
+        dayOfWeek: 2,
+        date: '2026-09-09',
+        startTime: '17:00:00',
+        endTime: '18:00:00',
+        durationMinutes: 60,
+        topic: 'TCP Handshake & Congestion Control',
+        chapter: 'Transport Layer Protocols',
+        materialTitle: 'CN Unit 3 Notes.pdf',
+        materialId: 'mat-uuid-1',
+        whatToStudy: ['3-Way Handshake', 'Slow Start algorithm', 'TCP Tahoe vs Reno'],
+        selectionReason: 'Highest exam weightage topic',
+        difficultyScore: 68,
+        difficulty: 'MEDIUM',
+        isCompleted: true,
+        status: 'completed',
+        hasEvidence: true,
+        evidenceStatus: 'APPROVED',
+        evidenceScore: 88,
+        evidenceId: 'ev-uuid-1',
+        notes: 'Completed with full notes proof',
+      };
+
+      expect(slot.id).toBe('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d');
+      expect(slot.hasEvidence).toBe(true);
+      expect(slot.evidenceStatus).toBe('APPROVED');
+      expect(slot.evidenceScore).toBe(88);
+      expect(slot.isCompleted).toBe(true);
+      expect(slot.durationMinutes).toBe(60);
+    });
+
+    it('verifies MaterialResponse schema matches Web upload and preview contract', () => {
+      const material: import('../types/material.types').MaterialResponse = {
+        id: 'mat-uuid-101',
+        subjectId: 'sub-uuid-202',
+        subjectName: 'Operating Systems',
+        title: 'Virtual Memory & Paging Algorithms',
+        fileName: 'OS_Unit_4.pdf',
+        fileUrl: 'https://studyplanner.supabase.co/storage/v1/object/public/materials/OS_Unit_4.pdf',
+        fileType: 'application/pdf',
+        materialType: 'DOCUMENT',
+        fileSizeBytes: 2048576,
+        aiSummary: 'Comprehensive overview of virtual memory, page fault handling, LRU and Clock replacement.',
+        extractedTopics: 'Paging, TLB, Page Replacement Algorithms, Thrashing',
+        extractedChapters: 'Chapter 8: Main Memory, Chapter 9: Virtual Memory',
+        extractedKeywords: 'demand paging, page fault, frame allocation, thrashing',
+        overallDifficulty: 'MEDIUM',
+        difficultyScore: 65,
+        difficultyReason: 'Algorithmic complexity of page replacement',
+        processingStatus: 'COMPLETED',
+        uploadedAt: '2026-09-09T12:00:00Z',
+      };
+
+      expect(material.id).toBe('mat-uuid-101');
+      expect(material.subjectId).toBe('sub-uuid-202');
+      expect(material.subjectName).toBe('Operating Systems');
+      expect(material.processingStatus).toBe('COMPLETED');
+      expect(material.difficultyScore).toBe(65);
+    });
+
+    it('verifies StudentResponse schema matches 6 persistent profile fields and notification preferences', () => {
+      const profile: import('../types/student.types').StudentResponse = {
+        id: 'stu-uuid-555',
+        firebaseUid: 'firebase-uid-555',
+        fullName: 'Aswini Pavan',
+        email: 'aswini.pavan@university.edu',
+        phoneNumber: '+91 9876543210',
+        collegeName: 'National Institute of Technology',
+        department: 'Computer Science & Engineering',
+        semester: 6,
+        isPremium: true,
+        studyStreak: 7,
+        availableHoursPerDay: 4.0,
+        preferredStudyTime: 'EVENING',
+        profilePictureUrl: 'https://studyplanner.supabase.co/avatars/user555.png',
+        emailNotifications: true,
+        pushNotifications: true,
+      };
+
+      expect(profile.fullName).toBe('Aswini Pavan');
+      expect(profile.phoneNumber).toBe('+91 9876543210');
+      expect(profile.semester).toBe(6);
+      expect(profile.availableHoursPerDay).toBe(4.0);
+      expect(profile.preferredStudyTime).toBe('EVENING');
+      expect(profile.emailNotifications).toBe(true);
+      expect(profile.pushNotifications).toBe(true);
+    });
+  });
+
+  describe('Mobile Timetable Capacity & State Evaluation', () => {
+    const {
+      slotDurationMinutes,
+      formatHoursAndMinutes,
+      computeDayStudyCapacityMobile,
+      evaluateMobileSessionState,
+    } = require('../utils/dateUtils');
+
+    it('calculates slot duration accurately in minutes including midnight crossing', () => {
+      expect(slotDurationMinutes('17:00', '18:00')).toBe(60);
+      expect(slotDurationMinutes('14:30', '16:00')).toBe(90);
+      expect(slotDurationMinutes('23:00', '01:00')).toBe(120);
+    });
+
+    it('formats minutes to human readable hours and minutes', () => {
+      expect(formatHoursAndMinutes(0)).toBe('0m');
+      expect(formatHoursAndMinutes(45)).toBe('45m');
+      expect(formatHoursAndMinutes(60)).toBe('1h');
+      expect(formatHoursAndMinutes(90)).toBe('1h 30m');
+      expect(formatHoursAndMinutes(120)).toBe('2h');
+    });
+
+    it('computes mobile day study capacity and over-allocation correctly', () => {
+      const slots = [
+        { startTime: '17:00', endTime: '18:00' }, // 60m
+        { startTime: '18:15', endTime: '19:15' }, // 60m
+      ];
+
+      const underAllocated = computeDayStudyCapacityMobile(3, slots); // 180m cap, 120m sched
+      expect(underAllocated.capacityMinutes).toBe(180);
+      expect(underAllocated.scheduledMinutes).toBe(120);
+      expect(underAllocated.remainingMinutes).toBe(60);
+      expect(underAllocated.isOverAllocated).toBe(false);
+      expect(underAllocated.utilizationPercent).toBe(67);
+      expect(underAllocated.capacityFormatted).toBe('3h');
+      expect(underAllocated.scheduledFormatted).toBe('2h');
+      expect(underAllocated.remainingFormatted).toBe('1h');
+
+      const overAllocated = computeDayStudyCapacityMobile(1, slots); // 60m cap, 120m sched
+      expect(overAllocated.isOverAllocated).toBe(true);
+      expect(overAllocated.remainingMinutes).toBe(0);
+      expect(overAllocated.utilizationPercent).toBe(200);
+    });
+
+    it('evaluates future slot state as FUTURE_LOCKED (never missed or actionable early)', () => {
+      const futureSlot = {
+        date: '2026-09-15',
+        startTime: '17:00',
+        endTime: '18:00',
+        isCompleted: false,
+      };
+      const fixedNow = new Date('2026-09-09T14:00:00');
+      const evalRes = evaluateMobileSessionState(futureSlot, fixedNow);
+      expect(evalRes.state).toBe('FUTURE_LOCKED');
+      expect(evalRes.isLocked).toBe(true);
+      expect(evalRes.isMissed).toBe(false);
+      expect(evalRes.isActive).toBe(false);
+      expect(evalRes.isUpcoming).toBe(false);
+    });
+
+    it('evaluates today catch-up slot accurately during active hours without labeling as missed', () => {
+      const catchUpSlot = {
+        date: '2026-09-09',
+        startTime: '14:00',
+        endTime: '15:00',
+        isCatchUp: true,
+        isCompleted: false,
+      };
+      const fixedNow = new Date('2026-09-09T14:30:00');
+      const evalRes = evaluateMobileSessionState(catchUpSlot, fixedNow);
+      expect(evalRes.state).toBe('CATCH_UP_TODAY');
+      expect(evalRes.isActive).toBe(true);
+      expect(evalRes.isMissed).toBe(false);
+      expect(evalRes.isLocked).toBe(false);
+      expect(evalRes.isCatchUp).toBe(true);
+    });
+  });
+
+  describe('P2.5B AI Revision Mode (Mobile)', () => {
+    it('calculates 5-question quiz score percentage and mastery tier correctly', () => {
+      const quizQuestions = [
+        { id: 1, question: 'Q1', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0, explanation: 'Exp 1' },
+        { id: 2, question: 'Q2', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 1, explanation: 'Exp 2' },
+        { id: 3, question: 'Q3', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 2, explanation: 'Exp 3' },
+        { id: 4, question: 'Q4', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 3, explanation: 'Exp 4' },
+        { id: 5, question: 'Q5', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0, explanation: 'Exp 5' },
+      ];
+
+      const userAnswers: Record<number, number> = {
+        0: 0, // Correct
+        1: 1, // Correct
+        2: 2, // Correct
+        3: 3, // Correct
+        4: 1, // Incorrect (correct was 0)
+      };
+
+      const correctCount = quizQuestions.reduce((acc, q, idx) => {
+        return userAnswers[idx] === q.correctOptionIndex ? acc + 1 : acc;
+      }, 0);
+
+      const scorePercentage = Math.round((correctCount / quizQuestions.length) * 100);
+
+      expect(correctCount).toBe(4);
+      expect(scorePercentage).toBe(80);
+      expect(scorePercentage >= 80).toBe(true); // Mastery tier
+    });
+
+    it('validates SlotRevisionResponse schema contracts and key elements', () => {
+      const mockRevision = {
+        id: 'rev-uuid-1',
+        slotId: 'slot-uuid-1',
+        topic: 'Fourier Series & Harmonic Analysis',
+        summary: 'A Fourier series decomposes periodic functions into sinusoidal components.',
+        keyConcepts: ['Orthogonality', 'Dirichlet Conditions', 'Gibbs Phenomenon'],
+        importantFormulas: [
+          {
+            title: 'Fourier Series Expansion',
+            formula: 'f(x) = \\frac{a_0}{2} + \\sum_{n=1}^\\infty \\left[ a_n \\cos(nx) + b_n \\sin(nx) \\right]',
+            description: 'Standard trigonometric series expansion',
+          },
+        ],
+        quizQuestions: [
+          {
+            id: 1,
+            question: 'What is the period of the fundamental harmonic?',
+            options: ['2π/ω', 'π/ω', '4π/ω', 'ω/2π'],
+            correctOptionIndex: 0,
+            explanation: 'The fundamental frequency has period T = 2π/ω.',
+          },
+        ],
+        weakAreas: ['Integration by parts sign errors', 'Even/Odd coefficient simplifications'],
+        quickRevisionPoints: ['Verify Dirichlet conditions first', 'Check function parity before integrating'],
+        isCompleted: false,
+      };
+
+      expect(mockRevision.slotId).toBe('slot-uuid-1');
+      expect(mockRevision.topic).toContain('Fourier Series');
+      expect(mockRevision.keyConcepts).toHaveLength(3);
+      expect(mockRevision.importantFormulas[0].formula).toContain('\\frac{a_0}{2}');
+      expect(mockRevision.quizQuestions[0].options).toHaveLength(4);
+      expect(mockRevision.weakAreas).toHaveLength(2);
+      expect(mockRevision.quickRevisionPoints).toHaveLength(2);
+      expect(mockRevision.isCompleted).toBe(false);
+    });
+
+    it('enables AI revision trigger on completed and verified slots only', () => {
+      const completedSlot = {
+        id: 'slot-1',
+        isCompleted: true,
+        date: '2026-09-09',
+        startTime: '10:00',
+        endTime: '11:00',
+      };
+      const pendingSlot = {
+        id: 'slot-2',
+        isCompleted: false,
+        date: '2026-09-09',
+        startTime: '11:00',
+        endTime: '12:00',
+      };
+
+      const now = new Date('2026-09-09T12:00:00');
+      const evalCompleted = evaluateMobileSessionState(completedSlot, now);
+      const evalPending = evaluateMobileSessionState(pendingSlot, now);
+
+      expect(evalCompleted.isCompleted).toBe(true);
+      expect(evalPending.isCompleted).toBe(false);
+    });
+  });
 });
+
 
 

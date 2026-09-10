@@ -15,6 +15,7 @@ import {useSubjects} from '@/hooks/useStudent';
 import {useAuthStore} from '@/stores/authStore';
 import {DaySelector} from '@/components/timetable/DaySelector';
 import {SlotCard} from '@/components/timetable/SlotCard';
+import {MobileSlotDetailModal} from '@/components/timetable/MobileSlotDetailModal';
 import {LoadingSpinner} from '@/components/common/LoadingSpinner';
 import {EmptyState} from '@/components/common/EmptyState';
 import {ErrorState} from '@/components/common/ErrorState';
@@ -22,8 +23,13 @@ import {ScreenHeader} from '@/components/common/ScreenHeader';
 import {Button} from '@/components/common/Button';
 import {Card} from '@/components/common/Card';
 import {COLORS} from '@/constants/colors';
-import {SPACING} from '@/constants/theme';
-import {getTodayDayOfWeek, getDayLabel} from '@/utils/dateUtils';
+import {SPACING, RADIUS} from '@/constants/theme';
+import {
+  getTodayDayOfWeek,
+  getDayLabel,
+  computeDayStudyCapacityMobile,
+  formatHoursAndMinutes,
+} from '@/utils/dateUtils';
 import type {SlotResponse} from '@/types/timetable.types';
 import type {SubjectResponse} from '@/types/student.types';
 
@@ -32,6 +38,7 @@ export function TimetableScreen() {
   const student = useAuthStore(s => s.student);
   const todayIndex = getTodayDayOfWeek();
   const [selectedDay, setSelectedDay] = useState(todayIndex);
+  const [selectedSlot, setSelectedSlot] = useState<SlotResponse | null>(null);
 
   const {
     data: timetable,
@@ -56,6 +63,11 @@ export function TimetableScreen() {
     .sort((a: SlotResponse, b: SlotResponse) => a.startTime.localeCompare(b.startTime));
 
   const completedCount = daySlots.filter((s: SlotResponse) => s.isCompleted).length;
+
+  const capacityStats = computeDayStudyCapacityMobile(
+    student?.availableHoursPerDay ?? 2,
+    daySlots
+  );
 
   const handleGenerate = () => {
     if (subjects.length === 0) {
@@ -136,6 +148,56 @@ export function TimetableScreen() {
         activeDays={activeDays}
       />
 
+      {/* Daily Study Capacity & Allocation Card */}
+      {timetable && (
+        <View style={styles.capacityCard}>
+          <View style={styles.capacityTopRow}>
+            <Text style={styles.capacityTitle}>
+              📊 Daily Study Capacity · {getDayLabel(selectedDay)}
+            </Text>
+            <Text style={styles.capacityWindowText}>
+              {student?.preferredStudyTime ? `${student.preferredStudyTime} focus` : 'Evening focus'}
+            </Text>
+          </View>
+
+          <View style={styles.capacityStatsGrid}>
+            <View style={styles.capacityStatItem}>
+              <Text style={styles.capacityStatLabel}>Capacity</Text>
+              <Text style={styles.capacityStatValue}>{capacityStats.capacityFormatted}</Text>
+            </View>
+            <View style={[styles.capacityStatItem, styles.capacityStatItemScheduled]}>
+              <Text style={styles.capacityStatLabel}>Scheduled</Text>
+              <Text style={styles.capacityStatValue}>{capacityStats.scheduledFormatted}</Text>
+            </View>
+            <View
+              style={[
+                styles.capacityStatItem,
+                capacityStats.isOverAllocated ? styles.capacityStatItemAlert : undefined,
+              ]}
+            >
+              <Text style={styles.capacityStatLabel}>
+                {capacityStats.isOverAllocated ? 'Over' : 'Remaining'}
+              </Text>
+              <Text style={styles.capacityStatValue}>
+                {capacityStats.isOverAllocated
+                  ? `+${formatHoursAndMinutes(capacityStats.scheduledMinutes - capacityStats.capacityMinutes)}`
+                  : capacityStats.remainingFormatted}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.capacityTrack}>
+            <View
+              style={[
+                styles.capacityFill,
+                capacityStats.isOverAllocated ? styles.capacityFillAlert : undefined,
+                {width: `${Math.min(100, capacityStats.utilizationPercent)}%`},
+              ]}
+            />
+          </View>
+        </View>
+      )}
+
       {/* Day label + progress */}
       <View style={styles.dayHeader}>
         <Text style={styles.dayTitle}>{getDayLabel(selectedDay)}</Text>
@@ -174,16 +236,100 @@ export function TimetableScreen() {
               slot={item}
               onToggle={() => toggleSlot(item.id)}
               isToggling={isToggling && togglingSlotId === item.id}
+              onPress={() => setSelectedSlot(item)}
             />
           )}
         />
       )}
+
+      {/* Rich Session Detail Modal */}
+      <MobileSlotDetailModal
+        slot={selectedSlot}
+        isOpen={Boolean(selectedSlot)}
+        onClose={() => setSelectedSlot(null)}
+        onToggleStatus={id => toggleSlot(id)}
+        isToggling={isToggling}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: COLORS.BG_DEEP},
+  capacityCard: {
+    backgroundColor: COLORS.BG_SURFACE,
+    marginHorizontal: SPACING.MD,
+    marginTop: SPACING.SM,
+    marginBottom: SPACING.XS,
+    padding: SPACING.SM + 2,
+    borderRadius: RADIUS.MD,
+    borderWidth: 1,
+    borderColor: COLORS.BG_BORDER,
+    gap: 8,
+  },
+  capacityTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  capacityTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.TEXT_PRIMARY,
+  },
+  capacityWindowText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLORS.TEXT_MUTED,
+    textTransform: 'uppercase',
+  },
+  capacityStatsGrid: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  capacityStatItem: {
+    flex: 1,
+    backgroundColor: COLORS.BG_ELEVATED,
+    borderRadius: RADIUS.SM,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.BG_BORDER,
+  },
+  capacityStatItemScheduled: {
+    borderColor: 'rgba(0,212,170,0.3)',
+    backgroundColor: 'rgba(0,212,170,0.08)',
+  },
+  capacityStatItemAlert: {
+    borderColor: 'rgba(239,68,68,0.3)',
+    backgroundColor: 'rgba(239,68,68,0.08)',
+  },
+  capacityStatLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: COLORS.TEXT_MUTED,
+    textTransform: 'uppercase',
+  },
+  capacityStatValue: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: COLORS.TEXT_PRIMARY,
+  },
+  capacityTrack: {
+    height: 4,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: RADIUS.FULL,
+    overflow: 'hidden',
+  },
+  capacityFill: {
+    height: '100%',
+    backgroundColor: COLORS.SECONDARY,
+    borderRadius: RADIUS.FULL,
+  },
+  capacityFillAlert: {
+    backgroundColor: '#ef4444',
+  },
   dayHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -193,7 +339,7 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.XS,
   },
   dayTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '800',
     color: COLORS.TEXT_PRIMARY,
   },
@@ -217,3 +363,4 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.SM,
   },
 });
+

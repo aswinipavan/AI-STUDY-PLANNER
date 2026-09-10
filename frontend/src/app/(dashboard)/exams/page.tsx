@@ -52,13 +52,24 @@ export default function ExamsPage() {
     </div>
   );
 
-  if (error) return <div className="p-6"><ErrorState message="Could not load exams." onRetry={refetch} /></div>;
+  if (error) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Could Not Load Upcoming Exams"
+          message="We were unable to retrieve your exam schedule from the server."
+          suggestion="Please check your connection and retry."
+          onRetry={refetch}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <PageHeader
         title="Upcoming Exams"
-        subtitle="Track your exam schedule and stay prepared."
+        subtitle="Track your exam schedule, monitor countdowns, and stay prepared."
         breadcrumb={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Exams' }]}
         action={
           <AppButton leftIcon={<Plus size={16} />} onClick={() => setSlideOpen(true)}>
@@ -70,8 +81,9 @@ export default function ExamsPage() {
       {!exams?.length ? (
         <EmptyState
           icon={CalendarDays}
-          message="No upcoming exams. Add your first exam to start tracking!"
-          action={{ label: 'Add Exam', onClick: () => setSlideOpen(true) }}
+          title="No Upcoming Exams Scheduled"
+          message="Add your exam dates to track countdowns, activate pre-exam revision in your timetable, and assess readiness."
+          action={{ label: '+ Add Your First Exam', onClick: () => setSlideOpen(true), icon: Plus }}
         />
       ) : (
         <div className="space-y-3">

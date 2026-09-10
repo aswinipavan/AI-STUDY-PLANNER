@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -13,6 +14,8 @@ import { subjectsApi } from '@/api/subjects.api';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/constants/queryKeys';
 
+import { useToast } from '@/components/ui/ToastProvider';
+
 const SUBJECT_COLORS = [
   '#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b',
   '#ef4444', '#ec4899', '#6366f1', '#14b8a6', '#f97316',
@@ -21,7 +24,7 @@ const SUBJECT_COLORS = [
 const subjectSchema = z.object({
   name: z.string().min(1, 'Subject name is required').max(50, 'Max 50 characters'),
   color: z.string().optional(),
-  targetHours: z.number().min(0, 'Min 0').max(100, 'Max 100').optional(),
+  targetHours: z.number().min(0, 'Target hours must be at least 0').max(100, 'Max 100 hours').optional(),
 });
 
 type SubjectFormData = z.infer<typeof subjectSchema>;
@@ -34,7 +37,9 @@ interface Props {
 
 export function SubjectModal({ isOpen, onClose, editSubject }: Props) {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const isEditing = !!editSubject;
+  const [formError, setFormError] = React.useState<string | null>(null);
 
   const { register, handleSubmit, setValue, control, reset, formState: { errors, isSubmitting } } = useForm<SubjectFormData>({
     resolver: zodResolver(subjectSchema),
@@ -44,6 +49,7 @@ export function SubjectModal({ isOpen, onClose, editSubject }: Props) {
   const selectedColor = useWatch({ control, name: 'color' });
 
   useEffect(() => {
+    setFormError(null);
     if (editSubject) {
       reset({
         name: editSubject.name,
@@ -53,18 +59,27 @@ export function SubjectModal({ isOpen, onClose, editSubject }: Props) {
     } else {
       reset({ name: '', color: SUBJECT_COLORS[0], targetHours: undefined });
     }
-  }, [editSubject, reset]);
+  }, [editSubject, reset, isOpen]);
 
   const { mutateAsync: createSubject } = useCreateSubject();
 
   const onSubmit = async (data: SubjectFormData) => {
-    if (isEditing && editSubject) {
-      await subjectsApi.update(editSubject.id, data);
-      qc.invalidateQueries({ queryKey: QK.subjects });
-    } else {
-      await createSubject(data);
+    setFormError(null);
+    try {
+      if (isEditing && editSubject) {
+        await subjectsApi.update(editSubject.id, data);
+        qc.invalidateQueries({ queryKey: QK.subjects });
+        toast.success(`Subject "${data.name}" updated successfully!`);
+      } else {
+        await createSubject(data);
+        toast.success(`Subject "${data.name}" created successfully!`);
+      }
+      onClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save subject. Please try again.';
+      setFormError(msg);
+      toast.error(msg);
     }
-    onClose();
   };
 
   return (
@@ -105,11 +120,17 @@ export function SubjectModal({ isOpen, onClose, editSubject }: Props) {
           {errors.targetHours && <p className="text-destructive text-xs mt-1">{errors.targetHours.message}</p>}
         </div>
 
+        {formError && (
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm" role="alert">
+            {formError}
+          </div>
+        )}
+
         <div className="pt-4 flex gap-3">
-          <AppButton type="button" variant="outline" className="flex-1" onClick={onClose}>
+          <AppButton type="button" variant="outline" className="flex-1" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </AppButton>
-          <AppButton type="submit" className="flex-1" loading={isSubmitting}>
+          <AppButton type="submit" className="flex-1" loading={isSubmitting} disabled={isSubmitting}>
             {isEditing ? 'Save Changes' : 'Create Subject'}
           </AppButton>
         </div>

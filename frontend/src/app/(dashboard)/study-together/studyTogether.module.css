@@ -351,6 +351,12 @@
   border-color: #00e5c0;
 }
 
+.formSelect option {
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+  padding: 0.5rem;
+}
+
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;

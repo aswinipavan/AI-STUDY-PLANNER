@@ -268,3 +268,77 @@ export function evaluateSessionState(
   };
 }
 
+/**
+ * Format total minutes to clean human-readable hours and minutes string.
+ * e.g., 120 -> "2h", 90 -> "1h 30m", 45 -> "45m", 0 -> "0m"
+ */
+export function formatHoursAndMinutes(totalMinutes: number): string {
+  if (!totalMinutes || totalMinutes <= 0) return '0m';
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = Math.round(totalMinutes % 60);
+
+  if (hours > 0 && minutes > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  return `${minutes}m`;
+}
+
+export interface DayStudyCapacity {
+  capacityMinutes: number;
+  scheduledMinutes: number;
+  remainingMinutes: number;
+  isOverAllocated: boolean;
+  utilizationPercent: number;
+  capacityFormatted: string;
+  scheduledFormatted: string;
+  remainingFormatted: string;
+}
+
+/**
+ * Compute daily study capacity and allocation metrics.
+ * @param availableHoursPerDay daily capacity in hours (from user profile, e.g. 2, 4)
+ * @param slots list of slots for that specific day
+ */
+export function computeDayStudyCapacity(
+  availableHoursPerDay: number = 2,
+  slots: Array<{
+    durationMinutes?: number;
+    startTime?: string;
+    endTime?: string;
+  }> = []
+): DayStudyCapacity {
+  const capacityMinutes = Math.max(0, Math.round((availableHoursPerDay || 2) * 60));
+  
+  const scheduledMinutes = slots.reduce((total, s) => {
+    if (typeof s.durationMinutes === 'number' && s.durationMinutes > 0) {
+      return total + s.durationMinutes;
+    }
+    const startMins = parseTimeToMinutes(s.startTime);
+    const endMins = parseTimeToMinutes(s.endTime);
+    if (startMins !== null && endMins !== null) {
+      let diff = endMins - startMins;
+      if (diff < 0) diff += 24 * 60;
+      return total + (diff > 0 ? diff : 60);
+    }
+    return total + 60;
+  }, 0);
+
+  const remainingMinutes = Math.max(0, capacityMinutes - scheduledMinutes);
+  const isOverAllocated = scheduledMinutes > capacityMinutes;
+  const utilizationPercent = capacityMinutes > 0 ? Math.round((scheduledMinutes / capacityMinutes) * 100) : 0;
+
+  return {
+    capacityMinutes,
+    scheduledMinutes,
+    remainingMinutes,
+    isOverAllocated,
+    utilizationPercent,
+    capacityFormatted: formatHoursAndMinutes(capacityMinutes),
+    scheduledFormatted: formatHoursAndMinutes(scheduledMinutes),
+    remainingFormatted: formatHoursAndMinutes(remainingMinutes),
+  };
+}
+

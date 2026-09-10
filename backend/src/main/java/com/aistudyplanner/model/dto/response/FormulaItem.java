@@ -1,0 +1,16 @@
+package com.aistudyplanner.model.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class FormulaItem {
+    private String name;
+    private String formula;
+    private String explanation;
+}

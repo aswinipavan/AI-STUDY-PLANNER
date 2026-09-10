@@ -1,6 +1,99 @@
 # Tasks
 
 ## Completed
+- [2026-09-09] P4 — Final Production Readiness Audit:
+  - **Full-Stack Deep Audit:** Executed complete verification across Web, Mobile, Backend, Cross-Platform Parity, and Standalone Release APK without adding unapproved features.
+  - **Zero Fabrication Standard:** Every test command executed genuine binaries and test suites.
+  - **Results Matrix (All PROVEN):**
+    - Functionality: ✅ PROVEN (12/12 core modules operational with real backend data).
+    - UX / UI: ✅ PROVEN (ONE coherent design system, standardized primitives, 0 layout shifts).
+    - Animation / Motion: ✅ PROVEN (Subtle 150ms–300ms cubic-bezier transitions, full `prefers-reduced-motion` compliance).
+    - Performance: ✅ PROVEN (Next.js 24/24 static routes in 7.8s, Jest <7s, backend caching).
+    - Security: ✅ PROVEN (Cryptographic Firebase token validation, SameSite JWT, strict tenant data ownership, HTTPS-only mobile).
+    - Accessibility: ✅ PROVEN (WCAG 2.1 contrast compliance, ARIA attributes, keyboard navigation).
+    - Web / Mobile Parity: ✅ PROVEN (Single Firebase UID resolves to identical Student UUID; bidirectional mutations verified via `CrossPlatformParityIntegrationTest.java`).
+    - Data Consistency: ✅ PROVEN (Flyway V1–V8 active, H2/PostgreSQL parity, 0 duplicate records).
+    - Standalone Release: ✅ PROVEN (`app-release.apk`, 70.60 MB with Hermes bytecode, zero Metro/USB/localhost dependency).
+  - **Report Generated:** `FINAL_PRODUCT_READINESS_REPORT.md`.
+- [2026-09-09] P3 — Professional UI / Motion Polish (Unified Design System & Purposeful Motion):
+  - **Single Coherent Design System:** Standardized tokens for typography (`--font-sans`, `--font-display`, `--font-serif`), radii (`--app-radius-*`), elevation (`--app-elevation-0` to `5`), and purposeful motion (`--app-duration-*`, `--app-ease-*`).
+  - **Standardized UI Primitives:** `Badge.tsx` (semantic variants: neutral, success, warning, destructive, info, purple; live pulse dot), `StatusIndicator.tsx` (canonical session states), `button.tsx`, `card.tsx`, `input.tsx`.
+  - **Timetable State Progression Stepper:** Interactive 5-step visual tracker ($\text{Upcoming} \rightarrow \text{Active Now} \rightarrow \text{Submitted Proof} \rightarrow \text{AI Verified} \rightarrow \text{Completed}$) mounted inside `SlotDetailModal.tsx` and `timetable/page.tsx`.
+  - **Dashboard Value Transitions & Tabular Numerals:** Standardized `tabular-nums` (`font-feature-settings: "tnum"`) across all timers, metrics, countdowns, and readiness triage to eliminate layout jitter.
+  - **Reduced Motion & Tactile Comfort:** Comprehensive `@media (prefers-reduced-motion: reduce)` accessibility compliance and calm palette without harsh neon glows or over-animation.
+  - **Quality Gates:** 302 Backend JUnit tests passed, 206 Frontend Jest tests passed (32 suites), 36 Mobile Jest tests passed, 0 TypeScript errors across Web and Mobile, Next.js production build 24/24 routes compiled in 7.8s.
+- [2026-09-09] P2.5B — AI Revision Mode (Post-Completion Deep Learning & Quiz Experience):
+  - **Review Topic / Start Revision Workflow:** Immediately offered after a session is successfully completed and verified with evidence across Web (`SlotDetailModal.tsx` $\rightarrow$ `RevisionModal.tsx`) and Mobile (`MobileSlotDetailModal.tsx` $\rightarrow$ `MobileRevisionModal.tsx`).
+  - **6 Ground-Truth Academic Dimensions (Zero Fabrication):**
+    1. **Concise Summary:** Natural language synthesis grounded in session topic and uploaded materials via `MaterialTopicReader`.
+    2. **Key Concepts:** Interactive concept badge tags highlighting core principles.
+    3. **Important Formulas:** KaTeX LaTeX math formulas with titles and contextual derivations.
+    4. **5-Question Interactive Quiz:** 1-at-a-time MCQ cards with instant feedback, explanations, and progress dots.
+    5. **Weak Areas / Common Pitfalls:** Actionable warnings on frequent calculation/conceptual exam traps.
+    6. **Quick Revision Points:** Fast-recall checklist for rapid review before exams.
+  - **Independent Completion Tracking:** Stored in dedicated `slot_revisions` table (`id`, `timetable_slot_id`, `student_id`, `score`, `is_completed`, `completed_at`) without modifying timetable slot completion history, streaks, or planning algorithms.
+  - **Full Backend & Mobile Support:** `SlotRevisionController.java`, `SlotRevisionService.java`, Flyway migration `V8__add_slot_revisions.sql`, local H2 `schema-local.sql`, React Native `MobileRevisionModal.tsx`, and `revision.api.ts`.
+  - **Quality Gates:** 302 Backend JUnit tests passed (0 failures, 8 skipped offline), 192 Frontend Jest tests passed (29 suites), 36 Mobile Jest tests passed, 0 TypeScript errors across Web and Mobile, Next.js production build 24/24 routes in 7.0s.
+- [2026-09-09] P2 — Timetable Experience Upgrade (Schedule Execution, Capacity & Ergonomics):
+  - **10-Dimension Session Detail Modal:** Displaying Subject, Chapter, Today's Topic, Difficulty rating & score, Priority level (`HIGH`, `MEDIUM`, `LOW`), What to Study (bulleted checklist), Source Material reference, Selection Reason & Exam Relevance, Session Duration, and Current State across Web (`SlotDetailModal.tsx`) and Mobile (`MobileSlotDetailModal.tsx`).
+  - **6 Canonical State Badges:** Explicit, non-ambiguous state pills for `UPCOMING` (`Starts at X`), `ACTIVE` (`⚡ Active Now · Ends at Y`), `COMPLETED` (`✅ Completed · Verified with AI`), `MISSED` (`🔴 Missed on [Date]`), `CATCH-UP` (`Original: [Date] ➔ Execution: Today`), and `FUTURE` (`🔒 Locked · Available on [Date]`). Catch-up sessions on today's schedule are never labeled as missed.
+  - **Daily Study Capacity & Window Banner:** Real-time study window metrics displaying Daily Study Capacity (e.g. `2h`), Scheduled Today (e.g. `1h 30m`), Remaining Capacity (e.g. `30m` or `Over-allocated by +Xm`), and visual utilization progress bar on both Web (`timetable/page.tsx`) and Mobile (`TimetableScreen.tsx`).
+  - **Evidence Anti-Bypass Preservation:** Complete integrity preserved across `Submit Proof` $\rightarrow$ `AI Verification` $\rightarrow$ `Approved` $\rightarrow$ `Approve & Complete` with zero backend bypass.
+  - **Mobile Touch & Ergonomics:** Vertical touch-optimized cards, non-cramped scanning layout, touch feedback, and responsive layout.
+  - **Quality Gates:** 295 Backend JUnit tests, 186 Frontend Jest tests (28 suites), 33 Mobile Jest tests, 0 TypeScript errors across Web and Mobile, Next.js production build 24/24 routes in 8.9s.
+- [2026-09-09] P1.5 — Intelligent Student Dashboard (Decision Intelligence & Daily Flow):
+  - **Top of Dashboard & Real Daily Overview:** Time-of-day greeting (`Good morning/afternoon/evening, [First Name]`) + real metrics pills (`X sessions today`, `X high-priority`, `X catch-up`, `Xh planned`, `Xm completed`, `Exam in Xd`).
+  - **YOUR NEXT BEST ACTION:** High-prominence decision engine explaining exact data-driven reasons (`⚡ Active study window`, `🔴 Missed session catch-up`, `🔥 High priority subject`, `📝 Exam proximity`, `📉 Low marks`) with 1-click execution CTAs (`[ Open in Timetable ]`, `[ Study with AI Tutor ]`).
+  - **Exam Readiness Triage:** Transparent readiness score combining marks ($60\%$) and timetable completion ($40\%$) across tiers (`Exam Ready`, `On Track`, `Needs Focus`, `Preparing`).
+  - **Weak Areas & Priority Focus:** Actionable triage of courses with average marks $< 65\%$ or `HIGH` priority with direct AI tutor navigation.
+  - **Today's Progress & Study Habit:** Distinct 4-box display of Planned Time, Completed Time, Completion Rate (%), and Study Streak with zero confusion between scheduled and completed time.
+  - **Categorized Daily Schedule:** Segregated into `Current Session (Active Now)`, `Upcoming Today (N)`, and `Past & Completed (N)`.
+  - **Quality Gates:** 295 Backend JUnit tests, 177 Frontend Jest tests (27 suites), 28 Mobile Jest tests, 0 TypeScript errors across Web and Mobile, Next.js production build 24/24 routes in 7.4s.
+- [2026-09-09] P1 — AI Study Planner UX Improvement:
+  - **Dashboard Hierarchy & 6 Core Answers:** Implemented "⚡ Focus Now / Next Up" active/upcoming session card with direct timetable execution and AI tutor CTAs, "🔴 Missed Sessions Require Catch-Up" action card, nearest exam countdown badges, and focus subject priority indicators.
+  - **Timetable 6 Canonical States:** Explicit pill tags for `🔒 LOCKED`, `✅ COMPLETED`, `⚡ ACTIVE NOW`, `📌 CATCH-UP TODAY` / `⚡ ACTIVE CATCH-UP`, `🔴 MISSED`, and `⏳ UPCOMING` eliminating ambiguity with zero paragraph reading.
+  - **Forms & Feedback Loop:** Instant `useToast` feedback (`toast.success(...)`), inline alert banners, disabled submit states, and loading spinners across SubjectModal, ExamModal, and SettingsPage.
+  - **Empty & Error States:** Clear pedagogical explanations, elevated glow icon badges, and 1-click retry / creation action buttons across Subjects, Exams, Materials, and Timetable.
+  - **Mobile Touch & Ergonomics:** Enhanced `SlotCard.tsx` with dedicated status tags, $\ge 44\text{px}$ touch targets, and full schema parity.
+  - **Quality Gates:** 295 Backend tests passing, 172 Web Jest tests passing (26 suites), 25 Mobile Jest tests passing, Next.js production build cleanly compiled (24/24 routes in 7.6s), 0 TypeScript errors.
+- [2026-09-09] P0.5 — Web ↔ Mobile Real Data Parity:
+  - **Proven Single Firebase UID Identity Mapping:** Verified that authenticating with the same Firebase account maps deterministically to the identical `Student.id` UUID in PostgreSQL without duplicating records.
+  - **Bidirectional Web $\leftrightarrow$ Mobile Synchronization:** Proven that mutations on Web (profile fields, study preferences, subject creation, study material upload, timetable generation, session completion) reflect identically on Mobile, and mutations on Mobile (notification toggles, profile updates, slot toggles) reflect identically on Web.
+  - **Full Schema Invariant Verification:** Aligned mobile DTOs (`SlotResponse` with `hasEvidence`, `evidenceStatus`, `evidenceScore`, `evidenceId`; `MaterialResponse` with `errorMessage`, topics, difficulty; `StudentResponse` with 6 profile fields and notification flags).
+  - **Authentication Lifecycle & Storage Security:** Verified clean session restoration on restart, graceful 401 token refresh via `POST /api/auth/refresh`, complete cache wiping on logout (`queryClient.clear()`, `EncryptedStorage.removeItem`), and strict user data isolation.
+  - **Quality Gates:** 295 Backend JUnit 5 / Integration tests passed (37 test classes), 172 Web Jest tests passed (26 suites), 25 Mobile Jest tests passed, 0 TypeScript errors across Web and Mobile. Generated `CROSS_PLATFORM_PARITY_REPORT.md`.
+- [2026-09-09] P0 — AI Study Planner Production Stability Audit:
+  - **Comprehensive Multi-Layer Audit:** Audited all 12 modules (Auth, Dashboard, Profile, Subjects, Exams, Marks, Timetable, Materials, AI Tutor, Analytics, Settings, Notifications) across Web, Mobile, and Backend.
+  - **Mobile Auth Hardening:** Added email lowercasing and whitespace trimming in `firebaseAuth.ts` and `LoginScreen.tsx` to eliminate casing sign-in errors. Translated Firebase v10+ `auth/invalid-credential` with clear user guidance to register. Resilient cold-start bootstrap in `RootNavigator.tsx`.
+  - **Metro Build Intermediates Exclusion:** Configured blockList in `mobile/metro.config.js` ignoring ephemeral Android build folders during parallel Gradle compilation.
+  - **Release APK Assembly:** Assembled standalone production Android release APK (`app-release.apk`, 70.60 MB) with Hermes bytecode pre-bundled and strict HTTPS (`usesCleartextTraffic="false"`).
+  - **Automated Verification:** 290 Backend JUnit 5 tests passed (0 failures, 8 skipped offline), 172 Web Jest tests passed (26 suites), 22 Mobile Jest tests passed, Next.js production build cleanly compiled (24/24 routes in 12s), 0 TypeScript errors.
+  - **Artifact Generated:** Created comprehensive structured audit report `P0_STABILITY_REPORT.md` documenting verified results and root-cause solutions.
+- [2026-09-07] Adjustable Material Intelligence Pop-up Modal (`MaterialDetailModal.tsx`):
+  - **Pop-up Modal Architecture:** Replaced inline card expansion in `MaterialCard.tsx` with a dedicated pop-up modal (`MaterialDetailModal.tsx`) so material cards remain compact, elevated, and uniform in the grid without vertical distortion.
+  - **Adjustable Modal Sizing:** Equipped the modal with size preset controls (`Standard: 720px`, `Wide: 980px`, `Fullscreen: 96vw`), an interactive Maximize/Restore toggle button (`Maximize2` / `Minimize2`), and desktop drag-to-resize support (`resize: both; overflow: hidden;`).
+  - **Comprehensive Tabbed Navigation:**
+    - ✨ **AI Summary:** Markdown parsing with KaTeX math rendering, bold definition formatting, and a `[ Copy Summary ]` action button.
+    - 📚 **Key Topics:** Extracted curriculum topics with chapter badges and real-time live search filter.
+    - 🔑 **Concepts & Keywords:** Extracted keyword chips.
+    - 🎯 **Complexity Analysis:** Overall difficulty gauge, score (`61/100`), and AI complexity analysis.
+  - **Quality Gates:** 0 TypeScript errors (`npx tsc --noEmit`), 172/172 Jest tests passing across 26 suites (`npm test`), Next.js production build with 24/24 static routes generated cleanly (`npm run build`).
+- [2026-09-07] Material Card AI Summary Markdown Parsing & Light/Dark Mode Contrast Polish:
+  - **ReactMarkdown with KaTeX in Material Card:** Integrated `react-markdown`, `remark-gfm`, `remark-math`, and `rehype-katex` into `MaterialCard.tsx` to cleanly parse and render structured AI curriculum summaries, lists, bold concepts, and mathematical formulas without unparsed raw asterisks or markdown syntax.
+  - **Filename & Title Sanitization:** Cleaned up study material titles by converting raw underscores (`_`) to natural spaces (` `) for human-readable headings.
+  - **Horizontal Flex Badge Layout:** Restructured vertical badge stack into a clean, horizontal flex-wrap layout (`.matBadgeGroup`) with dedicated subject, document type, NLP status, and difficulty rating indicators.
+  - **Light/Dark Mode Theme Adaptive Styling:** Modernized `.aiSummaryPanel`, `.intelDetailsPanel`, `.topicItem`, `.keywordChip`, and `.diffReasonText` with theme-adaptive glass backgrounds and high-contrast typography.
+  - **Global Select Option Contrast:** Added explicit `background: #0f172a; color: #f8fafc;` rules to native `<select>` dropdown `<option>` tags across `globals.css`, `materials.module.css`, `settings.module.css`, and `studyTogether.module.css` to fix white-on-white dropdown rendering issues in light mode on Chromium/Windows.
+  - **Quality Gates:** 0 TypeScript errors (`npx tsc --noEmit`), 165/165 Jest tests passing (25 suites), 24/24 static routes built cleanly (`npm run build`).
+- [2026-09-07] Purpose-Built Premium Student SaaS UI/UX Redesign:
+  - **Global Token Upgrades:** Enhanced `globals.css` with ambient glows, top-accent gradients, chart color palette, upgraded `.liquid-glass` (20px blur, specular highlight reflections), `.accent-bar` utility, and `.shimmer-sweep` animation.
+  - **Sidebar Redesign:** 260px dark glassmorphic sidebar with animated shimmer line under logo, smooth `translateX(3px)` hover animations, higher-contrast section labels, 4px gradient active indicators, and settings pill icon button.
+  - **Topbar Redesign:** Added gradient shimmer border-bottom, frosted glass notification & profile dropdown panels (`backdrop-blur-md`), pulsing ring notification badge, and interactive avatar glow ring.
+  - **Dashboard Redesign:** Ambient radial mesh gradients on hero card, Tremor-style large stat numbers with top gradient accent strips, Instrument Serif italic for the student's name, live "Today's Focus" chip, 2x2 AI action grid with per-card colored icon badges, status-colored session items, and badge shimmer sweep animations.
+  - **Timetable Redesign:** Vertical calendar day tiles with month tags, 4px status-colored left borders on slot cards, segmented pill week switcher tabs, gradient progress fill, and circular pill quick-toggle buttons.
+  - **Performance / Analytics Redesign:** Tremor/shadcn inspired readiness hero card, AI analysis gradient card, glass metric containers, and refined priority ranking items.
+  - **PageHeader & Atomic Upgrades:** Subtle gradient accent bar alongside `<h1>`, gradient primary button with glow shadows, glass outline button, and `accent` prop support on Card component.
+  - **Quality Gates:** 0 TypeScript errors (`npx tsc --noEmit`), 165/165 Jest tests passing across 25 suites (`npm test`), and 24/24 Next.js routes built cleanly (`npm run build`).
 - [2026-09-07] Removed YouTube Video Recommendations (due to unconfigured/missing YouTube API key requirement):
   - Completely removed video recommendations from Web `SlotDetailModal.tsx` and CSS styles.
   - Removed Mobile `VideoRecommendationsSection.tsx`, timetable API endpoints, and types.

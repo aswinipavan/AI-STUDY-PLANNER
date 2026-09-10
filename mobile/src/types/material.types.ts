@@ -29,6 +29,7 @@ export interface MaterialResponse {
   overallDifficulty?: string;
   difficultyScore?: number;
   difficultyReason?: string;
+  errorMessage?: string;
   uploadedAt: string;
 }
 

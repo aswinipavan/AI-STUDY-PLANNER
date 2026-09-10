@@ -92,10 +92,11 @@ export default function MaterialsPage() {
         ) : filteredMaterials.length === 0 ? (
           <EmptyState
             icon={FileQuestion}
+            title={isFiltered ? 'No Matching Materials' : 'No Study Materials Uploaded Yet'}
             message={
               isFiltered
-                ? 'No materials match that search. Try a different title or subject.'
-                : 'No materials yet. Upload a PDF, image or document above and the planner will read it for topics.'
+                ? 'No documents match your search or filter. Try a different keyword or select "All Subjects".'
+                : 'Upload PDF lecture notes, syllabi, or textbook chapters using the dropzone above. The AI will extract key concepts and map them directly into your timetable study sessions.'
             }
           />
         ) : (

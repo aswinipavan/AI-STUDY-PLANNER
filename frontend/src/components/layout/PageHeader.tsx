@@ -53,12 +53,18 @@ export function PageHeader({ title, subtitle, breadcrumb, action }: PageHeaderPr
             })}
           </nav>
         )}
-        <h1 className="font-display text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
-          {title}
-        </h1>
+        <div className="flex items-center gap-2.5">
+          <span
+            className="hidden sm:inline-block h-6 w-1 rounded-full bg-gradient-to-b from-[#00e5c0] to-[#3b82f6] shadow-[0_0_8px_rgba(0,229,192,0.4)]"
+            aria-hidden="true"
+          />
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
+            {title}
+          </h1>
+        </div>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
-      {action && <div className="flex-shrink-0">{action}</div>}
+      {action && <div className="flex-shrink-0 flex items-center gap-2">{action}</div>}
     </div>
   );
 }

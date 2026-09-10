@@ -35,6 +35,8 @@ import {
   formatFutureAvailability,
   evaluateSessionState,
   getSessionState,
+  computeDayStudyCapacity,
+  formatHoursAndMinutes,
 } from '@/utils/dateHelpers';
 import { SlotDetailModal } from '@/components/timetable/SlotDetailModal';
 import styles from './timetable.module.css';
@@ -109,6 +111,7 @@ function SlotCardItem({
     isActive,
     isCompleted,
     isCatchUpActive,
+    isUpcoming,
   } = evaluateSessionState(slot, now);
 
   const nextStatus = (current: TimetableSlot['status']): TimetableSlot['status'] => {
@@ -151,7 +154,14 @@ function SlotCardItem({
         </span>
       )}
 
-      {/* 2. Catch-up indicator on actionable active/upcoming session on today */}
+      {/* 2. Completed Badge */}
+      {isCompleted && (
+        <span className={styles.completedBadge} data-testid={`completed-badge-${slot.id}`}>
+          ✅ COMPLETED
+        </span>
+      )}
+
+      {/* 3. Catch-up indicator on actionable active/upcoming session on today */}
       {isCatchUpActive && !isCompleted && !isLocked && !isMissed && (
         isActive ? (
           <span className={styles.catchUpActiveBadge} data-testid="catchup-badge">
@@ -164,17 +174,24 @@ function SlotCardItem({
         )
       )}
 
-      {/* 3. Missed badge (historical uncompleted session or missed execution deadline) */}
+      {/* 4. Missed badge (historical uncompleted session or missed execution deadline) */}
       {isMissed && !isCompleted && !isLocked && (
         <span className={styles.missedBadge} data-testid="missed-badge">
           🔴 MISSED
         </span>
       )}
 
-      {/* 4. Active in-progress session badge (standard session) */}
+      {/* 5. Active in-progress session badge (standard session) */}
       {isActive && !isCompleted && !isCatchUpActive && (
         <span className={styles.activeBadge} data-testid={`active-badge-${slot.id}`}>
           ⚡ ACTIVE NOW
+        </span>
+      )}
+
+      {/* 6. Upcoming session on today */}
+      {isUpcoming && !isCompleted && !isLocked && !isCatchUpActive && !isMissed && !isActive && (
+        <span className={styles.upcomingBadge} data-testid={`upcoming-badge-${slot.id}`}>
+          ⏳ UPCOMING
         </span>
       )}
 
@@ -439,7 +456,18 @@ export default function TimetablePage() {
   };
 
   if (isLoading) return <div className="p-6"><TimetableGridSkeleton /></div>;
-  if (error) return <div className="p-6"><ErrorState message="Could not load timetable." onRetry={refetch} /></div>;
+  if (error) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Could Not Load Timetable"
+          message="We were unable to load your active study timetable."
+          suggestion="Please check your connection and retry."
+          onRetry={refetch}
+        />
+      </div>
+    );
+  }
 
   const currentWeekDays = weeks[selectedWeekIndex] || calendarDays.slice(0, 7);
 
@@ -479,43 +507,74 @@ export default function TimetablePage() {
         </div>
       )}
 
-      {/* Daily study window banner based on user's saved preferences */}
+      {/* Daily study window & capacity banner based on user's saved preferences */}
       {timetable && user && (() => {
         const windowEnum = user.preferredStudyTime ?? 'EVENING';
         const hours = user.availableHoursPerDay ?? 2;
         const period = calcStudyPeriod(windowEnum, hours);
         const startLabel = ENUM_TO_LABEL[windowEnum] ?? '5:00 PM';
+        const capacity = computeDayStudyCapacity(hours, todaySlots);
+
         return (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.625rem 1rem',
-              borderRadius: '0.5rem',
-              background: 'rgba(0, 229, 192, 0.05)',
-              border: '1px solid rgba(0, 229, 192, 0.2)',
-              borderLeft: '3px solid var(--color-primary)',
-              fontSize: '0.8125rem',
-              color: 'var(--color-muted-foreground)',
-              marginBottom: '1rem',
-            }}
-            data-testid="study-window-banner"
-          >
-            <Clock size={14} style={{ flexShrink: 0, color: 'var(--color-primary)' }} aria-hidden="true" />
-            <span>
-              {`Your daily study window: `}
-              <strong style={{ color: 'var(--color-foreground)' }} data-testid="timetable-study-window-value">
-                <span data-testid="study-window-range">{period.label}</span>
-              </strong>
-              <span data-testid="study-window-meta">{` · Based on your saved preferences (${startLabel} start, ${hours}h/day). `}</span>
+          <div className={styles.capacityBanner} data-testid="study-window-banner">
+            <div className={styles.capacityBannerTop}>
+              <div className={styles.capacityStudyWindow}>
+                <Clock size={15} style={{ flexShrink: 0, color: 'var(--color-primary)' }} aria-hidden="true" />
+                <span>
+                  {`Your daily study window: `}
+                  <strong style={{ color: 'var(--color-foreground)' }} data-testid="timetable-study-window-value">
+                    <span data-testid="study-window-range">{period.label}</span>
+                  </strong>
+                  <span data-testid="study-window-meta">{` · (${startLabel} start, ${hours}h/day)`}</span>
+                </span>
+              </div>
               <a
                 href="/settings"
-                style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}
+                style={{ color: 'var(--color-primary)', fontSize: '0.8125rem', textDecoration: 'underline' }}
               >
                 Change in Settings
               </a>
-            </span>
+            </div>
+
+            <div className={styles.capacityStatsGrid}>
+              <div className={styles.capacityStatItem} data-testid="capacity-total-pill">
+                <span>Daily capacity:</span>
+                <strong>{capacity.capacityFormatted}</strong>
+              </div>
+              <div className={`${styles.capacityStatItem} ${styles.capacityStatItemHighlight}`} data-testid="capacity-scheduled-pill">
+                <span>Scheduled today:</span>
+                <strong>{capacity.scheduledFormatted}</strong>
+              </div>
+              <div
+                className={`${styles.capacityStatItem} ${capacity.isOverAllocated ? styles.capacityStatItemAlert : ''}`}
+                data-testid="capacity-remaining-pill"
+              >
+                <span>{capacity.isOverAllocated ? 'Over-allocated:' : 'Remaining:'}</span>
+                <strong>
+                  {capacity.isOverAllocated
+                    ? `+${formatHoursAndMinutes(capacity.scheduledMinutes - capacity.capacityMinutes)}`
+                    : capacity.remainingFormatted}
+                </strong>
+              </div>
+              <div className={styles.capacityStatItem} style={{ marginLeft: 'auto', fontSize: '0.6875rem', opacity: 0.8 }}>
+                <span>Utilization: {capacity.utilizationPercent}%</span>
+              </div>
+            </div>
+
+            <div
+              className={styles.capacityTrack}
+              role="progressbar"
+              aria-label="Daily study capacity utilized"
+              aria-valuenow={Math.min(100, capacity.utilizationPercent)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              data-testid="study-capacity-bar"
+            >
+              <div
+                className={`${styles.capacityFill} ${capacity.isOverAllocated ? styles.capacityFillOver : ''}`}
+                style={{ width: `${Math.min(100, capacity.utilizationPercent)}%` }}
+              />
+            </div>
           </div>
         );
       })()}
@@ -523,8 +582,9 @@ export default function TimetablePage() {
       {!timetable || !optimisticSlots.length ? (
         <EmptyState
           icon={CalendarDays}
-          message="No active timetable. Generate an AI-powered study plan to get started!"
-          action={{ label: 'Generate Timetable', onClick: () => router.push('/timetable/generate') }}
+          title="No Active Timetable Found"
+          message="Generate a personalized, AI-optimized study schedule tailored to your available daily study hours, preferred study time, and upcoming exam deadlines."
+          action={{ label: '⚡ Generate AI Timetable', onClick: () => router.push('/timetable/generate'), icon: Zap }}
         />
       ) : (
         <>

@@ -13,7 +13,7 @@ export const COLORS = {
   PRIMARY: '#6C63FF',        // Violet — primary CTA
   PRIMARY_LIGHT: '#8B84FF',  // Lighter shade
   PRIMARY_DARK: '#4F46E5',   // Darker shade
-  PRIMARY_GLOW: 'rgba(108, 99, 255, 0.18)', // For glow effects
+  PRIMARY_GLOW: 'rgba(108, 99, 255, 0.12)', // Subtle muted accent tint
 
   // ── Secondary accent ──────────────────────────────────────────────────────
   SECONDARY: '#00D4AA',      // Teal — secondary / success / streak

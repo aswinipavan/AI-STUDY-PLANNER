@@ -20,5 +20,7 @@
 | `POST /api/timetable/slots/{id}/evidence` | Implemented & Multi-Modal Verified | Yes | Yes | No | Agent |
 | `GET /api/timetable/slots/{id}/evidence` | Implemented & Latest Retrieved | Yes | Yes | No | Agent |
 | `POST /api/timetable/slots/{id}/approve-completion` | Implemented & Anti-Bypass Enforced | Yes | Yes | No | Agent |
+| `GET /api/timetable/slots/{id}/revision` | Implemented & AI Grounded | Yes | Yes | No | Agent |
+| `POST /api/timetable/slots/{id}/revision/complete` | Implemented & Independently Tracked | Yes | Yes | No | Agent |
 
 
